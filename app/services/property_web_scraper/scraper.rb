@@ -41,7 +41,7 @@ module PropertyWebScraper
       # Fetch and parse HTML document
       doc = Nokogiri::HTML(open(target_url))
 
-      scraper_mapping = Pwb::ScraperMapping.find_by_name("pwb")
+      scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name("pwb")
 
       scraper_mapping.textFields.keys.each do |mapping_key|
         mapping = scraper_mapping.textFields[mapping_key]

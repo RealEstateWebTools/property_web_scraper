@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     property_web_scraper (0.1.0)
+      active_hash
       faraday
       nokogiri
       rails (>= 5.0.0)
@@ -32,6 +33,8 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
+    active_hash (1.5.2)
+      activesupport (>= 2.2.2)
     activejob (5.0.3)
       activesupport (= 5.0.3)
       globalid (>= 0.3.6)

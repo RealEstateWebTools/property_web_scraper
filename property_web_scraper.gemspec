@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", ">= 5.0.0"
   s.add_dependency 'nokogiri'
   s.add_dependency 'faraday'
+  s.add_dependency 'active_hash'
 
 
   s.add_development_dependency "pg"
