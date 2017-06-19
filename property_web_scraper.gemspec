@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = PropertyWebScraper::VERSION
   s.authors     = ["Ed Tewiah"]
   s.email       = ["etewiah@hotmail.cim"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of PropertyWebScraper."
-  s.description = "TODO: Description of PropertyWebScraper."
+  s.homepage    = ""
+  s.summary     = "Web based UI to make scraping data from real estate websites super simple."
+  s.description = "PropertyWebScraper makes it easy for anyone to scrape data from real estate websites."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
