@@ -3,8 +3,8 @@
 
 
 <%= form_tag("/retrieve", method: "get") do %>
-  <%= label_tag(:webpage_url, "Webpage URL:") %>
-  <%= text_field_tag(:webpage_url) %>
+  <%= label_tag(:source_url, "Webpage URL:") %>
+  <%= text_field_tag(:source_url) %>
   <br>
   <%= submit_tag("Retrieve from webpage") %>
 <% end %>
