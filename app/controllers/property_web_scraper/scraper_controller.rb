@@ -22,10 +22,10 @@ module PropertyWebScraper
       unless params[:source_url].present?
         return render json: { error: "Please provide url."}, status: 422
       end
+      source_url = params[:source_url]
 
-      target_url = params[:source_url]
-
-      retrieved_properties = PropertyWebScraper::Scraper.new(target_url).retrieve_from_webpage
+      web_scraper = PropertyWebScraper::Scraper.new(params[:scraper_name])
+      retrieved_properties = web_scraper.retrieve_from_webpage source_url
 
       render json: retrieved_properties
 

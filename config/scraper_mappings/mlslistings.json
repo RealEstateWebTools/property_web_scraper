@@ -1,0 +1,46 @@
+[{
+  "name": "mlslistings",
+  "defaultValues": {
+    "country": {
+      "value": "USA"
+    },
+    "area_unit": {
+      "value": "sqft"
+    },
+    "currency": {
+      "value": "USD"
+    }
+  },
+  "textFields": {
+    "reference": {
+      "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(3) > span"
+    },
+    "title_en": {
+      "cssLocator": "#propertyAddress > small"
+    },
+    "description_en": {
+      "cssLocator": "#propertyRemarks"
+    },
+    "price": {
+      "cssLocator": "#propertyAddress",
+      "splitTextCharacter": " ",
+      "splitTextArrayId": "0"
+    },
+    "count_bedrooms": {
+      "cssLocator": "#quickDetails > div > div:nth-child(2) > p:nth-child(1)",
+      "splitTextCharacter": " ",
+      "splitTextArrayId": "1"
+    },
+    "constructed_area": {
+      "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(1) > span",
+    }
+  },
+  "booleanFields": {
+    "for_rent": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "5",
+      "evaluator": "include?",
+      "evaluatorParam": "Rent"
+    }
+  }
+}]

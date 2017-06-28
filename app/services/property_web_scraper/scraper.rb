@@ -5,10 +5,12 @@ require 'faraday'
 
 module PropertyWebScraper
   class Scraper
-    attr_accessor :target_url
+    attr_accessor :scraper_mapping
 
-    def initialize(target_url)
-      self.target_url = target_url
+    def initialize(scraper_mapping)
+      self.scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name(scraper_mapping)
+      # self.scraper_mapping = scraper_mapping
+      raise ArgumentError.new("Not valid scraper") if self.scraper_mapping.blank?
     end
 
     def retrieve_from_api
@@ -33,7 +35,7 @@ module PropertyWebScraper
       return retrieved_properties
     end
 
-    def retrieve_from_webpage
+    def retrieve_from_webpage target_url
       # just a proof of concept at this stage
       properties = []
       property_hash = {}
@@ -45,8 +47,6 @@ module PropertyWebScraper
       #   # byebug
       #   binding.pry
       # end
-
-      scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name("pwb")
 
       scraper_mapping.textFields.keys.each do |mapping_key|
         mapping = scraper_mapping.textFields[mapping_key]
@@ -84,11 +84,32 @@ module PropertyWebScraper
     def retrieve_target_text doc, mapping
       target_elements = doc.css(mapping["cssLocator"]) || []
       target_text = ""
-      if target_elements.present? && mapping["cssCountId"].present?
-        begin
-          target_text = target_elements[mapping["cssCountId"].to_i].text || ""
-        rescue Exception => e
-
+      binding.pry
+      if target_elements.present?
+        target_text = target_elements.text
+        if mapping["cssCountId"].present?
+          # in this case we have multiple elements matched
+          # and the cssCountId refers to where in the list of matched elements 
+          # the correct item is
+          begin
+            css_count_id = mapping["cssCountId"].to_i
+            target_text = target_elements[css_count_id].text || ""
+          rescue Exception => e
+          end
+        end
+        if !mapping["splitTextCharacter"].nil?
+          # - cannot use .present? above as splitTextCharacter is sometimes " " 
+          # mapping["splitTextCharacter"].present?
+          # 
+          # in this case the element's text need to be split by the splitTextCharacter
+          # splitTextArrayId refers to where in the resulting array 
+          # the correct item is
+          begin
+            splitTextCharacter = mapping["splitTextCharacter"] || " "
+            splitTextArrayId = mapping["splitTextArrayId"].to_i
+            target_text = target_elements.text.split(splitTextCharacter)[splitTextArrayId]
+          rescue Exception => e
+          end
         end
       end
       return target_text

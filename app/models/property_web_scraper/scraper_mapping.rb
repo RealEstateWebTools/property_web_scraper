@@ -10,6 +10,6 @@ module PropertyWebScraper
     use_multiple_files
     # when adding new files, need to restart server and ensure correct name
     # is used in corresponding json file
-    set_filenames "pwb"
+    set_filenames "pwb", "mlslistings"
   end
 end
