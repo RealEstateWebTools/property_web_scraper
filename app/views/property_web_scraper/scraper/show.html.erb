@@ -1,14 +1,17 @@
 <div class="row">
   <div class="col-sm-12">
-    <%= form_tag("/scrapers/submit", method: "post") do %>
+    <%= form_tag("/scrapers/#{@scraper_name}/retrieve", method: "get") do %>
       <div>
-        <%= label_tag(:source_url, "Host to scrape:") %>
+
+      </div>
+      <div>
+        <%= label_tag(:source_url, "Webpage URL:") %>
         <span class="url_input">
-          <%= collection_select(:scraper, :scraper_name, @scraper_configs_coll, :name, :name) %>
+          <%= text_field_tag(:source_url) %>
         </span>
       </div>
       <br>
-      <%= submit_tag("Go") %>
+      <%= submit_tag("Retrieve from webpage") %>
     <% end %>
     <br>
     <p><a href="https://github.com/etewiah/property_web_builder/issues/13">

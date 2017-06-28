@@ -41,11 +41,10 @@ module PropertyWebScraper
       # Fetch and parse HTML document
       doc = Nokogiri::HTML(open(target_url))
 
-      if target_url.include? "public.olr.com"
-# byebug
-binding.pry
-        
-      end
+      # if target_url.include? "public.olr.com"
+      #   # byebug
+      #   binding.pry
+      # end
 
       scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name("pwb")
 
