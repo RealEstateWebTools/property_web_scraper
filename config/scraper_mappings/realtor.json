@@ -1,0 +1,39 @@
+[{
+  "name": "realtor",
+  "defaultValues": {
+    "country": {
+      "value": "USA"
+    },
+    "area_unit": {
+      "value": "sqft"
+    },
+    "currency": {
+      "value": "USD"
+    }
+  },
+  "textFields": {
+    "reference": {
+      "cssLocator": "#ldp-listing-provider-info > table > tr:nth-child(3) > td:nth-child(2)"
+    },
+    "title_en": {
+      "cssLocator": "#ldp-address > h1 > span:nth-child(1)"
+    },
+    "street_address": {
+      "cssLocator": "#ldp-address > h1 > span:nth-child(1)"
+    },
+    "description_en": {
+      "cssLocator": ""
+    },
+    "price": {
+      "cssLocator": "#ldp-pricewrap > div > div > span"
+    },
+    "count_bedrooms": {
+      "cssLocator": "#ldp-property-meta > ul > li:nth-child(1) > span"
+    },
+    "constructed_area": {
+      "cssLocator": "#ldp-property-meta > ul > li:nth-child(3) > span"
+    }
+  },
+  "booleanFields": {
+  }
+}]

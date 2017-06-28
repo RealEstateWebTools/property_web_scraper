@@ -81,7 +81,7 @@ module PropertyWebScraper
     private
 
     def retrieve_target_text doc, mapping
-      target_elements = doc.css(mapping["cssLocator"]) || []
+      target_elements = mapping["cssLocator"].present? ? doc.css(mapping["cssLocator"]) : []
       target_text = ""
       if target_elements.present?
         target_text = target_elements.text
