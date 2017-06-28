@@ -1,0 +1,12 @@
+class CreatePropertyWebScraperImportHosts < ActiveRecord::Migration[5.0]
+  def change
+    create_table :property_web_scraper_import_hosts do |t|
+      t.integer  :flags, default: 0, null: false
+      t.string :scraper_name
+      t.string :host
+      t.json :details, default: {}
+      t.string :slug
+      t.timestamps
+    end
+  end
+end

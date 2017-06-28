@@ -1,6 +1,7 @@
 <div class="row">
   <div class="col-sm-12">
-    <%= form_tag("/scrapers/#{@scraper_name}/retrieve", method: "get") do %>
+  <% if @import_host %>
+    <%= form_tag("/scrapers/#{@import_host.scraper_name}/retrieve", method: "get") do %>
       <div>
 
       </div>
@@ -17,5 +18,10 @@
     <p><a href="https://github.com/etewiah/property_web_builder/issues/13">
         This is an experimental feature. Help us improve it by giving feedback here.</a>
     </p>
+  <% else %>
+    <div>
+      Sorry, scraper could not be found
+    </div>
+  <% end %>
   </div>
 </div>

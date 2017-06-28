@@ -32,7 +32,7 @@
       "splitTextArrayId": "1"
     },
     "constructed_area": {
-      "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(1) > span",
+      "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(1) > span"
     }
   },
   "booleanFields": {

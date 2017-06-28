@@ -9,7 +9,9 @@ module PropertyWebScraper
     end
 
     def show
-      @scraper_name = params[:scraper_name]
+      # @scraper_name = params[:scraper_name]
+      @import_host = PropertyWebScraper::ImportHost.find_by(id: params[:id])
+
     end
 
     def welcome
