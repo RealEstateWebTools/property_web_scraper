@@ -13,3 +13,10 @@
  *= require_tree .
  *= require_self
  */
+
+.url_input input {
+  width: 80%;
+  padding: 6px;
+  margin: 10px;
+  font-size: large;
+}

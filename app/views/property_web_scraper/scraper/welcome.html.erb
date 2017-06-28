@@ -1,37 +1,16 @@
 <div class="row">
   <div class="col-sm-12">
-
-
-<%= form_tag("/retrieve", method: "get") do %>
-  <%= label_tag(:source_url, "Webpage URL:") %>
-  <%= text_field_tag(:source_url) %>
-  <br>
-  <%= submit_tag("Retrieve from webpage") %>
-<% end %>
-<br>
-
-        <p><a href="https://github.com/etewiah/property_web_builder/issues/13">
+    <%= form_tag("/retrieve", method: "get") do %>
+      <%= label_tag(:source_url, "Webpage URL:") %>
+      <span class="url_input">
+        <%= text_field_tag(:source_url) %>
+      </span>
+      <br>
+      <%= submit_tag("Retrieve from webpage") %>
+    <% end %>
+    <br>
+    <p><a href="https://github.com/etewiah/property_web_builder/issues/13">
         This is an experimental feature. Help us improve it by giving feedback here.</a>
-        </p>
-
-
-
-    <div class="row">
-      <div class="col-sm-12" style="">
-        <label class="fg-label m-t-20">Webpage URL:</label>
-        <input id="ember921" type="text" class="input-sm form-control fg-input translation-input ember-view ember-text-field">
-      </div>
-
-      <div class="col-sm-12 m-t-20">
-  <!---->        <p style="" class="">
-          <a class="btn btn-edfile" data-ember-action="922">
-          Retrieve from webpage
-          </a>
-        </p>
-      </div>
-    </div>
-
-
-
+    </p>
   </div>
 </div>
