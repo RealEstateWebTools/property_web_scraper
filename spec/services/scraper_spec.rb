@@ -5,15 +5,16 @@ module PropertyWebScraper
     it "warns of non existent scraper" do
       expect{ PropertyWebScraper::Scraper.new("dummy") }.to raise_error(ArgumentError)
     end
-    # it "scrapes PropertyWebScraper property page correctly" do
-    #   VCR.use_cassette("listing_re_renting") do
-    #     # just a proof of concept at this stage
-    #     target_url = "http://re-renting.com/en/properties/for-rent/1/acogedor-piso-en-anton-martin"
-    #     # "http://public.olr.com/details.aspx?id=1658517"
+    it "scrapes PropertyWebScraper property page correctly" do
+      VCR.use_cassette("scrapers/mlslistings") do
+        target_url = "http://www.mlslistings.com/property/ml81643266/1547-desdemona-ct-san-jose-ca-95121/"
 
-    #     retrieved_properties = PropertyWebScraper::Scraper.new(target_url).retrieve_from_webpage
-    #     expect(retrieved_properties.length).to eq(1)
-    #   end
-    # end
+        web_scraper = PropertyWebScraper::Scraper.new("mlslistings")
+        retrieved_properties = web_scraper.retrieve_from_webpage target_url
+
+        expect(retrieved_properties.length).to eq(1)
+        expect(retrieved_properties[0]["reference"]).to eq("ML81643266")
+      end
+    end
   end
 end

@@ -6,6 +6,11 @@ require 'rspec/rails'
 require 'rspec/autorun'
 require 'factory_girl_rails'
 
+# http://www.thegreatcodeadventure.com/stubbing-with-vcr/
+require 'vcr'
+require 'webmock/rspec'
+WebMock.disable_net_connect!(allow_localhost: true)
+
 Rails.backtrace_cleaner.remove_silencers!
 
 # Load support files
@@ -18,7 +23,3 @@ RSpec.configure do |config|
  config.order = "random"
 end
 
-# http://www.thegreatcodeadventure.com/stubbing-with-vcr/
-require 'vcr'
-require 'webmock/rspec'
-WebMock.disable_net_connect!(allow_localhost: true)
