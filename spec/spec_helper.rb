@@ -17,3 +17,8 @@ RSpec.configure do |config|
  config.infer_base_class_for_anonymous_controllers = false
  config.order = "random"
 end
+
+# http://www.thegreatcodeadventure.com/stubbing-with-vcr/
+require 'vcr'
+require 'webmock/rspec'
+WebMock.disable_net_connect!(allow_localhost: true)
