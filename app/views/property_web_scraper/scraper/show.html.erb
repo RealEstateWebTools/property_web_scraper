@@ -1,14 +1,8 @@
 <div class="row">
   <div class="col-sm-12">
     <% if @import_host %>
-      <%= form_tag("/scrapers/#{@import_host.scraper_name}/retrieve", method: "get") do %>
+      <%= form_tag("/scrapers/#{@import_host.id}/retrieve", method: "get") do %>
         <br>
-        <br>
-        <div>
-          <p>
-            Please use a url from this site <%= "#{@import_host.scraper_name}" %>
-          </p>
-        </div>
         <br>
         <br>
         <div>
@@ -16,6 +10,9 @@
           <span class="url_input">
             <%= text_field_tag(:source_url) %>
           </span>
+          <p>
+            Please use a url from this site <%= link_to "#{@import_host.host_url}", "#{@import_host.host_url}", target: "_blank" %>
+          </p>
         </div>
         <br>
         <%= submit_tag("Retrieve from webpage") %>

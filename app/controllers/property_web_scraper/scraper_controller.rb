@@ -9,13 +9,11 @@ module PropertyWebScraper
     end
 
     def show
-      # @scraper_name = params[:scraper_name]
       @import_host = PropertyWebScraper::ImportHost.find_by(id: params[:id])
-
     end
 
     def welcome
-      @scraper_configs_coll = PropertyWebScraper::ScraperMapping.all
+      @scraper_configs_coll = PropertyWebScraper::ImportHost.all
       
     end
 
@@ -26,7 +24,8 @@ module PropertyWebScraper
       end
       source_url = params[:source_url]
 
-      web_scraper = PropertyWebScraper::Scraper.new(params[:scraper_name])
+      @import_host = PropertyWebScraper::ImportHost.find_by(id: params[:id])
+      web_scraper = PropertyWebScraper::Scraper.new(@import_host.scraper_name)
       retrieved_properties = web_scraper.retrieve_from_webpage source_url
 
       render json: retrieved_properties

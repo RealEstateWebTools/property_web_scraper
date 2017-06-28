@@ -45,7 +45,6 @@ module PropertyWebScraper
 
       # if target_url.include? "public.olr.com"
       #   # byebug
-      #   binding.pry
       # end
 
       scraper_mapping.textFields.keys.each do |mapping_key|
@@ -84,7 +83,6 @@ module PropertyWebScraper
     def retrieve_target_text doc, mapping
       target_elements = doc.css(mapping["cssLocator"]) || []
       target_text = ""
-      binding.pry
       if target_elements.present?
         target_text = target_elements.text
         if mapping["cssCountId"].present?
