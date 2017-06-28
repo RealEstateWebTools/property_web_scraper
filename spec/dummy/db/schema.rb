@@ -19,10 +19,12 @@ ActiveRecord::Schema.define(version: 20170628160331) do
     t.integer  "flags",        default: 0,  null: false
     t.string   "scraper_name"
     t.string   "host"
+    t.boolean  "is_https"
     t.json     "details",      default: {}
     t.string   "slug"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.index ["host"], name: "index_property_web_scraper_import_hosts_on_host", unique: true, using: :btree
   end
 
 end
