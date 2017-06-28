@@ -1,27 +1,33 @@
 <div class="row">
   <div class="col-sm-12">
-  <% if @import_host %>
-    <%= form_tag("/scrapers/#{@import_host.scraper_name}/retrieve", method: "get") do %>
-      <div>
-
-      </div>
-      <div>
-        <%= label_tag(:source_url, "Webpage URL:") %>
-        <span class="url_input">
-          <%= text_field_tag(:source_url) %>
-        </span>
-      </div>
+    <% if @import_host %>
+      <%= form_tag("/scrapers/#{@import_host.scraper_name}/retrieve", method: "get") do %>
+        <br>
+        <br>
+        <div>
+          <p>
+            Please use a url from this site <%= "#{@import_host.scraper_name}" %>
+          </p>
+        </div>
+        <br>
+        <br>
+        <div>
+          <%= label_tag(:source_url, "Webpage URL:") %>
+          <span class="url_input">
+            <%= text_field_tag(:source_url) %>
+          </span>
+        </div>
+        <br>
+        <%= submit_tag("Retrieve from webpage") %>
+      <% end %>
       <br>
-      <%= submit_tag("Retrieve from webpage") %>
-    <% end %>
-    <br>
-    <p><a href="https://github.com/etewiah/property_web_builder/issues/13">
-        This is an experimental feature. Help us improve it by giving feedback here.</a>
-    </p>
-  <% else %>
-    <div>
-      Sorry, scraper could not be found
+      <p><a href="https://github.com/etewiah/property_web_builder/issues/13">
+          This is an experimental feature. Help us improve it by giving feedback here.</a>
+      </p>
+    <% else %>
+      <div>
+        Sorry, scraper could not be found
     </div>
-  <% end %>
+    <% end %>
   </div>
 </div>

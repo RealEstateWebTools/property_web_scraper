@@ -4,6 +4,7 @@ class CreatePropertyWebScraperImportHosts < ActiveRecord::Migration[5.0]
       t.integer  :flags, default: 0, null: false
       t.string :scraper_name
       t.string :host
+      t.boolean :is_https
       t.json :details, default: {}
       t.string :slug
       t.timestamps
