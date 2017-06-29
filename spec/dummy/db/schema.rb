@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170628160331) do
+ActiveRecord::Schema.define(version: 20170628201113) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,6 +25,47 @@ ActiveRecord::Schema.define(version: 20170628160331) do
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
     t.index ["host"], name: "index_property_web_scraper_import_hosts_on_host", unique: true, using: :btree
+  end
+
+  create_table "property_web_scraper_listings", force: :cascade do |t|
+    t.integer  "flags",                  default: 0,     null: false
+    t.string   "reference"
+    t.integer  "year_construction",      default: 0,     null: false
+    t.integer  "count_bedrooms",         default: 0,     null: false
+    t.float    "count_bathrooms",        default: 0.0,   null: false
+    t.integer  "count_toilets",          default: 0,     null: false
+    t.integer  "count_garages",          default: 0,     null: false
+    t.float    "plot_area",              default: 0.0,   null: false
+    t.float    "constructed_area",       default: 0.0,   null: false
+    t.integer  "energy_rating"
+    t.float    "energy_performance"
+    t.string   "title"
+    t.text     "description"
+    t.string   "locale_code"
+    t.boolean  "furnished",              default: false
+    t.boolean  "sold",                   default: false
+    t.boolean  "reserved",               default: false
+    t.boolean  "for_rent_short_term",    default: false
+    t.boolean  "for_rent_long_term",     default: false
+    t.boolean  "for_sale",               default: false
+    t.datetime "available_to_rent_from"
+    t.datetime "available_to_rent_till"
+    t.string   "price"
+    t.string   "currency"
+    t.string   "street_number"
+    t.string   "street_name"
+    t.string   "street_address"
+    t.string   "postal_code"
+    t.string   "province"
+    t.string   "city"
+    t.string   "region"
+    t.string   "country"
+    t.float    "latitude"
+    t.float    "longitude"
+    t.datetime "last_retrieved_at"
+    t.json     "import_history",         default: {}
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
   end
 
 end
