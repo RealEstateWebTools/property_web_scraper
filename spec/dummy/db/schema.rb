@@ -63,9 +63,15 @@ ActiveRecord::Schema.define(version: 20170628201113) do
     t.float    "latitude"
     t.float    "longitude"
     t.datetime "last_retrieved_at"
+    t.integer  "import_host_id"
+    t.string   "import_url"
     t.json     "import_history",         default: {}
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
+    t.index ["flags"], name: "index_property_web_scraper_listings_on_flags", using: :btree
+    t.index ["import_url"], name: "index_property_web_scraper_listings_on_import_url", using: :btree
+    t.index ["price"], name: "index_property_web_scraper_listings_on_price", using: :btree
+    t.index ["reference"], name: "index_property_web_scraper_listings_on_reference", using: :btree
   end
 
 end

@@ -49,6 +49,8 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.float :longitude
 
       t.datetime :last_retrieved_at
+      t.integer :import_host_id
+      t.string :import_url
       t.json :import_history, default: {}
 
       t.timestamps
@@ -57,6 +59,7 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
     add_index :property_web_scraper_listings, :flags
     add_index :property_web_scraper_listings, :price
     add_index :property_web_scraper_listings, :reference
+    add_index :property_web_scraper_listings, :import_url
 
   end
 end

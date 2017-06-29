@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Property web scraper</title>
-  <%= stylesheet_link_tag    "property_web_scraper/application", media: "all" %>
-  <%= javascript_include_tag "property_web_scraper/application" %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
-
-<%= yield %>
-
-</body>
+  <head>
+    <title>Property web scraper</title>
+    <%= stylesheet_link_tag    "property_web_scraper/application", media: "all" %>
+    <%= javascript_include_tag "property_web_scraper/application" %>
+    <%= csrf_meta_tags %>
+  </head>
+  <body>
+    <div>
+      <h3>
+        <%= link_to "home", "/" %>
+      </h3>
+      <br>
+      <br>
+    </div>
+    <%= yield %>
+  </body>
 </html>
