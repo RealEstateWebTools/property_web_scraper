@@ -11,6 +11,12 @@
       "value": "USD"
     }
   },
+  "floatFields": {
+    "constructed_area": {
+      "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(1) > span",
+      "comaToDot": "true"
+    }
+  },
   "textFields": {
     "reference": {
       "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(3) > span"
@@ -30,9 +36,6 @@
       "cssLocator": "#quickDetails > div > div:nth-child(2) > p:nth-child(1)",
       "splitTextCharacter": " ",
       "splitTextArrayId": "1"
-    },
-    "constructed_area": {
-      "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(1) > span"
     }
   },
   "booleanFields": {

@@ -9,9 +9,9 @@
           <p>
             Please enter the url for a property from <%= link_to "#{@import_host.host_url}", "#{@import_host.host_url}", target: "_blank" %>
           </p>
-          <%# label_tag(:source_url, "Webpage URL:") %>
+          <%# label_tag(:import_url, "Webpage URL:") %>
           <span class="url_input">
-            <%= text_field_tag(:source_url) %>
+            <%= text_field_tag(:import_url) %>
           </span>
           <%= submit_tag("Retrieve property info") %>
         </div>

@@ -2,7 +2,7 @@
   <div class="col-sm-12">
     <%= form_tag("/scrapers/submit", method: "post") do %>
       <div>
-        <%= label_tag(:source_url, "Host to scrape:") %>
+        <%= label_tag(:import_url, "Host to scrape:") %>
         <span class="url_input">
           <%= collection_select(:scraper, :scraper_name, @scraper_configs_coll, :id, :host) %>
         </span>

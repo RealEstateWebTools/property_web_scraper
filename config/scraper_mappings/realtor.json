@@ -11,6 +11,12 @@
       "value": "USD"
     }
   },
+  "floatFields": {
+    "constructed_area": {
+      "cssLocator": "#ldp-property-meta > ul > li:nth-child(3) > span",
+      "comaToDot": "true"
+    }
+  },
   "textFields": {
     "reference": {
       "cssLocator": "#ldp-listing-provider-info > table > tr:nth-child(3) > td:nth-child(2)"
@@ -29,9 +35,6 @@
     },
     "count_bedrooms": {
       "cssLocator": "#ldp-property-meta > ul > li:nth-child(1) > span"
-    },
-    "constructed_area": {
-      "cssLocator": "#ldp-property-meta > ul > li:nth-child(3) > span"
     }
   },
   "booleanFields": {
