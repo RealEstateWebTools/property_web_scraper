@@ -35,9 +35,7 @@ module PropertyWebScraper
       web_scraper = PropertyWebScraper::Scraper.new(@import_host.scraper_name)
 
       listing = web_scraper.retrieve_and_save import_url, @import_host.id
-
       render json: listing.as_json
-
 
       # render json: {
       #   success: true

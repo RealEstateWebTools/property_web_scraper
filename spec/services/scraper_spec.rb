@@ -11,7 +11,12 @@ module PropertyWebScraper
 
         web_scraper = PropertyWebScraper::Scraper.new("realtor")
         retrieved_properties = web_scraper.retrieve_and_save target_url, 1
+        # byebug
+
+        expect(retrieved_properties.as_json["import_history"]).not_to be_present
+        # expect(retrieved_properties.as_json).not_to have_attributes("import_history") 
         expect(retrieved_properties.reference).to eq("21701902")
+        expect(retrieved_properties.title).to eq("5804 Cedar Glen Ln")
         expect(retrieved_properties.constructed_area).to eq(1.133)
       end
     end

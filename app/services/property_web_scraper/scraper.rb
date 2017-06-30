@@ -48,6 +48,7 @@ module PropertyWebScraper
       listing.count_bathrooms = retrieved_properties[0]["count_bathrooms"] || 0
       listing.import_host_id = import_host_id
       listing.save!
+
       return listing
     end
 

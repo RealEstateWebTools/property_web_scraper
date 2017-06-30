@@ -21,10 +21,10 @@
     "reference": {
       "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(3) > span"
     },
-    "title_en": {
+    "title": {
       "cssLocator": "#propertyAddress > small"
     },
-    "description_en": {
+    "description": {
       "cssLocator": "#propertyRemarks"
     },
     "price": {
