@@ -1,0 +1,18 @@
+language: ruby
+sudo: false
+rvm:
+  - 2.3.3
+branches:
+  only:
+    - master
+
+before_install:
+
+before_script:
+  - cp config/database.yml.travis config/database.yml
+  - cp spec/dummy/config/secrets.yml.travis spec/dummy/config/secrets.yml
+  - psql -c 'create database pwb_dummy_test;' -U postgres
+services:
+  - postgresql
+addons:
+  postgresql: "9.4"
