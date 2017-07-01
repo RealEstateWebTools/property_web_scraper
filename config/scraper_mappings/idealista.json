@@ -1,0 +1,42 @@
+[{
+  "name": "idealista",
+  "defaultValues": {
+    "country": {
+      "value": "Spain"
+    },
+    "area_unit": {
+      "value": "sqmt"
+    },
+    "currency": {
+      "value": "EUR"
+    }
+  },
+  "floatFields": {
+    "constructed_area": {
+      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(2) > span"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(3) > span"
+    }
+  },
+  "textFields": {
+    "reference": {
+      "cssLocator": "#side-content > section > div.advertiser-data.txt-soft > p:nth-child(2)",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1"
+    },
+    "title": {
+      "cssLocator": "#main > div > div > section > h1 > span"
+    },
+    "description": {
+      "cssLocator": "#details > div.commentsContainer > div"
+    },
+    "price": {
+      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(1) > span"
+    }
+  },
+  "booleanFields": {
+  }
+}]
