@@ -45,6 +45,9 @@ module PropertyWebScraper
       listing.constructed_area = retrieved_properties[0]['constructed_area'] || 0
       listing.count_bedrooms = retrieved_properties[0]['count_bedrooms'] || 0
       listing.count_bathrooms = retrieved_properties[0]['count_bathrooms'] || 0
+      # listing.area_unit = retrieved_properties[0]['area_unit']
+      listing.currency = retrieved_properties[0]['currency']
+      listing.country = retrieved_properties[0]['country']
       listing.import_host_id = import_host_id
       listing.save!
 
@@ -59,9 +62,20 @@ module PropertyWebScraper
       # Fetch and parse HTML document
       doc = Nokogiri::HTML(open(import_url))
 
-      # if import_url.include? "public.olr.com"
-      #   # byebug
-      # end
+      if scraper_mapping.defaultValues
+        scraper_mapping.defaultValues.keys.each do |mapping_key|
+          mapping = scraper_mapping.defaultValues[mapping_key]
+          property_hash[mapping_key] = mapping["value"]
+        end
+      end
+
+      if scraper_mapping.intFields
+        scraper_mapping.intFields.keys.each do |mapping_key|
+          mapping = scraper_mapping.intFields[mapping_key]
+          target_text = retrieve_target_text doc, mapping
+          property_hash[mapping_key] = target_text.strip.to_i
+        end
+      end
 
       if scraper_mapping.floatFields
         scraper_mapping.floatFields.keys.each do |mapping_key|
