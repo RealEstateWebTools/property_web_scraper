@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'money-rails', '~>1'
 
   s.add_dependency 'flag_shih_tzu'
-  s.add_dependency 'bootstrap'
+  # s.add_dependency 'bootstrap'
 
   s.add_dependency 'nokogiri'
   s.add_dependency 'faraday'

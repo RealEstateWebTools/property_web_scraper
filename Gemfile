@@ -25,3 +25,5 @@ group :development, :test do
   # gem 'zeus'
   # gem 'json_spec'
 end
+
+gem 'bootstrap', git: 'https://github.com/twbs/bootstrap-rubygem'

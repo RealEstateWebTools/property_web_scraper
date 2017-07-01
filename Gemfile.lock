@@ -1,9 +1,17 @@
+GIT
+  remote: https://github.com/twbs/bootstrap-rubygem
+  revision: 7cdeca9a0e8db3bb7548d9fa5bdaad9b644fca32
+  specs:
+    bootstrap (4.0.0.alpha6)
+      autoprefixer-rails (>= 6.0.3)
+      popper_js (>= 1.9.9, < 2.0)
+      sass (>= 3.4.19)
+
 PATH
   remote: .
   specs:
     property_web_scraper (0.1.0)
       active_hash
-      bootstrap
       faraday
       flag_shih_tzu
       money-rails (~> 1)
@@ -58,9 +66,6 @@ GEM
     ast (2.3.0)
     autoprefixer-rails (7.1.1.2)
       execjs
-    bootstrap (4.0.0.alpha5)
-      autoprefixer-rails (>= 6.0.3)
-      sass (>= 3.4.19)
     builder (3.2.3)
     byebug (9.0.6)
     capybara (2.10.1)
@@ -143,6 +148,7 @@ GEM
     parser (2.3.1.4)
       ast (~> 2.2)
     pg (0.21.0)
+    popper_js (1.9.9)
     powerpack (0.1.1)
     pry (0.10.4)
       coderay (~> 1.1.0)
@@ -250,6 +256,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bootstrap!
   byebug
   capybara
   factory_girl_rails
