@@ -2,15 +2,15 @@
 
 [![Build Status](https://api.travis-ci.org/RealEstateWebTools/property_web_scraper.svg?branch=master)](https://api.travis-ci.org/RealEstateWebTools/property_web_scraper)
 
-This project has been created to address a glaring gap in the rails ecosystem: the lack of an open source project for real estate websites.  
+This project was created while I was working on another open source product called [PropertyWebBuilder](https://github.com/etewiah/property_web_builder) which allows real estate agents to create their own website with ease.  I wanted to provide a way to allow people to import their listings from other websites and found there was no easy way to do this.
 
-The result is that WordPress has become the dominant tool for creating real estate websites.  This is far from ideal and PropertyWebScraper seeks to address this.
+The aim of PropertyWebScraper is to make it easy for anyone to import real estate data from any website.  As of June 2017, it is a proof of concept.  We hope to improve the usefulness of this project over the next few weeks by adding support for as many real estate websites as possible.
 
-Read more about this here: [http://propertywebbuilder.com](http://propertywebbuilder.com)
+You can read more about PropertyWebBuilder here: [http://propertywebbuilder.com](http://propertywebbuilder.com)
 
-##[Demo](https://propertywebbuilder.herokuapp.com/)
+##[Demo](https://real-estate-web-scraper.herokuapp.com/)
 
-You can try out a demo at [https://propertywebbuilder.herokuapp.com](https://propertywebbuilder.herokuapp.com/)
+You can try out a demo at [https://real-estate-web-scraper.herokuapp.com](https://real-estate-web-scraper.herokuapp.com/)
 
 ## Rails Version
 
