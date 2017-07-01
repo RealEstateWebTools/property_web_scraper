@@ -41,7 +41,8 @@ module PropertyWebScraper
       listing.reference = retrieved_properties[0]['reference']
       listing.title = retrieved_properties[0]['title']
       listing.description = retrieved_properties[0]['description']
-      listing.price = retrieved_properties[0]['price']
+      listing.price_string = retrieved_properties[0]['price_string']
+      listing.price_float = retrieved_properties[0]['price_float']
       listing.constructed_area = retrieved_properties[0]['constructed_area'] || 0
       listing.count_bedrooms = retrieved_properties[0]['count_bedrooms'] || 0
       listing.count_bathrooms = retrieved_properties[0]['count_bathrooms'] || 0
@@ -83,6 +84,8 @@ module PropertyWebScraper
           target_text = retrieve_target_text doc, mapping
           if mapping['comaToDot']
             property_hash[mapping_key] = target_text.strip.tr(',', '.').to_f
+          elsif mapping['stripPunct']
+            property_hash[mapping_key] = target_text.strip.tr('.', '').to_f
           else
             property_hash[mapping_key] = target_text.strip.to_f
           end

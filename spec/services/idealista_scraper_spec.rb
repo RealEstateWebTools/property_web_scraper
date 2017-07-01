@@ -15,11 +15,10 @@ module PropertyWebScraper
         expect(retrieved_properties.reference).to eq('30191362')
         expect(retrieved_properties.constructed_area).to eq(427)
         expect(retrieved_properties.currency).to eq("EUR")
-        byebug
-
-
-        
+        expect(retrieved_properties.price_string).to eq("147.000")
+        expect(retrieved_properties.price_float).to eq(147000.0)
       end
+      
     end
   end
 end

@@ -1,3 +1,5 @@
+require 'money-rails'
+
 module PropertyWebScraper
   class Engine < ::Rails::Engine
     isolate_namespace PropertyWebScraper

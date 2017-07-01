@@ -10,66 +10,78 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_170_628_201_113) do
+ActiveRecord::Schema.define(version: 20170628201113) do
+
   # These are extensions that must be enabled in order to support this database
-  enable_extension 'plpgsql'
+  enable_extension "plpgsql"
 
-  create_table 'property_web_scraper_import_hosts', force: :cascade do |t|
-    t.integer  'flags', default: 0, null: false
-    t.string   'scraper_name'
-    t.string   'host'
-    t.boolean  'is_https'
-    t.json     'details', default: {}
-    t.string   'slug'
-    t.datetime 'created_at',                null: false
-    t.datetime 'updated_at',                null: false
-    t.index ['host'], name: 'index_property_web_scraper_import_hosts_on_host', unique: true, using: :btree
+  create_table "property_web_scraper_import_hosts", force: :cascade do |t|
+    t.integer  "flags",        default: 0,  null: false
+    t.string   "scraper_name"
+    t.string   "host"
+    t.boolean  "is_https"
+    t.json     "details",      default: {}
+    t.string   "slug"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.index ["host"], name: "index_property_web_scraper_import_hosts_on_host", unique: true, using: :btree
   end
 
-  create_table 'property_web_scraper_listings', force: :cascade do |t|
-    t.integer  'flags', default: 0, null: false
-    t.string   'reference'
-    t.integer  'year_construction',      default: 0,     null: false
-    t.integer  'count_bedrooms',         default: 0,     null: false
-    t.float    'count_bathrooms',        default: 0.0,   null: false
-    t.integer  'count_toilets',          default: 0,     null: false
-    t.integer  'count_garages',          default: 0,     null: false
-    t.float    'plot_area',              default: 0.0,   null: false
-    t.float    'constructed_area',       default: 0.0,   null: false
-    t.integer  'energy_rating'
-    t.float    'energy_performance'
-    t.string   'title'
-    t.text     'description'
-    t.string   'locale_code'
-    t.boolean  'furnished',              default: false
-    t.boolean  'sold',                   default: false
-    t.boolean  'reserved',               default: false
-    t.boolean  'for_rent_short_term',    default: false
-    t.boolean  'for_rent_long_term',     default: false
-    t.boolean  'for_sale',               default: false
-    t.datetime 'available_to_rent_from'
-    t.datetime 'available_to_rent_till'
-    t.string   'price'
-    t.string   'currency'
-    t.string   'street_number'
-    t.string   'street_name'
-    t.string   'street_address'
-    t.string   'postal_code'
-    t.string   'province'
-    t.string   'city'
-    t.string   'region'
-    t.string   'country'
-    t.float    'latitude'
-    t.float    'longitude'
-    t.datetime 'last_retrieved_at'
-    t.integer  'import_host_id'
-    t.string   'import_url'
-    t.json     'import_history', default: {}
-    t.datetime 'created_at',                             null: false
-    t.datetime 'updated_at',                             null: false
-    t.index ['flags'], name: 'index_property_web_scraper_listings_on_flags', using: :btree
-    t.index ['import_url'], name: 'index_property_web_scraper_listings_on_import_url', using: :btree
-    t.index ['price'], name: 'index_property_web_scraper_listings_on_price', using: :btree
-    t.index ['reference'], name: 'index_property_web_scraper_listings_on_reference', using: :btree
+  create_table "property_web_scraper_listings", force: :cascade do |t|
+    t.integer  "flags",                  default: 0,     null: false
+    t.integer  "area_unit",              default: 0,     null: false
+    t.string   "reference"
+    t.integer  "year_construction",      default: 0,     null: false
+    t.integer  "count_bedrooms",         default: 0,     null: false
+    t.float    "count_bathrooms",        default: 0.0,   null: false
+    t.integer  "count_toilets",          default: 0,     null: false
+    t.integer  "count_garages",          default: 0,     null: false
+    t.float    "plot_area",              default: 0.0,   null: false
+    t.float    "constructed_area",       default: 0.0,   null: false
+    t.integer  "energy_rating"
+    t.float    "energy_performance"
+    t.string   "title"
+    t.text     "description"
+    t.string   "locale_code"
+    t.boolean  "furnished",              default: false
+    t.boolean  "sold",                   default: false
+    t.boolean  "reserved",               default: false
+    t.boolean  "for_rent_short_term",    default: false
+    t.boolean  "for_rent_long_term",     default: false
+    t.boolean  "for_sale",               default: false
+    t.datetime "available_to_rent_from"
+    t.datetime "available_to_rent_till"
+    t.string   "price_string"
+    t.float    "price_float"
+    t.integer  "price_sale_cents",       default: 0,     null: false
+    t.string   "price_sale_currency",    default: "USD", null: false
+    t.integer  "price_rental_cents",     default: 0,     null: false
+    t.string   "price_rental_currency",  default: "USD", null: false
+    t.string   "currency"
+    t.string   "address_string"
+    t.string   "street_number"
+    t.string   "street_name"
+    t.string   "street_address"
+    t.string   "postal_code"
+    t.string   "province"
+    t.string   "city"
+    t.string   "region"
+    t.string   "country"
+    t.float    "latitude"
+    t.float    "longitude"
+    t.datetime "last_retrieved_at"
+    t.integer  "import_host_id"
+    t.integer  "re_agent_id"
+    t.string   "import_url"
+    t.json     "import_history",         default: {}
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.index ["flags"], name: "index_property_web_scraper_listings_on_flags", using: :btree
+    t.index ["import_url"], name: "index_property_web_scraper_listings_on_import_url", using: :btree
+    t.index ["price_float"], name: "index_property_web_scraper_listings_on_price_float", using: :btree
+    t.index ["price_rental_cents"], name: "index_property_web_scraper_listings_on_price_rental_cents", using: :btree
+    t.index ["price_sale_cents"], name: "index_property_web_scraper_listings_on_price_sale_cents", using: :btree
+    t.index ["reference"], name: "index_property_web_scraper_listings_on_reference", using: :btree
   end
+
 end

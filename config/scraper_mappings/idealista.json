@@ -14,6 +14,10 @@
   "floatFields": {
     "constructed_area": {
       "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(2) > span"
+    },
+    "price_float": {
+      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(1) > span",
+      "stripPunct": "true"
     }
   },
   "intFields": {
@@ -33,7 +37,7 @@
     "description": {
       "cssLocator": "#details > div.commentsContainer > div"
     },
-    "price": {
+    "price_string": {
       "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(1) > span"
     }
   },
