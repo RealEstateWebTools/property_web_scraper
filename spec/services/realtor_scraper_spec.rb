@@ -17,7 +17,12 @@ module PropertyWebScraper
         # expect(retrieved_properties.as_json).not_to have_attributes("import_history")
         expect(retrieved_properties.reference).to eq('21701902')
         expect(retrieved_properties.title).to eq('5804 Cedar Glen Ln')
-        expect(retrieved_properties.constructed_area).to eq(1.133)
+        expect(retrieved_properties.constructed_area).to eq(1133)
+        
+        expect(retrieved_properties.currency).to eq("USD")
+        expect(retrieved_properties.price_string).to eq("$144,950")
+        expect(retrieved_properties.price_float).to eq(144950)
+
       end
     end
   end

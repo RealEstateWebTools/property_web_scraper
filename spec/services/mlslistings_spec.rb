@@ -10,7 +10,11 @@ module PropertyWebScraper
         retrieved_properties = web_scraper.retrieve_and_save target_url, 1
 
         expect(retrieved_properties.reference).to eq('ML81643266')
-        expect(retrieved_properties.constructed_area).to eq(1.176)
+        expect(retrieved_properties.constructed_area).to eq(1176)
+        expect(retrieved_properties.currency).to eq("USD")
+        expect(retrieved_properties.price_string).to eq("$489,000")
+        expect(retrieved_properties.price_float).to eq(489000.0)
+
       end
     end
   end

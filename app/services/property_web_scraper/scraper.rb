@@ -82,13 +82,16 @@ module PropertyWebScraper
         scraper_mapping.floatFields.keys.each do |mapping_key|
           mapping = scraper_mapping.floatFields[mapping_key]
           target_text = retrieve_target_text doc, mapping
-          if mapping['comaToDot']
-            property_hash[mapping_key] = target_text.strip.tr(',', '.').to_f
-          elsif mapping['stripPunct']
-            property_hash[mapping_key] = target_text.strip.tr('.', '').to_f
-          else
-            property_hash[mapping_key] = target_text.strip.to_f
+          # if mapping['comaToDot']
+          #   target_text = target_text.strip.tr(',', '.')
+          # end
+          if mapping['stripPunct']
+            target_text = target_text.tr('.', '').tr(',', '')           
           end
+          if mapping['stripFirstChar']
+            target_text = target_text.strip.last(-1)
+          end
+          property_hash[mapping_key] = target_text.strip.to_f
         end
       end
 
@@ -104,19 +107,6 @@ module PropertyWebScraper
         # target_element = doc.css(mapping["cssLocator"])[mapping["cssCountId"].to_i] || ""
         property_hash[mapping_key] = target_text.strip.send(mapping['evaluator'], mapping['evaluatorParam'])
       end
-
-      # images = []
-      # byebug
-      # doc.css(".imgvspace").each do |image_tag|
-      #   image_url = image_tag["src"]
-      #   images.push image_url
-      # end
-      # property_hash["images"] = images
-
-      # property_hash["price_sale_current"] = doc.css('.listing_detail_field2')[2].content
-
-      # property_hash["description_en"] = doc.css('.detail_indent').first.content
-      # property_hash["extras"] = doc.css('.detail_indent').last.content
 
       properties.push property_hash
       properties

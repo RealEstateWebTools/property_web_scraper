@@ -14,7 +14,14 @@
   "floatFields": {
     "constructed_area": {
       "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(1) > span",
-      "comaToDot": "true"
+      "stripPunct": "true"
+    },
+    "price_float": {
+      "cssLocator": "#propertyAddress",
+      "splitTextCharacter": " ",
+      "splitTextArrayId": "0",
+      "stripFirstChar": "true",
+      "stripPunct": "true"
     }
   },
   "textFields": {
@@ -27,7 +34,7 @@
     "description": {
       "cssLocator": "#propertyRemarks"
     },
-    "price": {
+    "price_string": {
       "cssLocator": "#propertyAddress",
       "splitTextCharacter": " ",
       "splitTextArrayId": "0"

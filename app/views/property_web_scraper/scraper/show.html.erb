@@ -36,17 +36,25 @@
       <br>
     </div>
   </div>
-<% end %>
-<% @import_host_listings.each do |listing| %>
-  <div class="row">
-    <div class="col-sm-2">
-      <span> <%= listing.reference %> </span>
-    </div>
-    <div class="col-sm-2">
-      <span> <%= listing.price_string %> </span>
-    </div>
-    <div class="col-sm-8">
-      <%= link_to listing.import_url, listing.import_url, target: "_blank" %>
-    </div>
-  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Reference</th>
+        <th>Price</th>
+        <th>Url</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @import_host_listings.each do |listing| %>
+        <tr>
+          <th scope="row"></th>
+          <td><%= listing.reference %></td>
+          <td><%= listing.price_string %></td>
+          <td><%= link_to listing.import_url, listing.import_url, target: "_blank" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 <% end %>

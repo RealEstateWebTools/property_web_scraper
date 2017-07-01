@@ -14,7 +14,12 @@
   "floatFields": {
     "constructed_area": {
       "cssLocator": "#ldp-property-meta > ul > li:nth-child(3) > span",
-      "comaToDot": "true"
+      "stripPunct": "true"
+    },
+    "price_float": {
+      "cssLocator": "#ldp-pricewrap > div > div > span",
+      "stripFirstChar": "true",
+      "stripPunct": "true"
     }
   },
   "textFields": {
@@ -30,7 +35,7 @@
     "description": {
       "cssLocator": ""
     },
-    "price": {
+    "price_string": {
       "cssLocator": "#ldp-pricewrap > div > div > span"
     },
     "count_bedrooms": {
