@@ -1,4 +1,4 @@
-require "property_web_scraper/engine"
+require 'property_web_scraper/engine'
 
 module PropertyWebScraper
   # Your code goes here...

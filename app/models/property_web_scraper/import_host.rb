@@ -1,7 +1,7 @@
 module PropertyWebScraper
   class ImportHost < ApplicationRecord
     def host_url
-      "http://#{self.host}"
+      "http://#{host}"
     end
   end
 end

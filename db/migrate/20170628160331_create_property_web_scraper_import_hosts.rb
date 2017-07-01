@@ -10,7 +10,6 @@ class CreatePropertyWebScraperImportHosts < ActiveRecord::Migration[5.0]
       t.timestamps
     end
 
-    add_index :property_web_scraper_import_hosts, :host, :unique => true
-
+    add_index :property_web_scraper_import_hosts, :host, unique: true
   end
 end

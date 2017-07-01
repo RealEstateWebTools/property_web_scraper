@@ -13,9 +13,8 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
-
 group :development, :test do
-  gem 'simplecov',                 require: false
+  gem 'simplecov', require: false
   gem 'rubocop', require: false
   # gem 'capybara'
   # gem 'database_cleaner'

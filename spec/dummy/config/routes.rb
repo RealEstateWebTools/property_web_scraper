@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount PropertyWebScraper::Engine => "/"
+  mount PropertyWebScraper::Engine => '/'
 end

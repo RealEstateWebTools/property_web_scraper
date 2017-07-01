@@ -1,12 +1,11 @@
 class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
   def change
     create_table :property_web_scraper_listings do |t|
-
       t.integer  :flags, default: 0, null: false
       t.string   :reference
       t.integer  :year_construction, default: 0, null: false
       t.integer  :count_bedrooms, default: 0, null: false
-      t.float  :count_bathrooms, default: 0, null: false
+      t.float :count_bathrooms, default: 0, null: false
       # turns out count_bathrooms in the US can be .5, 1.5 etc
       # so need a float for above
       t.integer  :count_toilets, default: 0, null: false
@@ -34,8 +33,7 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
 
       t.string :price
 
-      t.string   :currency
-
+      t.string :currency
 
       t.string :street_number
       t.string :street_name
@@ -60,6 +58,5 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
     add_index :property_web_scraper_listings, :price
     add_index :property_web_scraper_listings, :reference
     add_index :property_web_scraper_listings, :import_url
-
   end
 end
