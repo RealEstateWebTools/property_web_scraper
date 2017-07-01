@@ -12,3 +12,17 @@ gemspec
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
+
+
+group :development, :test do
+  gem 'simplecov',                 require: false
+  gem 'rubocop', require: false
+  # gem 'capybara'
+  # gem 'database_cleaner'
+  # gem 'rails-controller-testing'
+  # gem 'poltergeist'
+  # gem 'shoulda-matchers'
+  gem 'guard-rspec', require: false
+  # gem 'zeus'
+  # gem 'json_spec'
+end
