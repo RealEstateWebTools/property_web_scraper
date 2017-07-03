@@ -1,0 +1,52 @@
+[{
+  "name": "zoopla",
+  "defaultValues": {
+    "country": {
+      "value": "UK"
+    },
+    "area_unit": {
+      "value": "sqft"
+    },
+    "currency": {
+      "value": "GBP"
+    }
+  },
+  "floatFields": {
+    "constructed_area": {
+      "cssLocator": "#listing-details > div.clearfix.bottom > div.listing-details-address > div > span.num-icon.num-sqft",
+      "stripPunct": "true"
+    },
+    "price_float": {
+      "cssLocator": "#listing-details > div:nth-child(1) > div > strong",
+      "stripFirstChar": "true",
+      "stripPunct": "true",
+      "splitTextCharacter": " ",
+      "splitTextArrayId": "0"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(3) > span"
+    }
+  },
+  "textFields": {
+    "reference": {
+    },
+    "address_string": {
+      "cssLocator": "#listing-details > div.clearfix.bottom > div.listing-details-address > h2"
+    },
+    "title": {
+      "cssLocator": "#listing-details > div:nth-child(1) > h2"
+    },
+    "description": {
+      "cssLocator": "#tab-details > div.bottom-plus-half > div > p"
+    },
+    "price_string": {
+      "cssLocator": "#listing-details > div:nth-child(1) > div > strong",
+      "splitTextCharacter": " ",
+      "splitTextArrayId": "0"
+    }
+  },
+  "booleanFields": {
+  }
+}]

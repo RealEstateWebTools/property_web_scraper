@@ -46,7 +46,8 @@ module PropertyWebScraper
       listing.constructed_area = retrieved_properties[0]['constructed_area'] || 0
       listing.count_bedrooms = retrieved_properties[0]['count_bedrooms'] || 0
       listing.count_bathrooms = retrieved_properties[0]['count_bathrooms'] || 0
-      # listing.area_unit = retrieved_properties[0]['area_unit']
+      listing.area_unit = retrieved_properties[0]['area_unit']
+      listing.address_string = retrieved_properties[0]['address_string']
       listing.currency = retrieved_properties[0]['currency']
       listing.country = retrieved_properties[0]['country']
       listing.import_host_id = import_host_id
