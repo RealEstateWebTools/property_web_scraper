@@ -36,25 +36,9 @@ module PropertyWebScraper
     def retrieve_and_save(import_url, import_host_id)
       retrieved_properties = retrieve_from_webpage import_url
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
-
-      # TODO: - move below to listing model and save retrieval history
-      listing.reference = retrieved_properties[0]['reference']
-      listing.title = retrieved_properties[0]['title']
-      listing.description = retrieved_properties[0]['description']
-      listing.price_string = retrieved_properties[0]['price_string']
-      listing.price_float = retrieved_properties[0]['price_float']
-      listing.constructed_area = retrieved_properties[0]['constructed_area'] || 0
-      listing.count_bedrooms = retrieved_properties[0]['count_bedrooms'] || 0
-      listing.count_bathrooms = retrieved_properties[0]['count_bathrooms'] || 0
-      listing.area_unit = retrieved_properties[0]['area_unit']
-      listing.address_string = retrieved_properties[0]['address_string']
-      listing.currency = retrieved_properties[0]['currency']
-      listing.country = retrieved_properties[0]['country']
-      listing.longitude = retrieved_properties[0]['longitude']
-      listing.latitude = retrieved_properties[0]['latitude']
-      listing.main_image_url = retrieved_properties[0]['main_image_url']
       listing.import_host_id = import_host_id
-      listing.save!
+
+      Listing.update_from_hash listing, retrieved_properties[0]
 
       listing
     end
