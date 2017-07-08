@@ -37,6 +37,7 @@ module PropertyWebScraper
       retrieved_properties = retrieve_from_webpage import_url
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
       listing.import_host_id = import_host_id
+      listing.last_retrieved_at = DateTime.now
 
       Listing.update_from_hash listing, retrieved_properties[0]
 

@@ -16,16 +16,17 @@ ActiveRecord::Schema.define(version: 20170628201113) do
   enable_extension "plpgsql"
 
   create_table "property_web_scraper_import_hosts", force: :cascade do |t|
-    t.integer  "flags",        default: 0,  null: false
+    t.integer  "flags",             default: 0,  null: false
     t.string   "scraper_name"
     t.string   "host"
     t.boolean  "is_https"
-    t.json     "details",      default: {}
+    t.json     "details",           default: {}
     t.string   "slug"
-    t.text     "example_urls", default: [],              array: true
-    t.text     "invalid_urls", default: [],              array: true
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.text     "example_urls",      default: [],              array: true
+    t.text     "invalid_urls",      default: [],              array: true
+    t.datetime "last_retrieval_at"
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
     t.index ["host"], name: "index_property_web_scraper_import_hosts_on_host", unique: true, using: :btree
   end
 
