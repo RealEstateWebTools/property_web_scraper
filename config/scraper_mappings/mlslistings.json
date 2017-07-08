@@ -22,6 +22,12 @@
       "splitTextArrayId": "0",
       "stripFirstChar": "true",
       "stripPunct": "true"
+    },
+    "longitude": {
+      "xpath": "//meta[@property='place:location:longitude']/@content"
+    },
+    "latitude": {
+      "xpath": "//meta[@property='place:location:latitude']/@content"
     }
   },
   "textFields": {
@@ -29,7 +35,7 @@
       "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(3) > span"
     },
     "title": {
-      "cssLocator": "#propertyAddress > small"
+      "xpath": "//meta[@property='og:title']/@content"
     },
     "description": {
       "cssLocator": "#propertyRemarks"
@@ -46,11 +52,10 @@
     }
   },
   "booleanFields": {
-    "for_rent": {
-      "cssLocator": ".table-striped tbody tr td",
-      "cssCountId": "5",
+    "for_sale": {
+      "xpath": "//meta[@property='og:title']/@content",
       "evaluator": "include?",
-      "evaluatorParam": "Rent"
+      "evaluatorParam": "For Sale"
     }
   }
 }]

@@ -10,8 +10,11 @@ module PropertyWebScraper
         retrieved_properties = web_scraper.retrieve_and_save target_url, 1
 
         expect(retrieved_properties.reference).to eq('ML81643266')
+        expect(retrieved_properties.longitude).to eq(-121.8234990)
+        expect(retrieved_properties.title).to eq("1547 Desdemona CT, SAN JOSE, CA 95121 ( For Sale )")        
         expect(retrieved_properties.constructed_area).to eq(1176)
         expect(retrieved_properties.currency).to eq("USD")
+
         expect(retrieved_properties.price_string).to eq("$489,000")
         expect(retrieved_properties.price_float).to eq(489000.0)
 

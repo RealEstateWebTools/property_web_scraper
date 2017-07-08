@@ -50,6 +50,8 @@ module PropertyWebScraper
       listing.address_string = retrieved_properties[0]['address_string']
       listing.currency = retrieved_properties[0]['currency']
       listing.country = retrieved_properties[0]['country']
+      listing.longitude = retrieved_properties[0]['longitude']
+      listing.latitude = retrieved_properties[0]['latitude']
       listing.import_host_id = import_host_id
       listing.save!
 
@@ -87,10 +89,10 @@ module PropertyWebScraper
           #   target_text = target_text.strip.tr(',', '.')
           # end
           if mapping['stripPunct']
-            target_text = target_text.tr('.', '').tr(',', '')           
+            target_text = target_text.tr('.', '').tr(',', '')
           end
           if mapping['stripFirstChar']
-            target_text = target_text.strip.last(-1)
+            target_text = target_text.strip.last(-1) || ""
           end
           property_hash[mapping_key] = target_text.strip.to_f
         end
@@ -108,7 +110,6 @@ module PropertyWebScraper
         # target_element = doc.css(mapping["cssLocator"])[mapping["cssCountId"].to_i] || ""
         property_hash[mapping_key] = target_text.strip.send(mapping['evaluator'], mapping['evaluatorParam'])
       end
-
       properties.push property_hash
       properties
     end
@@ -116,36 +117,48 @@ module PropertyWebScraper
     private
 
     def retrieve_target_text(doc, mapping)
-      target_elements = mapping['cssLocator'].present? ? doc.css(mapping['cssLocator']) : []
       target_text = ''
-      if target_elements.present?
-        target_text = target_elements.text
-        if mapping['cssCountId'].present?
-          # in this case we have multiple elements matched
-          # and the cssCountId refers to where in the list of matched elements
-          # the correct item is
-          begin
-            css_count_id = mapping['cssCountId'].to_i
-            target_text = target_elements[css_count_id].text || ''
-          rescue Exception => e
-          end
-        end
-        unless mapping['splitTextCharacter'].nil?
-          # - cannot use .present? above as splitTextCharacter is sometimes " "
-          # mapping["splitTextCharacter"].present?
-          #
-          # in this case the element's text need to be split by the splitTextCharacter
-          # splitTextArrayId refers to where in the resulting array
-          # the correct item is
-          begin
-            splitTextCharacter = mapping['splitTextCharacter'] || ' '
-            splitTextArrayId = mapping['splitTextArrayId'].to_i
-            target_text = target_elements.text.split(splitTextCharacter)[splitTextArrayId]
-          rescue Exception => e
-          end
+      if mapping['cssLocator'].present?
+        css_elements = doc.css(mapping['cssLocator'])
+        target_text = get_text_from_css css_elements, mapping
+      end
+      if mapping['xpath'].present?
+        css_elements = doc.css(mapping['xpath'])
+        # able to retrieve xpath just like with css
+        # but in future this might change
+        target_text = get_text_from_css css_elements, mapping
+      end
+      return target_text
+    end
+
+    def get_text_from_css css_elements, mapping
+      target_text = css_elements.text
+      if mapping['cssCountId'].present?
+        # in this case we have multiple elements matched
+        # and the cssCountId refers to where in the list of matched elements
+        # the correct item is
+        begin
+          css_count_id = mapping['cssCountId'].to_i
+          target_text = css_elements[css_count_id].text || ''
+        rescue Exception => e
         end
       end
-      target_text
+      unless mapping['splitTextCharacter'].nil?
+        # - cannot use .present? above as splitTextCharacter is sometimes " "
+        # mapping["splitTextCharacter"].present?
+        #
+        # in this case the element's text need to be split by the splitTextCharacter
+        # splitTextArrayId refers to where in the resulting array
+        # the correct item is
+        begin
+          splitTextCharacter = mapping['splitTextCharacter'] || ' '
+          splitTextArrayId = mapping['splitTextArrayId'].to_i
+          target_text = css_elements.text.split(splitTextCharacter)[splitTextArrayId]
+        rescue Exception => e
+        end
+      end
+      return target_text
     end
+
   end
 end
