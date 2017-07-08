@@ -52,6 +52,7 @@ module PropertyWebScraper
       listing.country = retrieved_properties[0]['country']
       listing.longitude = retrieved_properties[0]['longitude']
       listing.latitude = retrieved_properties[0]['latitude']
+      listing.main_image_url = retrieved_properties[0]['main_image_url']
       listing.import_host_id = import_host_id
       listing.save!
 

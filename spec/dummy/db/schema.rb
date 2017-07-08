@@ -22,6 +22,8 @@ ActiveRecord::Schema.define(version: 20170628201113) do
     t.boolean  "is_https"
     t.json     "details",      default: {}
     t.string   "slug"
+    t.text     "example_urls", default: [],              array: true
+    t.text     "invalid_urls", default: [],              array: true
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
     t.index ["host"], name: "index_property_web_scraper_import_hosts_on_host", unique: true, using: :btree
@@ -49,6 +51,7 @@ ActiveRecord::Schema.define(version: 20170628201113) do
     t.boolean  "for_rent_short_term",    default: false
     t.boolean  "for_rent_long_term",     default: false
     t.boolean  "for_sale",               default: false
+    t.boolean  "for_rent",               default: false
     t.datetime "available_to_rent_from"
     t.datetime "available_to_rent_till"
     t.string   "price_string"
@@ -74,6 +77,9 @@ ActiveRecord::Schema.define(version: 20170628201113) do
     t.integer  "re_agent_id"
     t.string   "import_url"
     t.json     "import_history",         default: {}
+    t.string   "main_image_url"
+    t.text     "image_urls",             default: [],                 array: true
+    t.text     "unknown_fields",         default: [],                 array: true
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
     t.index ["flags"], name: "index_property_web_scraper_listings_on_flags", using: :btree

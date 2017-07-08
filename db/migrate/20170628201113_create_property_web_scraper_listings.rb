@@ -28,6 +28,7 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.boolean :for_rent_short_term, default: false
       t.boolean :for_rent_long_term, default: false
       t.boolean :for_sale, default: false
+      t.boolean :for_rent, default: false
 
       t.datetime :available_to_rent_from
       t.datetime :available_to_rent_till
@@ -60,6 +61,10 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.integer :re_agent_id
       t.string :import_url
       t.json :import_history, default: {}
+
+      t.string :main_image_url
+      t.text :image_urls, array: true, default: []
+      t.text :unknown_fields, array: true, default: []
 
       t.timestamps
     end

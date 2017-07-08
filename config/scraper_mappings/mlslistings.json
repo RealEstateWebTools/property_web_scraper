@@ -49,6 +49,9 @@
       "cssLocator": "#quickDetails > div > div:nth-child(2) > p:nth-child(1)",
       "splitTextCharacter": " ",
       "splitTextArrayId": "1"
+    },
+    "main_image_url": {
+      "xpath": "//meta[@property='og:image']/@content"
     }
   },
   "booleanFields": {
