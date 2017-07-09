@@ -1,5 +1,8 @@
 [{
   "name": "mlslistings",
+  "unRetrievedFields": [
+    "count_bathrooms"
+  ],
   "defaultValues": {
     "country": {
       "value": "USA"
@@ -45,10 +48,13 @@
       "splitTextCharacter": " ",
       "splitTextArrayId": "0"
     },
+    // "count_bathrooms": {
+    //   "xpath": "//meta[@property='mlsl_fb:baths']/@content"
+    // },
     "count_bedrooms": {
-      "cssLocator": "#quickDetails > div > div:nth-child(2) > p:nth-child(1)",
-      "splitTextCharacter": " ",
-      "splitTextArrayId": "1"
+      "xpath": "//meta[@property='mlsl_fb:beds']/@content"
+      // "splitTextCharacter": " ",
+      // "splitTextArrayId": "1"
     },
     "main_image_url": {
       "xpath": "//meta[@property='og:image']/@content"

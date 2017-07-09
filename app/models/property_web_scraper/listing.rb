@@ -14,7 +14,7 @@ module PropertyWebScraper
                 :count_toilets, :count_garages,
                 :currency, :city, :region, :country,
                 :address_string, :longitude, :latitude,
-                :for_sale, :for_rent,
+                :for_sale, :for_rent, :main_image_url,
                 :last_retrieved_at
               ],
               methods: [] }.merge(options || {}))
@@ -23,13 +23,15 @@ module PropertyWebScraper
     def self.update_from_hash listing, property_hash
       attributes = %w(reference title description
       price_string price_float area_unit address_string currency
-      country longitude latitude main_image_url)
+      country longitude latitude main_image_url for_rent for_sale )
       attributes.each do |attribute|
         listing[attribute] = property_hash[attribute]
       end
       listing.constructed_area = property_hash['constructed_area'] || 0
       listing.count_bedrooms = property_hash['count_bedrooms'] || 0
       listing.count_bathrooms = property_hash['count_bathrooms'] || 0
+      listing.count_toilets = property_hash['count_toilets'] || 0
+      listing.count_garages = property_hash['count_garages'] || 0
       listing.save!
       # TODO: - save retrieval history
     end

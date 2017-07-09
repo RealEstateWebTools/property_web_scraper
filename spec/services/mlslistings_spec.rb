@@ -18,7 +18,8 @@ module PropertyWebScraper
         expect(retrieved_properties.currency).to eq("USD")
         expect(retrieved_properties.price_string).to eq("$489,000")
         expect(retrieved_properties.price_float).to eq(489000.0)
-
+        expect(retrieved_properties.count_bedrooms).to eq(3)
+        expect(retrieved_properties.for_sale).to eq(true)
       end
     end
   end
