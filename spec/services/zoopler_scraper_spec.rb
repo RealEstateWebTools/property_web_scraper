@@ -7,13 +7,11 @@ module PropertyWebScraper
     end
     it 'scrapes and save zoopla property page correctly' do
       VCR.use_cassette('scrapers/zoopla') do
-        target_url = 'https://www.zoopla.co.uk/for-sale/details/43719239#yRkxcYIphFJYc139.97'
-
-
+        import_url = 'https://www.zoopla.co.uk/for-sale/details/43719239#yRkxcYIphFJYc139.97'
         web_scraper = PropertyWebScraper::Scraper.new('zoopla')
-        retrieved_properties = web_scraper.retrieve_and_save target_url, 1
-        # byebug
 
+        listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
+        retrieved_properties = web_scraper.retrieve_and_save listing, 1
 
         expect(retrieved_properties.as_json['import_history']).not_to be_present
         # expect(retrieved_properties.as_json).not_to have_attributes("import_history")

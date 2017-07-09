@@ -7,11 +7,11 @@ module PropertyWebScraper
     end
     it 'scrapes and save realtor property page correctly' do
       VCR.use_cassette('scrapers/realtor') do
-        target_url = 'http://www.realtor.com/realestateandhomes-detail/5804-Cedar-Glen-Ln_Bakersfield_CA_93313_M12147-18296'
+        import_url = 'http://www.realtor.com/realestateandhomes-detail/5804-Cedar-Glen-Ln_Bakersfield_CA_93313_M12147-18296'
 
         web_scraper = PropertyWebScraper::Scraper.new('realtor')
-        retrieved_properties = web_scraper.retrieve_and_save target_url, 1
-        # byebug
+        listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
+        retrieved_properties = web_scraper.retrieve_and_save listing, 1
 
         expect(retrieved_properties.as_json['import_history']).not_to be_present
         # expect(retrieved_properties.as_json).not_to have_attributes("import_history")

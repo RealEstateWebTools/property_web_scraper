@@ -33,9 +33,20 @@ module PropertyWebScraper
     #   return retrieved_properties
     # end
 
-    def retrieve_and_save(import_url, import_host_id)
-      retrieved_properties = retrieve_from_webpage import_url
+    def process_url(import_url, import_host)
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
+      if listing.last_retrieved_at.present? && (listing.last_retrieved_at < DateTime.now - 24.hours)
+        retrieve_and_save listing, import_host_id
+        import_host.last_retrieval_at = DateTime.now
+        import_host.save!
+      end
+      # byebug
+      listing
+    end
+
+
+    def retrieve_and_save(listing, import_host_id)
+      retrieved_properties = retrieve_from_webpage listing.import_url
       listing.import_host_id = import_host_id
       listing.last_retrieved_at = DateTime.now
 

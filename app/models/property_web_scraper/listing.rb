@@ -13,7 +13,8 @@ module PropertyWebScraper
                 :count_bedrooms, :count_bathrooms,
                 :count_toilets, :count_garages,
                 :currency, :city, :region, :country,
-                :address_string,
+                :address_string, :longitude, :latitude,
+                :for_sale, :for_rent,
                 :last_retrieved_at
               ],
               methods: [] }.merge(options || {}))

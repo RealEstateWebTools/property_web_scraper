@@ -22,15 +22,11 @@ module PropertyWebScraper
         return render json: { error: 'Please provide url.' }, status: 422
       end
       import_url = params[:import_url]
-
-      # TODO: - a check to avoid retrieving if saved listing is up to date
-
       @import_host = PropertyWebScraper::ImportHost.find_by(id: params[:id])
-      @import_host.last_retrieval_at = DateTime.now
-      @import_host.save!
-      web_scraper = PropertyWebScraper::Scraper.new(@import_host.scraper_name)
 
-      listing = web_scraper.retrieve_and_save import_url, @import_host.id
+      web_scraper = PropertyWebScraper::Scraper.new(@import_host.scraper_name)
+      listing = web_scraper.process_url import_url, @import_host
+
       render json: listing.as_json
 
       # render json: {
