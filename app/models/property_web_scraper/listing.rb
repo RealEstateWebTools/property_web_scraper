@@ -15,7 +15,7 @@ module PropertyWebScraper
                 :currency, :city, :region, :country,
                 :address_string, :longitude, :latitude,
                 :for_sale, :for_rent, :main_image_url,
-                :last_retrieved_at
+                :last_retrieved_at, :unknown_fields
               ],
               methods: [] }.merge(options || {}))
     end

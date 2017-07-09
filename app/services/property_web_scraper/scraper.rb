@@ -35,12 +35,14 @@ module PropertyWebScraper
 
     def process_url(import_url, import_host)
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
-      if listing.last_retrieved_at.present? && (listing.last_retrieved_at < DateTime.now - 24.hours)
-        retrieve_and_save listing, import_host_id
+      # For datetime, yesterday is < today
+      listing_retrieved_recently = listing.last_retrieved_at.present? && (listing.last_retrieved_at > (DateTime.now.utc - 24.seconds))
+
+      if listing.last_retrieved_at.blank? || !listing_retrieved_recently
+        retrieve_and_save listing, import_host.id
         import_host.last_retrieval_at = DateTime.now
         import_host.save!
       end
-      # byebug
       listing
     end
 
@@ -49,7 +51,6 @@ module PropertyWebScraper
       retrieved_properties = retrieve_from_webpage listing.import_url
       listing.import_host_id = import_host_id
       listing.last_retrieved_at = DateTime.now
-
       Listing.update_from_hash listing, retrieved_properties[0]
 
       listing
@@ -61,7 +62,22 @@ module PropertyWebScraper
       property_hash = {}
 
       # Fetch and parse HTML document
-      doc = Nokogiri::HTML(open(import_url))
+      uri = URI.parse(import_url)
+      tries = 3
+
+      # redirects are sometimes legitimate but could also be used
+      # to hack site so need to stop after a few tries
+      # https://stackoverflow.com/questions/27407938/ruby-open-uri-redirect-forbidden
+      # https://twin.github.io/improving-open-uri/
+      begin
+        page_to_parse = uri.open(redirect: false)
+        # page_to_parse = open(import_url)
+      rescue OpenURI::HTTPRedirect => redirect
+        uri = redirect.uri # assigned from the "Location" response header
+        retry if (tries -= 1) > 0
+        raise
+      end
+      doc = Nokogiri::HTML(page_to_parse)
 
       if scraper_mapping.defaultValues
         scraper_mapping.defaultValues.keys.each do |mapping_key|
