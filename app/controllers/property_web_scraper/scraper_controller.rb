@@ -3,8 +3,10 @@ require_dependency 'property_web_scraper/application_controller'
 module PropertyWebScraper
   class ScraperController < ApplicationController
     def submit
-      scraper_name = params[:scraper][:scraper_name]
-      redirect_to "/scrapers/#{scraper_name}"
+      # scraper_name = params[:scraper][:scraper_name]
+      # byebug
+      # redirect_to "/scrapers/#{scraper_name}"
+      render "/property_web_scraper/retrieve_results.js.erb", layout: false
     end
 
     def show

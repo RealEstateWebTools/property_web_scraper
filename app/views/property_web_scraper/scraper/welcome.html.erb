@@ -12,6 +12,24 @@
       <%= submit_tag("Go") %>
     <% end %>
     <br>
+
+
+      <%= form_tag("/scrapers/submit.js", method: "post", remote: true, authenticity_token: true) do %>
+        <br>
+        <br>
+        <br>
+        <div>
+          <p>
+            Please enter the url for a property from 
+          </p>
+          <%# label_tag(:import_url, "Webpage URL:") %>
+          <span class="url_input">
+            <%= text_field_tag(:import_url) %>
+          </span>
+          <%= submit_tag("Retrieve property info") %>
+        </div>
+      <% end %>
+
     <br>
     <br>
     <p>Help us improve this product by giving us some feedback or contributing <a href="https://github.com/RealEstateWebTools/property_web_scraper">

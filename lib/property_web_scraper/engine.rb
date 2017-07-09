@@ -1,4 +1,6 @@
 require 'money-rails'
+require 'jquery-rails'
+# perhaps I had problems with bootstrap gem because I did not require it here
 
 module PropertyWebScraper
   class Engine < ::Rails::Engine
