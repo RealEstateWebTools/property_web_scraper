@@ -22,6 +22,7 @@ group :development, :test do
   # gem 'poltergeist'
   # gem 'shoulda-matchers'
   gem 'guard-rspec', require: false
+  gem 'pry-byebug'
   # gem 'zeus'
   # gem 'json_spec'
 end

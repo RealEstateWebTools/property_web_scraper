@@ -1,7 +1,10 @@
 <div class="row">
   <div class="col-sm-12">
-    <h3 style="margin: 20px 0px">Get started by selecting the website you would like to scrape from</h3>
-    <%= form_tag("/scrapers/submit", method: "post") do %>
+    <h3 style="margin: 20px 0px">
+      Easily retrieve details of properties for sale or rent in a standard format
+    </h3>
+    <p>Allows you to monitor price changes, export data, analyze trends etc.</p>
+    <!--     <% form_tag("/scrapers/submit", method: "post") do %>
       <div>
         <%= label_tag(:import_url, "Host to scrape:") %>
         <span class="url_input">
@@ -10,35 +13,32 @@
       </div>
       <br>
       <%= submit_tag("Go") %>
+    <% end %> -->
+    <br>
+    <%= form_tag("/scrapers/submit.js", method: "post", remote: true, authenticity_token: true) do %>
+      <br>
+      <div>
+        <p>
+          Please enter the url for a property for sale or for rent: 
+          </p>
+        <%# label_tag(:import_url, "Webpage URL:") %>
+        <span class="url_input">
+          <%= text_field_tag(:import_url) %>
+        </span>
+        <%= submit_tag("Retrieve property info") %>
+      </div>
     <% end %>
     <br>
-
-
-      <%= form_tag("/scrapers/submit.js", method: "post", remote: true, authenticity_token: true) do %>
-        <br>
-        <br>
-        <br>
-        <div>
-          <p>
-            Please enter the url for a property from 
-          </p>
-          <%# label_tag(:import_url, "Webpage URL:") %>
-          <span class="url_input">
-            <%= text_field_tag(:import_url) %>
-          </span>
-          <%= submit_tag("Retrieve property info") %>
-        </div>
-      <% end %>
-
+    <br>
+    <div id="retrieve-results"></div>
     <br>
     <br>
-    <p>Help us improve this product by giving us some feedback or contributing <a href="https://github.com/RealEstateWebTools/property_web_scraper">
-        here.</a>
+    <p>Help us improve this product by giving us some feedback:
     </p>
     <p>
     </p>
     <p>
-      <form action="https://formspree.io/your@email.com" method="POST">
+      <form action="https://formspree.io/pws@propertywebbuilder.com" method="POST">
         <div class="form-group row">
           <label for="example-url-input" class="col-2 col-form-label">Url you would like to scrape</label>
           <div class="col-10">
@@ -54,7 +54,7 @@
         <div class="form-group row">
           <label for="example-email-input" class="col-2 col-form-label">Email</label>
           <div class="col-10">
-            <input class="form-control" type="email" value="bootstrap@example.com" id="example-email-input">
+            <input class="form-control" type="email" value="" id="example-email-input">
           </div>
         </div>
         <div class="form-group row">
