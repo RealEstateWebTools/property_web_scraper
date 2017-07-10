@@ -46,6 +46,7 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.string :address_string
       t.string :street_number
       t.string :street_name
+      # TODO - remove below and add agent_id
       t.string :street_address
       t.string :postal_code
       t.string :province

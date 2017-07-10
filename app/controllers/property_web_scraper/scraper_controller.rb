@@ -4,14 +4,19 @@ module PropertyWebScraper
   class ScraperController < ApplicationController
     def submit
       # scraper_name = params[:scraper][:scraper_name]
-      uri = URI.parse params[:import_url]
+      import_url = params[:import_url].strip
+      begin
+        uri = URI.parse import_url
+      rescue URI::InvalidURIError => error
+        uri = ""
+      end
       @listing = {}
       if uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
         import_host = PropertyWebScraper::ImportHost.find_by_host(uri.host)
         if import_host
           @success = true
           web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
-          @listing = web_scraper.process_url params[:import_url], import_host
+          @listing = web_scraper.process_url import_url, import_host
           @listing_attributes = %w(reference title description
                                    price_string price_float area_unit address_string currency
                                    country longitude latitude main_image_url for_rent for_sale )
@@ -27,7 +32,7 @@ module PropertyWebScraper
           http://www.mlslistings.com</a></span>
           <span><a href="http://www.realtor.com">
           http://www.realtor.com</a></span>
-           or
+          or
           <span><a href="https://www.zoopla.co.uk">
           https://www.zoopla.co.uk</a></span>
           </div>
@@ -56,7 +61,7 @@ module PropertyWebScraper
       unless params[:import_url].present?
         return render json: { error: 'Please provide url.' }, status: 422
       end
-      import_url = params[:import_url]
+      import_url = params[:import_url].strip
       import_host = PropertyWebScraper::ImportHost.find_by(id: params[:id])
 
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
