@@ -46,7 +46,6 @@ module PropertyWebScraper
       listing
     end
 
-
     def retrieve_and_save(listing, import_host_id)
       retrieved_properties = retrieve_from_webpage listing.import_url
       listing.import_host_id = import_host_id
@@ -82,7 +81,7 @@ module PropertyWebScraper
       if scraper_mapping.defaultValues
         scraper_mapping.defaultValues.keys.each do |mapping_key|
           mapping = scraper_mapping.defaultValues[mapping_key]
-          property_hash[mapping_key] = mapping["value"]
+          property_hash[mapping_key] = mapping['value']
         end
       end
 
@@ -105,7 +104,7 @@ module PropertyWebScraper
             target_text = target_text.tr('.', '').tr(',', '')
           end
           if mapping['stripFirstChar']
-            target_text = target_text.strip.last(-1) || ""
+            target_text = target_text.strip.last(-1) || ''
           end
           property_hash[mapping_key] = target_text.strip.to_f
         end
@@ -141,10 +140,10 @@ module PropertyWebScraper
         # but in future this might change
         target_text = get_text_from_css css_elements, mapping
       end
-      return target_text
+      target_text
     end
 
-    def get_text_from_css css_elements, mapping
+    def get_text_from_css(css_elements, mapping)
       target_text = css_elements.text
       if mapping['cssCountId'].present?
         # in this case we have multiple elements matched
@@ -170,8 +169,7 @@ module PropertyWebScraper
         rescue Exception => e
         end
       end
-      return target_text
+      target_text
     end
-
   end
 end

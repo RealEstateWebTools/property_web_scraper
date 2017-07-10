@@ -7,23 +7,23 @@ module PropertyWebScraper
 
     def as_json(options = nil)
       super({ only: [
-                :reference, :price_string, :price_float,
-                :title, :description,
-                :area_unit, :plot_area, :constructed_area,
-                :count_bedrooms, :count_bathrooms,
-                :count_toilets, :count_garages,
-                :currency, :city, :region, :country,
-                :address_string, :longitude, :latitude,
-                :for_sale, :for_rent, :main_image_url,
-                :last_retrieved_at, :unknown_fields
-              ],
+        :reference, :price_string, :price_float,
+        :title, :description,
+        :area_unit, :plot_area, :constructed_area,
+        :count_bedrooms, :count_bathrooms,
+        :count_toilets, :count_garages,
+        :currency, :city, :region, :country,
+        :address_string, :longitude, :latitude,
+        :for_sale, :for_rent, :main_image_url,
+        :last_retrieved_at, :unknown_fields
+      ],
               methods: [] }.merge(options || {}))
     end
 
-    def self.update_from_hash listing, property_hash
+    def self.update_from_hash(listing, property_hash)
       attributes = %w(reference title description
-      price_string price_float area_unit address_string currency
-      country longitude latitude main_image_url for_rent for_sale )
+                      price_string price_float area_unit address_string currency
+                      country longitude latitude main_image_url for_rent for_sale )
       attributes.each do |attribute|
         listing[attribute] = property_hash[attribute]
       end

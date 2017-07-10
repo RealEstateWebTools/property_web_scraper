@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module PropertyWebScraper
   RSpec.describe 'Zoopler Scraper' do
-    let(:import_url) {'https://www.zoopla.co.uk/for-sale/details/43719239#yRkxcYIphFJYc139.97'}
+    let(:import_url) { 'https://www.zoopla.co.uk/for-sale/details/43719239#yRkxcYIphFJYc139.97' }
     before :all do
       load File.join(PropertyWebScraper::Engine.root, 'db', 'seeds', 'import_hosts.rb')
     end
@@ -25,12 +25,11 @@ module PropertyWebScraper
         expect(retrieved_properties.reference).to eq('')
         expect(retrieved_properties.title).to eq('4 bed flat for sale')
         expect(retrieved_properties.constructed_area).to eq(2205)
-        expect(retrieved_properties.currency).to eq("GBP")
-        expect(retrieved_properties.area_unit).to eq("sqft")
-        expect(retrieved_properties.address_string).to eq("38 St. Pauls Square, Birmingham B3")
-        expect(retrieved_properties.price_string).to eq("£875,000")
-        expect(retrieved_properties.price_float).to eq(875000)
-
+        expect(retrieved_properties.currency).to eq('GBP')
+        expect(retrieved_properties.area_unit).to eq('sqft')
+        expect(retrieved_properties.address_string).to eq('38 St. Pauls Square, Birmingham B3')
+        expect(retrieved_properties.price_string).to eq('£875,000')
+        expect(retrieved_properties.price_float).to eq(875_000)
       end
     end
   end

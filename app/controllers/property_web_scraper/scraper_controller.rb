@@ -6,15 +6,15 @@ module PropertyWebScraper
       # scraper_name = params[:scraper][:scraper_name]
       uri = URI.parse params[:import_url]
       @listing = {}
-      if uri.kind_of?(URI::HTTP) or uri.kind_of?(URI::HTTPS)
+      if uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
         import_host = PropertyWebScraper::ImportHost.find_by_host(uri.host)
         if import_host
           @success = true
           web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
           @listing = web_scraper.process_url params[:import_url], import_host
           @listing_attributes = %w(reference title description
-      price_string price_float area_unit address_string currency
-      country longitude latitude main_image_url for_rent for_sale )
+                                   price_string price_float area_unit address_string currency
+                                   country longitude latitude main_image_url for_rent for_sale )
         else
           @success = false
           @error_message = <<-HTML
@@ -27,7 +27,7 @@ module PropertyWebScraper
           http://www.mlslistings.com</a></span>
           <span><a href="http://www.realtor.com">
           http://www.realtor.com</a></span>
-           or 
+           or
           <span><a href="https://www.zoopla.co.uk">
           https://www.zoopla.co.uk</a></span>
           </div>
@@ -35,11 +35,11 @@ module PropertyWebScraper
 
         end
       else
-        @error_message = "Please enter a valid url"
+        @error_message = 'Please enter a valid url'
         @success = false
       end
       # redirect_to "/scrapers/#{scraper_name}"
-      render "/property_web_scraper/retrieve_results.js.erb", layout: false
+      render '/property_web_scraper/retrieve_results.js.erb', layout: false
     end
 
     def show
