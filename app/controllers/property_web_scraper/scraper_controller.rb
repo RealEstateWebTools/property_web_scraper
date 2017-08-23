@@ -2,7 +2,7 @@ require_dependency 'property_web_scraper/application_controller'
 
 module PropertyWebScraper
   class ScraperController < ApplicationController
-    def submit
+    def ajax_submit
       # scraper_name = params[:scraper][:scraper_name]
       import_url = params[:import_url].strip
       begin
@@ -20,6 +20,7 @@ module PropertyWebScraper
           @listing_attributes = %w(reference title description
                                    price_string price_float area_unit address_string currency
                                    country longitude latitude main_image_url for_rent for_sale )
+          # above used to display /views/property_web_scraper/scraper/_retrieve_results.html.erb
         else
           @success = false
           @error_message = <<-HTML

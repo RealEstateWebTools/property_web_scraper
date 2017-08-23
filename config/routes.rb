@@ -3,5 +3,5 @@ PropertyWebScraper::Engine.routes.draw do
   get '/retrieve' => 'scraper#retrieve'
   get '/scrapers/:id' => 'scraper#show'
   get '/scrapers/:id/retrieve' => 'scraper#retrieve'
-  post '/scrapers/submit' => 'scraper#submit'
+  post '/scrapers/submit' => 'scraper#ajax_submit'
 end
