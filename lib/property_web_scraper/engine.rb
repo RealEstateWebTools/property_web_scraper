@@ -1,6 +1,7 @@
 require 'money-rails'
 require 'jquery-rails'
 require 'rack/cors'
+require 'firebase'
 # perhaps I had problems with bootstrap gem because I did not require it here
 
 module PropertyWebScraper

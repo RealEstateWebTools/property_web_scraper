@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'active_hash'
   s.add_dependency 'jquery-rails'
   s.add_dependency 'rack-cors'
+  s.add_dependency 'firebase'
 
   s.add_development_dependency 'byebug'
   s.add_development_dependency 'pry'

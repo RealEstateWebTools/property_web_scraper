@@ -6,4 +6,5 @@ spec/dummy/db/*.sqlite3-journal
 spec/dummy/log/*.log
 spec/dummy/tmp/
 spec/dummy/.byebug_history
+spec/dummy/config/secrets.yml
 .byebug_history

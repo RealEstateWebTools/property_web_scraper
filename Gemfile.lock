@@ -4,6 +4,7 @@ PATH
     property_web_scraper (0.1.0)
       active_hash
       faraday
+      firebase
       flag_shih_tzu
       jquery-rails
       money-rails (~> 1)
@@ -81,6 +82,9 @@ GEM
     faraday (0.13.1)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.18)
+    firebase (0.2.6)
+      httpclient
+      json
     flag_shih_tzu (0.3.19)
     formatador (0.2.5)
     globalid (0.4.0)
@@ -100,6 +104,7 @@ GEM
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
     hashdiff (0.3.2)
+    httpclient (2.8.3)
     i18n (0.8.4)
     jquery-rails (4.3.1)
       rails-dom-testing (>= 1, < 3)
