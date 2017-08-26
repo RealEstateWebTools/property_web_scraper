@@ -53,9 +53,28 @@ module PropertyWebScraper
           error_message: "Sorry, the url provided is currently not supported"
         }
       end
+      if params["client_id"] && (params["client_id"].length > 5)
+        client_id = params["client_id"]
+      else
+        client_id = "pwb" + SecureRandom.urlsafe_base64(8)
+      end
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
       @listing = web_scraper.process_url uri.to_s, import_host
-      render json: @listing.to_json
+
+      fb_instance_id = Rails.application.secrets.fb_instance_id
+      base_uri = "https://#{fb_instance_id}.firebaseio.com/"
+      firebase = Firebase::Client.new(base_uri)
+
+      response = firebase.push("client-props/#{client_id}", @listing)
+
+      @props_hash = response.body
+      # byebug
+
+      render json: {
+        success: true,
+        client_id: client_id,
+        listing: @listing
+      }
     end
 
     def ajax_submit
