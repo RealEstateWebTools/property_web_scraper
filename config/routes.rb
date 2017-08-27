@@ -8,4 +8,5 @@ PropertyWebScraper::Engine.routes.draw do
   post '/scrapers/submit' => 'scraper#ajax_submit'
   post '/retriever/as_json' => 'scraper#retrieve_as_json'
   get '/retriever/as_json' => 'scraper#retrieve_as_json'
+  get '/config/as_json' => 'scraper#config_as_json'
 end

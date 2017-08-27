@@ -31,6 +31,23 @@ module PropertyWebScraper
       # @scraper_configs_coll = PropertyWebScraper::ImportHost.all
     end
 
+    def config_as_json
+      import_host = PropertyWebScraper::ImportHost.find_by_host("www.idealista.com")
+      scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name(import_host.scraper_name)
+
+      # binding.pry
+      config = scraper_mapping.attributes[:textFields].map do |field|
+        {field[0] => field[1], "parseInfo" => field[1],"name" => field[0]}
+        # {field[0] => field[1], field[0] => field[1]}
+      end
+      # { |i| {i[0] => i[1] } }
+      render json: {
+        success: true,
+        key: import_host.host,
+        config: config
+      }
+    end
+
     def retrieve_as_json
 
       unless params["url"]

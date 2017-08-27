@@ -36,7 +36,7 @@ module PropertyWebScraper
     def process_url(import_url, import_host)
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
       # For datetime, yesterday is < today
-      listing_retrieved_recently = listing.last_retrieved_at.present? && (listing.last_retrieved_at > (DateTime.now.utc - 24.seconds))
+      listing_retrieved_recently = listing.last_retrieved_at.present? && (listing.last_retrieved_at > (DateTime.now.utc - 24.hours))
 
       if listing.last_retrieved_at.blank? || !listing_retrieved_recently
         retrieve_and_save listing, import_host.id
