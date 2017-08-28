@@ -42,5 +42,10 @@
     }
   },
   "booleanFields": {
+  },
+  "extraFields": {
+    "images": {
+      "imagesCssLocator": "#main-multimedia > div > img"
+    }
   }
 }]

@@ -32,15 +32,24 @@ module PropertyWebScraper
     end
 
     def config_as_json
-      import_host = PropertyWebScraper::ImportHost.find_by_host("www.idealista.com")
+      import_host = PropertyWebScraper::ImportHost.find_by_host("www.realtor.com")
+      unless import_host.present?
+        return render json: {
+          success: false,
+          key: "import_host"
+        }
+      end
+
       scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name(import_host.scraper_name)
 
-      # binding.pry
-      config = scraper_mapping.attributes[:textFields].map do |field|
-        {field[0] => field[1], "parseInfo" => field[1],"name" => field[0]}
-        # {field[0] => field[1], field[0] => field[1]}
-      end
-      # { |i| {i[0] => i[1] } }
+      config = []
+      config += (reform_config scraper_mapping.attributes[:defaultValues])
+      config += (reform_config scraper_mapping.attributes[:textFields])
+      config += (reform_config scraper_mapping.attributes[:booleanFields])
+      config += (reform_config scraper_mapping.attributes[:floatFields])
+      config += (reform_config scraper_mapping.attributes[:intFields])
+      config += (reform_config scraper_mapping.attributes[:extraFields])
+
       render json: {
         success: true,
         key: import_host.host,
@@ -142,6 +151,16 @@ module PropertyWebScraper
     end
 
     private
+
+    def reform_config scraper_mapping_attributes
+      unless scraper_mapping_attributes
+        return []
+      end
+      config = scraper_mapping_attributes.map do |field|
+        {"parseInfo" => field[1],"name" => field[0]}
+        # {field[0] => field[1], field[0] => field[1]}
+      end
+    end
 
     def uri_from_url import_url
       begin

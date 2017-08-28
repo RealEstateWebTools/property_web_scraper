@@ -1,65 +1,102 @@
-[{
+[
+{
   "name": "realtor",
-  "defaultValues": {
-    "country": {
+  "defaultValues":
+  {
+    "country":
+    {
       "value": "USA"
     },
-    "area_unit": {
+    "area_unit":
+    {
       "value": "sqft"
     },
-    "currency": {
+    "currency":
+    {
       "value": "USD"
     }
   },
-  "floatFields": {
-    "constructed_area": {
+  "floatFields":
+  {
+    "constructed_area":
+    {
       "cssLocator": "#ldp-property-meta > ul > li:nth-child(3) > span",
       "stripPunct": "true"
     },
-    "price_float": {
+    "price_float":
+    {
       "cssLocator": "#ldp-pricewrap > div > div > span",
       "stripFirstChar": "true",
       "stripPunct": "true"
     },
-    "longitude": {
-      "xpath": "//meta[@property='place:location:longitude']/@content"
+    "longitude":
+    {
+      "xpath": "//meta[@property='place:location:longitude']/@content",
+      "xpathLocator": "meta[property='place:location:longitude']"
     },
-    "latitude": {
-      "xpath": "//meta[@property='place:location:latitude']/@content"
+    "latitude":
+    {
+      "xpath": "//meta[@property='place:location:latitude']/@content",
+      "xpathLocator": "meta[property='place:location:latitude']"
     }
   },
-  "textFields": {
-    "reference": {
-      "cssLocator": "#ldp-listing-provider-info > table > tr:nth-child(3) > td:nth-child(2)"
+  "textFields":
+  {
+    "reference":
+    {
+      "cssLocator": "#ldp-listing-provider-info > table tr:nth-child(3) > td:nth-child(2)"
     },
-    "title": {
+    "title":
+    {
       "cssLocator": "#ldp-address > h1 > span:nth-child(1)"
     },
-    "description": {
-      "xpath": "//meta[@name='description']/@content"
+    "description":
+    {
+      "xpath": "//meta[@name='description']/@content",
+      "xpathLocator": "meta[name='description']"
     },
-    "price_string": {
+    "price_string":
+    {
       "cssLocator": "#ldp-pricewrap > div > div > span"
     },
-    "count_bedrooms": {
+    "count_bedrooms":
+    {
       "cssLocator": "#ldp-property-meta > ul > li:nth-child(1) > span"
     },
-    "postal_code": {
-      "xpath": "//meta[@property='og:postal-code']/@content"
+    "postal_code":
+    {
+      "xpath": "//meta[@property='og:postal-code']/@content",
+      "xpathLocator": "meta[property='og:postal-code']"
     },
-    "city": {
-      "xpath": "//meta[@property='og:locality']/@content"
+    "city":
+    {
+      "xpath": "//meta[@property='og:locality']/@content",
+      "xpathLocator": "meta[property='og:locality']"
     },
-    "region": {
-      "xpath": "//meta[@property='og:region']/@content"
+    "region":
+    {
+      "xpath": "//meta[@property='og:region']/@content",
+      "xpathLocator": "meta[property='og:region']"
     },
-    "address_string": {
-      "xpath": "//meta[@property='og:street-address']/@content"
+    "address_string":
+    {
+      "xpath": "//meta[@property='og:street-address']/@content",
+      "xpathLocator": "meta[property='og:street-address']"
     },
-    "main_image_url": {
-      "xpath": "//meta[@property='og:image']/@content"
+    "main_image_url":
+    {
+      "xpath": "//meta[@property='og:image']/@content",
+      "xpathLocator": "meta[property='og:image']"
     }
   },
-  "booleanFields": {
+  "booleanFields":
+  {},
+  "extraFields":
+  {
+    "images":
+    {
+      "imagesCssLocator": "#ldpHeroCarousel > div.owl-stage-outer > div > div > div > img"
+    }
   }
+
 }]
