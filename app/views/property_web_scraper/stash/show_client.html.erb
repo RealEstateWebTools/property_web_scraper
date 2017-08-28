@@ -1,0 +1,19 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h3 style="margin: 20px 0px">
+      View client
+    </h3>
+    <div>
+      <div>
+          <% @props_hash.keys.each do |prop_key| %>
+            <div>
+              <%= @props_hash[prop_key].to_s %>
+              <a href="/stash/<%= @client_key %>/<%= prop_key %>">/stash/<%= @client_key %>/<%= prop_key %></a>
+            </div>
+            <hr>
+          <% end %>
+      </div>
+      ttt
+    </div>
+  </div>
+</div>

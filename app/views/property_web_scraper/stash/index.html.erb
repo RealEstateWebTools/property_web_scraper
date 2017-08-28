@@ -3,13 +3,19 @@
     <h3 style="margin: 20px 0px">
       Easily retrieve details of properties for sale or rent in a standard format
     </h3>
-
     <div>
-      <% @props_hash.keys.each do |prop_key| %>
+      <% @clients_hash.keys.each do |client_key| %>
         <div>
-          <%= @props_hash[prop_key].to_s %>
-          <a href="/stash/<%= prop_key %>">/stash/<%= prop_key %></a>
+          <%= client_key.to_s %><a href="/stash/<%= client_key %>">/stash/<%= client_key %></a>
+          <% @clients_hash[client_key].keys.each do |prop_key| %>
+            <div>
+              <%= @clients_hash[client_key][prop_key].to_s %>
+              <a href="/stash/<%= client_key %>/<%= prop_key %>">/stash/<%= client_key %>/<%= prop_key %></a>
+            </div>
+            <hr>
+          <% end %>
         </div>
+        <hr>
       <% end %>
       ttt
     </div>

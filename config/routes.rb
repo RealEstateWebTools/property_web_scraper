@@ -1,7 +1,8 @@
 PropertyWebScraper::Engine.routes.draw do
   root to: 'scraper#welcome'
   get '/stash' => 'stash#index'
-  get '/stash/:id' => 'stash#show'
+  get '/stash/:client_id' => 'stash#show_client'
+  get '/stash/:client_id/:prop_id' => 'stash#show_prop'
   # get '/retrieve' => 'scraper#retrieve'
   # get '/scrapers/:id' => 'scraper#show'
   # get '/scrapers/:id/retrieve' => 'scraper#retrieve'
