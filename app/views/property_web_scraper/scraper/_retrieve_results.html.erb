@@ -1,5 +1,5 @@
 <!-- <h5>Result:</h5> -->
-<p>Property info retrieved:</p>
+<p>Property info retrieved..:</p>
 <table class="table">
   <% @listing_attributes.each do |listing_attribute| %>
     <tr>
@@ -18,3 +18,11 @@
   <tbody>
   </tbody>
 </table>
+<div>
+  <strong>Images</strong>
+</div>
+<% @listing.image_urls.each do |listing_image_url| %>
+  <div>
+    <%= link_to listing_image_url, listing_image_url, target: "_blank" %>
+  </div>
+<% end %>

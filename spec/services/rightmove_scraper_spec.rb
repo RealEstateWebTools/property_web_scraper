@@ -21,8 +21,12 @@ module PropertyWebScraper
 # byebug
         expect(retrieved_properties.for_rent).to eq(true)
         expect(retrieved_properties.reference).to eq("property-51775029")
+        expect(retrieved_properties.image_urls[0]).to eq("http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg")
 
-                
+
+
+
+
         # expect(retrieved_properties.constructed_area).to eq(427)
 
         # expect(retrieved_properties.currency).to eq('EUR')

@@ -58,8 +58,9 @@ module PropertyWebScraper
     end
 
     def retrieve_from_webpage(import_url)
-      # just a proof of concept at this stage
       properties = []
+      # nov 2017 - only 1 property is ever returned currently
+
       property_hash = {}
 
       # Fetch and parse HTML document
@@ -84,6 +85,13 @@ module PropertyWebScraper
         scraper_mapping.defaultValues.keys.each do |mapping_key|
           mapping = scraper_mapping.defaultValues[mapping_key]
           property_hash[mapping_key] = mapping['value']
+        end
+      end
+
+      if scraper_mapping.images
+        scraper_mapping.images.each do |image_mapping|
+          retrieved_array = retrieve_target_array doc, image_mapping, uri
+          property_hash["image_urls"] = retrieved_array
         end
       end
 
@@ -130,6 +138,26 @@ module PropertyWebScraper
 
     private
 
+    def retrieve_target_array(doc, mapping, uri)
+      retrieved_array = []
+      if mapping['cssLocator'].present?
+        css_elements = doc.css(mapping['cssLocator'])
+      end
+      if mapping['xpath'].present?
+        css_elements = doc.css(mapping['xpath'])
+      end
+      css_elements.each do |element|
+        retrieved_array.push element.text  
+      end
+      trimmed_and_stripped_array = []
+      retrieved_array.each do |string_to_clean|
+        cleaned_string = clean_up_string string_to_clean, mapping
+        trimmed_and_stripped_array.push cleaned_string
+        # string_to_clean.sub("_max_135x100", "")
+      end
+      trimmed_and_stripped_array
+    end
+
     def retrieve_target_text(doc, mapping, uri)
       retrieved_text = ''
       if mapping['urlPathPart'].present?
@@ -146,6 +174,24 @@ module PropertyWebScraper
         # but in future this might change
         retrieved_text = get_text_from_css css_elements, mapping
       end
+      # unless mapping['splitTextCharacter'].nil?
+      #   # - cannot use .present? above as splitTextCharacter is sometimes " "
+      #   # mapping["splitTextCharacter"].present?
+      #   #
+      #   # in this case the element's text need to be split by the splitTextCharacter
+      #   # splitTextArrayId refers to where in the resulting array
+      #   # the correct item is
+      #   begin
+      #     splitTextCharacter = mapping['splitTextCharacter'] || ' '
+      #     splitTextArrayId = mapping['splitTextArrayId'].to_i
+      #     retrieved_text = retrieved_text.split(splitTextCharacter)[splitTextArrayId]
+      #   rescue Exception => e
+      #   end
+      # end
+      retrieved_text = clean_up_string retrieved_text, mapping
+    end
+
+    def clean_up_string(string_to_clean, mapping)
       unless mapping['splitTextCharacter'].nil?
         # - cannot use .present? above as splitTextCharacter is sometimes " "
         # mapping["splitTextCharacter"].present?
@@ -155,19 +201,21 @@ module PropertyWebScraper
         # the correct item is
         begin
           splitTextCharacter = mapping['splitTextCharacter'] || ' '
-          # byebug
           splitTextArrayId = mapping['splitTextArrayId'].to_i
-          retrieved_text = retrieved_text.split(splitTextCharacter)[splitTextArrayId]
+          string_to_clean = string_to_clean.split(splitTextCharacter)[splitTextArrayId]
         rescue Exception => e
         end
-      end
-      retrieved_text
+      end     
+      if mapping['stripString'].present?
+         string_to_clean = string_to_clean.sub(mapping['stripString'], "")
+       end 
+      string_to_clean
     end
 
     def get_text_from_url(url_path_part, uri)
-      url_retrieved_text = uri.path        
+      url_retrieved_text = uri.path
       if url_path_part.to_i > 0
-        url_retrieved_text = uri.path.split("/")[url_path_part.to_i]        
+        url_retrieved_text = uri.path.split("/")[url_path_part.to_i]
       end
       url_retrieved_text
     end

@@ -90,6 +90,13 @@
       "xpathLocator": "meta[property='og:image']"
     }
   },
+  "images": [
+    {
+      "xpath": "//meta[@property='og:image']/@content",
+      "xpathLocator": "meta[property='og:image']",
+      "stripString": "_max_135x100"
+    }
+  ],
   "booleanFields": {
     "for_rent": {
       "urlPathPart": "1",

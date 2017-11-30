@@ -23,7 +23,7 @@ module PropertyWebScraper
     def self.update_from_hash(listing, property_hash)
       attributes = %w(reference title description
                       price_string price_float area_unit address_string currency
-                      country longitude latitude main_image_url for_rent for_sale )
+                      country longitude latitude main_image_url for_rent for_sale image_urls )
       attributes.each do |attribute|
         listing[attribute] = property_hash[attribute]
       end
