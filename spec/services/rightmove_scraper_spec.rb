@@ -22,16 +22,14 @@ module PropertyWebScraper
         expect(retrieved_properties.for_rent).to eq(true)
         expect(retrieved_properties.reference).to eq("property-51775029")
         expect(retrieved_properties.image_urls[0]).to eq("http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg")
+        expect(retrieved_properties.title).to eq("4 bedroom detached house to rent in School Road, Birmingham, B14, B14")
 
+        expect(retrieved_properties.address_string).to eq("School Road, Birmingham, B14")
 
-
-
-
-        # expect(retrieved_properties.constructed_area).to eq(427)
-
-        # expect(retrieved_properties.currency).to eq('EUR')
-        # expect(retrieved_properties.price_string).to eq('147.000')
-        # expect(retrieved_properties.price_float).to eq(147_000.0)
+        
+        expect(retrieved_properties.currency).to eq('GBP')
+        expect(retrieved_properties.price_string).to eq('£995 pcm')
+        expect(retrieved_properties.price_float).to eq(995.0)
       end
     end
   end

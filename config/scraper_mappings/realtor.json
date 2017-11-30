@@ -31,13 +31,11 @@
     },
     "longitude":
     {
-      "xpath": "//meta[@property='place:location:longitude']/@content",
-      "xpathLocator": "meta[property='place:location:longitude']"
+      "xpath": "//meta[@property='place:location:longitude']/@content"
     },
     "latitude":
     {
-      "xpath": "//meta[@property='place:location:latitude']/@content",
-      "xpathLocator": "meta[property='place:location:latitude']"
+      "xpath": "//meta[@property='place:location:latitude']/@content"
     }
   },
   "textFields":
@@ -52,8 +50,7 @@
     },
     "description":
     {
-      "xpath": "//meta[@name='description']/@content",
-      "xpathLocator": "meta[name='description']"
+      "xpath": "//meta[@name='description']/@content"
     },
     "price_string":
     {
@@ -65,28 +62,23 @@
     },
     "postal_code":
     {
-      "xpath": "//meta[@property='og:postal-code']/@content",
-      "xpathLocator": "meta[property='og:postal-code']"
+      "xpath": "//meta[@property='og:postal-code']/@content"
     },
     "city":
     {
-      "xpath": "//meta[@property='og:locality']/@content",
-      "xpathLocator": "meta[property='og:locality']"
+      "xpath": "//meta[@property='og:locality']/@content"
     },
     "region":
     {
-      "xpath": "//meta[@property='og:region']/@content",
-      "xpathLocator": "meta[property='og:region']"
+      "xpath": "//meta[@property='og:region']/@content"
     },
     "address_string":
     {
-      "xpath": "//meta[@property='og:street-address']/@content",
-      "xpathLocator": "meta[property='og:street-address']"
+      "xpath": "//meta[@property='og:street-address']/@content"
     },
     "main_image_url":
     {
-      "xpath": "//meta[@property='og:image']/@content",
-      "xpathLocator": "meta[property='og:image']"
+      "xpath": "//meta[@property='og:image']/@content"
     }
   },
   "booleanFields":

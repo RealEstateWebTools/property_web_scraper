@@ -18,26 +18,19 @@
   },
   "floatFields":
   {
-    "constructed_area":
-    {
-      "cssLocator": "#ldp-property-meta > ul > li:nth-child(3) > span",
-      "stripPunct": "true"
-    },
     "price_float":
     {
-      "cssLocator": "#ldp-pricewrap > div > div > span",
+      "cssLocator": "#propertyHeaderPrice > strong",
       "stripFirstChar": "true",
       "stripPunct": "true"
     },
     "longitude":
     {
-      "xpath": "//meta[@property='place:location:longitude']/@content",
-      "xpathLocator": "meta[property='place:location:longitude']"
+      "xpath": "//meta[@property='place:location:longitude']/@content"
     },
     "latitude":
     {
-      "xpath": "//meta[@property='place:location:latitude']/@content",
-      "xpathLocator": "meta[property='place:location:latitude']"
+      "xpath": "//meta[@property='place:location:latitude']/@content"
     }
   },
   "textFields":
@@ -49,51 +42,30 @@
     },
     "title":
     {
-      "cssLocator": "#ldp-address > h1 > span:nth-child(1)"
+      "cssLocator": "title"
     },
     "description":
     {
-      "xpath": "//meta[@name='description']/@content",
-      "xpathLocator": "meta[name='description']"
+      // https://stackoverflow.com/questions/45459234/rails-nokogiri-gem-scrap-data-using-itemprop
+      "xpath": "//p[@itemprop = 'description']"
     },
     "price_string":
     {
-      "cssLocator": "#ldp-pricewrap > div > div > span"
+      "cssLocator": "#propertyHeaderPrice > strong"
     },
-    "count_bedrooms":
-    {
-      "cssLocator": "#ldp-property-meta > ul > li:nth-child(1) > span"
-    },
-    "postal_code":
-    {
-      "xpath": "//meta[@property='og:postal-code']/@content",
-      "xpathLocator": "meta[property='og:postal-code']"
-    },
-    "city":
-    {
-      "xpath": "//meta[@property='og:locality']/@content",
-      "xpathLocator": "meta[property='og:locality']"
-    },
-    "region":
-    {
-      "xpath": "//meta[@property='og:region']/@content",
-      "xpathLocator": "meta[property='og:region']"
-    },
+
     "address_string":
     {
-      "xpath": "//meta[@property='og:street-address']/@content",
-      "xpathLocator": "meta[property='og:street-address']"
+      "xpath": "//meta[@itemprop = 'streetAddress']/@content"
     },
     "main_image_url":
     {
-      "xpath": "//meta[@property='og:image']/@content",
-      "xpathLocator": "meta[property='og:image']"
+      "xpath": "//meta[@name='twitter:image:src']/@content"
     }
   },
   "images": [
     {
       "xpath": "//meta[@property='og:image']/@content",
-      "xpathLocator": "meta[property='og:image']",
       "stripString": "_max_135x100"
     }
   ],
@@ -107,13 +79,6 @@
       "urlPathPart": "1",
       "evaluator": "include?",
       "evaluatorParam": "property-for-sale"
-    }
-  },
-  "extraFields":
-  {
-    "images":
-    {
-      "imagesCssLocator": "#ldpHeroCarousel > div.owl-stage-outer > div > div > div > img"
     }
   }
 
