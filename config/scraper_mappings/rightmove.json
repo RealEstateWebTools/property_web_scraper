@@ -42,9 +42,10 @@
   },
   "textFields":
   {
-    "reference":
-    {
-      "cssLocator": "#ldp-listing-provider-info > table tr:nth-child(3) > td:nth-child(2)"
+    "reference": {
+      "urlPathPart": "2",
+      "splitTextCharacter": ".",
+      "splitTextArrayId": "0"
     },
     "title":
     {
@@ -89,8 +90,18 @@
       "xpathLocator": "meta[property='og:image']"
     }
   },
-  "booleanFields":
-  {},
+  "booleanFields": {
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator": "include?",
+      "evaluatorParam": "property-to-rent"
+    },
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator": "include?",
+      "evaluatorParam": "property-for-sale"
+    }
+  },
   "extraFields":
   {
     "images":

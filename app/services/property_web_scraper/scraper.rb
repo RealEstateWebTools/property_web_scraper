@@ -90,39 +90,39 @@ module PropertyWebScraper
       if scraper_mapping.intFields
         scraper_mapping.intFields.keys.each do |mapping_key|
           mapping = scraper_mapping.intFields[mapping_key]
-          target_text = retrieve_target_text doc, mapping
-          property_hash[mapping_key] = target_text.strip.to_i
+          retrieved_text = retrieve_target_text doc, mapping, uri
+          property_hash[mapping_key] = retrieved_text.strip.to_i
         end
       end
 
       if scraper_mapping.floatFields
         scraper_mapping.floatFields.keys.each do |mapping_key|
           mapping = scraper_mapping.floatFields[mapping_key]
-          target_text = retrieve_target_text doc, mapping
+          retrieved_text = retrieve_target_text doc, mapping, uri
           # if mapping['comaToDot']
-          #   target_text = target_text.strip.tr(',', '.')
+          #   retrieved_text = retrieved_text.strip.tr(',', '.')
           # end
           if mapping['stripPunct']
-            target_text = target_text.tr('.', '').tr(',', '')
+            retrieved_text = retrieved_text.tr('.', '').tr(',', '')
           end
           if mapping['stripFirstChar']
-            target_text = target_text.strip.last(-1) || ''
+            retrieved_text = retrieved_text.strip.last(-1) || ''
           end
-          property_hash[mapping_key] = target_text.strip.to_f
+          property_hash[mapping_key] = retrieved_text.strip.to_f
         end
       end
 
       scraper_mapping.textFields.keys.each do |mapping_key|
         mapping = scraper_mapping.textFields[mapping_key]
-        target_text = retrieve_target_text doc, mapping
-        property_hash[mapping_key] = target_text.strip
+        retrieved_text = retrieve_target_text doc, mapping, uri
+        property_hash[mapping_key] = retrieved_text.strip
       end
 
       scraper_mapping.booleanFields.keys.each do |mapping_key|
         mapping = scraper_mapping.booleanFields[mapping_key]
-        target_text = retrieve_target_text doc, mapping
+        retrieved_text = retrieve_target_text doc, mapping, uri
         # target_element = doc.css(mapping["cssLocator"])[mapping["cssCountId"].to_i] || ""
-        property_hash[mapping_key] = target_text.strip.send(mapping['evaluator'], mapping['evaluatorParam'])
+        property_hash[mapping_key] = retrieved_text.strip.send(mapping['evaluator'], mapping['evaluatorParam'])
       end
       properties.push property_hash
       properties
@@ -130,32 +130,21 @@ module PropertyWebScraper
 
     private
 
-    def retrieve_target_text(doc, mapping)
-      target_text = ''
+    def retrieve_target_text(doc, mapping, uri)
+      retrieved_text = ''
+      if mapping['urlPathPart'].present?
+        url_path_part = mapping['urlPathPart']
+        retrieved_text = get_text_from_url url_path_part, uri
+      end
       if mapping['cssLocator'].present?
         css_elements = doc.css(mapping['cssLocator'])
-        target_text = get_text_from_css css_elements, mapping
+        retrieved_text = get_text_from_css css_elements, mapping
       end
       if mapping['xpath'].present?
         css_elements = doc.css(mapping['xpath'])
         # able to retrieve xpath just like with css
         # but in future this might change
-        target_text = get_text_from_css css_elements, mapping
-      end
-      target_text
-    end
-
-    def get_text_from_css(css_elements, mapping)
-      target_text = css_elements.text
-      if mapping['cssCountId'].present?
-        # in this case we have multiple elements matched
-        # and the cssCountId refers to where in the list of matched elements
-        # the correct item is
-        begin
-          css_count_id = mapping['cssCountId'].to_i
-          target_text = css_elements[css_count_id].text || ''
-        rescue Exception => e
-        end
+        retrieved_text = get_text_from_css css_elements, mapping
       end
       unless mapping['splitTextCharacter'].nil?
         # - cannot use .present? above as splitTextCharacter is sometimes " "
@@ -166,12 +155,36 @@ module PropertyWebScraper
         # the correct item is
         begin
           splitTextCharacter = mapping['splitTextCharacter'] || ' '
+          # byebug
           splitTextArrayId = mapping['splitTextArrayId'].to_i
-          target_text = css_elements.text.split(splitTextCharacter)[splitTextArrayId]
+          retrieved_text = retrieved_text.split(splitTextCharacter)[splitTextArrayId]
         rescue Exception => e
         end
       end
-      target_text
+      retrieved_text
+    end
+
+    def get_text_from_url(url_path_part, uri)
+      url_retrieved_text = uri.path        
+      if url_path_part.to_i > 0
+        url_retrieved_text = uri.path.split("/")[url_path_part.to_i]        
+      end
+      url_retrieved_text
+    end
+
+    def get_text_from_css(css_elements, mapping)
+      css_retrieved_text = css_elements.text
+      if mapping['cssCountId'].present?
+        # in this case we have multiple elements matched
+        # and the cssCountId refers to where in the list of matched elements
+        # the correct item is
+        begin
+          css_count_id = mapping['cssCountId'].to_i
+          css_retrieved_text = css_elements[css_count_id].text || ''
+        rescue Exception => e
+        end
+      end
+      css_retrieved_text
     end
   end
 end
