@@ -6,8 +6,8 @@ module PropertyWebScraper
   class Scraper
     attr_accessor :scraper_mapping
 
-    def initialize(scraper_mapping)
-      self.scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name(scraper_mapping)
+    def initialize(scraper_mapping_name)
+      self.scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name(scraper_mapping_name)
       raise ArgumentError, 'Not valid scraper' if self.scraper_mapping.blank?
     end
 
@@ -36,7 +36,9 @@ module PropertyWebScraper
     def process_url(import_url, import_host)
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
       # For datetime, yesterday is < today
-      listing_retrieved_recently = listing.last_retrieved_at.present? && (listing.last_retrieved_at > (DateTime.now.utc - 24.hours))
+      # recent = (DateTime.now.utc - 24.hours)
+      recent = (DateTime.now.utc)
+      listing_retrieved_recently = listing.last_retrieved_at.present? && (listing.last_retrieved_at > recent)
 
       if listing.last_retrieved_at.blank? || !listing_retrieved_recently
         retrieve_and_save listing, import_host.id

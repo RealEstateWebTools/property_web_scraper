@@ -121,7 +121,8 @@ module PropertyWebScraper
           @listing = web_scraper.process_url import_url, import_host
           @listing_attributes = %w(reference title description
                                    price_string price_float area_unit address_string currency
-                                   country longitude latitude main_image_url for_rent for_sale )
+                                   country longitude latitude main_image_url for_rent for_sale
+                                   count_bedrooms )
           # above used to display /views/property_web_scraper/scraper/_retrieve_results.html.erb
         else
           @success = false

@@ -3,6 +3,7 @@ import_hosts_data_array = [
   { scraper_name: 'mlslistings', host: 'www.mlslistings.com' },
   { scraper_name: 'realtor', host: 'www.realtor.com' },
   { scraper_name: 'idealista', host: 'www.idealista.com' },
+  { scraper_name: 'rightmove', host: 'www.rightmove.co.uk' },
   { scraper_name: 'zoopla', host: 'www.zoopla.co.uk' }
 ]
 

@@ -4,6 +4,7 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.integer  :flags, default: 0, null: false
       t.integer  :area_unit, default: 0, null: false
       t.string   :reference
+      # -1 indicates value could not be retrieved
       t.integer  :year_construction, default: 0, null: false
       t.integer  :count_bedrooms, default: 0, null: false
       t.float :count_bathrooms, default: 0, null: false
