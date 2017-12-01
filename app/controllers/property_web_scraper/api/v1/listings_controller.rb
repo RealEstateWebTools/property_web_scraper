@@ -38,9 +38,19 @@ module PropertyWebScraper
       # response = firebase.push("client-props/#{client_id}", @listing)
       # @props_hash = response.body
 
+      # currently only 1 listing will be returned but in the future
+      # where a page contains other listings, a urls_remaining number
+      # will indicate how many more listings remain to be retrieved.
+      # The retry_duration will indicate how long the client needs to wait before making
+      # call.
+      # On each call, an extra listing will be added
       render json: {
         success: true,
-        listing: @listing
+        retry_duration: 0,
+        urls_remaining: 0,
+        listings: [
+          @listing
+        ]
       }
     end
 

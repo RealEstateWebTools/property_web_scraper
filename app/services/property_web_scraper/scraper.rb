@@ -34,13 +34,17 @@ module PropertyWebScraper
     # end
 
     def process_url(import_url, import_host)
+      # TODO - use import_host.stale_age_duration or query_param to decide if to refresh
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
       # For datetime, yesterday is < today
       # recent = (DateTime.now.utc - 24.hours)
       recent = (DateTime.now.utc)
       listing_retrieved_recently = listing.last_retrieved_at.present? && (listing.last_retrieved_at > recent)
 
+      # TODO - add specs for stale_age calculation
       if listing.last_retrieved_at.blank? || !listing_retrieved_recently
+        # if listing has not been retrieved within time defined by stale age
+        # retrieve from source rather than db
         retrieve_and_save listing, import_host.slug
         import_host.last_retrieval_at = DateTime.now
         import_host.save!

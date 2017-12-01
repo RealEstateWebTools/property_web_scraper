@@ -11,7 +11,8 @@ class CreatePropertyWebScraperImportHosts < ActiveRecord::Migration[5.0]
       t.text :invalid_urls, array: true, default: []
       t.datetime :last_retrieval_at
       t.string :valid_url_regex
-      t.string :stale_age
+      t.string :pause_between_calls, default: "5.seconds"
+      t.string :stale_age, default: "1.day"
       t.timestamps
     end
 
