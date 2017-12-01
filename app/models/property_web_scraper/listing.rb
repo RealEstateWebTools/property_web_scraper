@@ -7,17 +7,22 @@ module PropertyWebScraper
 
     def as_json(options = nil)
       super({ only: [
-        :import_url,
-        :reference, :price_string, :price_float,
-        :title, :description,
-        :area_unit, :plot_area, :constructed_area,
-        :count_bedrooms, :count_bathrooms,
-        :count_toilets, :count_garages,
-        :currency, :city, :region, :country,
-        :address_string, :longitude, :latitude,
-        :for_sale, :for_rent, :main_image_url,
-        :last_retrieved_at, :image_urls, :unknown_fields
-      ],
+                :import_url,
+                :reference, :price_string, :price_float,
+                :title, :description,
+                :area_unit, :plot_area, :constructed_area,
+                :count_bedrooms, :count_bathrooms,
+                :count_toilets, :count_garages,
+                :currency,
+                :street_number, :street_name,
+                :street_address, :postal_code,
+                :city, :province,
+                :region, :country,
+                :address_string, :longitude, :latitude,
+                :for_sale, :for_rent, :main_image_url,
+                :last_retrieved_at, :image_urls,
+                :features, :unknown_fields
+              ],
               methods: [] }.merge(options || {}))
     end
 

@@ -74,12 +74,14 @@ ActiveRecord::Schema.define(version: 20170628201113) do
     t.float    "latitude"
     t.float    "longitude"
     t.datetime "last_retrieved_at"
-    t.integer  "import_host_id"
+    t.string   "import_host_slug"
     t.integer  "re_agent_id"
     t.string   "import_url"
     t.json     "import_history",         default: {}
     t.string   "main_image_url"
     t.text     "image_urls",             default: [],                 array: true
+    t.text     "related_urls",           default: [],                 array: true
+    t.text     "features",               default: [],                 array: true
     t.text     "unknown_fields",         default: [],                 array: true
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false

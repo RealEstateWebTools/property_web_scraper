@@ -1,10 +1,11 @@
 # load File.join(PropertyWebScraper::Engine.root, 'db', 'seeds', 'import_hosts.rb')
 import_hosts_data_array = [
-  { scraper_name: 'mlslistings', host: 'www.mlslistings.com' },
-  { scraper_name: 'realtor', host: 'www.realtor.com' },
-  { scraper_name: 'idealista', host: 'www.idealista.com' },
-  { scraper_name: 'rightmove', host: 'www.rightmove.co.uk' },
-  { scraper_name: 'zoopla', host: 'www.zoopla.co.uk' }
+  { slug: 'mlslistings', scraper_name: 'mlslistings', host: 'www.mlslistings.com' },
+  { slug: 'realtor', scraper_name: 'realtor', host: 'www.realtor.com' },
+  { slug: 'idealista', scraper_name: 'idealista', host: 'www.idealista.com' },
+  { slug: 'rightmove', scraper_name: 'rightmove', host: 'www.rightmove.co.uk' },
+  { slug: 'example', scraper_name: 'default', host: 'www.example.co.uk' },
+  { slug: 'zoopla', scraper_name: 'zoopla', host: 'www.zoopla.co.uk' }
 ]
 
 import_hosts_data_array.each do |import_host_data|

@@ -41,16 +41,16 @@ module PropertyWebScraper
       listing_retrieved_recently = listing.last_retrieved_at.present? && (listing.last_retrieved_at > recent)
 
       if listing.last_retrieved_at.blank? || !listing_retrieved_recently
-        retrieve_and_save listing, import_host.id
+        retrieve_and_save listing, import_host.slug
         import_host.last_retrieval_at = DateTime.now
         import_host.save!
       end
       listing
     end
 
-    def retrieve_and_save(listing, import_host_id)
+    def retrieve_and_save(listing, import_host_slug)
       retrieved_properties = retrieve_from_webpage listing.import_url
-      listing.import_host_id = import_host_id
+      listing.import_host_slug = import_host_slug
       listing.last_retrieved_at = DateTime.now
       Listing.update_from_hash listing, retrieved_properties[0]
 

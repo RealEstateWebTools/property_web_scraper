@@ -47,7 +47,6 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.string :address_string
       t.string :street_number
       t.string :street_name
-      # TODO - remove below and add agent_id, slug, related_urls as json...
       t.string :street_address
       t.string :postal_code
       t.string :province
@@ -58,7 +57,8 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.float :longitude
 
       t.datetime :last_retrieved_at
-      t.integer :import_host_id
+      # t.integer :import_host_id
+      t.string :import_host_slug
       # for real estate agent ref:
       t.integer :re_agent_id
       t.string :import_url
@@ -66,6 +66,8 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
 
       t.string :main_image_url
       t.text :image_urls, array: true, default: []
+      t.text :related_urls, array: true, default: []
+      t.text :features, array: true, default: []
       t.text :unknown_fields, array: true, default: []
 
       t.timestamps
