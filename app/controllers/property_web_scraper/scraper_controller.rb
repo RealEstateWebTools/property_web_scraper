@@ -1,4 +1,5 @@
 require_dependency 'property_web_scraper/application_controller'
+# scraper endpoints save to firebase
 
 module PropertyWebScraper
   class ScraperController < ApplicationController
@@ -160,14 +161,6 @@ module PropertyWebScraper
       config = scraper_mapping_attributes.map do |field|
         {"parseInfo" => field[1],"name" => field[0]}
         # {field[0] => field[1], field[0] => field[1]}
-      end
-    end
-
-    def uri_from_url import_url
-      begin
-        uri = URI.parse import_url
-      rescue URI::InvalidURIError => error
-        uri = ""
       end
     end
 
