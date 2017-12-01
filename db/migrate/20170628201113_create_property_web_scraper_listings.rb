@@ -5,15 +5,15 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.integer  :area_unit, default: 0, null: false
       t.string   :reference
       # -1 indicates value could not be retrieved
-      t.integer  :year_construction, default: 0, null: false
-      t.integer  :count_bedrooms, default: 0, null: false
-      t.float :count_bathrooms, default: 0, null: false
+      t.integer  :year_construction, default: 0 #, null: false
+      t.integer  :count_bedrooms, default: 0 #, null: false
+      t.float :count_bathrooms, default: 0 #, null: false
       # turns out count_bathrooms in the US can be .5, 1.5 etc
       # so need a float for above
-      t.integer  :count_toilets, default: 0, null: false
-      t.integer  :count_garages, default: 0, null: false
-      t.float    :plot_area, default: 0, null: false
-      t.float    :constructed_area, default: 0, null: false
+      t.integer  :count_toilets, default: 0 #, null: false
+      t.integer  :count_garages, default: 0 #, null: false
+      t.float    :plot_area, default: 0 #, null: false
+      t.float    :constructed_area, default: 0 #, null: false
       t.integer  :energy_rating
       t.float    :energy_performance
       t.string   :title
@@ -31,6 +31,8 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.boolean :for_sale, default: false
       t.boolean :for_rent, default: false
 
+      t.datetime :deleted_at
+      t.datetime :active_from
       t.datetime :available_to_rent_from
       t.datetime :available_to_rent_till
 
@@ -40,7 +42,23 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       # above will create below in schema.rb:
       # t.integer  "price_sale_cents",                     default: 0,     null: false
       # t.string   "price_sale_currency",                  default: "EUR", null: false
-      t.monetize :price_rental
+      # t.monetize :price_rental
+
+      t.monetize :price_sale_current
+      t.monetize :price_sale_original
+
+      t.monetize :price_rental_monthly_current
+      t.monetize :price_rental_monthly_original
+      t.monetize :price_rental_monthly_low_season
+      t.monetize :price_rental_monthly_high_season
+      t.monetize :price_rental_monthly_standard_season
+      t.monetize :commission
+      t.monetize :service_charge_yearly
+
+      # below is the lowest of the 3 seasonal monthly values
+      # or the standard rental value
+      # needed to allow me to search across diff rental types
+      t.monetize :price_rental_monthly_for_search
 
       t.string :currency
 

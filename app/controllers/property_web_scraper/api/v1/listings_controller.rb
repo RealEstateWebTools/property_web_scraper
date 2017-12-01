@@ -30,12 +30,15 @@ module PropertyWebScraper
       #   client_id = "pwb" + SecureRandom.urlsafe_base64(8)
       # end
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
-      @listing = web_scraper.process_url uri.to_s, import_host
+      listing = web_scraper.process_url uri.to_s, import_host
+
+      pwb_listing = PropertyWebScraper::PwbListing.find listing.id
+
 
       # fb_instance_id = Rails.application.secrets.fb_instance_id
       # base_uri = "https://#{fb_instance_id}.firebaseio.com/"
       # firebase = Firebase::Client.new(base_uri)
-      # response = firebase.push("client-props/#{client_id}", @listing)
+      # response = firebase.push("client-props/#{client_id}", pwb_listing)
       # @props_hash = response.body
 
       # currently only 1 listing will be returned but in the future
@@ -49,7 +52,7 @@ module PropertyWebScraper
         retry_duration: 0,
         urls_remaining: 0,
         listings: [
-          @listing
+          pwb_listing
         ]
       }
     end

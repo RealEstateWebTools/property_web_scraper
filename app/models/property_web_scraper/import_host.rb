@@ -5,8 +5,9 @@ module PropertyWebScraper
       "http://#{host}"
     end
 
-    # TODO - use valid_url_regex to 
-    # and pause_between_calls + last_retrieval_at to decide when to hit server again 
+    # TODO - use valid_url_regex to decide if url is valid for current import host
+    #   - also use pause_between_calls + last_retrieval_at to decide 
+    # when to hit server again 
 
     def stale_age_duration
       duration_string = "1.day"

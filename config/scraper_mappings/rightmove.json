@@ -14,6 +14,9 @@
     "currency":
     {
       "value": "GBP"
+    },
+    "for_rent_short_term": {
+      "value": "false"
     }
   },
   "floatFields":
@@ -58,6 +61,10 @@
     {
       "xpath": "//meta[@itemprop = 'streetAddress']/@content"
     },
+    "street_address":
+    {
+      "xpath": "//meta[@itemprop = 'streetAddress']/@content"
+    },
     "main_image_url":
     {
       "xpath": "//meta[@name='twitter:image:src']/@content"
@@ -71,6 +78,11 @@
   ],
   "booleanFields": {
     "for_rent": {
+      "urlPathPart": "1",
+      "evaluator": "include?",
+      "evaluatorParam": "property-to-rent"
+    },
+    "for_rent_long_term": {
       "urlPathPart": "1",
       "evaluator": "include?",
       "evaluatorParam": "property-to-rent"
