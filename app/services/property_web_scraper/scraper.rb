@@ -174,7 +174,7 @@ module PropertyWebScraper
         # "longitude:[^\,]*"
         # regex_results_array = doc.search("script").text.scan(regex) || [""]
         retrieved_text = doc.search("script").text.scan(regex)[0] || ""
-        retrieved_text = retrieved_text.split("\"")[1] || ""
+        # retrieved_text = retrieved_text.split("\"")[1] || ""
       end
       if mapping['urlPathPart'].present?
         url_path_part = mapping['urlPathPart']
@@ -215,6 +215,7 @@ module PropertyWebScraper
         # in this case the element's text need to be split by the splitTextCharacter
         # splitTextArrayId refers to where in the resulting array
         # the correct item is
+        # byebug
         begin
           splitTextCharacter = mapping['splitTextCharacter'] || ' '
           splitTextArrayId = mapping['splitTextArrayId'].to_i

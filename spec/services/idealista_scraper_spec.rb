@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module PropertyWebScraper
   RSpec.describe 'Idealista Scraper' do
-    let(:import_url) { 'https://www.idealista.com/inmueble/30191362/' }
+    let(:import_url) { 'https://www.idealista.com/inmueble/1678322/' }
     before :all do
       load File.join(PropertyWebScraper::Engine.root, 'db', 'seeds', 'import_hosts.rb')
     end
@@ -19,11 +19,15 @@ module PropertyWebScraper
         listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
         retrieved_properties = web_scraper.retrieve_and_save listing, 1
 
-        expect(retrieved_properties.reference).to eq('30191362')
-        expect(retrieved_properties.constructed_area).to eq(427)
+
+        expect(retrieved_properties.for_sale).to eq(true)
+        expect(retrieved_properties.latitude).to eq(40.732845)
+        expect(retrieved_properties.longitude).to eq(-3.5815072)
+        expect(retrieved_properties.reference).to eq('1678322')
+        expect(retrieved_properties.constructed_area).to eq(70)
         expect(retrieved_properties.currency).to eq('EUR')
-        expect(retrieved_properties.price_string).to eq('147.000')
-        expect(retrieved_properties.price_float).to eq(147_000.0)
+        expect(retrieved_properties.price_string).to eq('82.000')
+        expect(retrieved_properties.price_float).to eq(82_000.0)
       end
     end
   end
