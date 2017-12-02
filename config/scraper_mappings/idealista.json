@@ -18,6 +18,15 @@
     "price_float": {
       "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(1) > span",
       "stripPunct": "true"
+    },
+    "latitude":
+    {
+      // below is actually "latitude:[^\,]*" but had to escape the \
+      "scriptRegEx": "latitude:[^\\,]*"
+    },
+    "longitude":
+    {
+      "scriptRegEx": "longitude:[^\\,]*"
     }
   },
   "intFields": {
@@ -27,9 +36,7 @@
   },
   "textFields": {
     "reference": {
-      "cssLocator": "#side-content > section > div.advertiser-data.txt-soft > p:nth-child(2)",
-      "splitTextCharacter": ":",
-      "splitTextArrayId": "1"
+      "scriptRegEx": "propertyId:[^\\,]*"
     },
     "title": {
       "cssLocator": "#main > div > div > section > h1 > span"
@@ -41,6 +48,12 @@
       "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(1) > span"
     }
   },
+  "images": [
+    {
+      "cssLocator": "#grid-multimedia img",
+      "stripString": ",WEB_DETAIL"
+    }
+  ],
   "booleanFields": {
   },
   "extraFields": {

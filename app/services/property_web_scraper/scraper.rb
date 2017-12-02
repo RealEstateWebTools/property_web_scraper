@@ -146,12 +146,17 @@ module PropertyWebScraper
       retrieved_array = []
       if mapping['cssLocator'].present?
         css_elements = doc.css(mapping['cssLocator'])
+        css_elements.each do |element|
+          # TODO - allow passing in of element to be evaluated
+          retrieved_array.push element.attr('data-service')
+        end
       end
+
       if mapping['xpath'].present?
         css_elements = doc.css(mapping['xpath'])
-      end
-      css_elements.each do |element|
-        retrieved_array.push element.text  
+        css_elements.each do |element|
+          retrieved_array.push element.text
+        end
       end
       trimmed_and_stripped_array = []
       retrieved_array.each do |string_to_clean|
@@ -164,6 +169,13 @@ module PropertyWebScraper
 
     def retrieve_target_text(doc, mapping, uri)
       retrieved_text = ''
+      if mapping['scriptRegEx'].present?
+        regex = Regexp.new mapping['scriptRegEx']
+        # "longitude:[^\,]*"
+        # regex_results_array = doc.search("script").text.scan(regex) || [""]
+        retrieved_text = doc.search("script").text.scan(regex)[0] || ""
+        retrieved_text = retrieved_text.split("\"")[1] || ""
+      end
       if mapping['urlPathPart'].present?
         url_path_part = mapping['urlPathPart']
         retrieved_text = get_text_from_url url_path_part, uri
@@ -207,12 +219,14 @@ module PropertyWebScraper
           splitTextCharacter = mapping['splitTextCharacter'] || ' '
           splitTextArrayId = mapping['splitTextArrayId'].to_i
           string_to_clean = string_to_clean.split(splitTextCharacter)[splitTextArrayId]
+          # in case above returns nil
+          string_to_clean = string_to_clean || ''
         rescue Exception => e
         end
-      end     
+      end
       if mapping['stripString'].present?
-         string_to_clean = string_to_clean.sub(mapping['stripString'], "")
-       end 
+        string_to_clean = string_to_clean.sub(mapping['stripString'], "")
+      end
       string_to_clean
     end
 

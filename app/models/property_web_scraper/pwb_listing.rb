@@ -46,6 +46,7 @@ module PropertyWebScraper
 
     def property_photos
       property_photos = []
+      image_urls = self.image_urls || []
       image_urls.each do |image_url|
         property_photos.push({
           url: image_url
