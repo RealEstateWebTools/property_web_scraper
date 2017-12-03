@@ -148,7 +148,24 @@ module PropertyWebScraper
         css_elements = doc.css(mapping['cssLocator'])
         css_elements.each do |element|
           # TODO - allow passing in of element to be evaluated
-          retrieved_array.push element.attr('data-service')
+          if mapping['cssAttr'] && element.attr(mapping['cssAttr'])
+            img_url = element.attr(mapping['cssAttr'])
+          else
+            img_url = element.text
+          end
+
+          # ensure_url_is_absolute
+          # TODO - move below into custom method
+          img_uri = URI.parse(img_url)
+          unless img_uri.host
+            img_uri.scheme = uri.scheme
+            img_uri.host = uri.host
+            unless img_uri.path.start_with? "/"
+              img_uri.path = "/" + img_uri.path
+            end
+            img_url = img_uri.to_s
+          end
+          retrieved_array.push img_url
         end
       end
 
@@ -185,7 +202,7 @@ module PropertyWebScraper
         retrieved_text = get_text_from_css css_elements, mapping
       end
       if mapping['xpath'].present?
-        css_elements = doc.css(mapping['xpath'])
+        css_elements = doc.xpath(mapping['xpath'])
         # able to retrieve xpath just like with css
         # but in future this might change
         retrieved_text = get_text_from_css css_elements, mapping
@@ -215,7 +232,6 @@ module PropertyWebScraper
         # in this case the element's text need to be split by the splitTextCharacter
         # splitTextArrayId refers to where in the resulting array
         # the correct item is
-        # byebug
         begin
           splitTextCharacter = mapping['splitTextCharacter'] || ' '
           splitTextArrayId = mapping['splitTextArrayId'].to_i

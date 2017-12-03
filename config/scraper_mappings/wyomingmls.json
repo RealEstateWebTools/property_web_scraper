@@ -1,0 +1,104 @@
+[
+{
+  "name": "wyomingmls",
+  "defaultValues":
+  {
+    "country":
+    {
+      "value": "USA"
+    },
+    "area_unit":
+    {
+      "value": "sqft"
+    },
+    "currency":
+    {
+      "value": "USD"
+    },
+    "for_rent_short_term": {
+      "value": "false"
+    },
+    "for_rent_long_term": {
+      "value": "false"
+    },
+    "for_sale": {
+      "value": "true"
+    },
+    "locale_code": {
+      "value": "en"
+    }
+  },
+  "intFields": {
+    "year_construction": {
+      "cssLocator": "#content > ul:nth-child(7) > li:nth-child(3) > span.right"
+    },
+    "count_bedrooms": {
+      "cssLocator": "#content > ul:nth-child(7) > li:nth-child(4) > span.right"
+    }
+  },
+  "floatFields":
+  {
+    "count_bathrooms": {
+      "cssLocator": "#content > ul:nth-child(7) > li:nth-child(5) > span.right"
+    },
+    "constructed_area":
+    {
+      "cssLocator": "#content > ul:nth-child(7) > li:nth-child(1) > span.right",
+      "stripPunct": "true"
+    },
+    "price_float":
+    {
+      "xpath": "//*[@id='content']/div[2]/div[1]/p/strong/following-sibling::text()",
+      "splitTextCharacter": "\r",
+      "splitTextArrayId": "1",
+      "stripString": "$",
+      "stripPunct": "true"
+    },
+    "latitude":
+    {
+      // below is actually "latitude:[^\,]*" but had to escape the \
+      "scriptRegEx": "hub_lat[^\\;]*",
+      "splitTextCharacter": "=",
+      "splitTextArrayId": "1"
+    },
+    "longitude":
+    {
+      "scriptRegEx": "hub_long[^\\;]*",
+      "splitTextCharacter": "=",
+      "splitTextArrayId": "1"
+    }
+  },
+  "textFields":
+  {
+    "reference":
+    {
+      "xpath": "//*[@id='content']/div[2]/div[1]/p/strong/following-sibling::text()",
+      "splitTextCharacter": "\r",
+      "splitTextArrayId": "0"
+    },
+    "title":
+    {
+      "cssLocator": "title"
+    },
+    "description":
+    {
+      "cssLocator": "#content > ul:nth-child(7) > li:nth-child(10) > span.right.remarks"
+    },
+    "price_string":
+    {
+      "xpath": "//*[@id='content']/div[2]/div[1]/p/strong/following-sibling::text()",
+      "splitTextCharacter": "\r",
+      "splitTextArrayId": "1"
+    }
+  },
+  "booleanFields":
+  {},
+  "images": [
+    {
+      "cssLocator": "#sidebar > div.propertytour > a > img",
+      // "stripString": "_max_135x100",
+      "cssAttr": "src"
+    }
+  ]
+
+}]

@@ -6,7 +6,8 @@ import_hosts_data_array = [
   { slug: 'rightmove', scraper_name: 'rightmove', host: 'www.rightmove.co.uk' },
   { slug: 'example', scraper_name: 'default', host: 'www.example.co.uk' },
   { slug: 'laventa', scraper_name: 'pwb', host: 'www.laventa-mallorca.com' },
-  { slug: 'zoopla', scraper_name: 'zoopla', host: 'www.zoopla.co.uk' }
+  { slug: 'zoopla', scraper_name: 'zoopla', host: 'www.zoopla.co.uk' },
+  { slug: 'wyomingmls', scraper_name: 'wyomingmls', host: 'www.wyomingmls.com' },
 ]
 
 import_hosts_data_array.each do |import_host_data|

@@ -1,0 +1,212 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://www.wyomingmls.com/property_res.php?id=85738
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sun, 03 Dec 2017 12:11:31 GMT
+      Server:
+      - Apache/2.2.3 (Red Hat)
+      X-Powered-By:
+      - PHP/5.1.6
+      Connection:
+      - close
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - text/html; charset=UTF-8
+    body:
+      encoding: UTF-8
+      string: "\r\n\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
+        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n<head>\r\n
+        \       <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"
+        />\r\n<title>Residential Property 20176813 - Wyoming MLS - Your Complete Source
+        For Real Estate in Wyoming</title>\r\n<meta name=\"keywords\" content=\"Wyoming
+        Housing Search, Wyoming Real Estate MLS, Wyoming Real Estate Search, Wyoming
+        RealEstate Search, Wyoming RealEstate, Wyoming Real Estate, Wyoming, Real
+        Estate, RealEstate, Multiple Listing Service, Wyoming MLS, Wyoming Multiple
+        Listing Service, Wyoming Realty, Wyoming Properties, Wyoming Housing, MLS,
+        Realtors Wyoming, Wyoming Realtors\" />\r\n<style type=\"text/css\">\r\n<!--\r\n@import
+        url(\"css/screen.css\");\r\n-->\r\n</style>\r\n<!--[if lte IE 7]>\r\n<script
+        src=\"http://ie7-js.googlecode.com/svn/version/2.0(beta3)/IE8.js\" type=\"text/javascript\"></script>\r\n<link
+        rel=\"stylesheet\" type=\"text/css\" href=\"css/ie.css\" />\r\n<![endif]-->\r\n<!--<link
+        href=\"css/jquery.lightbox.packeds.css\" media=\"screen\" rel=\"stylesheet\"
+        type=\"text/css\" />-->\r\n<link href=\"css/print.css\" media=\"print\" rel=\"stylesheet\"
+        type=\"text/css\" />\r\n<link href=\"css/lightbox.css\" media=\"screen\" rel=\"stylesheet\"
+        type=\"text/css\" />\r\n<script type=\"text/javascript\" src=\"js/jquery.js\"></script><script
+        src=\"http://code.jquery.com/jquery-migrate-1.2.1.js\"></script>\r\n<script
+        type=\"text/javascript\" src=\"js/lightbox.min.js\"></script>\r\n<script type='text/javascript'
+        src='//maps.googleapis.com/maps/api/js?v=3.exp&#038;sensor=false&#038;ver=4.1.4'></script>\r\n<script
+        type=\"text/javascript\" src=\"js/animate.js\"></script>\r\n<!--<script src=\"js/jquery.lightbox.packed.js?show_extended_info=true&amp;show_info=true\"
+        type=\"text/javascript\">\r\n</script>-->\r\n<script type=\"text/javascript\">\r\n$(document).ready(function(){\r\n
+        \    // add a \"rel\" attrib if Opera 7+\r\n     if(window.opera) {\r\n          if
+        ($(\"a.jqbookmark\").attr(\"rel\") != \"\"){ // don't overwrite the rel attrib
+        if already set\r\n             $(\"a.jqbookmark\").attr(\"rel\",\"sidebar\");\r\n
+        \        }\r\n     }\r\n\r\n     $(\"a.jqbookmark\").click(function(event){\r\n
+        \        event.preventDefault(); // prevent the anchor tag from sending the
+        user off to the link\r\n         var url = this.href;\r\n         var title
+        = this.title;\r\n         var browser=navigator.appName;\r\n\r\n         if(browser==\"Microsoft
+        Internet Explorer\"){\r\n            window.external.AddFavorite( url, title);\r\n
+        \        }\r\n         else {\r\n         if (window.sidebar) { // Mozilla
+        Firefox Bookmark\r\n             window.sidebar.addPanel(title, url,\"\");\r\n
+        \        }\r\n         else if(window.opera) { // Opera 7+\r\n             return
+        false; // do nothing - the rel=\"sidebar\" should do the trick\r\n         }
+        else { // for Safari, Konq etc - browsers who do not support bookmarking scripts
+        (that i could find anyway)\r\n              alert('Unfortunately, this browser
+        does not support the requested action,'\r\n              + ' please bookmark
+        this page manually.');\r\n         }\r\n         }\r\n\r\n     });\r\n});\r\n</script>\r\n</head>\r\n<!--<body
+        class=\"inside\" onload=\"onLoad()\">-->\r\n<body class=\"inside\">\r\n<div
+        id=\"container\">\r\n<div id=\"mainwrap\">\r\n\t<div id=\"header\">\r\n<div
+        id=\"header_inner\">\r\n    <img src=\"images/mls_logo2.png\" width=\"355\"
+        height=\"63\" alt=\"Wyoming MLS\" id=\"logo\" />\r\n    <div id=\"topnav\">\r\n
+        \       <ul>\r\n            <li><a href=\"index.php\" title=\"Home Page\">Home</a></li>\r\n
+        \           <li><a href=\"about.php\" title=\"About\">About</a></li>\r\n            <li><a
+        href=\"login.php\" title=\"Realtor Login\">Realtor Login</a></li>\r\n            <li><a
+        href=\"documents.php\" title=\"MLS News\">MLS Info</a></li>\r\n            <li><a
+        href=\"contact.php\" title=\"Contact\">Contact</a></li>\r\n        </ul>\r\n
+        \   </div>\r\n</div>\r\n</div>    <div id=\"wrapper\">\r\n    \t<div id=\"content\">\r\n
+        \       \t<h1>Property Details</h1>\r\n        \t                    <div
+        class=\"badge\">\r\n                    <a href=\"images/property/wyo20176813.jpg\"
+        class=\"lightbox-enabled\" data-lightbox=\"image-gallery\" rel=\"lightbox-tour\"
+        data-title=\"MLS #20176813\">\r\n          \t  <img src=\"images/property/wyo20176813.jpg\"
+        width=\"100\" alt=\"Property Image\" class=\"propimg\" />\r\n          </a>\r\n
+        \    </div>\r\n\r\n     <div class=\"propertymain \">\r\n     \t          <div
+        class=\"left\">\r\n             <p><strong>MLS:</strong> 20176813<br />\r\n
+        \            <strong>Price:</strong> $33,500<br />\r\n             <strong>Type:</strong>
+        Mobile/Manufactured</p>\r\n         </div>\r\n         <div class=\"right\">\r\n
+        \        \t <p><strong>Address: </strong><br />\r\n             350 N Forest
+        #20<br />\r\n             Casper, WY 82609</p>\r\n         </div>\r\n     </div>\r\n
+        \    <h1 class=\"prophead\">Agent Details</h1>\r\n     <div class=\"propertyagent\">\r\n
+        \              <p><strong>Agent:</strong>  <a href=\"mailto:janetcaspersells@gmail.com\">Janet
+        Reinhart</a><br />\r\n          <strong>Agent Phone:</strong> 307-262-0361<br
+        />\r\n                <strong>Company:</strong> <a href=\"http://www.wyomingmls.com\">Casper
+        Real Estate Today, LLC</a><br />\r\n          <strong>Company Phone:</strong>
+        307-333-1559<br /></p>\r\n          </div>\r\n\t <h1 class=\"prophead\">Property
+        Information</h1>\r\n     <ul class=\"propinfo\">\r\n     <li><span class=\"left\">Square
+        Feet: </span> <span class=\"right\">1056</span></li>                <li><span
+        class=\"left\">Style: </span> <span class=\"right\">Mobile Home</span></li>
+        \    <li><span class=\"left\">Year Built: </span> <span class=\"right\">2002</span></li>
+        \    <li><span class=\"left\">Bedrooms: </span> <span class=\"right\">3</span></li>
+        \    <li><span class=\"left\">Baths: </span> <span class=\"right\">2.0</span></li>
+        \         <li><span class=\"left\">Garage Capacity: </span> <span class=\"right\">None</span></li>
+        \         <li><span class=\"left\">Basement Finished: </span> <span class=\"right\">0</span></li>
+        \                                                                                                                                           <li><span
+        class=\"left\">Above Square Feet: </span> <span class=\"right\">1056</span></li>
+        \    <li><span class=\"left\">Below Square Feet: </span> <span class=\"right\">0</span></li>
+        \                        <li><span class=\"left\">Public Remarks: </span>
+        <span class=\"right remarks\">350 N FOREST DR LOT #20  -  THIS HOME CAN BE
+        MOVED  2002 16x66 3 bedroom 2 bathroom mobile home for sale. This mobile home
+        is in immaculate condition and sits on a beautiful lot! The home includes
+        a $2,000 shed, has a new $5,000 roof, fenced yard, fresh paint and has brand
+        new beautiful flooring. This is a must see! Motivated Seller - bring your
+        offer! Call Janet Reinhart 307-262-0361 for your private showing!</span></li>
+        \    </ul>\r\n     <!-- Features -->\r\n     <h1 class=\"prophead\">Features</h1>\r\n
+        \    <ul class=\"propinfo features\">\r\n     </li><li><strong>BASEMENT</strong>:<br
+        /> None</li><li><strong>COOLING</strong>:<br /> Central Air</li><li><strong>EXTERIOR</strong>:<br
+        /> Wood Siding</li><li><strong>FLOOR COVERING</strong>:<br /> Laminate Flooring</li><li><strong>FOUNDATION</strong>:<br
+        /> Other</li><li><strong>HEATING</strong>:<br /> Forced Air Gas</li><li><strong>LAUNDRY</strong>:<br
+        /> Entry Level</li><li><strong>ROOF</strong>:<br /> Architectural</li>     </ul>\r\n\r\n
+        \       </div>\r\n        <div id=\"sidebar\">\r\n            <div  id=\"sidebar_map\"
+        style=\"width:297px;height:287px;\">\r\n                        <noscript><b>Javascript
+        must be enabled in order to use Google Maps.</b></noscript>\r\n            </div>\r\n\r\n
+        \         <script type=\"text/javascript\">\r\n          var map;\r\n          function
+        initialize() {\r\n            var mapOptions = {\r\n            center: new
+        google.maps.LatLng(42.866698, -106.313088),\r\n            zoom: 14,\r\n            mapTypeId:
+        google.maps.MapTypeId.ROADMAP\r\n            };\r\n            map = new google.maps.Map(document.getElementById(\"sidebar_map\"),\r\n
+        \             mapOptions);\r\n            }\r\n            google.maps.event.addDomListener(window,
+        'load', initialize);\r\n          window.onload=function(){\r\n            var
+        hub_lat = 42.852044;\r\n            var hub_long = -106.28227;\r\n            var
+        myLatLng = new google.maps.LatLng(hub_lat,hub_long);\r\n            var marker
+        = new google.maps.Marker({\r\n              position: myLatLng,\r\n              map:
+        map,\r\n              //icon: markerIcon,\r\n              title: '20176813',\r\n
+        \             zIndex: 1\r\n            });\r\n            map.setCenter(myLatLng);\r\n
+        \           var contentString = '<h4 id=\"firstHeading\" class=\"firstHeading\">20176813</h4><div
+        id=\"bodyContent\"><p>350 N Forest #20 Casper WY 82609<br /></p><p><a href=\"https://maps.google.com/maps?&daddr=350+N+Forest+%2320+Casper+WY+82609\"
+        target=\"_blank\">Get Directions</a></p></div>';\r\n            var infoWindow
+        = new google.maps.InfoWindow({content:contentString});\r\n            google.maps.event.addListener(marker,
+        'click', function() {infoWindow.open(map,marker);});\r\n          };\r\n          </script>\r\n
+        \        <ul id=\"sidebarbuttons\">\r\n\r\n        \t<li id=\"printprop\">\r\n
+        \           \t<a href=\"#\" onclick=\"window.print(); return false\" title=\"Print
+        This Property\">Print This Property!</a>\r\n            </li>\r\n            <li
+        id=\"bookprop\">\r\n            \t<a href=\"http://www.wyomingmls.com/property_res.php?id=85738\"
+        class=\"jqbookmark\" title=\"MLS Property 20176813\">Bookmark this listing!</a>\r\n
+        \           </li>\r\n            <li id=\"gobackprop\">\r\n            \t<a
+        href=\"javascript:history.go(-1)\" onmouseover=\"self.status=document.referrer;return
+        true\" title=\"Go Back To Results\">Go Back To Results</a>\r\n            </li>\r\n
+        \      \t  </ul>\r\n     \t                                            <div
+        class=\"propertytour\">\r\n                              <h3>Property Images:
+        </h3>\r\n                                                                      <a
+        href=\"images/property/wyo20176813a.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813a.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                                                <a
+        href=\"images/property/wyo20176813b.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813b.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                                                <a
+        href=\"images/property/wyo20176813c.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813c.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                                                <a
+        href=\"images/property/wyo20176813d.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813d.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                                                <a
+        href=\"images/property/wyo20176813e.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813e.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                                                <a
+        href=\"images/property/wyo20176813f.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813f.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                                                <a
+        href=\"images/property/wyo20176813h.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813h.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                                                <a
+        href=\"images/property/wyo20176813i.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813i.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                                                <a
+        href=\"images/property/wyo20176813j.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813j.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                                                <a
+        href=\"images/property/wyo20176813k.jpg\" class=\"lightbox-enabled\" data-lightbox=\"image-gallery\"
+        rel=\"lightbox-tour\" data-title=\"MLS #20176813\">\r\n                                             <img
+        src=\"images/property/wyo20176813k.jpg\" width=\"75\" alt=\"Property Image\"
+        />\r\n                                        </a>\r\n                                                 \t\t\t\t</div>\r\n
+        \                     \r\n        </div>\r\n    </div>\r\n</div><!-- END MAINWRAP
+        -->\r\n<div id=\"footer\">\r\n    <div class=\"footleft\">\r\n        <img
+        src=\"images/footer_logo-trans.png\" width=\"75\" height=\"30\" alt=\"An Equal
+        Housing Opportunity and Member of National Realtor Association\" />\r\n        <p>Copyright
+        &copy; 2017 Wyoming MLS<br />\r\n        Site Design by: <a href=\"http://www.adbay.com\"
+        title=\"Adbay.com - Wyoming's Best Websites\" target=\"_blank\">Adbay.com</a></p>\r\n
+        \   </div>\r\n    <div class=\"footlinks\">\r\n    <p><a href=\"privacy.php\"
+        title=\"Terms of Use\">Terms Of Use &amp; Privacy Policy</a>  |   <a href=\"mailto:cmls@tribcsp.com?subject=Adveritising
+        Request\" title=\"Advertise With Us\">Advertise With Us</a>  |  <a href=\"map.php\"
+        title=\"Map\">Wyoming Map</a></p>\r\n    </div>\r\n</div><!-- END FOOTER -->\r\n<div
+        class=\"footcopy\"> <p>Copyright &copy; 2009 Wyoming MLS</p></div>\r\n</div><!--
+        END CONTAINER -->\r\n<script type=\"text/javascript\">\r\nvar gaJsHost = ((\"https:\"
+        == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");\r\ndocument.write(unescape(\"%3Cscript
+        src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));\r\n</script>\r\n<script
+        type=\"text/javascript\">\r\ntry {\r\nvar pageTracker = _gat._getTracker(\"UA-8586202-1\");\r\npageTracker._trackPageview();\r\n}
+        catch(err) {}</script>\r\n</body>\r\n</html>"
+    http_version: 
+  recorded_at: Sun, 03 Dec 2017 12:11:31 GMT
+recorded_with: VCR 3.0.3
