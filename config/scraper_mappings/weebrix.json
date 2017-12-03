@@ -1,0 +1,78 @@
+[{
+  "name": "pwb",
+  "defaultValues": {
+    "country": {
+      "value": "Spain"
+    },
+    "area_unit": {
+      "value": "sqmt"
+    },
+    "currency": {
+      "value": "EUR"
+    },
+    "for_rent_short_term": {
+      "value": "false"
+    },
+    "locale_code": {
+      "value": "es"
+    }
+  },
+  "floatFields":
+  {
+    "price_float":
+    {
+      "cssLocator": "#propertyHeaderPrice > strong",
+      "stripFirstChar": "true",
+      "stripPunct": "true"
+    },
+    "latitude":
+    {
+      // below is actually "latitude:[^\,]*" but had to escape the \
+      "scriptRegEx": "latitude[^\\}]*",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1"
+    },
+    "longitude":
+    {
+      "scriptRegEx": "longitude[^\\}]*",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1"
+    }
+  },
+  "textFields": {
+    "postal_code":
+    {
+      "scriptRegEx": "postal_code[^\\,]*",
+      "splitTextCharacter": "\"",
+      "splitTextArrayId": "2"
+    },
+    "reference": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "1"
+    },
+    "property_type": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "7"
+    },
+    "city": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "9"
+    },
+    "region": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "11"
+    },
+    "description_en": {
+      "cssLocator": ".col-md-9 .col-md-12 > span"
+      // "cssCountId": "1"
+    }
+  },
+  "booleanFields": {
+    "for_rent": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "5",
+      "evaluator": "include?",
+      "evaluatorParam": "Rent"
+    }
+  }
+}]
