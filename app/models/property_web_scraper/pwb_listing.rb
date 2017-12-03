@@ -7,7 +7,7 @@ module PropertyWebScraper
 
     def as_json(options = nil)
       super({ only: [
-                :reference, 
+                :reference, :locale_code,
                 :title, :description,
                 :area_unit, :plot_area, :constructed_area,
                 :count_bedrooms, :count_bathrooms,

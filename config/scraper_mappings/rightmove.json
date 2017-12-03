@@ -17,6 +17,16 @@
     },
     "for_rent_short_term": {
       "value": "false"
+    },
+    "locale_code": {
+      "value": "en"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "scriptRegEx": "beds[^\\,]*",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1"
     }
   },
   "floatFields":
@@ -27,21 +37,27 @@
       "stripFirstChar": "true",
       "stripPunct": "true"
     },
-    "longitude":
-    {
-      "xpath": "//meta[@property='place:location:longitude']/@content"
-    },
     "latitude":
     {
-      "xpath": "//meta[@property='place:location:latitude']/@content"
+      // below is actually "latitude:[^\,]*" but had to escape the \
+      "scriptRegEx": "latitude[^\\}]*",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1"
+    },
+    "longitude":
+    {
+      "scriptRegEx": "longitude[^\\}]*",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1"
     }
   },
   "textFields":
   {
     "reference": {
       "urlPathPart": "2",
-      "splitTextCharacter": ".",
-      "splitTextArrayId": "0"
+      "splitTextCharacter": "-",
+      "splitTextArrayId": "1",
+      "stripString": ".html"
     },
     "title":
     {
@@ -56,7 +72,12 @@
     {
       "cssLocator": "#propertyHeaderPrice > strong"
     },
-
+    "postal_code":
+    {
+      "scriptRegEx": "postcode[^\\,]*",
+      "splitTextCharacter": "\"",
+      "splitTextArrayId": "2"
+    },
     "address_string":
     {
       "xpath": "//meta[@itemprop = 'streetAddress']/@content"

@@ -12,6 +12,9 @@
     },
     "for_rent_short_term": {
       "value": "false"
+    },
+    "locale_code": {
+      "value": "es"
     }
   },
   "floatFields": {

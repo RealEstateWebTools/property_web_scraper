@@ -19,7 +19,17 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       t.string   :title
       t.text     :description
       t.string   :locale_code
-      # t.text     details
+      # will use locale_code to say what default lang is
+      # but for popular languages will save in dedicated cols
+      t.string   :title_es
+      t.text     :description_es
+      t.string   :title_de
+      t.text     :description_de
+      t.string   :title_fr
+      t.text     :description_fr
+      t.string   :title_it
+      t.text     :description_it
+
 
       # booleans used in scopes
       t.boolean :furnished, default: false
