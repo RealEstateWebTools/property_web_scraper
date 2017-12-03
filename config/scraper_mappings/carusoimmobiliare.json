@@ -1,0 +1,92 @@
+[
+{
+  "name": "carusoimmobiliare",
+  "defaultValues":
+  {
+    "city": {
+      "value": "Trapani"
+    },
+    "country":
+    {
+      "value": "IT"
+    },
+    "area_unit": {
+      "value": "sqmt"
+    },
+    "currency":
+    {
+      "value": "EUR"
+    },
+    "for_rent_short_term": {
+      "value": "false"
+    },
+    "for_rent_long_term": {
+      "value": "false"
+    },
+    "for_sale": {
+      "value": "true"
+    },
+    "locale_code": {
+      "value": "it"
+    }
+  },
+  "intFields": {
+  },
+  "floatFields":
+  {
+    "price_float":
+    {
+      "cssLocator": "body > table.tabella > tr > td:nth-child(1) > table > tr:nth-child(2) > td:nth-child(1) > table > tr:nth-child(2) > td",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1",
+      "stripPunct": "false"
+    },
+    "latitude":
+    {
+      // below is actually "latitude:[^\,]*" but had to escape the \
+      "scriptRegEx": "hub_lat[^\\;]*",
+      "splitTextCharacter": "=",
+      "splitTextArrayId": "1"
+    },
+    "longitude":
+    {
+      "scriptRegEx": "hub_long[^\\;]*",
+      "splitTextCharacter": "=",
+      "splitTextArrayId": "1"
+    }
+  },
+  "textFields":
+  {
+    "reference":
+    {
+      "cssLocator": "body > table.tabella > tr > td:nth-child(1) > table > tr:nth-child(2) > td:nth-child(3)",
+      "splitTextCharacter": "\n",
+      "splitTextArrayId": "0"
+    },
+    "title":
+    {
+      "cssLocator": "title"
+    },
+    "description":
+    {
+      "cssLocator": "body > table.tabella > tr > td:nth-child(1) > span > font > strong"
+    },
+    "price_string":
+    {
+      "cssLocator": "body > table.tabella > tr > td:nth-child(1) > table > tr:nth-child(2) > td:nth-child(1) > table > tr:nth-child(2) > td",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1"
+    }
+  },
+  "booleanFields":
+  {},
+  "images": [
+    {
+      "cssLocator": "body > table.tabella > tr > td:nth-child(1) > table > tr:nth-child(2) > td:nth-child(1) > table > tr:nth-child(1) > td > img",
+      // "stripString": "_max_135x100",
+      "cssAttr": "src",
+      "imagePathPrefix": "/immobiliare"
+    }
+  ]
+
+}]

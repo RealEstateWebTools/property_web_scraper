@@ -94,7 +94,7 @@ module PropertyWebScraper
 
       if scraper_mapping.images
         scraper_mapping.images.each do |image_mapping|
-          retrieved_array = retrieve_target_array doc, image_mapping, uri
+          retrieved_array = retrieve_images_array doc, image_mapping, uri
           property_hash["image_urls"] = retrieved_array
         end
       end
@@ -142,7 +142,7 @@ module PropertyWebScraper
 
     private
 
-    def retrieve_target_array(doc, mapping, uri)
+    def retrieve_images_array(doc, mapping, uri)
       retrieved_array = []
       if mapping['cssLocator'].present?
         css_elements = doc.css(mapping['cssLocator'])
@@ -162,6 +162,10 @@ module PropertyWebScraper
             img_uri.host = uri.host
             unless img_uri.path.start_with? "/"
               img_uri.path = "/" + img_uri.path
+            end
+            if mapping['imagePathPrefix'].present?
+              # workaround for carusoimmobiliare with sucky url paths
+              img_uri.path = mapping['imagePathPrefix'] + img_uri.path
             end
             img_url = img_uri.to_s
           end

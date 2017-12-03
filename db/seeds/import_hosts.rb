@@ -7,6 +7,7 @@ import_hosts_data_array = [
   { slug: 'example', scraper_name: 'default', host: 'www.example.co.uk' },
   { slug: 'laventa', scraper_name: 'pwb', host: 'www.laventa-mallorca.com' },
   { slug: 'zoopla', scraper_name: 'zoopla', host: 'www.zoopla.co.uk' },
+  { slug: 'carusoimmobiliare', scraper_name: 'carusoimmobiliare', host: 'www.carusoimmobiliare.it' },
   { slug: 'wyomingmls', scraper_name: 'wyomingmls', host: 'www.wyomingmls.com' },
 ]
 

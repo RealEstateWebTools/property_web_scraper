@@ -32,6 +32,7 @@ module PropertyWebScraper
                       country longitude latitude main_image_url for_rent for_sale image_urls
                       for_rent_short_term for_rent_long_term
                       street_address address_string locale_code 
+                      city province region
                       postal_code )
       attributes.each do |attribute|
         listing[attribute] = property_hash[attribute]
