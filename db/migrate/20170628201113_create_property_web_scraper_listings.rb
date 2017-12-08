@@ -52,7 +52,7 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
       # above will create below in schema.rb:
       # t.integer  "price_sale_cents",                     default: 0,     null: false
       # t.string   "price_sale_currency",                  default: "EUR", null: false
-      # t.monetize :price_rental
+      t.monetize :price_rental
 
       t.monetize :price_sale_current
       t.monetize :price_sale_original
@@ -103,8 +103,8 @@ class CreatePropertyWebScraperListings < ActiveRecord::Migration[5.0]
 
     add_index :property_web_scraper_listings, :flags
     add_index :property_web_scraper_listings, :price_float
-    add_index :property_web_scraper_listings, :price_rental_cents
-    add_index :property_web_scraper_listings, :price_sale_cents
+    # add_index :property_web_scraper_listings, :price_rental_cents
+    # add_index :property_web_scraper_listings, :price_sale_cents
     add_index :property_web_scraper_listings, :reference
     add_index :property_web_scraper_listings, :import_url
   end
