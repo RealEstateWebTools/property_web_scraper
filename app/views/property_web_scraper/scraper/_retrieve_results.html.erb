@@ -18,11 +18,15 @@
   <tbody>
   </tbody>
 </table>
-<div>
+<div style="display: none;">
   <strong>Images</strong>
+  <% @listing.image_urls.each do |listing_image_url| %>
+    <div>
+      <%= link_to listing_image_url, listing_image_url, target: "_blank" %>
+    </div>
+  <% end %>
 </div>
-<% @listing.image_urls.each do |listing_image_url| %>
+
   <div>
-    <%= link_to listing_image_url, listing_image_url, target: "_blank" %>
+    <%= link_to "Single Page view", single_property_view_path %>
   </div>
-<% end %>

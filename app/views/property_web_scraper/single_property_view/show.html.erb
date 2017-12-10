@@ -1,0 +1,58 @@
+<%# page_title @listing.title  %>
+<%# render '/property_web_scraper/single_property_view/meta_tags' %>
+<%# render '/property_web_scraper/single_property_view/breadcrumb_row' %>
+<!-- MAIN CONTENT -->
+<section class="slice bg-white bb">
+  <div class="wp-section estate">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-9">
+          <div class="row">
+            <div class="col-md-12">
+              <%# render '/property_web_scraper/single_property_view/images_section_carousel' %>
+            </div>
+            <div class="col-md-12">
+              <%= render '/property_web_scraper/single_property_view/property_info_list' %>
+            </div>
+          </div>
+          <!-- PROPERTY DESCRIPTION -->
+          <div class="row">
+            <div class="col-md-12">
+              <h3>Description</h3>
+              <%== @listing.description %>
+              <br>
+              <br>
+            </div>
+            <div class="col-md-12">
+
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="sidebar">
+            <%# render '/property_web_scraper/single_property_view/request_prop_info' %>
+            <%# render '/property_web_scraper/single_property_view/prop_contact_info' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <social-sharing  class="center"  inline-template>
+    <div class="social-icons icon-circle">
+      <network network="facebook">
+        <i class="fa fa-facebook"></i>
+      </network>
+      <network network="googleplus">
+        <i class="fa fa-google-plus"></i>
+      </network>
+      <network network="linkedin">
+        <i class="fa fa-linkedin"></i>
+      </network>
+      <network network="twitter">
+        <i class="fa fa-twitter"></i>
+      </network>
+    </div>
+  </social-sharing>
+</section>
+
+
