@@ -1,0 +1,42 @@
+  <div class="carousel carousel-slider center " data-indicators="true">
+    <div class="carousel-fixed-item center middle-indicator">
+     <div class="left">
+      <a href="#" class="movePrevCarousel middle-indicator-text waves-effect waves-light content-indicator"><i class="material-icons left  middle-indicator-text">chevron_left</i></a>
+     </div>
+     
+     <div class="right">
+     <a href="#" class=" moveNextCarousel middle-indicator-text waves-effect waves-light content-indicator"><i class="material-icons right middle-indicator-text">chevron_right</i></a>
+     </div>
+    </div>
+
+      <% @listing.image_urls.each.with_index do |image_url, index| %>
+        <a class="carousel-item" href="#one!">
+        <img src="<%= image_url %>"></a>
+      <% end %>
+
+
+
+    <div class="carousel-item red white-text" href="#one!">
+      <h2>First Panel</h2>
+      <p class="white-text">This is your first panel</p>
+    </div>
+<a class="carousel-item" href="#one!"><img src="https://lorempixel.com/800/400/food/1"></a>
+   
+    <div class="carousel-item amber white-text" href="#two!">
+      <h2>Second Panel</h2>
+      <p class="white-text">This is your second panel</p>
+    </div>
+    <div class="carousel-item green white-text" href="#three!">
+      <h2>Third Panel</h2>
+      <p class="white-text">This is your third panel</p>
+    </div>
+    <div class="carousel-item blue white-text" href="#four!">
+      <h2>Fourth Panel</h2>
+      <p class="white-text">This is your fourth panel</p>
+    </div>
+  </div>
+
+
+
+
+

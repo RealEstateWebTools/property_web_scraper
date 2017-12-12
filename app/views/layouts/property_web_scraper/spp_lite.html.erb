@@ -44,6 +44,27 @@
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
   <%= javascript_include_tag "property_web_scraper/spp_lite" %>
+  <script type="text/javascript">
+   // start carrousel
+   $('.carousel.carousel-slider').carousel({
+      fullWidth: true,
+      indicators: true
+   });
 
+
+   // move next carousel
+   $('.moveNextCarousel').click(function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      $('.carousel').carousel('next');
+   });
+
+   // move prev carousel
+   $('.movePrevCarousel').click(function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      $('.carousel').carousel('prev');
+   });
+   </script>
   </body>
 </html>
