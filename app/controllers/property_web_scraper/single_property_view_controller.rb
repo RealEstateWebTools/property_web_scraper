@@ -48,7 +48,7 @@ module PropertyWebScraper
         @error_message = 'Url is not valid'
         return render '/property_web_scraper/single_property_view/error', layout: false
       end
-      render '/property_web_scraper/single_property_view/show', layout: false
+      render '/property_web_scraper/single_property_view/show', layout: "property_web_scraper/spp_modern"
     end
 
     private
