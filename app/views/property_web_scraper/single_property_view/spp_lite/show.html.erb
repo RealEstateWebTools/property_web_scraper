@@ -1,42 +1,3 @@
-<section class="slice bg-white bb">
-  <div class="wp-section estate">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-9">
-          <div class="row">
-            <div class="col-md-12">
-            </div>
-            <div class="col-md-12">
-              <%= render '/property_web_scraper/single_property_view/property_info_list' %>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="sidebar">
-            <%# render '/property_web_scraper/single_property_view/request_prop_info' %>
-              <%# render '/property_web_scraper/single_property_view/prop_contact_info' %>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <social-sharing class="center" inline-template>
-    <div class="social-icons icon-circle">
-      <network network="facebook">
-        <i class="fa fa-facebook"></i>
-      </network>
-      <network network="googleplus">
-        <i class="fa fa-google-plus"></i>
-      </network>
-      <network network="linkedin">
-        <i class="fa fa-linkedin"></i>
-      </network>
-      <network network="twitter">
-        <i class="fa fa-twitter"></i>
-      </network>
-    </div>
-  </social-sharing>
-</section>
 <div id="index-banner" class="parallax-container">
   <div class="section no-pad-bot">
     <div class="container">
@@ -63,6 +24,24 @@
         <%== @listing.description %>
           <br>
           <br>
+      </div>
+      <div>
+          <social-sharing class="center" inline-template>
+    <div class="social-icons icon-circle">
+      <network network="facebook">
+        <i class="fa fa-facebook"></i>
+      </network>
+      <network network="googleplus">
+        <i class="fa fa-google-plus"></i>
+      </network>
+      <network network="linkedin">
+        <i class="fa fa-linkedin"></i>
+      </network>
+      <network network="twitter">
+        <i class="fa fa-twitter"></i>
+      </network>
+    </div>
+  </social-sharing>
       </div>
     </div>
   </div>
