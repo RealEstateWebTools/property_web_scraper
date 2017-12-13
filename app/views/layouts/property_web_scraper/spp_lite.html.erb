@@ -6,12 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Parallax Template - Materialize</title>
   <!-- CSS  -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+  <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
+
   <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection" />
   <%= stylesheet_link_tag    "property_web_scraper/spp_lite", media: "all" %>
 </head>
 
 <body>
+<div id="main-vue">
+  
   <nav class="white" role="navigation" style="display: none;">
     <div class="nav-wrapper container">
       <a id="logo-container" href="#" class="brand-logo">Logo</a>
@@ -36,9 +40,11 @@
         </div>
       </div>
     </footer>
+</div>
     <!--  Scripts-->
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <%= javascript_include_tag "property_web_scraper/spp_lite" %>
       <script type="text/javascript">
       // start carrousel

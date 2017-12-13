@@ -25,48 +25,47 @@
           <br>
           <br>
       </div>
-      <div>
-          <social-sharing class="center" inline-template>
-    <div class="social-icons icon-circle">
-      <network network="facebook">
-        <i class="fa fa-facebook"></i>
-      </network>
-      <network network="googleplus">
-        <i class="fa fa-google-plus"></i>
-      </network>
-      <network network="linkedin">
-        <i class="fa fa-linkedin"></i>
-      </network>
-      <network network="twitter">
-        <i class="fa fa-twitter"></i>
-      </network>
-    </div>
-  </social-sharing>
+      <div class="col s12 m12">
+        <social-sharing class="center" inline-template>
+          <div class="social-icons icon-circle">
+            <network network="facebook">
+              <i class="fa fa-facebook"></i>
+            </network>
+            <network network="googleplus">
+              <i class="fa fa-google-plus"></i>
+            </network>
+            <network network="linkedin">
+              <i class="fa fa-linkedin"></i>
+            </network>
+            <network network="twitter">
+              <i class="fa fa-twitter"></i>
+            </network>
+          </div>
+        </social-sharing>
       </div>
     </div>
   </div>
 </div>
 <%= render '/property_web_scraper/single_property_view/spp_lite/images_carousel' %>
-<%= render '/property_web_scraper/single_property_view/property_info_list' %>
-
-<div class="parallax-container valign-wrapper">
-  <div class="section no-pad-bot">
+  <%= render '/property_web_scraper/single_property_view/property_info_list' %>
+    <div class="parallax-container valign-wrapper">
+      <div class="section no-pad-bot">
+        <div class="container">
+          <div class="row center">
+            <h5 class="header col s12 light"><%= @listing.title %></h5>
+          </div>
+        </div>
+      </div>
+      <div class="parallax"><img src="<%= @main_image_url %>" alt="main image 2"></div>
+    </div>
     <div class="container">
-      <div class="row center">
-        <h5 class="header col s12 light"><%= @listing.title %></h5>
+      <div class="section">
+        <div class="row">
+          <div class="col s12 center">
+            <h3><i class="mdi-content-send brown-text"></i></h3>
+            <h4>Contact Us</h4>
+            <p class="left-align light">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque id nunc nec volutpat. Etiam pellentesque tristique arcu, non consequat magna fermentum ac. Cras ut ultricies eros. Maecenas eros justo, ullamcorper a sapien id, viverra ultrices eros. Morbi sem neque, posuere et pretium eget, bibendum sollicitudin lacus. Aliquam eleifend sollicitudin diam, eu mattis nisl maximus sed. Nulla imperdiet semper molestie. Morbi massa odio, condimentum sed ipsum ac, gravida ultrices erat. Nullam eget dignissim mauris, non tristique erat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;</p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="parallax"><img src="<%= @main_image_url %>" alt="main image 2"></div>
-</div>
-<div class="container">
-  <div class="section">
-    <div class="row">
-      <div class="col s12 center">
-        <h3><i class="mdi-content-send brown-text"></i></h3>
-        <h4>Contact Us</h4>
-        <p class="left-align light">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque id nunc nec volutpat. Etiam pellentesque tristique arcu, non consequat magna fermentum ac. Cras ut ultricies eros. Maecenas eros justo, ullamcorper a sapien id, viverra ultrices eros. Morbi sem neque, posuere et pretium eget, bibendum sollicitudin lacus. Aliquam eleifend sollicitudin diam, eu mattis nisl maximus sed. Nulla imperdiet semper molestie. Morbi massa odio, condimentum sed ipsum ac, gravida ultrices erat. Nullam eget dignissim mauris, non tristique erat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;</p>
-      </div>
-    </div>
-  </div>
-</div>
