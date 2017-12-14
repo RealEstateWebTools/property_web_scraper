@@ -1,0 +1,27 @@
+<%
+# ...
+if Rails.env.development?
+  require_asset ("vue-2.5.9.dev")
+else
+  require_asset ("vue-2.4.2.prod")
+end
+
+require_asset ("vue-social-sharing-2.3.3")
+require_asset ("vue-google-maps-0.1.21")
+require_asset ("./vue/inmo-map")
+require_asset ("./vue/vue-main")
+
+%>
+
+
+//= require vue-social-sharing-2.3.3
+//= require property_web_scraper/vue/vue-main
+
+(function($){
+  $(function(){
+
+    $('.button-collapse').sideNav();
+    $('.parallax').parallax();
+
+  }); // end of document ready
+})(jQuery); // end of jQuery name space
