@@ -21,11 +21,25 @@ module PropertyWebScraper
           @success = true
           web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
           @listing = web_scraper.process_url import_url, import_host
-          @listing_attributes = %w(reference title description
-                                   price_string price_float area_unit address_string currency
-                                   country longitude latitude main_image_url for_rent for_sale
-                                   count_bedrooms count_bathrooms )
-          # above used to display /views/property_web_scraper/scraper/_retrieve_results.html.erb
+
+          @markers = []
+
+          if @listing.latitude.present? && @listing.longitude.present?
+            title = @listing.title || ""
+            marker = {
+              title: title,
+              show_url: "#",
+              image_url: nil,
+              display_price: "",
+              position: {
+                lat: @listing.latitude,
+                lng: @listing.longitude
+              }
+            }
+            @markers.push marker
+          end
+
+
         else
           @error_message = <<-HTML
           <div class="error">

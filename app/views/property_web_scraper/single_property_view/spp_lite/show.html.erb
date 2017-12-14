@@ -58,12 +58,12 @@
       </div>
       <div class="parallax"><img src="<%= @main_image_url %>" alt="main image 2"></div>
     </div>
-    <div class="container">
-      <div class="section">
+    <div class="">
+      <div class="section" style="padding-top: 0px;">
         <div class="row">
           <div>
             
-    <inmo-map ref="inmomap" style="min-height: 600px;"  :markers="[{'id':1,'title':'Example country house for sale.','show_url':'/en/properties/for-sale/1/example-country-house-for-sale','image_url':'http://res.cloudinary.com/hyk02upex/image/upload/v1512916315/jqsu44qmncu3z1llmwst.jpg','display_price':'$300,000','position':{'lat':40.4076591,'lng':-74.5798604}}]"   :zoom="15">
+    <inmo-map ref="inmomap" style="min-height: 600px;"  :markers="<%= @markers.to_json %>"   :zoom="15">
     </inmo-map>
 
           </div>

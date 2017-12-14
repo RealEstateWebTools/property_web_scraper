@@ -35,7 +35,6 @@ Vue.component('inmo-map', {
   mounted: function() {
     var that = this;
     this.$refs.mmm.$mapCreated.then(function() {
-      debugger;
       if (that.mapkers.length > 1) {
         var bounds = new google.maps.LatLngBounds();
         that.mapkers.forEach(function(mapker){
@@ -101,10 +100,11 @@ Vue.component('inmo-map', {
       }
     },
     center: function() {
-      if (this.markers) {
-        var lat = this.markers[0].position.lat;
-        var lng = this.markers[0].position.lng;
-        return { lat: lat, lng: lng };
+      var latitude = 0;
+      var longitude = 0;
+      if (this.markers && (this.markers.length > 0)) {
+        latitude = this.markers[0].position.lat;
+        longitude = this.markers[0].position.lng;
 
         // if (this.mapkers.length < 2) {
         // } else {
@@ -115,6 +115,7 @@ Vue.component('inmo-map', {
         //   // this.$refs.map.$mapObject.fitBounds(bounds)
         // }
       }
+      return { lat: latitude, lng: longitude };
       // `this` points to the vm instance
     }
   },
