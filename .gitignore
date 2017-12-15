@@ -8,3 +8,5 @@ spec/dummy/tmp/
 spec/dummy/.byebug_history
 spec/dummy/config/secrets.yml
 .byebug_history
+
+spec/dummy/node_modules
