@@ -27,5 +27,6 @@ group :development, :test do
   # gem 'json_spec'
 end
 
+gem 'webpacker', '~> 3.0'
 # gem 'bootstrap', git: 'https://github.com/twbs/bootstrap-rubygem'
 # gem 'jquery-rails'
