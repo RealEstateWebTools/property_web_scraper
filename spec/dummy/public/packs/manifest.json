@@ -1,4 +1,8 @@
 {
-  "application.js": "/packs/application-9e2367315efa881cff5f.js",
-  "application.js.map": "/packs/application-9e2367315efa881cff5f.js.map"
+  "application.js": "/packs/application-a4e651f1209ff98683e4.js",
+  "application.js.map": "/packs/application-a4e651f1209ff98683e4.js.map",
+  "hello_vue.css": "/packs/hello_vue-9cb5a7334a6577c3422968b9b9970b2f.css",
+  "hello_vue.css.map": "/packs/hello_vue-9cb5a7334a6577c3422968b9b9970b2f.css.map",
+  "hello_vue.js": "/packs/hello_vue-9c15c86aa99317ea33e9.js",
+  "hello_vue.js.map": "/packs/hello_vue-9c15c86aa99317ea33e9.js.map"
 }
