@@ -62,7 +62,9 @@
       <div class="section" style="padding-top: 0px;">
         <div class="row">
           <div>
-
+            
+    <inmo-map ref="inmomap" style="min-height: 600px;"  :markers="<%= @markers.to_json %>"   :zoom="15">
+    </inmo-map>
 
           </div>
           <div class="col s12 center">

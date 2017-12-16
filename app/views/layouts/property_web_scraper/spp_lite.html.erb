@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
 
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection" />
   <%= stylesheet_link_tag    "property_web_scraper/spp_lite", media: "all" %>
 </head>
 
@@ -43,29 +42,28 @@
 </div>
     <!--  Scripts-->
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
     <%= javascript_pack_tag 'hello_vue' %>
       <script type="text/javascript">
       // start carrousel
-      $('.carousel.carousel-slider').carousel({
-        fullWidth: true,
-        indicators: true
-      });
+      // $('.carousel.carousel-slider').carousel({
+      //   fullWidth: true,
+      //   indicators: true
+      // });
 
 
-      // move next carousel
-      $('.moveNextCarousel').click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        $('.carousel').carousel('next');
-      });
+      // // move next carousel
+      // $('.moveNextCarousel').click(function(e) {
+      //   e.preventDefault();
+      //   e.stopPropagation();
+      //   $('.carousel').carousel('next');
+      // });
 
-      // move prev carousel
-      $('.movePrevCarousel').click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        $('.carousel').carousel('prev');
-      });
+      // // move prev carousel
+      // $('.movePrevCarousel').click(function(e) {
+      //   e.preventDefault();
+      //   e.stopPropagation();
+      //   $('.carousel').carousel('prev');
+      // });
       </script>
 </body>
 
