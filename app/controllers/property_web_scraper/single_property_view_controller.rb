@@ -63,7 +63,7 @@ module PropertyWebScraper
         return render '/property_web_scraper/single_property_view/error', layout: false
       end
       @main_image_url = "http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg"
-      theme_name = "spp_lite"
+      theme_name = "spp_vue_mod"
       render "/property_web_scraper/single_property_view/#{theme_name}/show", layout: "property_web_scraper/#{theme_name}"
     end
 

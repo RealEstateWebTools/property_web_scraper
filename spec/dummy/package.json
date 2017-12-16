@@ -5,7 +5,7 @@
     "vue": "2.5.9",
     "vue-loader": "^13.5.1",
     "vue-social-sharing": "^2.3.3",
-    "vue-template-compiler": "^2.5.11",
+    "vue-template-compiler": "2.5.9",
     "vue2-google-maps": "^0.8.4"
   },
   "devDependencies": {
