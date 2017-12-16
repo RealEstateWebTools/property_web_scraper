@@ -5,17 +5,17 @@
 // like app/views/layouts/application.html.erb.
 // All it does is render <div>Hello Vue</div> at the bottom of the page.
 
-import Vue from 'vue'
-import App from '../app.vue'
+// import Vue from 'vue'
+// import App from '../app.vue'
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.body.appendChild(document.createElement('hello'))
-  const app = new Vue({
-    render: h => h(App)
-  }).$mount('hello')
+// document.addEventListener('DOMContentLoaded', () => {
+//   document.body.appendChild(document.createElement('hello'))
+//   const app = new Vue({
+//     render: h => h(App)
+//   }).$mount('hello')
 
-  console.log(app)
-})
+//   console.log(app)
+// })
 
 
 // The above code uses Vue without the compiler, which means you cannot
@@ -32,18 +32,40 @@ document.addEventListener('DOMContentLoaded', () => {
 // </div>
 
 
-// import Vue from 'vue/dist/vue.esm'
-// import App from '../app.vue'
-//
-// document.addEventListener('DOMContentLoaded', () => {
-//   const app = new Vue({
-//     el: '#hello',
-//     data: {
-//       message: "Can you say hello?"
-//     },
-//     components: { App }
-//   })
-// })
+import Vue from 'vue/dist/vue.esm'
+// import * as VueGoogleMaps from 'vue2-google-maps'
+import SocialSharing from 'vue-social-sharing'
+import App from '../app.vue'
+var VueGoogleMaps = require('vue2-google-maps');
+// var SocialSharing = require('vue-social-sharing');
+Vue.use(SocialSharing);
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+
+
+
+
+  const app = new Vue({
+    el: '#main-vue',
+    data: {
+      message: "Can you say hello?"
+    }
+    // components: { App }
+  })
+
+})
+
+
+
+
 //
 //
 //
