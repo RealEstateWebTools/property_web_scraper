@@ -7,6 +7,10 @@ PropertyWebScraper::Engine.routes.draw do
   # get '/scrapers/:id' => 'scraper#show'
   # get '/scrapers/:id/retrieve' => 'scraper#retrieve'
 
+
+  get '/single_property_view' => 'single_property_view#show'
+
+
   # scraper endpoints save to firebase (useful for chrome extension for later retrieval)
   post '/scrapers/submit' => 'scraper#ajax_submit'
   post '/retriever/as_json' => 'scraper#retrieve_as_json'

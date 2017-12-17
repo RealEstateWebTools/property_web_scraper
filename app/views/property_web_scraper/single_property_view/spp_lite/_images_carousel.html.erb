@@ -1,0 +1,22 @@
+  <div class="carousel carousel-slider center " data-indicators="true">
+    <div class="carousel-fixed-item center middle-indicator">
+     <div class="left">
+      <a href="#" class="movePrevCarousel middle-indicator-text waves-effect waves-light content-indicator"><i class="material-icons left  middle-indicator-text">chevron_left</i></a>
+     </div>
+     
+     <div class="right">
+     <a href="#" class=" moveNextCarousel middle-indicator-text waves-effect waves-light content-indicator"><i class="material-icons right middle-indicator-text">chevron_right</i></a>
+     </div>
+    </div>
+
+      <% @listing.image_urls.each.with_index do |image_url, index| %>
+        <a class="carousel-item" href="#one!">
+        <img src="<%= image_url %>"></a>
+      <% end %>
+
+  </div>
+
+
+
+
+
