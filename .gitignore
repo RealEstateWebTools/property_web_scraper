@@ -1,5 +1,4 @@
 spec/dummy/node_modules/
-spec/dummy/public/packs/
 
 .bundle/
 log/*.log
