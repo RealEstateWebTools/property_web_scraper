@@ -1,0 +1,33 @@
+
+p[data-v-6fb8108a] {
+  font-size: 2em;
+  text-align: center;
+}
+
+.google-map[data-v-b8d62ec4] {
+  width: 800px;
+  height: 600px;
+  margin: 0 auto;
+  background: gray;
+}
+
+.vue-map-container {
+  position: relative;
+}
+.vue-map-container .vue-map {
+  left: 0; right: 0; top: 0; bottom: 0;
+  position: absolute;
+}
+.vue-map-hidden {
+  display: none;
+}
+
+.vue-street-view-pano-container {
+  position: relative;
+}
+.vue-street-view-pano-container .vue-street-view-pano {
+  left: 0; right: 0; top: 0; bottom: 0;
+  position: absolute;
+}
+
+/*# sourceMappingURL=spp_lite-428ac7681af9f9a86b08a189ec1fff67.css.map*/

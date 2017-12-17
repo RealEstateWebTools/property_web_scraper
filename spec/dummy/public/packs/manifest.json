@@ -1,16 +1,16 @@
 {
-  "application.js": "/packs/application-1ecf0a6988c300ea1e67.js",
-  "application.js.map": "/packs/application-1ecf0a6988c300ea1e67.js.map",
+  "application.js": "/packs/application-50ea085becc0a99ffc67.js",
+  "application.js.map": "/packs/application-50ea085becc0a99ffc67.js.map",
   "spp_lite.css": "/packs/spp_lite-428ac7681af9f9a86b08a189ec1fff67.css",
   "spp_lite.css.map": "/packs/spp_lite-428ac7681af9f9a86b08a189ec1fff67.css.map",
-  "spp_lite.js": "/packs/spp_lite-105853db434289db8a31.js",
-  "spp_lite.js.map": "/packs/spp_lite-105853db434289db8a31.js.map",
+  "spp_lite.js": "/packs/spp_lite-c3e52b3c8c8d377dcb4e.js",
+  "spp_lite.js.map": "/packs/spp_lite-c3e52b3c8c8d377dcb4e.js.map",
   "spp_vue_modern.css": "/packs/spp_vue_modern-428ac7681af9f9a86b08a189ec1fff67.css",
   "spp_vue_modern.css.map": "/packs/spp_vue_modern-428ac7681af9f9a86b08a189ec1fff67.css.map",
-  "spp_vue_modern.js": "/packs/spp_vue_modern-d5c40a9ec7c6dcfb4129.js",
-  "spp_vue_modern.js.map": "/packs/spp_vue_modern-d5c40a9ec7c6dcfb4129.js.map",
+  "spp_vue_modern.js": "/packs/spp_vue_modern-ac895522032f9c29fa3a.js",
+  "spp_vue_modern.js.map": "/packs/spp_vue_modern-ac895522032f9c29fa3a.js.map",
   "spp_vuetify.css": "/packs/spp_vuetify-545a528c2f51a27e3366244e88c6148a.css",
   "spp_vuetify.css.map": "/packs/spp_vuetify-545a528c2f51a27e3366244e88c6148a.css.map",
-  "spp_vuetify.js": "/packs/spp_vuetify-43ae039ddc1fd3e95971.js",
-  "spp_vuetify.js.map": "/packs/spp_vuetify-43ae039ddc1fd3e95971.js.map"
+  "spp_vuetify.js": "/packs/spp_vuetify-07045936a15995933a2d.js",
+  "spp_vuetify.js.map": "/packs/spp_vuetify-07045936a15995933a2d.js.map"
 }
