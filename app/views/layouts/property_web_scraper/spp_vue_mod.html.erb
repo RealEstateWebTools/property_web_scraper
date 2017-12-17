@@ -3,9 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPorm8YzIaUGhKfe5cvpgofZ_gdT8hdZw" ></script>
-
+    <%= stylesheet_link_tag    "property_web_scraper/spp_vue_mod", media: "all" %>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/vue-material.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/theme/default.css">
   </head>
 
   <body>
@@ -13,6 +14,9 @@
 
       <%= yield %>
     </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-material@beta"></script>
 
     <%= javascript_pack_tag 'spp_vue_modern' %>
 

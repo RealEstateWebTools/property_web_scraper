@@ -37,20 +37,12 @@ import Vue from 'vue/dist/vue.esm'
 import SocialSharing from 'vue-social-sharing'
 import App from '../app.vue'
 import GoogleMap from '../google-map.vue'
-import InmoMap from '../inmo-map'
-
 var VueGoogleMaps = require('vue2-google-maps');
 // var SocialSharing = require('vue-social-sharing');
 Vue.use(SocialSharing);
-// Vue.use(VueGoogleMaps);
+Vue.use(GoogleMap);
 
-  Vue.use(VueGoogleMaps, {
-    load: {
-      key: 'AIzaSyCPorm8YzIaUGhKfe5cvpgofZ_gdT8hdZw'
-      // v: '3.26', // Google Maps API version
-      // libraries: 'places',   // If you want to use places input
-    }
-  });
+
 
 
 
@@ -62,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     data: {
       message: "Can you say hello?"
     },
-    components: { }
+    components: { GoogleMap }
   })
 
 })
