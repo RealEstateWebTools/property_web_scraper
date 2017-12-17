@@ -2,7 +2,7 @@
 import Vue from 'vue/dist/vue.esm'
 
 Vue.component('inmo-map', {
-  template: '<gmap-map style="min-height: 600px;"' +
+  template: '<gmap-map style="width: 100%; height: 100%;"' +
     ':zoom="15" :center="center" ref="mmm">' +
     '<gmap-info-window ref="infwin" :options="infoOptions" :position="infoWindowPos"' +
     ':opened="infoWinOpen" @closeclick="infoWinOpen=false">' +

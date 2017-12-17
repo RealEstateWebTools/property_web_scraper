@@ -37,14 +37,22 @@ import Vuetify from 'vuetify'
 // import * as VueGoogleMaps from 'vue2-google-maps'
 import SocialSharing from 'vue-social-sharing'
 import App from '../app.vue'
-import GoogleMap from '../google-map.vue'
+// import * as InmoMap from '../inmo-map'
 var VueGoogleMaps = require('vue2-google-maps');
-// var SocialSharing = require('vue-social-sharing');
+var InmoMap = require('../inmo-map');
+
 Vue.use(SocialSharing);
-Vue.use(GoogleMap);
-Vue.use(Vuetify);
-
-
+// Vue.use(InmoMap);
+Vue.use(Vuetify, {
+  theme: PWSAPP.theme
+});
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: 'AIzaSyCPorm8YzIaUGhKfe5cvpgofZ_gdT8hdZw'
+    // v: '3.26', // Google Maps API version
+    // libraries: 'places',   // If you want to use places input
+  }
+});
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -52,8 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const app = new Vue({
     el: '#main-vue',
-    data: PWSAPP.vueData,
-    components: { GoogleMap }
+    data: PWSAPP.vueData
   })
 
 })

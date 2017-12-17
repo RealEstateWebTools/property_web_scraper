@@ -5,15 +5,34 @@
   <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
   <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
   <%= stylesheet_link_tag    "property_web_scraper/spp_vuetify", media: "all" %>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 
 <body>
   <div id="main-vue">
-    <%= yield %>
+    <v-app light>
+      <v-toolbar class="white" style="display: none;">
+        <v-toolbar-title v-text="title"></v-toolbar-title>
+      </v-toolbar>
+      <main>
+        <v-content>
+          <%= yield %>
+            <v-footer class="primary lighten-2">
+              <v-layout row wrap align-center>
+                <v-flex xs12>
+                  <div class="white--text ml-3">
+                    Powered by <a class="white--text text-lighten-3" href="https://github.com/RealEstateWebTools/property_web_scraper">PropertyWebScraper</a>
+                    <v-icon class="red--text">favorite</v-icon>
+                  </div>
+                </v-flex>
+              </v-layout>
+            </v-footer>
+        </v-content>
+      </main>
+      <v-content>
+      </v-content>
+    </v-app>
   </div>
-
   <script>
   var PWSAPP = PWSAPP || {};
 
@@ -21,12 +40,16 @@
   PWSAPP.vueData = {
     title: "rrrr",
     carouselPhotos: carouselPhotos
-  }
+  };
+  PWSAPP.theme = {
+    primary: 'green',
+    secondary: '#b0bec5',
+    accent: '#8c9eff',
+    error: '#b71c1c'
+  };
   </script>
-
   <%= javascript_pack_tag 'spp_vuetify' %>
-  <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
-
+    <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
 </body>
 
 </html>
