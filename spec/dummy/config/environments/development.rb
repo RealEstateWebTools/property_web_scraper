@@ -1,4 +1,10 @@
 Rails.application.configure do
+
+  # below is used in my layout to decide if to use javascript_pack_tag
+  # to load from webpacker endpoint 
+  config.x.is_spec_dummy_dev = true
+  # If above is false then I load previously compiled js in the vendor directory
+
     # Verifies that versions and hashed value of the package contents in the project's package.json
   config.webpacker.check_yarn_integrity = false
 

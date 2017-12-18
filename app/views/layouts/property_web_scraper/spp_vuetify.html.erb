@@ -48,8 +48,15 @@
     error: '#b71c1c'
   };
   </script>
-  <%= javascript_pack_tag 'spp_vuetify' %>
-    <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
+  <% if Rails.configuration.x.is_spec_dummy_dev == true %>
+    <!-- when engine is being used in dummy dev environment use the webpacker endpoint -->
+    <%= javascript_pack_tag 'spp_vuetify' %>
+  <% else %>
+    <!-- when engine is being used in a rails app use the compiled file which is available here: -->
+    <%= javascript_include_tag "property_web_scraper/spp_vuetify" %>
+  <% end %>
+
+  <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
 </body>
 
 </html>
