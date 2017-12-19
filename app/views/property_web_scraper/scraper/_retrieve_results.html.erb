@@ -20,7 +20,7 @@
 </table>
 <div style="display: none;">
   <strong>Images</strong>
-  <% @listing.image_urls.each do |listing_image_url| %>
+  <% @image_urls.each do |listing_image_url| %>
     <div>
       <%= link_to listing_image_url, listing_image_url, target: "_blank" %>
     </div>
