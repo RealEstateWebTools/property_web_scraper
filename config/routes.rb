@@ -1,5 +1,8 @@
 PropertyWebScraper::Engine.routes.draw do
   root to: 'scraper#welcome'
+  get '/mls' => 'mls#welcome'
+  post '/mls/submit' => 'mls#ajax_submit'
+
   get '/stash' => 'stash#index'
   get '/stash/:client_id' => 'stash#show_client'
   get '/stash/:client_id/:prop_id' => 'stash#show_prop'

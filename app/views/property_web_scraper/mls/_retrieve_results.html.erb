@@ -1,0 +1,32 @@
+<!-- <h5>Result:</h5> -->
+<p>Property info retrieved..:</p>
+<table class="table">
+  <% @listing_attributes.each do |listing_attribute| %>
+    <tr>
+      <th><%= listing_attribute  %></th>
+      <td><%= @listing[listing_attribute]  %></td>
+    </tr>
+  <% end %>
+  <tr>
+    <th>Url</th>
+    <td>
+      <%= link_to @listing.import_url, @listing.import_url, target: "_blank" %>
+    </td>
+  </tr>
+  <thead>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<div style="display: none;">
+  <strong>Images</strong>
+  <% @image_urls.each do |listing_image_url| %>
+    <div>
+      <%= link_to listing_image_url, listing_image_url, target: "_blank" %>
+    </div>
+  <% end %>
+</div>
+
+  <div>
+    <%= link_to "Single Page view", single_property_view_path %>
+  </div>

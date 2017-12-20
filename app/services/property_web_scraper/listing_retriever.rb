@@ -4,6 +4,8 @@ require 'faraday'
 
 module PropertyWebScraper
   class ListingRetriever
+    # TODO - add logic to retrieve
+    # from db or scraper depending on expiry
     attr_accessor :import_url
 
     def initialize(import_url)

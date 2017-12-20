@@ -165,7 +165,7 @@ module PropertyWebScraper
       #   @success = false
       # end
       # redirect_to "/scrapers/#{scraper_name}"
-      render '/property_web_scraper/retrieve_results.js.erb', layout: false
+      render '/property_web_scraper/scraper_retrieve_results.js.erb', layout: false
     end
 
     private
