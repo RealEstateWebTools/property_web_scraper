@@ -25,7 +25,7 @@ module PropertyWebScraper
 
       properties.each do |property|
         if count < 100
-          mapped_property = ImportMapper.new(import_source.import_mapper_name).map_property(property)
+          mapped_property = MlsImportMapper.new(import_source.import_mapper_name).map_property(property)
           retrieved_properties.push mapped_property
         end
         count += 1

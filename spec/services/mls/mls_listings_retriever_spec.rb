@@ -14,7 +14,6 @@ module PropertyWebScraper
         expect(retrieved_properties.count).to eq(5)
         expect( retrieved_properties[0]["AddressCity"]).to eq("Bastrop")
 
-
       end
     end
   end

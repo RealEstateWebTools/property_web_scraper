@@ -15,12 +15,6 @@ module PropertyWebScraper
       #     return render json: { error: "Please provide #{param_name}."}, status: 422
       #   end
       # end
-      mls_name = params[:mls_unique_name] || "mris"
-      import_source = PropertyWebScraper::MlsImportSource.find_by_unique_name mls_name
-
-      # import_source.details[:username] = params[:username]
-      import_source.details[:password] = params[:password]||'PMRISTEST'
-      # import_source.details[:login_url] = params[:login_url]
 
       limit = 25
       properties = PropertyWebScraper::MlsListingsRetriever.new(import_source).retrieve("(ListPrice=0+)", limit)
