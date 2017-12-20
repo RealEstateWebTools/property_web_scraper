@@ -9,13 +9,28 @@
     <%= form_tag("/mls/submit.js", method: "post", remote: true, authenticity_token: true) do %>
       <br>
       <div>
+
+      <div class="col-sm-12" style="display:block;">
         <p>
-          Please enter the url for a property for sale or for rent: 
+          Login URL: 
           </p>
-        <%# label_tag(:import_url, "Webpage URL:") %>
         <span class="url_input">
-          <%= text_field_tag(:import_url) %>
+          <%= text_field_tag(:login_url) %>
         </span>
+      </div>
+      <div class="col-sm-12">
+        <label class="fg-label m-t-20">Username:</label>
+        <span class="url_input">
+          <%= text_field_tag(:username) %>
+        </span>
+      </div>
+      <div class="col-sm-12">
+        <label class="fg-label m-t-20">Password:</label>
+        <span class="url_input">
+          <%= text_field_tag(:password) %>
+        </span>
+      </div>
+
         <%= submit_tag("Retrieve property info") %>
       </div>
     <% end %>

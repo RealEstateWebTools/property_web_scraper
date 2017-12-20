@@ -1,0 +1,150 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://agdb.rets.interealty.com/Login.asmx/Login
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - ACTRISIDX/1.0
+      Accept:
+      - "*/*"
+      Date:
+      - Wed, 20 Dec 2017 17:37:24 GMT
+      Rets-Version:
+      - RETS/1.5
+      Authorization:
+      - Basic QUNUUklTQkVUQTE6MUJldGFPbmU=
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - private, max-age=0
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - text/xml
+      Server:
+      - Microsoft-IIS/7.5
+      Rets-Version:
+      - RETS/1.5
+      Rets-Server:
+      - Interealty-RETS/1.5.247.0
+      Set-Cookie:
+      - ASP.NET_SessionId=ybcr30wa052xel44b0ug3vkb; path=/; HttpOnly
+      - RETS-Session-ID=ybcr30wa052xel44b0ug3vkb; path=/
+      X-Powered-By:
+      - ASP.NET
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      Date:
+      - Wed, 20 Dec 2017 17:37:23 GMT
+    body:
+      encoding: UTF-8
+      string: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<RETS ReplyCode=\"0\"
+        ReplyText=\"Success. Reference ID: 7463e59a-00f4-4b90-adfc-03f2e56fcb63\">\r\n
+        \ <RETS-RESPONSE>\r\nMemberName=\r\nUser=10203,20,!A,\r\nBroker=ACTRI,ACTRIS\r\nMetadataVersion=48.82.82401\r\nMinMetadataVersion=48.82.82401\r\nTimeoutSeconds=1800\r\nChangePassword=/ChangePassword.asmx/ChangePassword\r\nLogin=/Login.asmx/Login\r\nLogout=/Logout.asmx/Logout\r\nSearch=/Search.asmx/Search\r\nGetMetadata=/GetMetadata.asmx/GetMetadata\r\n</RETS-RESPONSE>\r\n</RETS>"
+    http_version: 
+  recorded_at: Wed, 20 Dec 2017 17:37:25 GMT
+- request:
+    method: post
+    uri: http://agdb.rets.interealty.com/Search.asmx/Search
+    body:
+      encoding: UTF-8
+      string: SearchType=Property&Class=PROPERTY&Format=COMPACT&Limit=5&Query=%28ListPrice%3D0%2B%29&QueryType=DMQL2
+    headers:
+      User-Agent:
+      - ACTRISIDX/1.0
+      Accept:
+      - "*/*"
+      Date:
+      - Wed, 20 Dec 2017 17:37:25 GMT
+      Rets-Version:
+      - RETS/1.5
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Cookie:
+      - ASP.NET_SessionId=ybcr30wa052xel44b0ug3vkb; RETS-Session-ID=ybcr30wa052xel44b0ug3vkb
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - private, max-age=0
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - text/xml
+      Server:
+      - Microsoft-IIS/7.5
+      Mime-Version:
+      - '1.0'
+      Rets-Version:
+      - RETS/1.5
+      Rets-Server:
+      - Interealty-RETS/1.5.247.0
+      Set-Cookie:
+      - RETS-Session-ID=ybcr30wa052xel44b0ug3vkb; path=/
+      X-Powered-By:
+      - ASP.NET
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      Date:
+      - Wed, 20 Dec 2017 17:37:26 GMT
+    body:
+      encoding: UTF-8
+      string: "<?xml version=\"1.0\"?>\r\n<RETS ReplyCode=\"0\" ReplyText=\"Operation
+        Successful Reference ID: cf80984d-8c81-4063-b8ef-916435d66ffe\">\r\n<DELIMITER
+        value=\"09\" />\r\n<COLUMNS>\tsysid\tAddressBoxNumber\tAddressCarrierRoute\tAddressCity\tAddressCountry\tAddressCounty\tAddressPostalCode\tAddressState\tAddressStreetAdditionalInfo\tAddressStreetAddress\tAddressStreetDirPrefix\tAddressStreetDirSuffix\tAddressStreetName\tAddressStreetNumber\tAddressStreetSuffix\tAddressUnitNumber\tAppliances\tAssociationFee\tAssociationFee2\tAssociationFeePeriod\tBaths1Qtr\tBaths3Qtr\tBathsFull\tBathsHalf\tBeds\tBoard\tCancellationDate\tCommission\tCommunityFeatures\tConstructionMaterial\tContingentDate\tCooling\tCoolingPresent\tDirections\tDisclaimer\tFireplaces\tFireplacesIndicator\tFloors\tFoundation\tGarageSpaces\tHeating\tHorseFacilities\tHorseFacilitiesIndicator\tHotTub\tHotTubIndicator\tidxVirtualTourURL\tInclusions\tListingAreaCode\tListingAreaDescription\tListingID\tListingStatus\tListingStatusCode\tListPrice\tListPricePrevious\tLivingArea\tLotSizeAreaAcres\tLotSizeAreaSqFeet\tLotSizeDim\tMapCoordinate\tModificationTimeStamp\tOriginalListPrice\tParkingCarPort\tParkingCoveredParking\tParkingTotal\tPendingDate\tphotoModificationTimestamp\tPoolPresent\tPorchType\tPropertySubTypeDescription\tPropertyTax\tPropertyTypeDescription\tPropertyTypeID\tPropertyTypeStandardName\tPublicRemarks\tREO\tRoof\tRoomsBasementArea\tRoomsBasementDim\tRoomsDenDescription\tRoomsDenDim\tRoomsDiningRoomDim\tRoomsDiningRoomPresent\tRoomsFamilyDescription\tRoomsFamilyRoomDim\tRoomsFamilyRoomPresent\tRoomsKitchenDimensions\tRoomsLaundryDimensions\tRoomsLivingRoomDim\tRoomsLivingRoomPresent\tRoomsOfficeDescription\tRoomsOfficeDimensions\tRoomsTotalRooms\tSchoolElementarySchool\tSchoolHighSchool\tSchoolJrHigh\tSchoolMiddleSchool\tSchoolSchoolDistrict\tSecurityFeatures\tStatusChangeDate\tSubdivision\tTerms\tTotalUnits\tTract\tUtilities\tUtilitiesSewer\tUtilitiesWater\tViewIndicator\tWaterFrontPresent\tZoning\tDisabilityFeatures\tExteriorFeatures\tFirePlaceDetails\tInteriorFeatures\tLotDesc\tViewDescription\tLegalBlock\tLegalLot\tUnitFIVE_RentPerMonth\tUnitFOUR_RentPerMonth\tUnitONE_RentPerMonth\tUnitTHREE_RentPerMonth\tUnitTWO_RentPerMonth\tTWP\tUnitFIVE_Baths\tUnitFIVE_Beds\tUnitFIVE_Desc\tUnitFIVE_Furnished\tUnitFOUR_Baths\tUnitFOUR_Beds\tUnitFOUR_Desc\tUnitFOUR_Furnished\tUnitONE_Baths\tUnitONE_Beds\tUnitONE_Desc\tUnitONE_Furnished\tUnitTHREE_Baths\tUnitTHREE_Beds\tUnitTHREE_Desc\tUnitTHREE_Furnished\tUnitTWO_Baths\tUnitTWO_Beds\tUnitTWO_Desc\tUnitTWO_Furnished\tAssociationAmenities\tAssociationFeeIncludes\tAssociationFeePeriod2\tAssociationName\tAssociationYN\tAttachedYN\tBoardSubBoard\tBuilderModel\tBuilderName\tBuildingAreaSource\tCarportYN\tContingency\tCropsIncludedYN\tCrossStreet\tDirectionFaces\tDisclosures\tFencing\tGarageAttachedYN\tGarageYN\tGreenBuildingCertification\tGreenEnergyEfficient\tHeatingYN\tIDXAutomatedValuationDisplayYN\tIDXConsumerCommentYN\tIrrigationSource\tIrrigationWaterRightsYN\tLeaseConsideredYN\tLotSizeSource\tNewConstructionYN\tNumberOfUnitsBuildings\tOpenParkingYN\tOtherParking\tParkingFeatures\tParkName\tRentControlYN\tRentIncludes\tRoomsBathroomOneDim\tRoomsBathroomOneLevel\tRoomsBathroomThreeDim\tRoomsBathroomThreeLevel\tRoomsBathroomTwoDim\tRoomsBathroomTwoLevel\tRoomsBedroomFiveArea\tRoomsBedroomFiveDescription\tRoomsBedroomFiveDim\tRoomsBedroomFiveLevel\tRoomsBedroomFourArea\tRoomsBedroomFourDescription\tRoomsBedroomOneArea\tRoomsBedroomOneDescription\tRoomsBedroomOneDim\tRoomsBedroomOneLevel\tRoomsBedroomThreeArea\tRoomsBedroomThreeDescription\tRoomsBedroomThreeDim\tRoomsBedroomThreeLevel\tRoomsBedroomTwoArea\tRoomsBedroomTwoDim\tRoomsBedroomTwoLevel\tRoomsBonusRoomLevel\tRoomsDenArea\tRoomsDenLevel\tRoomsDiningRoomArea\tRoomsDiningRoomFeatures\tRoomsFamilyRoomArea\tRoomsFamilyRoomFeatures\tRoomsGreatRoomArea\tRoomsGreatRoomDescription\tRoomsGreatRoomDim\tRoomsGreatRoomLevel\tRoomsKitchenArea\tRoomsKitchenFeatures\tRoomsKitchenLevel\tRoomsLaundryArea\tRoomsLaundryFeatures\tRoomsLaundryLevel\tRoomsLivingRoomArea\tRoomsLivingRoomFeatures\tRoomsMasterBathroomArea\tRoomsMasterBathroomDescription\tRoomsMasterBathroomDim\tRoomsMasterBathroomFeatures\tRoomsMasterBathroomLevel\tRoomsMasterBedroomArea\tRoomsMasterBedroomDescription\tRoomsMasterBedroomDim\tRoomsMasterBedroomFeatures\tRoomsMasterBedroomLevel\tRoomsMediaLevel\tRoomsOfficeArea\tRoomsOfficeLevel\tSchoolElementaryDistrict\tSchoolHighDistrict\tSchoolMiddleOrJuniorDistrict\tTaxAssessedValue\tTaxBookNumber\tTaxMapNumber\tUnitFIVE_UnitsTotal\tUnitFOUR_UnitsTotal\tUnitONE_UnitsTotal\tUnitTHREE_UnitsTotal\tUnitTWO_UnitsTotal\tWaterBodyName\tAddressPostalCodePlus4\tRESOStandardStatus\tRESOPropertyType\tRESORoomType\tRESOUnitType\t</COLUMNS>\r\n<DATA>\t148770704\t\t\tBastrop\t\tBastrop\t78602\tTX\t\t593
+        FM 2336\t\t\tFM 2336\t593\t\t\t\t0\t\t\t\t\t\t\t\t\t\tBuy Agnt 3.000, Sub
+        Agnt 3.000\t\t\t\t\t\tFROM AUSTIN 290 E TO MCDADE R ON 2336 PAST OAK HILL
+        CEMETARY RD ON L\t\t\t\t\t\t\t\t\tY\t\t\t\t\tBA\tBA\t533325\tSold\t\t17000\t\t\t3.66\t\t200
+        X 398.7\t\t2009-12-08T06:14:08\t17000\t\t\t\t2000-02-21T00:00:00\t\t\t\tSingle
+        Lot\t58\t\t5\tLot/Land\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tBastrop\t\t\tBastrop
+        ISD\t\t\tHOLIDAY HILLS\t\t\t\tElectricity Available,Phone Available,Propane
+        on Property\tSeptic Needed\tWater Line Available\tY\t\t\t\t\t\t\t\tHill Country\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tN\t\t\t\t\t\t\t\t\t\t\t\tNo
+        Fence\t\t\t\t\t\tY\tY\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMina\t\t\t\t\t\t\t\t\t\t\t\t\tC\tL\t\t\t</DATA>\r\n<DATA>\t148770705\t\t\tPflugerville\t\tTravis\t78660\tTX\t\t13909
+        HYMILL DR\t\t\tHYMILL\t13909\tDR\t\t\t\t\t\t\t\t\t\t\t\t\tBuy Agnt 4.000,
+        Sub Agnt 0.000\t\t\t\t\t\tDESSAU RD NORTH; GO EAST ON OLD DESSAU RIGHT ON
+        CRYSTAL BND;LEFT ON HYMILL\t\t\t\t\t\t\t\t\t\t\t\t\t\tPF\tPF\t533346\tSold\t\t29900\t\t\t0.15\t\t60.00
+        X 150.00\t\t2012-12-18T20:01:34\t29900\t\t\t\t2000-04-17T00:00:00\t\t\t\tSingle
+        Lot\t190\t\t5\tLot/Land\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPflugerville
+        ISD\t\t\tDESSAU ESTATES SEC 3\t\t\t\tElectricity on Property,Natural Gas on
+        Property,Natural Gas Available,Phone Available\tSeptic Needed\tCity,Water
+        Line On Th\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNo
+        Fence\t\t\t\t\t\tY\tY\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPflugerville\t\t\t\t\t\t\t\t\t\t\t\t\tC\tL\t\t\t</DATA>\r\n<DATA>\t148770706\t\t\tManor\t\tTravis\t78653\tTX\t\t208
+        PARSONS ST\t\t\tPARSONS\t208\tST\t\t\t\t\t\t\t\t\t\t\t\t\tBuy Agnt 3.000,
+        Sub Agnt 3.000\t\t\t\tNo A/C\tN\t290E TO MANOR R AT LIGHT TO 4WAY STOP LEFT
+        1 BLOCK ON RIGHT SEE SIGN\t\t\t\t\t\t\tNo Heat\t\t\t\t\t\t\tMA\tMA\t537331\tSold\t\t30000\t\t\t\t\t\t\t2012-04-06T20:02:43\t30000\t\t\t\t2000-05-01T00:00:00\t\t\t\tSite-Mixed
+        Use\t211\t\t1\tCommercial\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMANOR
+        TOWN OF\t\t0\t\t\tCity at Street\tCity\tY\t\t\t\t\t\t\t\tSee Agent\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tN\tY\tY\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t7810\t\t\t\t\t\t\t\t\t\tC\tCS\t\t\t</DATA>\r\n<DATA>\t148770707\t\t\tAustin\t\tTravis\t78747\tTX\t\t10011
+        WILD DUNES DR\t\t\tWILD DUNES\t10011\tDR\t\t\t22\t\tMonthly\t\t\t\t\t\t\t\tBuy
+        Agnt 3.000, Sub Agnt 3.000\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tN\t\t\t\t\tSC\tSC\t533361\tExpired\t\t45000\t\t\t0.31\t\t83.00
+        X 167.00\t\t2009-12-08T06:14:08\t0\t\t\t\t\t\t\t\tSingle Lot\t566\t\t5\tLot/Land\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAustin
+        ISD\t\t\tONION CREEK SEC 6 A\t\t\t\tElectricity Available\tPrivate\tCity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCommon
+        Area Maintenance,Trash Collection\t\t\tY\t\t\t\t\t\t\t\t\t\t\t\tNo Fence\t\t\t\t\t\tY\tY\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMenchaca\t\t\t\t\t\t\t\t\t\t\t\t\tE\tL\t\t\t</DATA>\r\n<DATA>\t148770708\t\t\tLago
+        Vista\t\tTravis\t78645\tTX\t\t2502 MAYFLOWER CV\t\t\tMAYFLOWER\t2502\tCV\t\t\t80\t\tAnnually\t\t\t\t\t\t\t\tBuy
+        Agnt 5.000, Sub Agnt 0.000\t\t\t\t\t\t1431 LT ON LOHMAN FD RT BOGGY FORD RT
+        AT Y LFT ON MACARTHUR LFT MAYFLOWER\t\t\t\t\t\t\t\t\tN\t\t\t\t\tLN\tLN\t533362\tSold\t\t12500\t\t\t0.25\t\t\t\t2009-12-08T06:14:08\t12500\t\t\t\t2000-03-09T00:00:00\t\t\t\tSingle
+        Lot\t353\tStructure - No V\t5\tLot/Land\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tLago
+        Vista ISD\t\t\tHIGHLAND LAKE ESTATES SEC 15\t\t\t\tElectricity Available,Natural
+        Gas on Property,Natural Gas Not Available,Phone Available\tCity at Street\tCity\tY\t\t\t\t\t\t\tCul-De-Sac,Public
+        Maintained Road\tHill Country\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCommon
+        Area Maintenance\t\t\tY\t\t\t\t\t\t\t\t\t\t\t\tNo Fence\t\t\t\t\t\tY\tY\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC\tL\t\t\t</DATA>\r\n<MAXROWS
+        />\r\n</RETS>"
+    http_version: 
+  recorded_at: Wed, 20 Dec 2017 17:37:27 GMT
+recorded_with: VCR 3.0.3

@@ -9,23 +9,36 @@ module PropertyWebScraper
 
 
     def ajax_submit
-      # scraper_name = params[:scraper][:scraper_name]
-      import_url = params[:import_url].strip
 
-      listing_retriever = PropertyWebScraper::ListingRetriever.new(import_url)
-      result = listing_retriever.retrieve
-      if result.success
-        @success = result.success
-        @listing = result.retrieved_listing
-        @image_urls = result.retrieved_listing.image_urls || []
-        @listing_attributes = %w(reference title description
-                                   price_string price_float area_unit address_string currency
-                                   country longitude latitude main_image_url for_rent for_sale
-                                   count_bedrooms count_bathrooms )
-        # above used to display /views/property_web_scraper/scraper/_retrieve_results.html.erb
-      else
-        @error_message = result.error_message
+      # [:username, :password, :login_url, :mls_unique_name].each do |param_name|
+      #   unless params[param_name].present?
+      #     return render json: { error: "Please provide #{param_name}."}, status: 422
+      #   end
+      # end
+      mls_name = params[:mls_unique_name] || "mris"
+      import_source = PropertyWebScraper::MlsImportSource.find_by_unique_name mls_name
+
+      # import_source.details[:username] = params[:username]
+      import_source.details[:password] = params[:password]||'PMRISTEST'
+      # import_source.details[:login_url] = params[:login_url]
+
+      limit = 25
+      properties = PropertyWebScraper::MlsListingsRetriever.new(import_source).retrieve("(ListPrice=0+)", limit)
+      retrieved_properties = []
+      count = 0
+      # return render json: properties.as_json
+
+      properties.each do |property|
+        if count < 100
+          mapped_property = ImportMapper.new(import_source.import_mapper_name).map_property(property)
+          retrieved_properties.push mapped_property
+        end
+        count += 1
       end
+
+      # render json: retrieved_properties
+
+
 
       render '/property_web_scraper/mls_retrieve_results.js.erb', layout: false
     end

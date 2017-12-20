@@ -29,6 +29,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'jquery-rails'
   s.add_dependency 'rack-cors'
   s.add_dependency 'firebase'
+  s.add_dependency 'ruby_odata'
+  s.add_dependency 'rets'
 
   s.add_development_dependency 'byebug'
   s.add_development_dependency 'pry'
