@@ -16,21 +16,11 @@ module PropertyWebScraper
       #   end
       # end
 
-      limit = 25
-      properties = PropertyWebScraper::MlsListingsRetriever.new(import_source).retrieve("(ListPrice=0+)", limit)
-      retrieved_properties = []
-      count = 0
-      # return render json: properties.as_json
+      limit = 5
+      listings_retriever = PropertyWebScraper::MlsListingsRetriever.new(import_source)
+      properties = listings_retriever.retrieve("(ListPrice=0+)", limit)
 
-      properties.each do |property|
-        if count < 100
-          mapped_property = ImportMapper.new(import_source.import_mapper_name).map_property(property)
-          retrieved_properties.push mapped_property
-        end
-        count += 1
-      end
 
-      # render json: retrieved_properties
 
 
 

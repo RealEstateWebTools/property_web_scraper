@@ -30,7 +30,8 @@ module PropertyWebScraper
         end
         count += 1
       end
-      
+
+      return retrieved_properties
     end
 
 
