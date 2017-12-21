@@ -36,7 +36,7 @@ module PropertyWebScraper
     def process_url(import_url, import_host)
       # TODO - use import_host.stale_age_duration or query_param to decide if to refresh
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
-      expiry_duration = 24.hours
+      expiry_duration = 24.seconds
       # expiry_duration = 1.minute
       # For datetime, yesterday is < today
       recent = (DateTime.now.utc - expiry_duration)
@@ -126,18 +126,23 @@ module PropertyWebScraper
         end
       end
 
-      scraper_mapping.textFields.keys.each do |mapping_key|
-        mapping = scraper_mapping.textFields[mapping_key]
-        retrieved_text = retrieve_target_text doc, mapping, uri
-        property_hash[mapping_key] = retrieved_text.strip
+      if scraper_mapping.textFields
+        scraper_mapping.textFields.keys.each do |mapping_key|
+          mapping = scraper_mapping.textFields[mapping_key]
+          retrieved_text = retrieve_target_text doc, mapping, uri
+          property_hash[mapping_key] = retrieved_text.strip
+        end
       end
 
-      scraper_mapping.booleanFields.keys.each do |mapping_key|
-        mapping = scraper_mapping.booleanFields[mapping_key]
-        retrieved_text = retrieve_target_text doc, mapping, uri
-        # target_element = doc.css(mapping["cssLocator"])[mapping["cssCountId"].to_i] || ""
-        property_hash[mapping_key] = retrieved_text.strip.send(mapping['evaluator'], mapping['evaluatorParam'])
+      if scraper_mapping.booleanFields
+        scraper_mapping.booleanFields.keys.each do |mapping_key|
+          mapping = scraper_mapping.booleanFields[mapping_key]
+          retrieved_text = retrieve_target_text doc, mapping, uri
+          # target_element = doc.css(mapping["cssLocator"])[mapping["cssCountId"].to_i] || ""
+          property_hash[mapping_key] = retrieved_text.strip.send(mapping['evaluator'], mapping['evaluatorParam'])
+        end
       end
+
       properties.push property_hash
       properties
     end

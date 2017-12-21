@@ -11,6 +11,7 @@ module PropertyWebScraper
     # when adding new files, need to restart server and ensure correct name
     # is used in corresponding json file
     set_filenames 'pwb', 'mlslistings', 'realtor',
-      'idealista', 'zoopla', 'rightmove', 'wyomingmls', 'carusoimmobiliare'
+      'idealista', 'zoopla', 'rightmove', 'wyomingmls', 'carusoimmobiliare',
+      'forsalebyowner'
   end
 end

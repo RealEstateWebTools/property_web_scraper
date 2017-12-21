@@ -83,10 +83,5 @@
       "evaluator": "include?",
       "evaluatorParam": "hipoteca"
     }
-  },
-  "extraFields": {
-    "images": {
-      "imagesCssLocator": "#main-multimedia > div > img"
-    }
   }
 }]

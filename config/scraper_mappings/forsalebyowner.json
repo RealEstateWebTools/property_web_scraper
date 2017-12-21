@@ -1,0 +1,43 @@
+[
+{
+  "name": "forsalebyowner",
+  "defaultValues":
+  {
+    "country":
+    {
+      "value": "USA"
+    },
+    "area_unit":
+    {
+      "value": "sqft"
+    },
+    "currency":
+    {
+      "value": "USD"
+    },
+    "for_rent_short_term":
+    {
+      "value": "false"
+    },
+    "locale_code":
+    {
+      "value": "en"
+    }
+  },
+  "textFields":
+  {
+    "description":
+    {
+      "cssLocator": "#description > div > div > div > div"
+    },
+    "price_string": {
+      "cssLocator": "#header > header > div > div.summary-list.clearfix > div.summary-list__col.col-2.col-md-5 > ul.list-inline.list-inline--with-delimiters.list-inline--large > li:nth-child(1) > label"
+    }
+  },
+  "images": [
+    {
+      "cssLocator": "#gallery img",
+      "cssAttr": "src"
+    }
+  ]
+}]
