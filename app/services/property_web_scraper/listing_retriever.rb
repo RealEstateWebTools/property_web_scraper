@@ -20,6 +20,8 @@ module PropertyWebScraper
         return result
       end
       import_host = PropertyWebScraper::ImportHost.find_by_host(import_uri.host)
+
+
       unless import_host
         result.error_message = "Unsupported Url"
         return result
