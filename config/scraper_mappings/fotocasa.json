@@ -41,8 +41,11 @@
   },
   "intFields": {
     "count_bedrooms": {
-      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(3) > span"
-    }
+      "cssLocator": "#litRooms > b"
+    },
+    "count_bathrooms": {
+      "cssLocator": "#litBaths"
+    } 
   },
   "textFields": {
     "reference": {
