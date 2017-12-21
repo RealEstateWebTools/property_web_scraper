@@ -9,6 +9,7 @@ import_hosts_data_array = [
   { slug: 'zoopla', scraper_name: 'zoopla', host: 'www.zoopla.co.uk' },
   { slug: 'carusoimmobiliare', scraper_name: 'carusoimmobiliare', host: 'www.carusoimmobiliare.it' },
   { slug: 'wyomingmls', scraper_name: 'wyomingmls', host: 'www.wyomingmls.com' },
+  { slug: 'fotocasa', scraper_name: 'fotocasa', host: 'www.fotocasa.es' },
 ]
 
 import_hosts_data_array.each do |import_host_data|
