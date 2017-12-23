@@ -1,22 +1,20 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
-  <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
-  <%= stylesheet_link_tag    "property_web_scraper/spp_vuetify", media: "all" %>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <%= stylesheet_link_tag    "property_web_scraper/spp_vuetify", media: "all" %>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-</head>
-
-<body>
-  <div id="main-vue">
-    <v-app light>
-      <v-toolbar class="white" style="display: none;">
-        <v-toolbar-title v-text="title"></v-toolbar-title>
-      </v-toolbar>
-      <main>
-        <v-content>
-          <%= yield %>
+  </head>
+  <body>
+    <div id="main-vue">
+      <v-app light>
+        <v-toolbar class="white" style="display: none;">
+          <v-toolbar-title v-text="title"></v-toolbar-title>
+        </v-toolbar>
+        <main>
+          <v-content>
+            <%= yield %>
             <v-footer class="primary lighten-2">
               <v-layout row wrap align-center>
                 <v-flex xs12>
@@ -27,36 +25,34 @@
                 </v-flex>
               </v-layout>
             </v-footer>
+          </v-content>
+        </main>
+        <v-content>
         </v-content>
-      </main>
-      <v-content>
-      </v-content>
-    </v-app>
-  </div>
-  <script>
-  var PWSAPP = PWSAPP || {};
-
-  var carouselPhotos = <%== @listing.image_urls.to_json %>;
-  PWSAPP.vueData = {
-    title: "rrrr",
-    carouselPhotos: carouselPhotos
-  };
-  PWSAPP.theme = {
-    primary: 'green',
-    secondary: '#b0bec5',
-    accent: '#8c9eff',
-    error: '#b71c1c'
-  };
-  </script>
-  <% if Rails.configuration.x.is_spec_dummy_dev == true %>
-    <!-- when engine is being used in dummy dev environment use the webpacker endpoint -->
-    <%= javascript_pack_tag 'spp_vuetify' %>
-  <% else %>
-    <!-- when engine is being used in a rails app use the compiled file which is available here: -->
-    <%= javascript_include_tag "property_web_scraper/spp_vuetify" %>
-  <% end %>
-
-  <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
-</body>
-
+      </v-app>
+    </div>
+    <script>
+      var PWSAPP = PWSAPP || {};
+      
+        var carouselPhotos = <%== @listing.image_urls.to_json %>;
+        PWSAPP.vueData = {
+          title: "rrrr",
+          carouselPhotos: carouselPhotos
+        };
+        PWSAPP.theme = {
+          primary: 'green',
+          secondary: '#b0bec5',
+          accent: '#8c9eff',
+          error: '#b71c1c'
+        };
+    </script>
+    <% if Rails.configuration.x.is_spec_dummy_dev == true %>
+      <!-- when engine is being used in dummy dev environment use the webpacker endpoint -->
+      <%= javascript_pack_tag 'spp_vuetify' %>
+    <% else %>
+      <!-- when engine is being used in a rails app use the compiled file which is available here: -->
+      <%= javascript_include_tag "property_web_scraper/spp_vuetify" %>
+    <% end %>
+    <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
+  </body>
 </html>

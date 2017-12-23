@@ -1,336 +1,279 @@
-
 <!doctype html>
 <html lang="en">
-<head>
-
-  <meta charset="utf-8">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-  <title>Property for sale</title>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Property for sale</title>
     <%= stylesheet_link_tag    "property_web_scraper/spp_modern", media: "all" %>
-
-
-
-
-
-
-<meta name="msapplication-TileColor" content="#ffffff">
-<meta name="msapplication-TileImage" content="/ms-icon-144x144.png?v=2">
-<meta name="theme-color" content="#ffffff">
-
-  <link href='//fonts.googleapis.com/css?family=Lato:100,300,400,700' rel='stylesheet' type='text/css'>
-
-
-
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPorm8YzIaUGhKfe5cvpgofZ_gdT8hdZw" type="text/javascript"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.14.2/TweenMax.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/ScrollMagic.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.3/plugins/animation.gsap.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/plugins/debug.addIndicators.min.js"></script>
-
-
-</head>
-
-<body id="landing-page" >
-
-<!-- Preloader -->
-<div class="preloader"></div>
-
-<header><!-- the buttons for preview mode is in preview -->
-
-
-  <nav class="navigation navigation-header" style="">
-    <div class="row">
-      <div class="navigation-brand col-xs-12 col-sm-3 col-md-3 col-lg-3">
-        <div class="brand-logo">
-          <div class="logo-wrapper">
-
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png?v=2">
+    <meta name="theme-color" content="#ffffff">
+    <link href='//fonts.googleapis.com/css?family=Lato:100,300,400,700' rel='stylesheet' type='text/css'>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPorm8YzIaUGhKfe5cvpgofZ_gdT8hdZw" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.14.2/TweenMax.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/ScrollMagic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.3/plugins/animation.gsap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/plugins/debug.addIndicators.min.js"></script>
+  </head>
+  <body id="landing-page" >
+    <!-- Preloader -->
+    <div class="preloader"></div>
+    <header><!-- the buttons for preview mode is in preview -->
+      <nav class="navigation navigation-header" style="">
+        <div class="row">
+          <div class="navigation-brand col-xs-12 col-sm-3 col-md-3 col-lg-3">
+            <div class="brand-logo">
+              <div class="logo-wrapper">
+              </div>
+            </div>
+            <button class="navigation-toggle visible-xs" type="button" data-toggle="dropdown" data-target=".navigation-navbar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div class="navigation-navbar">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+              <ul class="navigation-bar navigation-bar-left col-lg-12 col-xs-12">
+                <li class="active"><a href="#hero">Home</a></li>
+                <li><a href="#gallery-section"> Gallery</a></li>
+                <li><a href="#features">Property Details</a></li>
+                <li><a href="#contact">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+          <!-- removed social icons -->
+          <div class="social-wrap" style="margin-top: 14px;">
+            <ul class="list-inline socials col-xs-12 col-sm-2 col-md-3 col-lg-3 pull-right">
+              <li>
+              </li>
+              <li>
+                <a href="https://www.facebook.com/propertywebbuilder" title="Facebook" target="_blank"><i class="fa fa-facebook fa-2x"></i></a>
+              </li>
+              <li>
+                <a href="https://twitter.com/prptywebbuilder" title="Twitter" target="_blank"><i class="fa fa-twitter fa-2x"></i></a>
+              </li>
+              <li>
+                <a href="https://www.linkedin.com/company/propertywebbuilder" title="Linked In" target="_blank"><i class="fa fa-linkedin fa-2x"></i></a>
+              </li>
+            </ul>
           </div>
         </div>
-        <button class="navigation-toggle visible-xs" type="button" data-toggle="dropdown" data-target=".navigation-navbar">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
+      </nav>
+    </header>
+    <div id="hero" class="static-header register-version light clearfix" style="background-image: url('http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg')">
+      <div class="text-heading editable">
+        <h1 class="animated hiding" data-animation="bounceInDown" data-delay="0" style="font-weight: 600;text-shadow: 2px 2px #333;">Property for sale
+      </h1>
       </div>
-      <div class="navigation-navbar">
-        <div class="col-lg-6 col-md-6 col-sm-6">
-          <ul class="navigation-bar navigation-bar-left col-lg-12 col-xs-12">
-            <li class="active"><a href="#hero">Home</a></li>
-            <li><a href="#gallery-section"> Gallery</a></li>
-            
-            <li><a href="#features">Property Details</a></li>
-            
-            <li><a href="#contact">Contact</a></li>
-          </ul>
+      <div class="arrow bounce"></div>
+    </div>
+    <h1 id="gallery-section" class="section-title">
+      Gallery
+  </h1>
+    <section id="gallery" class="section dark gallery-slider hidden" style="z-index:20;margin-top:10px;padding: 0px 0;" data-photos-id="353130,353131,353133,353134,353135,353136,353137,353138,374557">
+      <div class="fs-gallery-container relative"></div>
+    </section>
+    <div class="gallery-container gallery-grid">
+      <div class="fullscreen-gallery hided pb0 pl0">
+        <div class="fs_grid_gallery is_masonry">
         </div>
       </div>
-      <!-- removed social icons -->
-      <div class="social-wrap" style="margin-top: 14px;">
-        <ul class="list-inline socials col-xs-12 col-sm-2 col-md-3 col-lg-3 pull-right">
-        <li>
-        </li>
-          <li>
-<a href="https://www.facebook.com/propertywebbuilder" title="Facebook" target="_blank"><i class="fa fa-facebook fa-2x"></i></a>
+    </div>
+    <section id="features" class="section dark">
+      <h1 class="section-title">Property Details</h1>
+      <div class="features content container-fluid" id="content-features">
+        <div>
+          <div class="wp-block property list no-border">
+            <div class="wp-block-content clearfix">
+              <div class="wp-block-footer style2">
+                <ul class="aux-info">
+                  <li><i class="fa fa-arrows-alt"></i>
+                    90.0m<sup>2</sup></li>
+                   
+                  <li><i class="fa fa-bed"></i>
+                    1
           </li>
-          <li>
-            <a href="https://twitter.com/prptywebbuilder" title="Twitter" target="_blank"><i class="fa fa-twitter fa-2x"></i></a>
+                   
+                  <li><i class="fa fa-shower"></i>
+                    1.0
           </li>
-          <li>
-           <a href="https://www.linkedin.com/company/propertywebbuilder" title="Linked In" target="_blank"><i class="fa fa-linkedin fa-2x"></i></a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</header>
-
-
-
-  <div id="hero" class="static-header register-version light clearfix" style="background-image: url('http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg')">
-    <div class="text-heading editable">
-      <h1 class="animated hiding" data-animation="bounceInDown" data-delay="0" style="font-weight: 600;text-shadow: 2px 2px #333;">Property for sale
-      </h1>
-    </div>
-    <div class="arrow bounce"></div>
-  </div>
-
-  <h1 id="gallery-section" class="section-title">
-    Gallery
-  </h1>
-
-  <section id="gallery" class="section dark gallery-slider hidden" style="z-index:20;margin-top:10px;padding: 0px 0;" data-photos-id="353130,353131,353133,353134,353135,353136,353137,353138,374557">
-    <div class="fs-gallery-container relative"></div>
-  </section>
-  <div class="gallery-container gallery-grid">
-
-    <div class="fullscreen-gallery hided pb0 pl0">
-        <div class="fs_grid_gallery is_masonry">
-            
-
-
-      </div>
-    </div>
-
-  </div>
-
-
-
-
-
-  <section id="features" class="section dark">
-  <h1 class="section-title">Property Details</h1>
-  <div class="features content container-fluid" id="content-features">
-    <div>
-      <div class="wp-block property list no-border"><div class="wp-block-content clearfix"><div class="wp-block-footer style2"><ul class="aux-info"><li><i class="fa fa-arrows-alt"></i>
-            90.0m<sup>2</sup></li> <li><i class="fa fa-bed"></i>
-            1
-          </li> <li><i class="fa fa-shower"></i>
-            1.0
-          </li> <li></li></ul></div></div>
-      </div>
-    </div>
-    <div class="row" style="margin-left: 0px;">
-      <div class="col-sm-12">
+                   
+                  <li></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="margin-left: 0px;">
+          <div class="col-sm-12">
             <div data-sr class="round-icon-number">
               <i class="fa fa-bed"></i>
               <span>$1,000,000</span>
             </div>
-
             <div data-sr class="round-icon-number">
               <i class="fa fa-bed"></i>
               <span>4,000 SQ FT</span>
             </div>
-
             <div data-sr class="round-icon-number">
               <i class="fa fa-bed"></i>
               <span class="editable">4 BR</span>
             </div>
-
             <div data-sr class="round-icon-number">
-            <i class="fa fa-shower"></i>
+              <i class="fa fa-shower"></i>
               <span class="editable">5.5 BATH</span>
             </div>
-
             <div data-sr class="round-icon-number">
               <i class="fa fa-bed"></i>
               <span class="editable">2 CAR GAR.</span>
             </div>
-
-        <span class="editable"><h2 class="section-title">Property for sale</h2></span>
-        <p class="mls-number"></p>
-
-        <div data-sr class="description" style="text-align: left;">
-          <p>Details about listing</p>
+            <span class="editable">
+              <h2 class="section-title">Property for sale</h2>
+            </span>
+            <p class="mls-number"></p>
+            <div data-sr class="description" style="text-align: left;">
+              <p>Details about listing</p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-  <section id="features" class="section dark" style="padding: 0px;">
-  <h1 class="section-title">Map</h1>
-  <div class="features content container-fluid" id="content-features" 
+    </section>
+    <section id="features" class="section dark" style="padding: 0px;">
+      <h1 class="section-title">Map</h1>
+      <div class="features content container-fluid" id="content-features" 
   style="padding:0px">
-    <div class="row" style="margin-left: 0px;">
-      <div class="col-sm-12">
-        <div data-sr class="map-wrapper">
-          <div id='map-canvas' style='height: 340px; width: 100%;'></div>
+        <div class="row" style="margin-left: 0px;">
+          <div class="col-sm-12">
+            <div data-sr class="map-wrapper">
+              <div id='map-canvas' style='height: 340px; width: 100%;'></div>
+            </div>
+          </div>
         </div>
       </div>
-
-          
-    </div>
-  </div>
-  </section>
-
-  <footer id="contact" class="container-fluid footer light clearfix" 
+    </section>
+    <footer id="contact" class="container-fluid footer light clearfix" 
 
   style="background-color: rgba(0,0,0,0.3); background-image: url('http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg');">
-  <h1 class="section-title">Contact</h1>
-  <div class="footer-content" style="">
-    <div class="col-sm-6">
-        <div class="logo-wrapper">
-          <div class="row">
-            <div data-sr class="col-xs-10 col-xs-offset-2">
-       
-            </div>
-
-            <div data-sr class="col-xs-10 col-xs-offset-2">
-    <ul class="list-unstyled contact-info">
-        <li class="realtor-name editable">
-          Contact name
+      <h1 class="section-title">Contact</h1>
+      <div class="footer-content" style="">
+        <div class="col-sm-6">
+          <div class="logo-wrapper">
+            <div class="row">
+              <div data-sr class="col-xs-10 col-xs-offset-2">
+              </div>
+              <div data-sr class="col-xs-10 col-xs-offset-2">
+                <ul class="list-unstyled contact-info">
+                  <li class="realtor-name editable">
+                    Contact name
         </li>
-        <li>
-          <a href="tel:12345">
-            12345
+                  <li>
+                    <a href="tel:12345">
+                      12345
           </a>
-        </li>
-        <li><a href="mailto:test@example.com">test@example.com</a></li>
-    </ul>
-</div>
-
+                  </li>
+                  <li><a href="mailto:test@example.com">test@example.com</a></li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
-    </div>
-    <div class="col-sm-5">
-        <div class="">
-          <div data-sr>
-            <form class="form form-register dark" id="registration" action="/form-endpoint" accept-charset="UTF-8" method="post">
-
-              <b></b>
-
-              <div class="form-group">
-                <label for="name" class="col-sm-3 col-xs-12 control-label" style="color: #666">Name</label>
-                <div class="col-sm-9 col-xs-12">
-                  <input type="text" name="name" id="name" placeholder="" class="form-control" />
+        <div class="col-sm-5">
+          <div class="">
+            <div data-sr>
+              <form class="form form-register dark" id="registration" action="/form-endpoint" accept-charset="UTF-8" method="post">
+                <b></b>
+                <div class="form-group">
+                  <label for="name" class="col-sm-3 col-xs-12 control-label" style="color: #666">Name</label>
+                  <div class="col-sm-9 col-xs-12">
+                    <input type="text" name="name" id="name" placeholder="" class="form-control" />
+                  </div>
                 </div>
-              </div>
-
-              <div class="form-group">
-                <label for="email" class="col-sm-3 col-xs-12 control-label" style="color: #666">Email</label>
-                <div class="col-sm-9 col-xs-12">
-                  <input type="text" name="email" id="email" placeholder="" class="form-control" />
+                <div class="form-group">
+                  <label for="email" class="col-sm-3 col-xs-12 control-label" style="color: #666">Email</label>
+                  <div class="col-sm-9 col-xs-12">
+                    <input type="text" name="email" id="email" placeholder="" class="form-control" />
+                  </div>
                 </div>
-              </div>
-
-              <div class="form-group">
-                <label for="phone" class="col-sm-3 col-xs-12 control-label" style="color: #666">Phone</label>
-                <div class="col-sm-9 col-xs-12">
-                  <input type="text" name="phone" id="phone" placeholder="" class="form-control" />
+                <div class="form-group">
+                  <label for="phone" class="col-sm-3 col-xs-12 control-label" style="color: #666">Phone</label>
+                  <div class="col-sm-9 col-xs-12">
+                    <input type="text" name="phone" id="phone" placeholder="" class="form-control" />
+                  </div>
                 </div>
-              </div>
-
-              <div class="form-group">
-                <label for="message" class="col-sm-3 col-xs-12 control-label" style="color: #666">Message</label>
-                <div class="col-sm-9 col-xs-12">
-                  <textarea name="message" id="message" data-default="I would like to learn more about Property for sale." placeholder="" class="form-control" rows="8" cols="10">
+                <div class="form-group">
+                  <label for="message" class="col-sm-3 col-xs-12 control-label" style="color: #666">Message</label>
+                  <div class="col-sm-9 col-xs-12">
+                    <textarea name="message" id="message" data-default="I would like to learn more about Property for sale." placeholder="" class="form-control" rows="8" cols="10">
 I would like to learn more about Property for sale.</textarea>
+                  </div>
                 </div>
-              </div>
-
-              <div id="contact_explanation_1512986329"><style type="text/css" media="screen" scoped="scoped">#contact_explanation_1512986329 { display:none; }</style><label for="contact_explanation">If you are a human, ignore this field</label><input type="text" name="contact_explanation" id="contact_explanation" /></div>
-
-              <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit-button">Request Info</button>
-
-</form>
+                <div id="contact_explanation_1512986329"><style type="text/css" media="screen" scoped="scoped">
+                    #contact_explanation_1512986329 { display:none; }
+                  </style><label for="contact_explanation">If you are a human, ignore this field</label><input type="text" name="contact_explanation" id="contact_explanation" /></div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit-button">Request Info</button>
+              </form>
+            </div>
           </div>
         </div>
-    </div>
-  </div>
-</footer>
-
-
+      </div>
+    </footer>
     <%= javascript_include_tag "property_web_scraper/spp_modern" %>
-
-
-
-<script>
-
-
-
-  jQuery(window).resize(function () {
-    "use strict";
-      window_h = jQuery(window).height();
-      window_w = jQuery(window).width();
-      content_update();
-  });
-  jQuery(window).resize(function () {
-    "use strict";
-      if (pp_block.size()) {
-          setTimeout('centerWindow404()', 500);
-          setTimeout('centerWindow404()', 1000);
-      }
-  });
-  content_update();
-  function content_update() {
-    "use strict";
-      if ($("html").hasClass('sticky_menu')) {
-          if ($("html").hasClass('without_border')) {
-              head_border = 0;
-          }
-          jQuery('body').css('padding-top', header.height() + head_border);
-      }
-      site_wrapper.width('100%').css('min-height', window_h - parseInt(body.css('padding-top')));
-      if (jQuery(window).width() > 760) {
-          main_wrapper.css('min-height', window_h - header.height() - footer.height() - parseInt(main_wrapper.css('padding-top')) - parseInt(main_wrapper.css('padding-bottom')) - parseInt(footer.css('border-top-width')) - parseInt(header.css('border-bottom-width')) + 'px');
-          if (fullscreen_block.size() > 0 && footer.size() > 0) {
-              fullscreen_block.css('min-height', window_h - header.height() - footer.height() - parseInt(fullscreen_block.css('padding-top')) - parseInt(fullscreen_block.css('padding-bottom')) - parseInt(footer.css('border-top-width')) - parseInt(header.css('border-bottom-width')) + 'px');
-          } else {
-              fullscreen_block.css('min-height', window_h - header.height() - parseInt(header.css('border-bottom-width')) + 'px');
-          }
-      } else {
-          //
-      }
-  }
-  // jQuery(document).ready(function(){
-  //   "use strict";
-
-
-  //   $('.is_masonry').imagesLoaded( function(){
-  //     $('.is_masonry').masonry({
-  //      itemSelector: '.grid-gallery-item',
-  //      columnWidth: 150,
-  //      isFitWidth: true
-  //     });
-  //   });
-  // });
-
-</script>
-
-<script src="https://unpkg.com/scrollreveal/dist/scrollreveal.min.js"></script>
-
-<script>
-  var config = {
-    vFactor:  0.1,
-    mobile: false
-  }
-  window.sr = new scrollReveal(config);
-</script>
-
-
-<link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
-
-</body>
+    <script>
+      jQuery(window).resize(function () {
+          "use strict";
+            window_h = jQuery(window).height();
+            window_w = jQuery(window).width();
+            content_update();
+        });
+        jQuery(window).resize(function () {
+          "use strict";
+            if (pp_block.size()) {
+                setTimeout('centerWindow404()', 500);
+                setTimeout('centerWindow404()', 1000);
+            }
+        });
+        content_update();
+        function content_update() {
+          "use strict";
+            if ($("html").hasClass('sticky_menu')) {
+                if ($("html").hasClass('without_border')) {
+                    head_border = 0;
+                }
+                jQuery('body').css('padding-top', header.height() + head_border);
+            }
+            site_wrapper.width('100%').css('min-height', window_h - parseInt(body.css('padding-top')));
+            if (jQuery(window).width() > 760) {
+                main_wrapper.css('min-height', window_h - header.height() - footer.height() - parseInt(main_wrapper.css('padding-top')) - parseInt(main_wrapper.css('padding-bottom')) - parseInt(footer.css('border-top-width')) - parseInt(header.css('border-bottom-width')) + 'px');
+                if (fullscreen_block.size() > 0 && footer.size() > 0) {
+                    fullscreen_block.css('min-height', window_h - header.height() - footer.height() - parseInt(fullscreen_block.css('padding-top')) - parseInt(fullscreen_block.css('padding-bottom')) - parseInt(footer.css('border-top-width')) - parseInt(header.css('border-bottom-width')) + 'px');
+                } else {
+                    fullscreen_block.css('min-height', window_h - header.height() - parseInt(header.css('border-bottom-width')) + 'px');
+                }
+            } else {
+                //
+            }
+        }
+        // jQuery(document).ready(function(){
+        //   "use strict";
+      
+      
+        //   $('.is_masonry').imagesLoaded( function(){
+        //     $('.is_masonry').masonry({
+        //      itemSelector: '.grid-gallery-item',
+        //      columnWidth: 150,
+        //      isFitWidth: true
+        //     });
+        //   });
+        // });
+    </script>
+    <script src="https://unpkg.com/scrollreveal/dist/scrollreveal.min.js"></script>
+    <script>
+      var config = {
+          vFactor:  0.1,
+          mobile: false
+        }
+        window.sr = new scrollReveal(config);
+    </script>
+    <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet">
+  </body>
 </html>

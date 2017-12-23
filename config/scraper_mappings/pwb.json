@@ -66,7 +66,7 @@
       "cssLocator": ".table-striped tbody tr td",
       "cssCountId": "11"
     },
-    "description_en": {
+    "description": {
       "cssLocator": "body > div > div.sticky-body > section > div > div > div > div.col-md-9 > div:nth-child(2) > div:nth-child(1)"
       // "cssCountId": "1"
     }
@@ -90,5 +90,11 @@
       "evaluator": "include?",
       "evaluatorParam": "Rent"
     }
-  }
+  },
+  "images": [
+    {
+      "cssLocator": "#propCarousel > div > div > img",
+      "cssAttr": "src"
+    }
+  ]
 }]

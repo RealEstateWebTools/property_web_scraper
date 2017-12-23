@@ -62,7 +62,12 @@ module PropertyWebScraper
         @error_message = 'Url is not valid'
         return render '/property_web_scraper/single_property_view/error', layout: false
       end
-      @main_image_url = "http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg"
+      @main_image_url = "https://placeholdit.co//i/500x250?bg=111111&text="
+      if @listing.image_urls.length > 0
+        @main_image_url = @listing.image_urls[0]
+      end
+
+       # "http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg"
       theme_name = "spp_vuetify"
       render "/property_web_scraper/single_property_view/#{theme_name}/show", layout: "property_web_scraper/#{theme_name}"
     end
