@@ -4,76 +4,18 @@
       Retrieve and display MLS data in a standard format
     </h3>
     <p></p>
-
-    <br>
-    <%= form_tag("/mls/submit.js", method: "post", remote: true, authenticity_token: true) do %>
-      <br>
-      <div>
-
-      <div class="col-sm-12" style="display:block;">
-        <p>
-          Login URL: 
-          </p>
-        <span class="url_input">
-          <%= text_field_tag(:login_url) %>
-        </span>
-      </div>
-      <div class="col-sm-12">
-        <label class="fg-label m-t-20">Username:</label>
-        <span class="url_input">
-          <%= text_field_tag(:username) %>
-        </span>
-      </div>
-      <div class="col-sm-12">
-        <label class="fg-label m-t-20">Password:</label>
-        <span class="url_input">
-          <%= text_field_tag(:password) %>
-        </span>
-      </div>
-
-        <%= submit_tag("Retrieve property info") %>
-      </div>
+    <% if @error_message %>
+      <%= form_tag("/mls", method: "get") do %>
+        <%= select_tag 'mls_slug', options_from_collection_for_select(PropertyWebScraper::MlsImportSource.all, :slug, :displayName), :onchange => "this.form.submit();"  %>
+      <% end %>
+    <% else %>
+      <%= render "retriever_form" %>
     <% end %>
     <br>
     <br>
     <div id="retrieve-results"></div>
     <br>
     <br>
-    <div class="card card-outline-info mb-3 text-center">
-      <div class="card-block">
-        <blockquote class="card-blockquote">
-          <p>Help us improve this product by giving us some feedback:</p>
-        </blockquote>
-        <p>
-          <form action="https://formspree.io/pws@propertywebbuilder.com" method="POST">
-            <div class="form-group row">
-              <label for="example-url-input" class="col-2 col-form-label">Url you would like to scrape</label>
-              <div class="col-10">
-                <input class="form-control" type="url" value="" id="example-url-input">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label for="example-bool-input" class="col-2 col-form-label">Would you pay for this service?</label>
-              <div class="col-10">
-                <input class="form-control" type="bool" value="" id="example-bool-input">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label for="example-email-input" class="col-2 col-form-label">Email</label>
-              <div class="col-10">
-                <input class="form-control" type="email" value="" id="example-email-input">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label for="example-text-input" class="col-2 col-form-label">Any other comments:</label>
-              <div class="col-10">
-                <input class="form-control" type="text" value="" id="example-text-input">
-              </div>
-            </div>
-            <input type="submit" value="Send">
-          </form>
-        </p>
-      </div>
-    </div>
+    <%= render "feedback_form" %>
   </div>
 </div>

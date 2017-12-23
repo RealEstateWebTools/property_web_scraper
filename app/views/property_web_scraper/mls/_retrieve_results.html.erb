@@ -1,32 +1,27 @@
-<!-- <h5>Result:</h5> -->
-<p>Property info retrieved..:</p>
+<p>Properties retrieved..:</p>
 <table class="table">
-  <% @listing_attributes.each do |listing_attribute| %>
-    <tr>
-      <th><%= listing_attribute  %></th>
-      <td><%= @listing[listing_attribute]  %></td>
-    </tr>
-  <% end %>
   <tr>
-    <th>Url</th>
-    <td>
-      <%= link_to @listing.import_url, @listing.import_url, target: "_blank" %>
-    </td>
+    <th>Reference</th>
+    <th>Price</th>
+    <th>Street Number</th>
+    <th>Street Name</th>
   </tr>
   <thead>
   </thead>
   <tbody>
+  <% @properties.each do |property| %>
+    <tr>
+      <td><%= property["reference"] %></td>
+      <td><%= property["price_sale_current"] %></td>
+      <td><%= property["street_number"] %></td>
+      <td><%= property["street_name"] %></td>
+    </tr>
+  <% end %>
+
   </tbody>
 </table>
-<div style="display: none;">
-  <strong>Images</strong>
-  <% @image_urls.each do |listing_image_url| %>
-    <div>
-      <%= link_to listing_image_url, listing_image_url, target: "_blank" %>
-    </div>
-  <% end %>
-</div>
+<div style="display: block;">
 
-  <div>
-    <%= link_to "Single Page view", single_property_view_path %>
-  </div>
+</div>
+<div>
+</div>

@@ -1,0 +1,30 @@
+<br>
+<%= form_tag("/mls/submit.js", method: "post", remote: true, authenticity_token: true) do %>
+  <br>
+  <div>
+    <div class="col-sm-12" style="display:block;">
+      <p>
+        Login URL:
+      </p>
+      <span class="login_url">
+          <%= text_field_tag(:login_url, @import_source.details[:login_url]) %>
+        </span>
+    </div>
+    <div class="col-sm-12">
+      <label class="fg-label m-t-20">Username:</label>
+      <span class="username">
+          <%= text_field_tag(:username, @import_source.details[:username]) %>
+        </span>
+    </div>
+    <div class="col-sm-12">
+      <label class="fg-label m-t-20">Password:</label>
+      <span class="password">
+          <%= text_field_tag(:password) %>
+        </span>
+    </div>
+      <span style="display: none;">
+          <%= text_field_tag(:slug, @import_source.slug) %>
+        </span>
+    <%= submit_tag("Retrieve property info") %>
+  </div>
+<% end %>

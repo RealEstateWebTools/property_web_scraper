@@ -12,32 +12,40 @@ module PropertyWebScraper
     end
 
     def retrieve query, limit
-      @import_source = mls_details
-      if import_source.source_type == "odata"
-        properties = retrieve_via_odata query, limit
-      else
-        properties = retrieve_via_rets query, limit
-      end
+      result = OpenStruct.new(:success => false, :error_message => "not processed")
 
-      retrieved_properties = []
-      count = 0
-      # return render json: properties.as_json
-
-      properties.each do |property|
-        if count < 100
-          mapped_property = MlsImportMapper.new(import_source.import_mapper_name).map_property(property)
-          retrieved_properties.push mapped_property
+      begin
+        @import_source = get_mls_details
+        if import_source.source_type == "odata"
+          properties = retrieve_via_odata query, limit
+        else
+          properties = retrieve_via_rets query, limit
         end
-        count += 1
+
+        retrieved_properties = []
+        count = 0
+        # return render json: properties.as_json
+
+        properties.each do |property|
+          if count < 100
+            mapped_property = MlsImportMapper.new(import_source.import_mapper_name).map_property(property)
+            retrieved_properties.push mapped_property
+          end
+          count += 1
+        end
+        result.success = true
+        result.properties = retrieved_properties
+      rescue Exception => e
+        result.error_message = e.message
       end
 
-      return retrieved_properties
+      return result
     end
 
 
     private
 
-    def mls_details
+    def get_mls_details
 
       mls_name = mls_slug
       import_source = PropertyWebScraper::MlsImportSource.find_by_slug mls_name
@@ -47,7 +55,7 @@ module PropertyWebScraper
 
       # import_source.details[:username] = params[:username]
       import_source.details[:password] = password
-       # password ||''
+      # password ||''
       # import_source.details[:login_url] = params[:login_url]
 
       return import_source
