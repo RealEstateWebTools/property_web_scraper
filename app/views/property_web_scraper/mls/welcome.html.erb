@@ -3,10 +3,13 @@
     <h3 style="margin: 20px 0px">
       Retrieve and display MLS data in a standard format
     </h3>
+    <h5>This functionality is not complete yet.  Contact us via the form below with your feedback to help this project</h5>
     <p></p>
-    <% if @error_message %>
+    <% if @prompt_for_mls %>
       <%= form_tag("/mls", method: "get") do %>
         <%= select_tag 'mls_slug', options_from_collection_for_select(PropertyWebScraper::MlsImportSource.all, :slug, :displayName), :onchange => "this.form.submit();"  %>
+
+        <%= submit_tag("Go") %>
       <% end %>
     <% else %>
       <%= render "retriever_form" %>

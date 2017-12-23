@@ -4,7 +4,6 @@ import_hosts_data_array = [
   { slug: 'realtor', scraper_name: 'realtor', host: 'www.realtor.com' },
   { slug: 'idealista', scraper_name: 'idealista', host: 'www.idealista.com' },
   { slug: 'rightmove', scraper_name: 'rightmove', host: 'www.rightmove.co.uk' },
-  { slug: 'example', scraper_name: 'default', host: 'www.example.co.uk' },
   { slug: 'laventa', scraper_name: 'pwb', host: 'www.laventa-mallorca.com' },
   { slug: 'zoopla', scraper_name: 'zoopla', host: 'www.zoopla.co.uk' },
   { slug: 'carusoimmobiliare', scraper_name: 'carusoimmobiliare', host: 'www.carusoimmobiliare.it' },

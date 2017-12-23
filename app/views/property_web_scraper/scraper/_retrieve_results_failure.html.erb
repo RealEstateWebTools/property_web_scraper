@@ -1,3 +1,11 @@
 <p>
-  <%= @error_message.html_safe %>
+  <% if @error_message == "Unsupported Url" %>
+    <p>Url not yet supported</p>
+    <% PropertyWebScraper::ImportHost.all.each do |import_host| %>
+      <div><%= import_host.host  %></div>
+    <% end %>
+
+  <% else %>
+    <%= @error_message.html_safe %>
+  <% end %>
 </p>

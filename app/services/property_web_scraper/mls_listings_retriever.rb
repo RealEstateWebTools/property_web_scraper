@@ -24,10 +24,9 @@ module PropertyWebScraper
 
         retrieved_properties = []
         count = 0
-        # return render json: properties.as_json
 
         properties.each do |property|
-          if count < 100
+          if count < limit
             mapped_property = MlsImportMapper.new(import_source.import_mapper_name).map_property(property)
             retrieved_properties.push mapped_property
           end

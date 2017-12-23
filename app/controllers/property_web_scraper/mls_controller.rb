@@ -7,7 +7,7 @@ module PropertyWebScraper
       @import_source = PropertyWebScraper::MlsImportSource.find_by_slug params[:mls_slug]
       if @import_source.blank?
         @import_sources = PropertyWebScraper::MlsImportSource.all
-        @error_message = "MLS not supported"
+        @prompt_for_mls = true
       else
         @login_url = @import_source.details[:login_url]
       end

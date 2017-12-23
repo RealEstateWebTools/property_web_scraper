@@ -20,7 +20,7 @@ module PropertyWebScraper
         expect(retrieved_properties[0]["price_sale_current"]).to eq("17000")
         expect(retrieved_properties[0]["reference"]).to eq("533325")
         expect(retrieved_properties[0]["street_number"]).to eq("593")
-        expect(retrieved_properties[0]["street_name"]).to eq("HYMILL")
+        expect(retrieved_properties[0]["street_name"]).to eq("FM 2336")
       end
     end
   end
