@@ -18,18 +18,18 @@ module PropertyWebScraper
         web_scraper = PropertyWebScraper::Scraper.new('zoopla')
 
         listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
-        retrieved_properties = web_scraper.retrieve_and_save listing, 1
+        retrieved_property = web_scraper.retrieve_and_save listing, 1
 
-        expect(retrieved_properties.as_json['import_history']).not_to be_present
-        # expect(retrieved_properties.as_json).not_to have_attributes("import_history")
-        expect(retrieved_properties.reference).to eq('')
-        expect(retrieved_properties.title).to eq('4 bed flat for sale')
-        expect(retrieved_properties.constructed_area).to eq(2205)
-        expect(retrieved_properties.currency).to eq('GBP')
-        expect(retrieved_properties.area_unit).to eq('sqft')
-        expect(retrieved_properties.address_string).to eq('38 St. Pauls Square, Birmingham B3')
-        expect(retrieved_properties.price_string).to eq('£875,000')
-        expect(retrieved_properties.price_float).to eq(875_000)
+        expect(retrieved_property.as_json['import_history']).not_to be_present
+        # expect(retrieved_property.as_json).not_to have_attributes("import_history")
+        expect(retrieved_property.reference).to eq('')
+        expect(retrieved_property.title).to eq('4 bed flat for sale')
+        expect(retrieved_property.constructed_area).to eq(2205)
+        expect(retrieved_property.currency).to eq('GBP')
+        expect(retrieved_property.area_unit).to eq('sqft')
+        expect(retrieved_property.address_string).to eq('38 St. Pauls Square, Birmingham B3')
+        expect(retrieved_property.price_string).to eq('£875,000')
+        expect(retrieved_property.price_float).to eq(875_000)
       end
     end
   end

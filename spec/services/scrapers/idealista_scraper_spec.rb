@@ -17,17 +17,17 @@ module PropertyWebScraper
         # import_url =
         web_scraper = PropertyWebScraper::Scraper.new('idealista')
         listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
-        retrieved_properties = web_scraper.retrieve_and_save listing, 1
+        retrieved_property = web_scraper.retrieve_and_save listing, 1
 
 
-        expect(retrieved_properties.for_sale).to eq(true)
-        expect(retrieved_properties.latitude).to eq(40.732845)
-        expect(retrieved_properties.longitude).to eq(-3.5815072)
-        expect(retrieved_properties.reference).to eq('1678322')
-        expect(retrieved_properties.constructed_area).to eq(70)
-        expect(retrieved_properties.currency).to eq('EUR')
-        expect(retrieved_properties.price_string).to eq('82.000')
-        expect(retrieved_properties.price_float).to eq(82_000.0)
+        expect(retrieved_property.for_sale).to eq(true)
+        expect(retrieved_property.latitude).to eq(40.732845)
+        expect(retrieved_property.longitude).to eq(-3.5815072)
+        expect(retrieved_property.reference).to eq('1678322')
+        expect(retrieved_property.constructed_area).to eq(70)
+        expect(retrieved_property.currency).to eq('EUR')
+        expect(retrieved_property.price_string).to eq('82.000')
+        expect(retrieved_property.price_float).to eq(82_000.0)
       end
     end
   end
