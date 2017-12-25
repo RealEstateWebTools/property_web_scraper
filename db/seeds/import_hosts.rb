@@ -9,6 +9,8 @@ import_hosts_data_array = [
   { slug: 'carusoimmobiliare', scraper_name: 'carusoimmobiliare', host: 'www.carusoimmobiliare.it' },
   { slug: 'wyomingmls', scraper_name: 'wyomingmls', host: 'www.wyomingmls.com' },
   { slug: 'forsalebyowner', scraper_name: 'forsalebyowner', host: 'www.forsalebyowner.com' },
+  { slug: 'cerdfw', scraper_name: 'cerdfw', host: 'cerdfw.com' },
+  { slug: 'realestateindia', scraper_name: 'realestateindia', host: 'www.realestateindia.com' },
   { slug: 'fotocasa', scraper_name: 'fotocasa', host: 'www.fotocasa.es' }
 ]
 

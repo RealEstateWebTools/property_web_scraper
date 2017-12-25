@@ -1,0 +1,1265 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/2-bedrooms-in-andheri-west-mumbai-maharashtra-712907.htm
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sun, 24 Dec 2017 15:16:46 GMT
+      Server:
+      - Apache/2.2.15 (CentOS)
+      X-Powered-By:
+      - PHP/5.3.3
+      Set-Cookie:
+      - PHPSESSID=5e5a6gjcvu5ra302lbbhbvbcg2; path=/; domain=.realestateindia.com
+      Expires:
+      - Sun, 24 Dec 2017 18:16:46 GMT
+      Cache-Control:
+      - no-store, no-cache, must-revalidate, max-age=0
+      Last-Modified:
+      - Fri, 15 Dec 2017 12:03:17 GMT
+      Vary:
+      - Accept-Encoding
+      Pragma:
+      - no-cache
+      Content-Length:
+      - '20269'
+      Content-Type:
+      - text/html; charset=UTF-8
+    body:
+      encoding: ASCII-8BIT
+      string: "<!doctype html>\r\n<html lang=\"en-us\" manifest=\"manifest.appcache\">\r\n<head>\r\n<meta
+        charset=\"utf-8\" />\r\n<meta name=\"viewport\" content=\"width=device-width,
+        initial-scale=1.0\"> \r\n<title>2 BHK Flats & Apartments for Rent in Andheri
+        West, Mumbai (REI712907) - 10000 Sq. Yards</title>\r\n<meta name=\"description\"
+        content=\"Find detail of 2 BHK Flats & Apartments for Rent in Andheri West,
+        Mumbai, Maharashtra (REI712907) posted by Vikas Estate Agency - on RealEstateIndia.com.\"
+        />\r\n<meta name=\"keywords\" content=\"2 BHK Flats & Apartments for Rent
+        in Andheri West, Mumbai\" />\r\n<link rel=\"canonical\" href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/2-bedrooms-in-andheri-west-mumbai-maharashtra-712907.htm\">\t<link
+        href=\"https://static.realestateindia.com/rei/css/dynamic_common.css\" rel=\"stylesheet\"
+        type=\"text/css\">\r\n\t\t<link href=\"https://static.realestateindia.com/rei/css/select2/select2.css\"
+        rel=\"stylesheet\" type=\"text/css\">\r\n\t\t<link href=\"https://static.realestateindia.com/rei/css/fancybox/jquery.fancybox.css\"
+        rel=\"stylesheet\" type=\"text/css\">\r\n\t\t<link href=\"https://static.realestateindia.com/rei/css/popup_box.css\"
+        rel=\"stylesheet\" type=\"text/css\">\r\n\t\t<link href=\"https://static.realestateindia.com/rei/css/carousel/jsCarousel.css\"
+        rel=\"stylesheet\" type=\"text/css\">\r\n\t<!--[if IE]><link href=\"https://static.realestateindia.com/rei/css/ie.css\"
+        rel=\"stylesheet\" /><![endif]-->\r\n<script language=\"javascript\" src=\"https://static.realestateindia.com/rei/js/dynamic_common.js\"
+        type=\"text/javascript\"></script>\r\n<style>\r\n#search_filter .dropdown-toggle
+        {padding:15px 22px 15px; display:inline-block;}\r\n#search_filter .dropdown-toggle.active
+        {padding:14px 21px 14px; background:#fff; border:1px solid #bccdd4; border-bottom:0px;}\r\n.equalize
+        li{min-height:240px;}\r\n</style>\r\n</head>\r\n\t<body itemscope itemtype=\"http://schema.org/WebPage\">\r\n\t<div
+        id=\"new_home_page\"><a href=\"#\" class=\"tac bg333 db w100 pt20px pb20px
+        ttu silver ts0 ffos dn\" style=\"font-size:26px;\">SWITCH TO MOBILE SITE</a>\r\n\t<meta
+        name=\"url\" content=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/2-bedrooms-in-andheri-west-mumbai-maharashtra-712907.htm\"
+        itemprop=\"url\" />\r\n\t<section class=\"pf zi10 bsb10px25 w100\" style=\"background:#f0f7ff;\">\r\n\t<div
+        class=\"p3px pb1px fw bsbb\">\r\n\t<ul class=\"fo\">\r\n\t<li class=\"fl\">\r\n\t<a
+        href=\"https://www.realestateindia.com?hprlink=logo\" title=\"Realestateindia.com\"
+        class=\"db\" itemscope=\"\" itemtype=\"http://schema.org/Brand\"><img itemprop=\"logo\"
+        alt=\"RealEstateIndia.com\" src=\"https://static.realestateindia.com/rei/images/realestateindia-logo-new-design.png\"></a>\r\n\t</li>\r\n\t<li
+        class=\"fr pt7px\" style=\"width:76%;\">\r\n\t<div class=\"fo\"> \r\n\t<ul
+        class=\"fl ac-pr mt5px\" itemtype=\"http://schema.org/SiteNavigationElement\"
+        itemscope=\"\">\r\n\t<li class=\"\"><a href=\"javascript:void();\" class=\"dul\"
+        id=\"select_city\" title=\"Mumbai\" style=\"font-weight:600;\">Mumbai <b class=\"icon-chevron-down
+        ml2px vam xxxsmall\"></b></a>\r\n\t<style>\r\n#header-popup-city-list{max-height:200px;
+        overflow-x:auto; position:absolute;width: 607px;border:1px solid #ccc;border-top:none;}\r\n#header-popup-city-list
+        li{padding:4px 10px; background:#fff;border-bottom:dashed 1px #ccc;}\r\n#header-popup-city-list
+        li:hover{background:#86c4fe;color:#fff;}\r\n</style>\r\n<ul class=\"pa bgfff
+        bsb10px33 gray\" id=\"show_city\" style=\"left:-100px; top:30px;z-index:10;
+        width:612px; display:none; border-top:solid 3px #d14445;\">\r\n\t<li class=\"bdr
+        bdr999 bdrt0 fo\">\r\n\t\t<div class=\"p25px pt15px city_pop_arrow1\">\r\n\t\t\t
+        \ <p class=\"b gray mb3px large\">Search from Over 2500 Cities <b class=\"pl5px
+        pr5px\">-</b> <a href=\"https://www.realestateindia.com?hprlink=logo\" class=\"bn
+        blue\">All India</a></p>\r\n\t\t\t  \r\n<input type=\"text\" placeholder=\"Type
+        to find your city\" class=\"p10px input bsbb bdr bgfff xlarge w100\" id=\"header_dropdown_city\"
+        name=\"header_dropdown_city\" autocomplete=\"off\">\r\n<input type=\"hidden\"
+        name=\"header_dropdown_city_hidden\" id=\"header_dropdown_city_hidden\" value=\"\">\r\n<div
+        id=\"header-search-popup-suggesstion-box\"></div>\r\n<p class=\"ttu b mt15px\">POPULAR
+        CITIES</p>\r\n\r\n<ul class=\"fo ac-fl ac-w140px blue\">\r\n<li><a href=\"https://www.realestateindia.com/delhi-property/\"
+        itemprop=\"url\" title=\"Delhi Property\"><span itemprop=\"name\">New Delhi</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/mumbai-property/\" itemprop=\"url\"
+        title=\"Mumbai Property\"><span itemprop=\"name\">Mumbai</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/gurgaon-property/\" itemprop=\"url\"
+        title=\"Gurgaon Property\"><span itemprop=\"name\">Gurgaon</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/noida-property/\" itemprop=\"url\"
+        title=\"Noida Property\"><span itemprop=\"name\">Noida</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/bangalore-property/\" itemprop=\"url\"
+        title=\"Bangalore Property\"><span itemprop=\"name\">Bangalore</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/ahmedabad-property/\" itemprop=\"url\"
+        title=\"Ahmedabad Property\"><span itemprop=\"name\">Ahmedabad</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/navimumbai-property/\" itemprop=\"url\"
+        title=\"Navi Mumbai Property\"><span itemprop=\"name\">Navi Mumbai</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/kolkata-property/\" itemprop=\"url\"
+        title=\"Kolkata Property\"><span itemprop=\"name\">Kolkata</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/chennai-property/\" itemprop=\"url\"
+        title=\"Chennai Property\"><span itemprop=\"name\">Chennai</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/pune-property/\" itemprop=\"url\" title=\"Pune
+        Property\"><span itemprop=\"name\">Pune</span></a></li>\r\n<li><a href=\"https://www.realestateindia.com/greaternoida-property/\"
+        itemprop=\"url\" title=\"Greater Noida Property\"><span itemprop=\"name\">Greater
+        Noida</span></a></li>\r\n<li><a href=\"https://www.realestateindia.com/thane-property/\"
+        itemprop=\"url\" title=\"Thane Property\"><span itemprop=\"name\">Thane</span></a></li>\r\n</ul>
+        \r\n\r\n<p class=\"ttu b mt15px\">OTHER CITIES</p>\r\n<ul class=\"fo ac-fl
+        ac-w140px blue\">\r\n<li><a href=\"https://www.realestateindia.com/agra-property/\"
+        title=\"Agra Property\" itemprop=\"url\"><span itemprop=\"name\">Agra</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/bhiwadi-property/\" title=\"Bhiwadi
+        Property\" itemprop=\"url\"><span itemprop=\"name\">Bhiwadi</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/bhubaneswar-property/\" title=\"Bhubaneswar
+        Property\" itemprop=\"url\"><span itemprop=\"name\">Bhubaneswar</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/bhopal-property/\" title=\"Bhopal Property\"
+        itemprop=\"url\"><span itemprop=\"name\">Bhopal</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/chandigarh-property/\" title=\"Chandigarh
+        Property\" itemprop=\"url\"><span itemprop=\"name\">Chandigarh</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/coimbatore-property/\" title=\"Coimbatore
+        Property\" itemprop=\"url\"><span itemprop=\"name\">Coimbatore</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/dehradun-property/\" title=\"Dehradun
+        Property\" itemprop=\"url\"><span itemprop=\"name\">Dehradun</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/faridabad-property/\" itemprop=\"url\"
+        title=\"Faridabad Property\"><span itemprop=\"name\">Faridabad</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/ghaziabad-property/\" itemprop=\"url\"
+        title=\"Ghaziabad Property\"><span itemprop=\"name\">Ghaziabad</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/haridwar-property/\" title=\"Haridwar
+        Property\" itemprop=\"url\"><span itemprop=\"name\">Haridwar</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/hyderabad-property/\" itemprop=\"url\"
+        title=\"Hyderabad Property\"><span itemprop=\"name\">Hyderabad</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/indore-property/\" title=\"Indore Property\"
+        itemprop=\"url\"><span itemprop=\"name\">Indore</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/jaipur-property/\" title=\"Jaipur Property\"
+        itemprop=\"url\"><span itemprop=\"name\">Jaipur</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/kochi-property/\" title=\"Kochi Property\"
+        itemprop=\"url\"><span itemprop=\"name\">Kochi</span></a></li>\r\n<li><a href=\"https://www.realestateindia.com/lucknow-property/\"
+        title=\"Lucknow Property\" itemprop=\"url\"><span itemprop=\"name\">Lucknow</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/ludhiana-property/\" title=\"Ludhiana
+        Property\" itemprop=\"url\"><span itemprop=\"name\">Ludhiana</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/nashik-property/\" title=\"Nashik Property\"
+        itemprop=\"url\"><span itemprop=\"name\">Nashik</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/nagpur-property/\" title=\"Nagpur Property\"
+        itemprop=\"url\"><span itemprop=\"name\">Nagpur</span></a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/surat-property/\" title=\"Surat Property\"
+        itemprop=\"url\"><span itemprop=\"name\">Surat</span></a></li>\r\n<li><a href=\"https://www.realestateindia.com/vadodara-property/\"
+        title=\"Vadodara Property\" itemprop=\"url\"><span itemprop=\"name\">Vadodara</span></a></li>\r\n</ul>
+        \r\n</div>\r\n</li>\r\n</ul>\t</li>\r\n\t</ul>\t\r\n\t<ul class=\"fr\">\r\n<li
+        class=\"moreNav dropdownLink pr\">\r\n<a href=\"javascript:void(0);\" class=\"moreLink\">\r\n<span>\r\n<span
+        class=\"lines-button\">\r\n<span class=\"lines\"></span>\r\n</span>\r\n<span
+        class=\"menuText\">menu</span>\r\n</span>\r\n</a>\r\n\r\n<div class=\"moreLinkDropDown\">\r\n<div
+        class=\"moreLinkDropDownInner p10px pl5px pr15px pb5px\">\r\n<span class=\"arrow_top\"><b
+        class=\"icon-caret-up\"></b></span>\r\n<ul class=\"fo ac-fl ac-hover-red ac-w33
+        ac-p7px ac-bsbb small ffos gray lh14em\" style=\"margin-top:-20px;\">\r\n<li>\r\n<a
+        href=\"https://www.realestateindia.com/projects/\" title=\"NEW PROJECTS\">\r\n<p
+        class=\"black hover-red large ffrr\">NEW PROJECTS</p>\r\n<p class=\"dul small\">Surf
+        Top Housing Projects Area-Wise</p>\r\n</a>\r\n</li>\r\n<li>\r\n<a href=\"https://www.realestateindia.com/property-for-sale/\"
+        title=\"PROPERTY FOR SALE\">\r\n<p class=\"black hover-red large ffrr\">PROPERTY
+        FOR SALE</p>\r\n<p class=\"dul small\">Get Quick Response From Prospects</p>\r\n</a>\r\n</li>\r\n<li>\r\n<a
+        href=\"https://www.realestateindia.com/property-for-rent/\" title=\"PROPERTY
+        FOR RENT\">\r\n<p class=\"black hover-red large ffrr\">PROPERTY FOR RENT</p>\r\n<p
+        class=\"dul small\">Get Suitable Rental Property</p>\r\n</a>\r\n</li>\r\n</ul>\r\n\r\n<ul
+        class=\"fo ac-fl ac-hover-red ac-w33 ac-p7px ac-bsbb small ffos gray lh14em\">\r\n<li>\r\n<a
+        href=\"https://www.realestateindia.com/property-lead/\" title=\"PROPERTY LEADS\">\r\n<p
+        class=\"black hover-red large ffrr\">PROPERTY LEADS</p>\r\n<p class=\"dul
+        small\">Get Verified Quality Leads</p>\r\n</a>\r\n</li>\r\n<li>\r\n<a href=\"https://www.realestateindia.com/services/realestate-agent.htm\"
+        title=\"REAL ESTATE AGENTS\">\r\n<p class=\"black hover-red large ffrr\">REAL
+        ESTATE AGENTS</p>\r\n<p class=\"dul small\">Get Top Property Agent By Location</p>\r\n</a>\r\n</li>\r\n<li>\r\n<a
+        href=\"https://www.realestateindia.com/services/builders.htm\" title=\"BUILDERS
+        & DEVELOPERS\">\r\n<p class=\"black hover-red large ffrr\">BUILDERS & DEVELOPERS</p>\r\n<p
+        class=\"dul small\">Find Top Builders & Developers</p>\r\n</a>\r\n</li>\r\n</ul>\r\n<ul
+        class=\"fo ac-fl ac-hover-red ac-w33 ac-p7px bdrt ac-bsbb small ffos gray
+        lh14em\">\t\t\t\r\n\t\t<li>\r\n\t\t<a href=\"https://www.realestateindia.com/registration.php\"
+        title=\"REGISTER WITH US\">\r\n\t\t<p class=\"black hover-red large ffrr\">REGISTER
+        WITH US</p>\r\n\t\t<p class=\"dul small\">Connect With Genuine Buyers</p>\r\n\t\t</a>\r\n\t\t</li>\r\n\t\t<li>\r\n<p
+        class=\"black hover-red large ffrr\"><a href=\"https://www.realestateindia.com/contactus.htm\"
+        title=\"CUSTOMER CARE\">CUSTOMER CARE</a></p>\r\n<p class=\"dul small\">+91-11-45679601
+        / <a href=\"https://www.realestateindia.com/feedback.htm\">Email Us</a></p>\r\n</li>\r\n<li>\r\n<a
+        href=\"https://www.realestateindia.com/advertise/\" title=\"ADVERTISE WITH
+        US\">\r\n<p class=\"black hover-red large ffrr\">ADVERTISE WITH US</p>\r\n<p
+        class=\"dul small\">Advertise Your Property With Us</p>\r\n</a>\r\n<li>\r\n</ul>\r\n<p
+        class=\"cb\"></p>\r\n</div>\r\n</div>\r\n</li>\r\n</ul> \r\n\r\n<style>      \r\n.moreLinkDropDown{width:630px;border-radius:0
+        0 2px 2px;position:absolute;right:0;padding:0 6px;margin-right:-6px;transition:all
+        .3s ease;height:0;overflow:hidden;z-index:99;}\r\n.dropdownLink:hover .moreLinkDropDown{height:230px;padding-top:7px;}\r\n.dropdownLink:hover
+        .adviceDropDown .moreLinkDropDown{padding:10px 8px 6px 6px}\r\n.moreLinkDropDown
+        .moreLinkDropDownInner{border-top:4px solid #da251c; border-bottom:1px solid
+        #ccc;background-color:#fff;box-shadow:0 0 15px rgba(0,0,0,.1);}\r\n.lines{background:#333
+        none repeat scroll 0 0;display:inline-block;height:3px;position:relative;transition:all
+        .3s ease 0;width:25px;top:-7px}\r\n.moreNav>a{width:25px;height:25px;display:inline-block}\r\n.moreNav
+        a.moreLink{height:22px}\r\n.lines-button{position:absolute}\r\n.lines::before,.lines::after{background:#333
+        none repeat scroll 0 0; content:\"\";display:inline-block;height:3px;left:0;position:absolute;transform-origin:.28571rem
+        center 0;transition: all .3s ease 0s;width: 25px;}\r\n.lines::after{top:-6px}\r\n.lines::before{top:6px}\r\n.moreNav:hover
+        .lines::before{transform:rotate3d(0,0,1,45deg);background-color:#da251c;}\r\n.moreNav:hover
+        .lines::before,.moreNav:hover .lines::after{top:0;transform-origin:50% 50%
+        0;width:25px}\r\n.moreNav:hover .lines::after{transform:rotate3d(0,0,1,-45deg);background-color:#da251c;}\r\n.moreNav:hover
+        .lines::before,.moreNav:hover .lines::after{top:0;transform-origin:50% 50%
+        0;width:25px}\r\n.moreNav:hover .lines{background:transparent none repeat
+        scroll 0 0}\r\n.menuText{display:inline-block;font-size:8px;margin-top:12px;text-transform:uppercase;color:#333}\r\n@keyframes
+        animationFrames{0%{transform:translate(0px,-190px)}100%{transform:translate(0px,0px)}}\r\n@keyframes
+        animationFrames2{0%{background-size:200%}100%{background-size:100%}}\r\n.moreLinkDropDownInner
+        .arrow_top{display:inline-block;position:relative;top:-27px;left:600px;color:#da251c;}\r\n</style>\t<ul
+        class=\"fo ac-fl fr ffos small ac-pr ttu mt4px mr20px\" itemscope=\"\" itemtype=\"http://schema.org/SiteNavigationElement\"
+        data-plugin=\"dropdown\">\r\n\t\t\t\t<li class=\"mr10px login_div pr10px\"><a
+        href=\"https://www.realestateindia.com/login.php\" itemprop=\"url\" title=\"Login\"><span
+        itemprop=\"name\"><b class=\"icon-user mr5px\"></b>LOGIN</span></a></li>\r\n\t\t\t<li
+        class=\"pr10px\"><a class=\"p5px\" href=\"https://www.realestateindia.com/property-lead/\"
+        itemprop=\"url\" title=\"Search Property Buyers City Wise\"><span itemprop=\"name\"><b
+        class=\"icon-search vam mr5px\"></b>Verified Buyers </span></a></li>\r\n\t\t\t\t<li
+        class=\"mr5px ml5px\"><a href=\"https://www.realestateindia.com/post-property-for-sale-rent.php\"
+        itemprop=\"url\" title=\"Post Property\" class=\"bgfff bdr p5px10px bt_link\"><span
+        itemprop=\"name\">Post Property <b class=\"ts0 yellow\">Free</b></span></a></li>\r\n\t<li><a
+        href=\"https://www.realestateindia.com/buy/requirement.php\" itemprop=\"url\"
+        title=\"Post Requirement\" class=\"bgfff bdr p5px10px bt_link\"><span itemprop=\"name\">Post
+        Requirement</span></a></li>\r\n\t</ul> \r\n\t</div>\r\n\t</li>\r\n\t</ul>\r\n\t</div>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/ajax/ajax_suggetion_city_list.js\"></script>\r\n<style>\r\n/******************************Below
+        Styles Is For AJAX****************************************/\r\n@media all
+        and (-ms-high-contrast:none) {\r\n.abc .p10px {padding:10px} /* IE10 */\r\n*::-ms-backdrop,
+        #tags { height:42px } /* IE11 */\r\n*::-ms-backdrop, .abc .p10px{ padding:10px
+        10px 9px}\r\n}\r\n\r\n.button-dropdown span.select_cat3 {\r\n    display:
+        inline-block;\r\n    overflow: hidden;\r\n    padding: 9px 9px 6px;\r\n    text-overflow:
+        ellipsis;\r\n    white-space: nowrap;\r\n    width: 40px;\r\n}\r\n</style>\r\n<script>\r\n$(document).ready(function()
+        {\r\n  if(!Modernizr.input.placeholder){\r\n    $(\"input\").each(function(){\r\n
+        \     if($(this).val()==\"\" && $(this).attr(\"placeholder\")!=\"\"){\r\n
+        \       $(this).val($(this).attr(\"placeholder\"));\r\n        $(this).focus(function(){\r\n
+        \         if($(this).val()==$(this).attr(\"placeholder\")) $(this).val(\"\");\r\n
+        \       });\r\n        $(this).blur(function(){\r\n          if($(this).val()==\"\")
+        $(this).val($(this).attr(\"placeholder\"));\r\n        });\r\n      }\r\n
+        \   });\r\n  }\r\n}); \r\n</script> \r\n<style>\r\n#inner-search-city-list{max-height:200px;
+        overflow-x:auto; position:absolute;width: 438px;border:1px solid #ccc;border-top:none;}\r\n#inner-search-city-list
+        li{padding:4px 10px; background:#fff;border-bottom:dashed 1px #ccc;}\r\n#inner-search-city-list
+        li:hover{background:#86c4fe;color:#fff;}\r\n\r\n#inner-search .error{padding:5px
+        10px; color:#cc0000; background:#fbefef; border:1px solid #cc0000; width:150px;
+        left:291px; top:74px; position:absolute;}\r\n#inner-search .error:after,#inner-search
+        .error:before{left:20px;bottom:100%;border:solid transparent;content:\" \";height:0;width:0;position:absolute;pointer-events:none}\r\n#inner-search
+        .error:after{border-bottom-color:#fbefef;border-width:6px;margin-left:-6px}\r\n#inner-search
+        .error:before{border-bottom-color:#cc0000;border-width:8px;margin-left:-8px}\r\n</style>\r\n\r\n<div
+        style=\"background: rgb(85, 172, 239) none repeat scroll 0% 0%; display: block\"
+        id=\"search_section\" class=\"w100 bsbb p4px bsb10px20 dn\">\r\n\r\n<form
+        name=\"inner-search\" id=\"inner-search\" method=\"get\" action=\"https://www.realestateindia.com/search.php\">\r\n<div
+        id=\"prop_search\" style=\"display:block\" class=\"fw ffos w100 dt ac-dtr
+        acac-dtc\">\r\n<ul>\r\n<li class=\"bg666 bdr bdrccc bdrr0 p5px bsbb w110px
+        pr gray button-dropdown\">\r\n<a class=\"db bdrr0 dropdown-toggle lh13em tac
+        white ts0\" href=\"javascript:void(0);\"> <span class=\"dib p1px \">Buy</span><b
+        class=\"icon-chevron-down xsmall mt5px dul ts0 fr silver\"></b>\r\n<input
+        type=\"hidden\" name=\"searchlistfor\" id=\"searchlistfor_sale_rent\" value=\"1\">\r\n\r\n</a>\r\n<div
+        style=\"top: 32px; left: -1px; border-color: rgb(188, 205, 212); z-index:
+        1; display: none;\" class=\"w100px pa bgfff bdr p5px dn dropdown-menu\" id=\"propertySearchType\">\r\n<ul
+        class=\"ac-p5px ac-bgfafafa-hover acac-db\"> \r\n<li><a href=\"javascript:void(0)\"
+        onClick=\"ShowHideSearchType('propertySearchType','buy');\" data-val=\"1\">Buy</a></li>\r\n<li><a
+        href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType','rent');\"
+        data-val=\"2\">Rent / PG</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType','project');\"
+        data-val=\"4\">Project</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType','dealer');\"
+        data-val=\"5\">Dealers</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType','service');\"
+        data-val=\"6\">Services</a></li>\r\n</ul>\r\n</div>\r\n</li>\r\n\r\n<li style=\"width:440px;\"
+        class=\"bgfff bdr bdrccc bdrr0 bsbb\">\r\n<input type=\"text\" class=\"w100
+        input bgfff bsbb bdr0 p5px\" placeholder=\"Enter your City / Locality\" name=\"cityname\"
+        id=\"cityname\"  autocomplete=\"off\" value=\"\"> \r\n<input type=\"hidden\"
+        name=\"cityname_hidden\" id=\"cityname_hidden\" value=\"\">\r\n<div id=\"inner-search-suggesstion-box\"></div>\r\n<label
+        for=\"cityname\" generated=\"true\" class=\"error\" style=\"display:none;\"></label>\r\n</li>\r\n<li
+        class=\"bgfff bdr bdrccc bdrr0 p5px bsbb w220px pr gray button-dropdown\">\r\n<a
+        href=\"javascript:void(0);\" class=\"bgfff db bdrr0 dropdown-toggle lh13em\">
+        <span class=\"dib p1px\">Residential Property</span> <b class=\"icon-chevron-down
+        xxxsmall dul bn mt7px fr\"></b>\r\n<input type=\"hidden\" name=\"allcategory\"
+        id=\"Profile-Created-sale\" value=\"5\">\r\n</a>\r\n<div style=\"top: 33px;
+        left: -1px; border-color: rgb(188, 205, 212); z-index: 1; overflow-y: scroll;
+        display: none;\" class=\"w210px pa bgfff bdr p5px pt10px dn dropdown-menu
+        h200px\" id=\"propertyType1\">\r\n<ul class=\"ac-p5px ac-bgfafafa-hover acac-db\">\r\n<li><a
+        href=\"javascript:void(0)\" class=\"b\" onClick=\"GetCategorySubcategory('propertyType2');\"
+        data-val=\"5\">Residential Property</a>\r\n<ul class=\"ac-p2px acac-bc-raquo
+        ac-bgf1f1f1-hover  acac-db\">\r\n\r\n\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"8\">Flats
+        & Apartments</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"9\">Individual House/Home</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"10\">Society
+        Housing</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"11\">Builder Floor</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"12\">Farm
+        House</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"13\">Serviced Apartments</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"25\">Residential
+        Land / Plot</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"48\">Bungalows / Villas</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"54\">Penthouses</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"55\">Studio Apartment</a></li>\r\n\t</ul>\r\n</li>\r\n<li><a class=\"b\"
+        href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"6\">Commercial Property</a>\r\n<ul class=\"ac-p2px acac-bc-raquo
+        ac-bgf1f1f1-hover acac-db\">\r\n\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"15\">Commercial Shops</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"16\">Showrooms</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"17\">Office Space</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"38\">Banquet
+        Hall & Guest House</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"23\">Business Center</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"27\">Commercial
+        Lands /Inst. Land</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"39\">Hotel & Restaurant</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"26\">Agricultural/Farm
+        Land</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"28\">Industrial Land / Plot</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType1');\" data-val=\"41\">Factory
+        / Industrial Building</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType1');\"
+        data-val=\"40\">Warehouse/Godown</a></li>\r\n\t</ul>\r\n</li>\r\n\r\n</ul>\r\n</div>\r\n</li>\r\n<li
+        class=\"bgfff bdr bdrccc bdrr0 w150px p5px abc pr\">\r\n<a id=\"myBudgetTabSaleRent\"
+        class=\"gray lh13em db\" href=\"javascript:void(0)\">\r\n<span id=\"myBudgetSaleRent\"
+        class=\"dib p1px\">Budget</span> \r\n<b class=\"icon-chevron-down xxxsmall
+        dul bn ml10px mt7px fr\"></b>\r\n</a>\r\n<script>\r\n$(function(){\r\n\t$(\"#myBudgetTabSaleRent\").click(function(){\r\n\t\t
+        $('#maxs_salerent').html('');\r\n\t\t $('.budget_text_salerent').val('');
+        \r\n\t});\r\n});\r\n</script> \r\n<div id=\"budget_dd_salerent\" style=\"top:
+        33px; left: -80px; border-width: 2px; display: none;\" class=\"w230px bgfff
+        pa bdrb bsb10px20 dn\">\r\n<div class=\"p10px\">\r\n<ul class=\"fo ac-fl ac-w50
+        dif b\">\r\n<li>Form</li>\r\n<li>To</li>\r\n</ul>\r\n<ul class=\"fo ac-fl
+        ac-w50\">\r\n<li>\r\n<input type=\"hidden\" name=\"min_val\" id=\"min_val_salerent\"
+        value=\"0\" placeholder=\"Rs. Min\">\r\n<input class=\"budget_text_salerent
+        input gbiwb lightbg1 bdr p7px w80px\" readonly data-rel=\"mins_salerent\"
+        placeholder=\"Any\">\r\n</li>\r\n<li>\r\n<input type=\"hidden\" name=\"max_val\"
+        id=\"max_val_salerent\" value=\"0\" placeholder=\"Rs. Max\">\r\n<input class=\"budget_text_salerent
+        input gbiwb lightbg1 bdr p7px w80px\" readonly data-rel=\"maxs_salerent\"
+        placeholder=\"Any\">\r\n</li>\r\n</ul>\r\n</div>\r\n<div style=\"max-height:170px;
+        overflow:auto;\" class=\"pl10px pb10px\">\r\n<ul class=\"ac-fo\">\r\n<li>\r\n<ul
+        class=\"w90px fl acac-db acac-p3px5px acac-bgeee-hover budget_salerent\" data-rel=\"min_val_salerent\"
+        id=\"mins_salerent\" data-id=\"#mins_salerent\">\r\n\t<li><a href=\"javascript:void(0)\"
+        data-val=\"500000\">5 Lacs</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"1000000\">10 Lacs</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"1500000\">15 Lacs</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"2500000\">25 Lacs</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"4000000\">40 Lacs</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"6000000\">60 Lacs</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"10000000\">1 crore</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"15000000\">1.5 crore</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"20000000\">2 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"25000000\">2.5 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"50000000\">5 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"100000000\">10 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"150000000\">15 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"200000000\">20 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"250000000\">25 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"300000000\">30 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"350000000\">35 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"400000000\">40 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"450000000\">45 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"500000000\">50 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"550000000\">55 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"600000000\">60 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"650000000\">65 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"700000000\">70 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"750000000\">75 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"800000000\">80 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"850000000\">85 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"900000000\">90 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"950000000\">95 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"1000000000\">100 crores</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        data-val=\"9999999999\">100+ crores</a></li>\r\n\t</ul>\r\n</li>\r\n<li>\r\n<ul
+        class=\"acac-db acac-p3px5px acac-bgeee-hover budget_salerent dn\" data-rel=\"max_val_salerent\"
+        id=\"maxs_salerent\" data-id=\"#budget_dd_salerent,#mins_salerent\" style=\"margin-left:100px;\">\r\n</ul>\r\n</li>\r\n\r\n</ul>\r\n</div>\r\n</div>\r\n</li>\r\n\r\n<li>\r\n<button
+        class=\"darkbg2 white b vam bdr0 large pb7px p5px15px\" type=\"submit\"><img
+        class=\"vam\" src=\"https://static.realestateindia.com/rei/images/search_icon.png\"></button>\r\n</li>\r\n</ul>\r\n</div>\r\n</form>\r\n\r\n\r\n<style>\r\n#inner-search-project-city-list{max-height:200px;
+        overflow-x:auto; position:absolute;width: 438px;border:1px solid #ccc;border-top:none;}\r\n#inner-search-project-city-list
+        li{padding:4px 10px; background:#fff;border-bottom:dashed 1px #ccc;}\r\n#inner-search-project-city-list
+        li:hover{background:#86c4fe;color:#fff;}\r\n\r\n#project-search .error{padding:5px
+        10px; color:#cc0000; background:#fbefef; border:1px solid #cc0000; width:150px;
+        left:291px; top:74px; position:absolute;}\r\n#project-search .error:after,#project-search
+        .error:before{left:20px;bottom:100%;border:solid transparent;content:\" \";height:0;width:0;position:absolute;pointer-events:none}\r\n#project-search
+        .error:after{border-bottom-color:#fbefef;border-width:6px;margin-left:-6px}\r\n#project-search
+        .error:before{border-bottom-color:#cc0000;border-width:8px;margin-left:-8px}\r\n</style>\r\n<form
+        name=\"project-search\" id=\"project-search\" method=\"post\" action=\"https://www.realestateindia.com/projects/search.php\">\r\n<div
+        id=\"proj_search\" style=\"display:none\" class=\"fw ffos w100 dt ac-dtr acac-dtc\">\r\n\r\n<ul>\r\n<li
+        class=\"bg666 bdr bdrccc bdrr0 p5px bsbb w110px pr gray button-dropdown\">\r\n<a
+        class=\"db bdrr0 dropdown-toggle lh13em tac white ts0\" href=\"javascript:void(0);\">
+        <span class=\"dib p1px \">Buy</span><b class=\"icon-chevron-down xsmall mt5px
+        dul ts0 fr silver\"></b>\r\n<input type=\"hidden\" name=\"searchlistfor\"
+        id=\"searchlistfor_project\" value=\"1\">\r\n</a>\r\n<div style=\"top: 32px;
+        left: -1px; border-color: rgb(188, 205, 212); z-index: 1; display: none;\"
+        class=\"w100px pa bgfff bdr p5px dn dropdown-menu\" id=\"propertySearchType2\">\r\n<ul
+        class=\"ac-p5px ac-bgfafafa-hover acac-db\"> \r\n<li><a href=\"javascript:void(0)\"
+        onClick=\"ShowHideSearchType('propertySearchType2','buy');\" data-val=\"1\">Buy</a></li>\r\n<li><a
+        href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType2','rent');\"
+        data-val=\"2\">Rent / PG</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType2','project');\"
+        data-val=\"4\">Project</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType2','dealer');\"
+        data-val=\"5\">Dealers</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType2','service');\"
+        data-val=\"6\">Services</a></li>\r\n</ul>\r\n</div>\r\n</li>\r\n\r\n<li style=\"width:440px;\"
+        class=\"bgfff bdr bdrccc bdrr0 bsbb\"> \r\n<input type=\"text\" class=\"w100
+        input bgfff bsbb bdr0 p5px\" placeholder=\"Enter your City / Locality\" name=\"cityname1\"
+        id=\"cityname1\"  autocomplete=\"off\" value=\"\"> \r\n<input type=\"hidden\"
+        name=\"cityname1_hidden\" id=\"cityname1_hidden\" value=\"\">\r\n<div id=\"inner-search-project-suggesstion-box\"></div>\r\n<label
+        for=\"cityname1\" generated=\"true\" class=\"error\" style=\"display:none;\"></label>\r\n</li>\r\n<li
+        class=\"bgfff bdr bdrccc bdrr0 p5px bsbb w220px pr gray button-dropdown\">\r\n<a
+        href=\"javascript:void(0);\" class=\"bgfff db bdrr0 dropdown-toggle lh13em\">
+        <span class=\"dib p1px\">Residential Project</span> <b class=\"icon-chevron-down
+        xxxsmall dul bn mt7px fr\"></b>\r\n<input type=\"hidden\" name=\"allcategory\"
+        id=\"Profile-Created-project\" value=\"5\">\r\n</a>\r\n<div style=\"top: 33px;
+        left: -1px; border-color: rgb(188, 205, 212); z-index: 1; overflow-y: scroll;
+        display: none;\" class=\"w210px pa bgfff bdr p5px pt10px dn dropdown-menu
+        h200px\" id=\"propertyType4\">\r\n<ul class=\"ac-p5px ac-bgfafafa-hover acac-db\">\r\n<li><a
+        href=\"javascript:void(0)\" class=\"b\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"5\">Residential Project</a>\r\n<ul class=\"ac-p2px acac-bc-raquo
+        ac-bgf1f1f1-hover  acac-db\">\r\n\r\n\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"8\">Flats
+        & Apartments</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"9\">Individual House/Home</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"10\">Society
+        Housing</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"11\">Builder Floor</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"12\">Farm
+        House</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"13\">Serviced Apartments</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"25\">Residential
+        Land / Plot</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"48\">Bungalows / Villas</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"54\">Penthouses</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"55\">Studio Apartment</a></li>\r\n\t</ul>\r\n</li>\r\n<li><a class=\"b\"
+        href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"6\">Commercial Property</a>\r\n<ul class=\"ac-p2px acac-bc-raquo
+        ac-bgf1f1f1-hover acac-db\">\r\n<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"15\">Commercial Shops</a></li>\r\n\r\n\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"15\">Commercial
+        Shops</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"16\">Showrooms</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"17\">Office
+        Space</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"38\">Banquet Hall & Guest House</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"23\">Business
+        Center</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"27\">Commercial Lands /Inst. Land</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"39\">Hotel
+        & Restaurant</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"26\">Agricultural/Farm Land</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"28\">Industrial
+        Land / Plot</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType4');\"
+        data-val=\"41\">Factory / Industrial Building</a></li>\r\n\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType4');\" data-val=\"40\">Warehouse/Godown</a></li>\r\n\t</ul>\r\n</li>\r\n\r\n</ul>\r\n</div>\r\n</li>\r\n<li
+        class=\"bgfff bdr bdrccc bdrr0 w150px p5px abc pr\">\r\n<a id=\"myBudgetTab2\"
+        class=\"gray lh13em db\" href=\"javascript:void(0)\">\r\n<span id=\"myBudget2\"
+        class=\"dib p1px\">Any</span> \r\n<b class=\"icon-chevron-down xxxsmall dul
+        bn ml10px mt7px fr\"></b>\r\n</a>\r\n<div id=\"budget_dd2\" style=\"top: 33px;
+        left: -80px; border-width: 2px; display: none;\" class=\"w230px bgfff pa bdrb
+        bsb10px20 dn\">\r\n<div class=\"p10px\">\r\n<ul class=\"fo ac-fl ac-w50 dif
+        b\">\r\n<li>Form</li>\r\n<li>To</li>\r\n</ul>\r\n<ul class=\"fo ac-fl ac-w50\">\r\n<li>\r\n<input
+        type=\"hidden\" name=\"min_val\" id=\"min_val2\" value=\"0\" placeholder=\"Rs.
+        Min\">\r\n<input class=\"budget_text input gbiwb lightbg1 bdr p7px w80px\"
+        readonly data-rel=\"mins2\" placeholder=\"Any\">\r\n</li>\r\n<li>\r\n<input
+        type=\"hidden\" name=\"max_val\" id=\"max_val2\" value=\"0\" placeholder=\"Rs.
+        Max\">\r\n<input class=\"budget_text input gbiwb lightbg1 bdr p7px w80px\"
+        readonly data-rel=\"maxs2\" placeholder=\"Any\">\r\n</li>\r\n</ul>\r\n</div>\r\n<div
+        style=\"max-height:170px; overflow:auto;\" class=\"pl10px pb10px\">\r\n<ul
+        class=\"ac-fo\">\r\n<li>\r\n<ul class=\"w90px fl acac-db acac-p3px5px acac-bgeee-hover
+        budget\" data-rel=\"min_val2\" id=\"mins2\" data-id=\"#mins2\">\r\n\t<li><a
+        href=\"javascript:void(0)\" data-val=\"500000\">5 Lacs</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"1000000\">10 Lacs</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"1500000\">15 Lacs</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"2500000\">25 Lacs</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"4000000\">40 Lacs</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"6000000\">60 Lacs</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"10000000\">1 crore</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"15000000\">1.5 crore</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"20000000\">2 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"25000000\">2.5 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"50000000\">5 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"100000000\">10 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"150000000\">15 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"200000000\">20 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"250000000\">25 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"300000000\">30 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"350000000\">35 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"400000000\">40 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"450000000\">45 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"500000000\">50 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"550000000\">55 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"600000000\">60 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"650000000\">65 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"700000000\">70 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"750000000\">75 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"800000000\">80 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"850000000\">85 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"900000000\">90 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"950000000\">95 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"1000000000\">100 crores</a></li>\r\n\t\t<li><a
+        href=\"javascript:void(0)\" data-val=\"9999999999\">100+ crores</a></li>\r\n\t</ul>\r\n</li>\r\n<li>\r\n<ul
+        class=\"acac-db acac-p3px5px acac-bgeee-hover budget dn\" data-rel=\"max_val2\"
+        id=\"maxs2\" data-id=\"#budget_dd2,#mins2\" style=\"margin-left:100px;\">\r\n</ul>\r\n</li>\r\n\r\n</ul>\r\n</div>\r\n</div>\r\n</li>\r\n\r\n<li>\r\n<button
+        class=\"darkbg2 white b vam bdr0 large pb7px p5px15px\" type=\"submit\"><img
+        class=\"vam\" src=\"https://static.realestateindia.com/rei/images/search_icon.png\"></button>\r\n</li>\r\n</ul>\r\n</div>\r\n</form>\r\n\r\n\r\n\r\n<style>\r\n#inner-search-dealer-city-list{max-height:200px;
+        overflow-x:auto; position:absolute;width: 818px;border:1px solid #ccc;border-top:none;}\r\n#inner-search-dealer-city-list
+        li{padding:4px 10px; background:#fff;border-bottom:dashed 1px #ccc;}\r\n#inner-search-dealer-city-list
+        li:hover{background:#86c4fe;color:#fff;}\r\n\r\n#dealer-search .error{padding:5px
+        10px; color:#cc0000; background:#fbefef; border:1px solid #cc0000; width:150px;
+        left:291px; top:74px; position:absolute;}\r\n#dealer-search .error:after,#dealer-search
+        .error:before{left:20px;bottom:100%;border:solid transparent;content:\" \";height:0;width:0;position:absolute;pointer-events:none}\r\n#dealer-search
+        .error:after{border-bottom-color:#fbefef;border-width:6px;margin-left:-6px}\r\n#dealer-search
+        .error:before{border-bottom-color:#cc0000;border-width:8px;margin-left:-8px}\r\n</style>\r\n<form
+        name=\"dealer-search\" id=\"dealer-search\" method=\"post\" action=\"https://www.realestateindia.com/agentsearch.php\">\r\n<div
+        id=\"dealers_tab\" style=\"display:none;\" class=\"fw ffos w100 dt ac-dtr
+        acac-dtc\">\r\n<ul>\r\n<li class=\"bg666 bdr bdrccc bdrr0 p5px bsbb w110px
+        pr gray button-dropdown\"> <a class=\"db bdrr0 dropdown-toggle lh13em tac
+        white ts0\" href=\"javascript:void(0);\"> <span class=\"dib p1px\">Buy</span>
+        <b class=\"icon-chevron-down xsmall mt5px dul ts0 fr\"></b>\r\n<input type=\"hidden\"
+        name=\"searchlistfor\" id=\"searchlistfor_dealer\" value=\"1\">\r\n\r\n</a>\r\n<div
+        style=\"top: 32px; left: -1px; border-color: rgb(188, 205, 212); z-index:
+        1; display: none;\" class=\"w100px pa bgfff bdr p5px dn dropdown-menu\" id=\"propertySearchType3\">\r\n<ul
+        class=\"ac-p5px ac-bgfafafa-hover acac-db\"> \r\n<li><a href=\"javascript:void(0)\"
+        onClick=\"ShowHideSearchType('propertySearchType3','buy');\" data-val=\"1\">Buy</a></li>\r\n<li><a
+        href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType3','rent');\"
+        data-val=\"2\">Rent / PG</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType3','project');\"
+        data-val=\"4\">Project</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType3','dealer');\"
+        data-val=\"5\">Dealers</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType3','service');\"
+        data-val=\"6\">Services</a></li>\r\n</ul>\r\n\r\n</div>\r\n</li>\r\n\r\n<li
+        style=\"width:821px;\" class=\"bgfff bdr bdrccc bdrr0 bsbb\">\r\n<input type=\"text\"
+        name=\"searchkeyword\" id=\"searchkeyword\" autocomplete=\"off\" value=\"\"
+        placeholder=\"Enter your City / Locality\" class=\"w100 input bgfff bsbb bdr0
+        p5px\" id=\"tags\"> \r\n<label for=\"searchkeyword\" generated=\"true\" class=\"error\"
+        style=\"display:none;\"></label>\r\n<input type=\"hidden\" name=\"searchkeyword_hidden\"
+        id=\"searchkeyword_hidden\" value=\"\">\r\n<div id=\"inner-search-dealer-suggesstion-box\"></div>\r\n</li>
+        \r\n<li>\r\n<input type=\"hidden\" name=\"member_type\" id=\"Profile-Created-servic-dealer\"
+        value=\"116\">\r\n<button class=\"darkbg2 white b vam bdr0 large pb7px p5px15px\"
+        type=\"submit\"><img class=\"vam\" src=\"https://static.realestateindia.com/rei/images/search_icon.png\"></button>\r\n</li>\r\n</ul>\r\n</div>\r\n</form>\r\n\r\n\r\n\r\n<style>\r\n#inner-search-service-city-list{max-height:200px;
+        overflow-x:auto; position:absolute;width: 599px;border:1px solid #ccc;border-top:none;}\r\n#inner-search-service-city-list
+        li{padding:4px 10px; background:#fff;border-bottom:dashed 1px #ccc;}\r\n#inner-search-service-city-list
+        li:hover{background:#86c4fe;color:#fff;}\r\n\r\n#service-search .error{padding:5px
+        10px; color:#cc0000; background:#fbefef; border:1px solid #cc0000; width:150px;
+        left:291px; top:74px; position:absolute;}\r\n#service-search .error:after,#service-search
+        .error:before{left:20px;bottom:100%;border:solid transparent;content:\" \";height:0;width:0;position:absolute;pointer-events:none}\r\n#service-search
+        .error:after{border-bottom-color:#fbefef;border-width:6px;margin-left:-6px}\r\n#service-search
+        .error:before{border-bottom-color:#cc0000;border-width:8px;margin-left:-8px}\r\n</style>\r\n<form
+        name=\"service-search\" id=\"service-search\" method=\"post\" action=\"https://www.realestateindia.com/agentsearch.php\">\r\n<div
+        id=\"services_tab\"  style=\"display:none\" class=\"fw ffos w100 dt ac-dtr
+        acac-dtc\">\r\n<ul>\r\n<li class=\"bg666 bdr bdrccc bdrr0 p5px bsbb w110px
+        pr gray button-dropdown\"> <a class=\"db bdrr0 dropdown-toggle lh13em tac
+        white ts0\" href=\"javascript:void(0);\"> <span class=\"dib p1px\">Buy</span>
+        <b class=\"icon-chevron-down xsmall mt5px dul ts0 fr\"></b>\r\n<input type=\"hidden\"
+        name=\"searchlistfor\" id=\"searchlistfor_service\" value=\"1\">\r\n</a>\r\n<div
+        style=\"top: 32px; left: -1px; border-color: rgb(188, 205, 212); z-index:
+        1; display: none;\" class=\"w100px pa bgfff bdr p5px dn dropdown-menu\" id=\"propertySearchType4\">\r\n\r\n<ul
+        class=\"ac-p5px ac-bgfafafa-hover acac-db\">\r\n<li><a href=\"javascript:void(0)\"
+        onClick=\"ShowHideSearchType('propertySearchType4','buy');\" data-val=\"1\">Buy</a></li>\r\n<li><a
+        href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType4','rent');\"
+        data-val=\"2\">Rent / PG</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType4','project');\"
+        data-val=\"4\">Project</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType4','dealer');\"
+        data-val=\"5\">Dealers</a></li>\r\n<li><a href=\"javascript:void(0)\" onClick=\"ShowHideSearchType('propertySearchType4','service');\"
+        data-val=\"6\">Services</a></li>\r\n</ul>\r\n</div>\r\n</li>\r\n<li style=\"width:601px;\"
+        class=\"bgfff bdr bdrccc bdrr0 bsbb\">\r\n<input type=\"text\" name=\"searchkeyword1\"
+        id=\"searchkeyword1\" autocomplete=\"off\" value=\"\" placeholder=\"Enter
+        your City / Locality\" class=\"w100 input bgfff bsbb bdr0 p5px\"> \r\n<label
+        for=\"searchkeyword1\" generated=\"true\" class=\"error\" style=\"display:none;\"></label>\r\n<input
+        type=\"hidden\" name=\"searchkeyword1_hidden\" id=\"searchkeyword1_hidden\"
+        value=\"\">\r\n<div id=\"inner-search-service-suggesstion-box\"></div>\r\n</li>\r\n\r\n<li
+        class=\"bgfff bdr bdrccc bdrr0 p5px bsbb w220px pr gray button-dropdown\">
+        <a class=\"bgfff db bdrr0 dropdown-toggle lh13em\" href=\"javascript:void(0);\">
+        <span class=\"dib p1px\">Architecture</span> <b class=\"icon-chevron-down
+        xxxsmall dul bn mt7px fr\"></b>\r\n<input type=\"hidden\" name=\"member_type\"
+        id=\"Profile-Created-service\" value=\"115\">\r\n</a>\r\n<div style=\"top:
+        33px; left: -1px; border-color: rgb(188, 205, 212); z-index: 1; overflow-y:
+        scroll; display: none;\" class=\"w210px pa bgfff bdr p5px pt10px dn dropdown-menu
+        h125px\" id=\"propertyType3\">\r\n<ul class=\"ac-p5px ac-bgfafafa-hover acac-db\">\r\n\t\t<li><a
+        href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType3');\"
+        data-val=\"115\">Architecture</a></li>\r\n\t\t\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType3');\" data-val=\"109\">Builders
+        & Developers</a></li>\r\n\t\t\t\t<li><a href=\"javascript:void(0)\" onClick=\"GetCategorySubcategory('propertyType3');\"
+        data-val=\"112\">Interior Decorators</a></li>\r\n\t\t\t\t<li><a href=\"javascript:void(0)\"
+        onClick=\"GetCategorySubcategory('propertyType3');\" data-val=\"111\">Vaastu
+        Consultant</a></li>\r\n\t\t</ul>\r\n</div>\r\n</li>\r\n<li>\r\n<button class=\"darkbg2
+        white b vam bdr0 large pb7px p5px15px\" type=\"submit\"><img class=\"vam\"
+        src=\"https://static.realestateindia.com/rei/images/search_icon.png\"></button>\r\n</li>\r\n</ul>\r\n</div>\r\n</form>\r\n\r\n\r\n</div>\r\n
+        \r\n\t\t</section>\r\n\t<p style=\"height:80px\"> </p>\r\n\t\t\t<div class=\"bgfff\">\r\n\t\t<div
+        class=\"property_detail bgf7f7f7\">\r\n<div class=\"fw\">\r\n<ul class=\"mt17px
+        mb12px fo uo ac-fl ac-pr ac-mr7px ts0 ffos dul small\" data-plugin=\"dropdown\"
+        itemscope=\"\" itemtype=\"http://schema.org/BreadcrumbList\">\r\n<li itemprop=\"itemListElement\"
+        itemscope=\"\" itemtype=\"http://schema.org/ListItem\"> <a href=\"https://www.realestateindia.com/\"
+        itemprop=\"item\" title=\"Home\"><span itemprop=\"name\">Home</span></a>\r\n<meta
+        itemprop=\"position\" content=\"1\">\r\n</li>\r\n\t<li itemprop=\"itemListElement\"
+        itemscope=\"\" itemtype=\"http://schema.org/ListItem\"> <b class=\"pl3px pr5px
+        bn ffv\">/</b> <a href=\"/mumbai-property/property-for-rent.htm\" itemprop=\"item\"
+        title=\"\">Mumbai <b class=\"icon-chevron-down ml2px xxxsmall vam\"></b></a>\r\n\t<meta
+        itemprop=\"position\" content=\"2\">\r\n\t\t\t<ul class=\"pa w180px bgfff
+        bsb10px20 bdr zi10 pop_arrow_topleft ac-p3px10px ac-bdrb ac-bdreee lc-bbw0
+        hig dn\" style=\"top:25px\">\r\n\t\t<li><a href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-andheri.htm\"
+        itemprop=\"item\" title=\"Property for Rent in Andheri Mumbai\">Andheri Mumbai</a>
+        </li><li><a href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-bandra.htm\"
+        itemprop=\"item\" title=\"Property for Rent in Bandra Mumbai\">Bandra Mumbai</a>
+        </li><li><a href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-mumbai-chembur.htm\"
+        itemprop=\"item\" title=\"Property for Rent in Chembur Mumbai\">Chembur Mumbai</a>
+        </li><li><a href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-powai.htm\"
+        itemprop=\"item\" title=\"Property for Rent in Powai Mumbai\">Powai Mumbai</a>
+        </li>\t\t</ul>\r\n\t\t\t</li>\r\n\t\t<li itemprop=\"itemListElement\" itemscope=\"\"
+        itemtype=\"http://schema.org/ListItem\"> <b class=\"pl3px pr5px bn ffv\">/</b>
+        <a href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-andheri-west.htm\"
+        itemprop=\"item\" title=\"Property for Rent in Andheri West Mumbai\">Andheri
+        West Mumbai</a>\r\n\t<meta itemprop=\"position\" content=\"4\">\r\n\t</li>\r\n\t\t<li
+        itemprop=\"itemListElement\" itemscope=\"\" itemtype=\"http://schema.org/ListItem\">
+        <b class=\"pl3px pr5px bn ffv\">/</b> <a href=\"https://www.realestateindia.com/mumbai-property/flats-apartments-for-rent.htm\"
+        itemprop=\"item\" title=\"Flats & Apartments for Rent in Mumbai\">Flats &
+        Apartments</a>\r\n\t\t<meta itemprop=\"position\" content=\"3\">\r\n\t\t\t</li>\r\n\t<li
+        style=\"margin-right:0\"><b class=\"pl3px pr5px bn ffv\">/</b> <span class=\"dul\">2
+        BHK Flats & Apartments for Rent in Andheri West, Mumbai</span></li>\r\n</ul>\r\n\r\n<p
+        class=\"cb\"></p>\r\n\r\n<section class=\"fo bgfff p10px mb20px bdr bdrddd
+        pt15px pb15px mt15px\">\r\n<div class=\"w100 dt ac-dtr acac-dtc fl mb10px\">\r\n<ul
+        class=\"gray\">\r\n<li class=\"vat pr30px\" style=\"width:300px;\">\r\n\r\n<figure
+        class=\"bgfff bdr lh0 w300px h300px mb5px pr\"><div class=\"w300px h300px
+        bgi bgs-cover\" style=\"background-image:url(https://dyimg2.realestateindia.com/prop_images/21437/712907_6-small.jpg);\"></div>\t<ul
+        class=\"pb5px fo pa p12px pb10px bsbb ac-w49 ac-fl\" style=\"left:0px;right:0px;
+        bottom:0px; background:rgba(0,0,0,0.7);\">\r\n\t<li> <a href=\"javascript:void(0);\"
+        class=\"white\" onClick=\"xidGal.showPhotoGallery(event,'pictures',0);trackEventByGA('FLOOR-TAB');\">
+        <span class=\"icon-camera mr5px xlarge vam\"></span><span class=\"\">Photo
+        </span> (5)</a> </li>\r\n\t</ul>\r\n\t</figure>\t\t\t\t\t\t\t\r\n</li>\r\n\r\n<li
+        class=\"vat ffos\">\r\n<div class=\"fo mb10px bdrb bdreee pb10px\">\r\n\r\n<div
+        class=\"mb5px black lh17em large\">\r\n\t<h1 class=\"xxxlarge\">2 BHK Flats
+        & Apartments for Rent in Andheri West, Mumbai - 10000 Sq. Yards</h1>\r\n</div>\r\n<p
+        class=\"gray\">\r\n<b class=\"icon-map-marker mr5px dul small\"></b> <span
+        class=\"dul pl5px\">by Vikas Estate Agency</span>\r\n</p> \r\n\r\n \r\n</div>\r\n\r\n\r\n<ul
+        class=\"fo ac-mb7px pb7px bdrb bdreee\">\r\n<li>\r\n<div class=\"b xxxlarge
+        mb10px\"><b class=\"webrupee red\" content=\"INR\">Rs</b> <span class=\"red\">45,000</span>
+        \r\n\t\t\t\r\n\t<span class=\"xxsmall gray bn\">@ Rs 45 per Sq.Ft</span>\r\n\t\t\t\r\n</div>\r\n</li>\r\n\r\n<li>\r\n<p
+        class=\"fl w130px\">Configuration </p>\r\n<p class=\"fl mr30px\">:</p>\r\n<p
+        class=\"w55 ofh black\"> 2 Bedrooms, 2 Bathrooms</p>\r\n</li>\r\n\r\n\t<li>\r\n\t<p
+        class=\"fl w130px\">Transaction</p>\r\n\t<p class=\"fl mr30px\">:</p>\r\n\t<p
+        class=\"w55 ofh black\">Resale Property</p>\r\n\t</li>\r\n\t</ul>\r\n<br />\r\n<a
+        class=\"darkbg2 bdr white p7px15px dib br3px b ts0 cont_btn mr10px\" href=\"#ContactDealer\"
+        title=\"Contact Builder\"> Contact Dealer </a> \r\n<a class=\"darkbdr2 dif
+        bdr p7px15px dib br3px b ts0 cont_btn mr10px\" rel=\"prop_det_inq\" href=\"https://www.realestateindia.com/view_contact_detail_rei.php?id=send_prop_enq&mailto=21437&prop_id=712907&page_url=https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/2-bedrooms-in-andheri-west-mumbai-maharashtra-712907.htm\"
+        title=\"View Phone No\"> View Phone No. </a></li>\r\n</ul>\r\n</div>\r\n</section>\r\n\r\n<div
+        class=\"fw dt ac-dtr acac-dtc acac-vat\">\r\n<ul>\r\n<li id=\"left_content\"
+        class=\"pr20px pb15px ffos\">\r\n<section data-anchor=\"s1\" class=\"bgfff
+        bdr p15px\">\r\n<div class=\"db pb3px mb12px bdrb bdreee\">\r\n\t<h2 class=\"xxlarge
+        ffrr\">About Property</h2>\r\n</div>\r\n<p class=\"aj mb10px\">peaceful location,neat,clean
+        & good security,stilt parking, tasteful furniture, electronics, centrally
+        located.</p>\r\n<ul class=\"fo ac-p10px ac-bdrt ac-bdreee mt20px\">\r\n<li>\r\n<div
+        class=\"w20 dib\">Price </div>  \r\n<div class=\"w70 dib\"> <b><b class=\"webrupee\"
+        content=\"INR\">Rs</b> <span>45,000</span> </b><span class=\"small\">( @ Rs
+        45 per Sq.Ft )</span> </div>\r\n</li>\r\n\t<li>\r\n\t<div class=\"w20 dib\">Area
+        </div>\r\n\t<div class=\"w70 dib black\"> <b class=\"bn\">Built Up Area :
+        <i>1000 Sq.ft.</i>, Plot / Land Area : <i>10000 Sq. Yards</i></b> </div>\r\n\t</li>\r\n\t\t<li>\r\n\t<div
+        class=\"w20 dib\">Furnishing </div>\r\n\t<div class=\"w70 dib black\"> <b
+        class=\"bn\">Furnished</b> </div>\r\n\t</li>\r\n\t\t<li>\r\n\t<div class=\"w20
+        dib\">Floors allowed</div>\r\n\t<div class=\"w70 dib black\"> <b class=\"bn\">7
+        </b> </div>\r\n\t</li>\r\n\t\t<li>\r\n\t<div class=\"w20 dib\">Age of Property</div>\r\n\t<div
+        class=\"w70 dib black\"> <b class=\"bn\">5 to 10 years </b> </div>\r\n\t</li>\r\n\t\t<li>\r\n\t<div
+        class=\"w20 dib\">Ownership</div>\r\n\t<div class=\"w70 dib black\"> <b class=\"bn\">
+        Agent </b> </div>\r\n\t</li>\r\n\t\t<li>\r\n\t<div class=\"w20 dib\">Land
+        Mark</div>\r\n\t<div class=\"w70 dib black\"> Hospitals : <i> .25 kms</i>,
+        Airport : <i> 4 kms</i>, ATM : <i> .15 kms</i>, School : <i> .5 kms</i>, Shopping
+        Mall : <i> 1 kms</i> </div>\r\n\t</li>\r\n\t</ul>\r\n</section>\r\n<br>\r\n<section
+        data-anchor=\"s3\" class=\"bgfff bdr p12px\">\r\n<div class=\"db pb3px mb12px
+        bdrb bdreee\">\r\n<h2 class=\"xxlarge ffrr\">Locality Info</h2>\r\n</div>\r\n\t\r\n\t<div
+        class=\"bdr p2px lh0 dib\"> \r\n\t<div class=\"map-container\">\r\n\t<iframe
+        width=\"675\" height=\"410\" frameborder=\"0\"  marginheight=\"0\" marginwidth=\"0\"\r\n\tsrc=\"https://www.google.com/maps/embed/v1/place?key=AIzaSyAN_m_CqOOtgmiF9crPBw9oSbiFBPNwn5o&q=Andheri
+        West, Mumbai, Maharashtra\">\r\n\t</iframe>\r\n\t</div>\r\n<style>.map-container
+        iframe{width:675px;display:block;pointer-events:none;position:relative;}</style>\r\n\t</div>\r\n\t</section>\r\n</li>\r\n\r\n<li
+        id=\"right_content\" class=\"w260px pb30px\">\r\n<div class=\"w260px\" id=\"sticky-form\"><a
+        name=\"ContactDealer\"></a>\r\n<iframe src=\"https://www.realestateindia.com/contact_dealer_form.php?prop_id=712907\"
+        width=\"100%\" height=\"685\" frameborder=\"0\"></iframe>\r\n</div>\r\n</li>\r\n</ul>\r\n</div>\r\n</div>\r\n\t<br
+        class=\"lh22em\">\r\n\t<section id=\"property-view\" class=\"bgfff pt20px
+        bdrt bdrb pb30px mb30px\">\r\n\t\t<div class=\"fw pb20px\">\r\n\t\t\t<div
+        class=\"ffrr db pb30px mb7px mt30px tac\">\r\n\t\t\t\t<h2 style=\"font-size:2.4em;\">Properties
+        you Might be Interested</h2>\r\n\t\t\t</div>\r\n\t\t\t<style>.property_slider
+        .prev,.property_slider .next{display:none;}.property_slider:hover .prev,.property_slider:hover
+        .next{display:block;}</style>\r\n\t\t\t<div class=\"pr property_slider\" data-plugin=\"slider2\">\r\n\t\t\t<a
+        href=\"javascript:void(0);\" class=\"prev bdr white ts0 cd alpha0 p5px pa
+        zi1 xxxlarge\" style=\"left:-5px;top:0px;padding:10.1% 5px; background:rgba(0,0,0,0.2);\"><b
+        class=\"icon-chevron-left\"></b></a>\r\n\t\t<a href=\"javascript:void(0);\"
+        class=\"next bdr white ts0 p5px pa zi1 xxxlarge\" style=\"right:-5px;top:0px;padding:10.1%
+        5px; background:rgba(0,0,0,0.2);\"><b class=\"vam icon-chevron-right\"></b></a>\r\n\t\t\t<ul
+        class=\"fo ac-fl\">\r\n\t<li>\r\n\t<ul class=\"fo fc-ml0 small ac-fl ac-darkbdr2-hover
+        ac-bsbb property_equals\">\r\n\t<li><a href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/3-bedrooms-in-ghatkopar-mumbai-maharashtra-630989.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\"><b class=\"webrupee\">Rs.</b>
+        68,000</b>\r\n\t\t\t<div class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dyimg1.realestateindia.com/prop_images/21445/630989_1-small.jpg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">3 BHK /
+        1200 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">SS Enterprises</span></p>\r\n\t\t<p
+        class=\"gray\">Ghatkopar (Mumbai)</p>\r\n\t\t</div></a> \r\n\t\t</li><li><a
+        href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/3-bedrooms-in-khar-west,-mumbai-central-mumbai-maharashtra-698071.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\"><b class=\"webrupee\">Rs.</b>
+        26,000</b>\r\n\t\t\t<div class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dyimg1.realestateindia.com/prop_images/137935/698071_1-small.jpg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">3 BHK /
+        1400 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">Mak Realtors Private...</span></p>\r\n\t\t<p
+        class=\"gray\">Khar West, Mumbai Ce..</p>\r\n\t\t</div></a> \r\n\t\t</li><li><a
+        href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/2-bedrooms-in-chandivali-mumbai-maharashtra-618664.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\"><b class=\"webrupee\">Rs.</b>
+        42,000</b>\r\n\t\t\t<div class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dyimg2.realestateindia.com/prop_images/1021207/618664_2-small.jpg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">2 BHK /
+        950 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">Shree Ram Property C...</span></p>\r\n\t\t<p
+        class=\"gray\">Chandivali (Mumbai)</p>\r\n\t\t</div></a> \r\n\t\t</li><li><a
+        href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/4-bedrooms-in-chembur-mumbai-central-maharashtra-456270.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\"><b class=\"webrupee\">Rs.</b>
+        93,000</b>\r\n\t\t\t<div class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dynamic.realestateindia.com/prop_images/11822/456270_1-small.jpg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">4 BHK /
+        2300 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">EK-OM Real Estate Co...</span></p>\r\n\t\t<p
+        class=\"gray\">Chembur (Mumbai)</p>\r\n\t\t</div></a> \r\n\t\t</li><li><a
+        href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/1-bedrooms-in-chembur-mumbai-central-maharashtra-411950.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\"><b class=\"webrupee\">Rs.</b>
+        18,000</b>\r\n\t\t\t<div class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dyimg1.realestateindia.com/prop_images/155816/411950_1-small.jpg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">1 BHK /
+        510 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">Lands Zone</span></p>\r\n\t\t<p
+        class=\"gray\">Chembur (Mumbai)</p>\r\n\t\t</div></a> \r\n\t\t</li>\t</ul>\r\n\t</li>\r\n\t\t\t<li>\r\n\t\t<ul
+        class=\"fo fc-ml0 small ac-fl ac-darkbdr2-hover ac-bsbb property_equals\">\r\n\t\t<li><a
+        href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/1-bedrooms-in-santacruz-mumbai-central-maharashtra-523012.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\">Price on Request</b>\r\n\t\t\t<div
+        class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dyimg2.realestateindia.com/prop_images/190089/523012_2-small.jpg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">1 BHK /
+        480 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">Hetali Estate Consul...</span></p>\r\n\t\t<p
+        class=\"gray\">Santacruz (Mumbai)</p>\r\n\t\t</div></a> \r\n\t\t</li><li><a
+        href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/1-bedrooms-in-kandivali-mumbai-north-maharashtra-361247.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\"><b class=\"webrupee\">Rs.</b>
+        19,000</b>\r\n\t\t\t<div class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dyimg1.realestateindia.com/prop_images/12186/361247_1-small.jpg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">1 BHK /
+        545 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">Gayatri Estate Agenc...</span></p>\r\n\t\t<p
+        class=\"gray\">Kandivali (Mumbai)</p>\r\n\t\t</div></a> \r\n\t\t</li><li><a
+        href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/1-bedrooms-in-kandivali-mumbai-north-mumbai-north-maharashtra-660777.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\"><b class=\"webrupee\">Rs.</b>
+        10,000</b>\r\n\t\t\t<div class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dyimg2.realestateindia.com/prop_images/1123018/660777_1-small.jpeg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">1 BHK /
+        340 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">Rashmi Property Cons...</span></p>\r\n\t\t<p
+        class=\"gray\">Kandivali (Mumbai)</p>\r\n\t\t</div></a> \r\n\t\t</li><li><a
+        href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/3-bedrooms-in-goregaon-mumbai-north-maharashtra-495026.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\"><b class=\"webrupee\">Rs.</b>
+        80,000</b>\r\n\t\t\t<div class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dyimg1.realestateindia.com/prop_images/65524/495026_1-small.jpg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">3 BHK /
+        2300 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">Hitesh Estate Consul...</span></p>\r\n\t\t<p
+        class=\"gray\">Goregaon (Mumbai)</p>\r\n\t\t</div></a> \r\n\t\t</li><li><a
+        href=\"https://www.realestateindia.com/property-detail/residential-flats-apartments/rent/3-bedrooms-in-mumbai-maharashtra-508750.htm\">\r\n\t\t<figure
+        class=\"w180px h110px bgi m0a pr\"> <b class=\"sale_rent\"><b class=\"webrupee\">Rs.</b>
+        20,000</b>\r\n\t\t\t<div class=\"w180px h110px bgi bgs-cover\" style=\"background-image:url(https://dynamic.realestateindia.com/prop_images/404572/508750_1-small.jpg);\"></div>\r\n\t\t</figure>\r\n\t\t<div
+        class=\"ac-mb4px lh13em p10px bsbb pb7px\" style=\"min-height:110px;\">\r\n\t\t\t<p
+        class=\"black\">Flats & Apartments</p>\r\n\t\t\t<p class=\"gray\">3 BHK /
+        1098 Sq.ft.</p>\r\n\t\t<p>by <span class=\"blue b\">Bright Real Estate C...</span></p>\r\n\t\t<p
+        class=\"gray\">Mumbai (Maharashtra)</p>\r\n\t\t</div></a> \r\n\t\t</li>\t\t</ul>\r\n\t\t</li>\r\n\t\t\t</ul>\r\n\t<br/>\r\n\t</div>\r\n\t</div>\r\n\t</section>\r\n\t<section
+        class=\"pt30px mt25px mb0px pb30px\">\r\n<div class=\"fw\">\r\n\t<script type=\"text/javascript\">\r\n\tfunction
+        stopRKey(evt) {\r\n\t\tvar evt = (evt) ? evt : ((event) ? event : null);\r\n\t\tvar
+        node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);\r\n\t\tif
+        ((evt.keyCode == 13) && (node.type==\"text\"))  {return false;}\r\n\t}\r\n\t\r\n\tdocument.onkeypress
+        = stopRKey;\r\n\t$(document).ready(function() {\r\n\t\tvar action_url_location_preference=\"https://www.realestateindia.com/ajax/buylead_location_preference.php\";\r\n\t\t$(\"#Location\").tokenInput(action_url_location_preference,{\r\n\t\t\tpreventDuplicates:
+        true,\r\n\t\t\tresultsLimit : 15,\r\n\t\t\tallowFreeTagging:true,\r\n\t\t\tplaceholder:
+        \"Enter Your Locality (Max 5)\",\r\n\t\t\thintText: \"Type a Locality\",\r\n\t\t\ttheme:
+        \"facebook\"\r\n\t\t});\r\n\t});\r\n\t\r\n\tjQuery(function($){\r\n\t\t$(\"#req_category,
+        #country, #state\").select2();\r\n\t\t$(\"#listfor, #req_category_pg, #units,
+        #bedrooms, #price1, #price2, #member_type\").select2({minimumResultsForSearch:-1});\r\n\t})\r\n\t</script>\r\n\t<link
+        rel=\"stylesheet\" type=\"text/css\" href=\"https://static.realestateindia.com/rei/css/select2/select2.css\">\r\n\t<link
+        rel=\"stylesheet\" type=\"text/css\" href=\"https://static.realestateindia.com/rei/css/token-input.css\">\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/modernizr.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/select2/select2.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/tell_us_requirement.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/jquery.tokeninput.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/custom.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/mobile_verify_popup.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/propertylead_locality.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/ajax/ajax-dynamic-city-list.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/ajax/ajax.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/chk_trim.js\"></script>\r\n\t<script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/rei/js/fancybox/jquery.fancybox.js\"></script>\r\n\t\t<div>\r\n\t<br/>\r\n\t<div
+        class=\"m0a\" style=\"width:990px;\">\r\n\t<div class=\"bdr bgfff\" style=\"border-color:#ffa40d;\">\r\n\t<p
+        class=\"tac\" style=\"margin-top:-15px;\"><b class=\"icon-bell br5px p10px15px
+        xlarge white ts0\" style=\"background:#ffa40d;\"></b></p>\r\n\t<p class=\"tac
+        pt30px ffrc ts0 dif mb7px\" style=\"font-size:2.1em;\"> TELL US YOUR REQUIREMENT</p>\r\n\t<p
+        class=\"tac\">(Let us know your requirement and get matching properties in
+        your inbox.)</p>\r\n\t<div id=\"mobile_ver_thanks\">\r\n\t\t\t<style>\r\n\t\t/******************************Below
+        Styles Is For AJAX*******************************************/\r\n\t\t#ajax_listOfOptions{BORDER:
+        #ccc 1px solid; Z-INDEX: 100; OVERFLOW: auto; WIDTH:470px; COLOR: #000000;
+        BORDER-TOP:none; POSITION: absolute; MAX-HEIGHT: 250px; BACKGROUND-COLOR:
+        #fff;}\r\n\t\t#ajax_listOfOptions DIV {\r\n\t\t\tFONT-SIZE: 0.9em; CURSOR:
+        pointer; padding:3px 5px 3px 10px; border-bottom:dashed 1px #ccc;\r\n\t\t}\r\n\t\t#ajax_listOfOptions
+        .optionDivSelected {\r\n\t\t\tCOLOR: #fff; BACKGROUND-COLOR: #035e92\r\n\t\t}\r\n\t\t.errorbdr{border:
+        1px solid #f00 !important} \r\n\t\tdiv.token-input-dropdown-facebook  ul {\r\n\t\t
+        \   margin: 0;\r\n\t\t    padding: 0;\r\n\t\t    min-height:38px;\r\n\t\t
+        \   overflow-y:auto;\r\n\t\t    max-height: 125px;\r\n\t\t}\r\n\t\t\r\n\t\tul.token-input-list-facebook
+        { \r\n\t\t\twidth: 469px;\r\n\t\t\tmin-height:38px;\r\n\t\t\tpadding:0px !important;
+        \r\n\t\t\tborder: 1px solid #ccc;\r\n\t\t}\r\n\t\t</style>\r\n\t\t\t<form
+        name=\"tell_us_requirement\" id=\"tell_us_requirement\" method=\"post\" action=\"/property-detail.php\">\r\n\t<div
+        class=\"p10px mt10px\">\r\n\t\t<ul class=\"fo ac-fl ac-w50 ac-p7px ac-bsbb\">\r\n\t<li>\r\n\t<select
+        style=\"width:100%;\" onchange=\"return channgeRequirement(this.value);\"
+        name=\"listfor\" id=\"listfor\">\r\n\t<option value=\"1\" >Buy</option>\r\n\t<option
+        value=\"2\" >Rent</option>\r\n\t<option value=\"3\" >PG</option>\r\n\t</select>\r\n\t</li>\r\n\t<li>\r\n\t<span
+        id=\"reg_category_div\">\r\n\t<select style=\"width:100%;\" name=\"req_category\"
+        id=\"req_category\" onchange=\"return show_hide_bedroom(this.value);\">\r\n\t<option
+        value=\"\">Select Property Type</option>\r\n\t<optgroup label=\"Residential
+        Property\">\r\n\t\t\t<option value=\"5^8\" >Flats & Apartments</option>\r\n\t\t\t\t<option
+        value=\"5^9\" >Individual House/Home</option>\r\n\t\t\t\t<option value=\"5^10\"
+        >Society Housing</option>\r\n\t\t\t\t<option value=\"5^11\" >Builder Floor</option>\r\n\t\t\t\t<option
+        value=\"5^12\" >Farm House</option>\r\n\t\t\t\t<option value=\"5^13\" >Serviced
+        Apartments</option>\r\n\t\t\t\t<option value=\"5^25\" >Residential Land /
+        Plot</option>\r\n\t\t\t\t<option value=\"5^48\" >Bungalows / Villas</option>\r\n\t\t\t\t<option
+        value=\"5^54\" >Penthouses</option>\r\n\t\t\t\t<option value=\"5^55\" >Studio
+        Apartment</option>\r\n\t\t\t</optgroup> \r\n\t<optgroup label=\"Commercial
+        Property\">\r\n\t\t\t<option value=\"6^15\" >Commercial Shops</option>\r\n\t\t\t\t<option
+        value=\"6^16\" >Showrooms</option>\r\n\t\t\t\t<option value=\"6^17\" >Office
+        Space</option>\r\n\t\t\t\t<option value=\"6^38\" >Banquet Hall & Guest House</option>\r\n\t\t\t\t<option
+        value=\"6^23\" >Business Center</option>\r\n\t\t\t\t<option value=\"6^27\"
+        >Commercial Lands /Inst. Land</option>\r\n\t\t\t\t<option value=\"6^39\" >Hotel
+        & Restaurant</option>\r\n\t\t\t\t<option value=\"6^26\" >Agricultural/Farm
+        Land</option>\r\n\t\t\t\t<option value=\"6^28\" >Industrial Land / Plot</option>\r\n\t\t\t\t<option
+        value=\"6^41\" >Factory / Industrial Building</option>\r\n\t\t\t\t<option
+        value=\"6^40\" >Warehouse/Godown</option>\r\n\t\t\t</optgroup>\r\n\t</select>\r\n\t</span>\r\n\t\r\n\t<span
+        id=\"pg_category_div\" style=\"display:none;\">\r\n\t<select style=\"width:100%;\"
+        name=\"req_category_pg\" id=\"req_category_pg\" onchange=\"return hidebadroom(this.value);\">\r\n\t<option
+        value=\"\">Select Property Type</option>\r\n\t<optgroup label=\"Residential
+        Property\"> \r\n\t\t\t<option value=\"5^8\" >Flats & Apartments</option>\r\n\t\t\t\t<option
+        value=\"5^9\" >Individual House/Home</option>\r\n\t\t\t\t<option value=\"5^10\"
+        >Society Housing</option>\r\n\t\t\t\t<option value=\"5^11\" >Builder Floor</option>\r\n\t\t\t\t<option
+        value=\"5^12\" >Farm House</option>\r\n\t\t\t\t<option value=\"5^13\" >Serviced
+        Apartments</option>\r\n\t\t\t\t<option value=\"5^25\" >Residential Land /
+        Plot</option>\r\n\t\t\t\t<option value=\"5^48\" >Bungalows / Villas</option>\r\n\t\t\t\t<option
+        value=\"5^54\" >Penthouses</option>\r\n\t\t\t\t<option value=\"5^55\" >Studio
+        Apartment</option>\r\n\t\t\t</optgroup>\r\n\t</select>\r\n\t</span>\r\n\t</select>\r\n\t</li>\r\n\t<li>\r\n\t<div
+        id=\"Flats_Apartments\">\r\n\t<select style=\"width:100%;\" name=\"bedrooms\"
+        id=\"bedrooms\">\r\n\t<option value=\"\">Select Bedroom</option>\r\n\t\t\t<option
+        value=\"1\" >1 BHK</option>\r\n\t\t\t\t<option value=\"2\" >2 BHK</option>\r\n\t\t\t\t<option
+        value=\"3\" >3 BHK</option>\r\n\t\t\t\t<option value=\"4\" >4 BHK</option>\r\n\t\t\t\t<option
+        value=\"5\" >5 BHK</option>\r\n\t\t\t\t<option value=\"6\" >6 BHK</option>\r\n\t\t\t\t<option
+        value=\"7\" >7 BHK</option>\r\n\t\t\t\t<option value=\"8\" >8 BHK</option>\r\n\t\t\t\t<option
+        value=\"9\" >9 BHK</option>\r\n\t\t>\r\n\t</select>\r\n\t</div>\r\n\t<div
+        id=\"Min_Area_unit\" style=\"display:none;\"> \r\n\t<input type=\"text\" placeholder=\"Min
+        Area\" class=\"bdr p10px w65 bsbb ml5px\" style=\"height:38px;\" value=\"\"
+        onkeypress=\"return isNumberKey(event);\" name=\"min_area\" id=\"min_area\"
+        maxlength=\"8\" /> \r\n\t<select style=\"width:159px; float:left;\" name=\"units\"
+        id=\"units\">\r\n\t<option value=\"Sq. Feet\" selected>Sq. Feet</option>\r\n\t<option
+        value=\"Cent\">Cent</option>\r\n\t<option value=\"Sq. Yards\">Sq. Yards</option>\r\n\t<option
+        value=\"Ares\">Ares</option>\r\n\t<option value=\"Acre\">Acre</option>\r\n\t<option
+        value=\"Sq. Meter\">Sq. Meter</option>\r\n\t<option value=\"Bigha\">Bigha</option>\r\n\t<option
+        value=\"Hectares\">Hectares</option>\r\n\t<option value=\"Guntha\">Guntha</option>\r\n\t<option
+        value=\"Marla\">Marla</option>\r\n\t</select>\r\n\t</div>\r\n\t</li>\r\n\t\t<li>\r\n\t<select
+        style=\"width:49%;\" name=\"price1\" id=\"price1\" onchange=\"getMaxRangeBudget(this.value);\">\r\n\t<option
+        value=\"\">Min Budget</option>\r\n\t\t\t<option value=\"5\">5 Lacs</option>\r\n\t\t\t\t<option
+        value=\"10\">10 Lacs</option>\r\n\t\t\t\t<option value=\"15\">15 Lacs</option>\r\n\t\t\t\t<option
+        value=\"25\">25 Lacs</option>\r\n\t\t\t\t<option value=\"40\">40 Lacs</option>\r\n\t\t\t\t<option
+        value=\"60\">60 Lacs</option>\r\n\t\t\t\t<option value=\"100\">1 crore</option>\r\n\t\t\t\t<option
+        value=\"150\">1.5 crore</option>\r\n\t\t\t\t<option value=\"200\">2 crores</option>\r\n\t\t\t\t<option
+        value=\"250\">2.5 crores</option>\r\n\t\t\t\t<option value=\"500\">5 crores</option>\r\n\t\t\t\t<option
+        value=\"1000\">10 crores</option>\r\n\t\t\t\t<option value=\"1500\">15 crores</option>\r\n\t\t\t\t<option
+        value=\"2000\">20 crores</option>\r\n\t\t\t\t<option value=\"2500\">25 crores</option>\r\n\t\t\t\t<option
+        value=\"3000\">30 crores</option>\r\n\t\t\t\t<option value=\"3500\">35 crores</option>\r\n\t\t\t\t<option
+        value=\"4000\">40 crores</option>\r\n\t\t\t\t<option value=\"4500\">45 crores</option>\r\n\t\t\t\t<option
+        value=\"5000\">50 crores</option>\r\n\t\t\t\t<option value=\"5500\">55 crores</option>\r\n\t\t\t\t<option
+        value=\"6000\">60 crores</option>\r\n\t\t\t\t<option value=\"6500\">65 crores</option>\r\n\t\t\t\t<option
+        value=\"7000\">70 crores</option>\r\n\t\t\t\t<option value=\"7500\">75 crores</option>\r\n\t\t\t\t<option
+        value=\"8000\">80 crores</option>\r\n\t\t\t\t<option value=\"8500\">85 crores</option>\r\n\t\t\t\t<option
+        value=\"9000\">90 crores</option>\r\n\t\t\t\t<option value=\"9500\">95 crores</option>\r\n\t\t\t\t<option
+        value=\"10000\">100 crores</option>\r\n\t\t\t\t<option value=\"999999\">100+
+        crores</option>\r\n\t\t\t</select>\r\n\t<select style=\"width:49%; float:right;\"
+        name=\"price2\" id=\"price2\" onchange=\"set_min_budget(this.value);\">\r\n\t<option
+        value=\"\">Max Budget</option>\r\n\t</select>\r\n\t</li>\r\n\t<li>\r\n\t<input
+        type=\"text\" class=\"bdr p10px w100 bsbb\" name=\"cityname_req\" id=\"cityname_req\"
+        onkeyup=\"search_buyerlead_city(this, 'getCountriesByLetters', event)\" onblur=\"disp_locality('https://www.realestateindia.com/ajax/buylead_locality.php',
+        this.value)\" autocomplete=\"off\" value=\"\" placeholder=\"Enter your City\"/>\r\n\t<input
+        type=\"hidden\" name=\"cityname_req_hidden\" id=\"cityname_req_hidden\" value=\"\">\r\n\t</li>\r\n\t<li
+        id=\"locality_disp\" style=\"display:none\">\r\n\t<input type=\"text\" class=\"bdr
+        p10px w100 bsbb\" name=\"search_city[]\" id=\"Location\" onKeyPress=\"return
+        disableEnterKey(event)\" placeholder=\"Enter Your Locality (Max 5)\"/>\r\n\t</li>\r\n\t\t\t<li>\r\n\t\t<input
+        type=\"text\" class=\"bdr p10px w100 bsbb\" name=\"email\" id=\"email\"  value=\"\"
+        onblur=\"if(this.value!='') { checkExistingUserPostRequirement('https://www.realestateindia.com',this.value);
+        }\" maxlength=\"70\" placeholder=\"Enter your Email ID\"/>\r\n\t\t<span id=\"loading_proc\"></span>\r\n\t\t</li>\r\n\t\t<li>\r\n\t\t<input
+        type=\"text\" class=\"bdr p10px w100 bsbb\" name=\"fname\" id=\"fname\" onKeyPress=\"return
+        disableEnterKey(event)\" value=\"\" maxlength=\"50\" placeholder=\"Enter your
+        name\"/>\r\n\t\t</li>\r\n\t\t<li>\r\n\t\t<select style=\"width:44%;margin-top:-4px;\"
+        name=\"country\" id=\"country\" onchange=\"setMobileMaxLenValue(this.value);\">\r\n\t\t<option
+        value=\"\">Select Country</option>\r\n\t\t\t\t\t<option value=\"AF^+93\" >AFG
+        (+93)</option>\r\n\t\t\t\t\t\t<option value=\"AL^+335\" >ALB (+335)</option>\r\n\t\t\t\t\t\t<option
+        value=\"DZ^+213\" >DZA (+213)</option>\r\n\t\t\t\t\t\t<option value=\"AS^+684\"
+        >ASM (+684)</option>\r\n\t\t\t\t\t\t<option value=\"AD^+376\" >AND (+376)</option>\r\n\t\t\t\t\t\t<option
+        value=\"AO^+244\" >AGO (+244)</option>\r\n\t\t\t\t\t\t<option value=\"AI^+264\"
+        >NAM (+264)</option>\r\n\t\t\t\t\t\t<option value=\"AQ^+672\" >NFK (+672)</option>\r\n\t\t\t\t\t\t<option
+        value=\"AG^+268\" >SWZ (+268)</option>\r\n\t\t\t\t\t\t<option value=\"AR^+54\"
+        >ARG (+54)</option>\r\n\t\t\t\t\t\t<option value=\"AM^+374\" >ARM (+374)</option>\r\n\t\t\t\t\t\t<option
+        value=\"AW^+297\" >ABW (+297)</option>\r\n\t\t\t\t\t\t<option value=\"AU^+61\"
+        >CCK (+61)</option>\r\n\t\t\t\t\t\t<option value=\"AT^+43\" >AUT (+43)</option>\r\n\t\t\t\t\t\t<option
+        value=\"AZ^+994\" >AZE (+994)</option>\r\n\t\t\t\t\t\t<option value=\"BS^+242\"
+        >COG (+242)</option>\r\n\t\t\t\t\t\t<option value=\"BH^+973\" >BHR (+973)</option>\r\n\t\t\t\t\t\t<option
+        value=\"BD^+880\" >BGD (+880)</option>\r\n\t\t\t\t\t\t<option value=\"BB^+246\"
+        >BRB (+246)</option>\r\n\t\t\t\t\t\t<option value=\"BY^+375\" >BLR (+375)</option>\r\n\t\t\t\t\t\t<option
+        value=\"BE^+32\" >BEL (+32)</option>\r\n\t\t\t\t\t\t<option value=\"BZ^+501\"
+        >BLZ (+501)</option>\r\n\t\t\t\t\t\t<option value=\"BJ^+229\" >BEN (+229)</option>\r\n\t\t\t\t\t\t<option
+        value=\"BM^+441\" >BMU (+441)</option>\r\n\t\t\t\t\t\t<option value=\"BT^+975\"
+        >BTN (+975)</option>\r\n\t\t\t\t\t\t<option value=\"BO^+591\" >BOL (+591)</option>\r\n\t\t\t\t\t\t<option
+        value=\"BA^+387\" >BIH (+387)</option>\r\n\t\t\t\t\t\t<option value=\"BW^+267\"
+        >BWA (+267)</option>\r\n\t\t\t\t\t\t<option value=\"BV^+47\" >NOR (+47)</option>\r\n\t\t\t\t\t\t<option
+        value=\"BR^+55\" >BRA (+55)</option>\r\n\t\t\t\t\t\t<option value=\"IO^+246\"
+        >IOT (+246)</option>\r\n\t\t\t\t\t\t<option value=\"BN^+673\" >BRN (+673)</option>\r\n\t\t\t\t\t\t<option
+        value=\"BG^+359\" >BGR (+359)</option>\r\n\t\t\t\t\t\t<option value=\"BF^+226\"
+        >BFA (+226)</option>\r\n\t\t\t\t\t\t<option value=\"BI^+257\" >BDI (+257)</option>\r\n\t\t\t\t\t\t<option
+        value=\"KH^+855\" >KHM (+855)</option>\r\n\t\t\t\t\t\t<option value=\"CM^+237\"
+        >CMR (+237)</option>\r\n\t\t\t\t\t\t<option value=\"CA^+1\" >PRI (+1)</option>\r\n\t\t\t\t\t\t<option
+        value=\"CV^+238\" >CPV (+238)</option>\r\n\t\t\t\t\t\t<option value=\"KY^+345\"
+        >CYM (+345)</option>\r\n\t\t\t\t\t\t<option value=\"CF^+236\" >CAF (+236)</option>\r\n\t\t\t\t\t\t<option
+        value=\"TD^+235\" >TCD (+235)</option>\r\n\t\t\t\t\t\t<option value=\"CL^+56\"
+        >CHL (+56)</option>\r\n\t\t\t\t\t\t<option value=\"CN^+86\" >CHN (+86)</option>\r\n\t\t\t\t\t\t<option
+        value=\"CX^+61\" >CCK (+61)</option>\r\n\t\t\t\t\t\t<option value=\"CC^+61\"
+        >CCK (+61)</option>\r\n\t\t\t\t\t\t<option value=\"CO^+57\" >COL (+57)</option>\r\n\t\t\t\t\t\t<option
+        value=\"KM^+269\" >COM (+269)</option>\r\n\t\t\t\t\t\t<option value=\"CG^+242\"
+        >COG (+242)</option>\r\n\t\t\t\t\t\t<option value=\"ZR^+243\" >COD (+243)</option>\r\n\t\t\t\t\t\t<option
+        value=\"CK^+682\" >COK (+682)</option>\r\n\t\t\t\t\t\t<option value=\"CR^+506\"
+        >CRC (+506)</option>\r\n\t\t\t\t\t\t<option value=\"CI^+225\" >CIV (+225)</option>\r\n\t\t\t\t\t\t<option
+        value=\"HR^+385\" >HRV (+385)</option>\r\n\t\t\t\t\t\t<option value=\"CU^+53\"
+        >CUB (+53)</option>\r\n\t\t\t\t\t\t<option value=\"CY^+357\" >CYP (+357)</option>\r\n\t\t\t\t\t\t<option
+        value=\"CZ^+420\" >CZE (+420)</option>\r\n\t\t\t\t\t\t<option value=\"DK^+45\"
+        >DNK (+45)</option>\r\n\t\t\t\t\t\t<option value=\"DJ^+253\" >DJI (+253)</option>\r\n\t\t\t\t\t\t<option
+        value=\"DM^+767\" >DMA (+767)</option>\r\n\t\t\t\t\t\t<option value=\"DO^+809\"
+        >DOM (+809)</option>\r\n\t\t\t\t\t\t<option value=\"TP^+670\" >TLS (+670)</option>\r\n\t\t\t\t\t\t<option
+        value=\"EC^+593\" >ECU (+593)</option>\r\n\t\t\t\t\t\t<option value=\"EG^+20\"
+        >EGY (+20)</option>\r\n\t\t\t\t\t\t<option value=\"SV^+503\" >SLV (+503)</option>\r\n\t\t\t\t\t\t<option
+        value=\"GQ^+240\" >GNQ (+240)</option>\r\n\t\t\t\t\t\t<option value=\"ER^+291\"
+        >ERI (+291)</option>\r\n\t\t\t\t\t\t<option value=\"EE^+372\" >EST (+372)</option>\r\n\t\t\t\t\t\t<option
+        value=\"ET^+251\" >ETH (+251)</option>\r\n\t\t\t\t\t\t<option value=\"FK^+500\"
+        >FLK (+500)</option>\r\n\t\t\t\t\t\t<option value=\"FO^+298\" >FRO (+298)</option>\r\n\t\t\t\t\t\t<option
+        value=\"FJ^+679\" >FJI (+679)</option>\r\n\t\t\t\t\t\t<option value=\"FI^+358\"
+        >FIN (+358)</option>\r\n\t\t\t\t\t\t<option value=\"FR^+33\" >FRA (+33)</option>\r\n\t\t\t\t\t\t<option
+        value=\"FX^+590\" >BLM (+590)</option>\r\n\t\t\t\t\t\t<option value=\"GF^+594\"
+        >GUF (+594)</option>\r\n\t\t\t\t\t\t<option value=\"PF^+689\" >PYF (+689)</option>\r\n\t\t\t\t\t\t<option
+        value=\"TF^+590\" >BLM (+590)</option>\r\n\t\t\t\t\t\t<option value=\"GA^+241\"
+        >GAB (+241)</option>\r\n\t\t\t\t\t\t<option value=\"GM^+220\" >GMB (+220)</option>\r\n\t\t\t\t\t\t<option
+        value=\"GE^+995\" >GEO (+995)</option>\r\n\t\t\t\t\t\t<option value=\"DE^+49\"
+        >DEU (+49)</option>\r\n\t\t\t\t\t\t<option value=\"GH^+233\" >GHA (+233)</option>\r\n\t\t\t\t\t\t<option
+        value=\"GI^+350\" >GIB (+350)</option>\r\n\t\t\t\t\t\t<option value=\"GR^+30\"
+        >GRC (+30)</option>\r\n\t\t\t\t\t\t<option value=\"GL^+299\" >GRL (+299)</option>\r\n\t\t\t\t\t\t<option
+        value=\"GD^+809\" >GRD (+809)</option>\r\n\t\t\t\t\t\t<option value=\"GP^+590\"
+        >BLM (+590)</option>\r\n\t\t\t\t\t\t<option value=\"GU^+1\" >PRI (+1)</option>\r\n\t\t\t\t\t\t<option
+        value=\"GT^+502\" >GTM (+502)</option>\r\n\t\t\t\t\t\t<option value=\"GN^+224\"
+        >GIN (+224)</option>\r\n\t\t\t\t\t\t<option value=\"GW^+245\" >GNB (+245)</option>\r\n\t\t\t\t\t\t<option
+        value=\"GY^+592\" >GUY (+592)</option>\r\n\t\t\t\t\t\t<option value=\"HT^+509\"
+        >HTI (+509)</option>\r\n\t\t\t\t\t\t<option value=\"HM^+61\" >CCK (+61)</option>\r\n\t\t\t\t\t\t<option
+        value=\"HN^+504\" >HND (+504)</option>\r\n\t\t\t\t\t\t<option value=\"HK^+852\"
+        >HKG (+852)</option>\r\n\t\t\t\t\t\t<option value=\"HU^+36\" >HUN (+36)</option>\r\n\t\t\t\t\t\t<option
+        value=\"IS^+354\" >IS (+354)</option>\r\n\t\t\t\t\t\t<option value=\"IN^+91\"
+        selected>IND (+91)</option>\r\n\t\t\t\t\t\t<option value=\"ID^+62\" >IDN (+62)</option>\r\n\t\t\t\t\t\t<option
+        value=\"IR^+98\" >IRN (+98)</option>\r\n\t\t\t\t\t\t<option value=\"IQ^+964\"
+        >IRQ (+964)</option>\r\n\t\t\t\t\t\t<option value=\"IE^+353\" >IRL (+353)</option>\r\n\t\t\t\t\t\t<option
+        value=\"IL^+972\" >ISR (+972)</option>\r\n\t\t\t\t\t\t<option value=\"IT^+39\"
+        >ITA (+39)</option>\r\n\t\t\t\t\t\t<option value=\"JM^+876\" >JAM (+876)</option>\r\n\t\t\t\t\t\t<option
+        value=\"JP^+81\" >JPN (+81)</option>\r\n\t\t\t\t\t\t<option value=\"JO^+962\"
+        >JOR (+962)</option>\r\n\t\t\t\t\t\t<option value=\"KZ^+7\" >RUS (+7)</option>\r\n\t\t\t\t\t\t<option
+        value=\"KE^+254\" >KEN (+254)</option>\r\n\t\t\t\t\t\t<option value=\"KI^+686\"
+        >KIR (+686)</option>\r\n\t\t\t\t\t\t<option value=\"KW^+965\" >KWT (+965)</option>\r\n\t\t\t\t\t\t<option
+        value=\"KG^+7\" >RUS (+7)</option>\r\n\t\t\t\t\t\t<option value=\"LA^+856\"
+        >LAO (+856)</option>\r\n\t\t\t\t\t\t<option value=\"LV^+371\" >LVA (+371)</option>\r\n\t\t\t\t\t\t<option
+        value=\"LB^+961\" >LBN (+961)</option>\r\n\t\t\t\t\t\t<option value=\"LS^+266\"
+        >LSO (+266)</option>\r\n\t\t\t\t\t\t<option value=\"LR^+231\" >LBR (+231)</option>\r\n\t\t\t\t\t\t<option
+        value=\"LY^+218\" >LBY (+218)</option>\r\n\t\t\t\t\t\t<option value=\"LI^+423\"
+        >LIE (+423)</option>\r\n\t\t\t\t\t\t<option value=\"LT^+370\" >LTU (+370)</option>\r\n\t\t\t\t\t\t<option
+        value=\"LU^+352\" >LUX (+352)</option>\r\n\t\t\t\t\t\t<option value=\"MO^+853\"
+        >MAC (+853)</option>\r\n\t\t\t\t\t\t<option value=\"MK^+389\" >MKD (+389)</option>\r\n\t\t\t\t\t\t<option
+        value=\"MG^+261\" >MDG (+261)</option>\r\n\t\t\t\t\t\t<option value=\"MW^+265\"
+        >MWI (+265)</option>\r\n\t\t\t\t\t\t<option value=\"MY^+60\" >MYS (+60)</option>\r\n\t\t\t\t\t\t<option
+        value=\"MV^+960\" >MDV (+960)</option>\r\n\t\t\t\t\t\t<option value=\"ML^+223\"
+        >MLI (+223)</option>\r\n\t\t\t\t\t\t<option value=\"MT^+356\" >MLT (+356)</option>\r\n\t\t\t\t\t\t<option
+        value=\"MH^+692\" >MHL (+692)</option>\r\n\t\t\t\t\t\t<option value=\"MQ^+596\"
+        >MTQ (+596)</option>\r\n\t\t\t\t\t\t<option value=\"MR^+222\" >MRT (+222)</option>\r\n\t\t\t\t\t\t<option
+        value=\"MU^+230\" >MUS (+230)</option>\r\n\t\t\t\t\t\t<option value=\"YT^+269\"
+        >COM (+269)</option>\r\n\t\t\t\t\t\t<option value=\"MX^+52\" >MEX (+52)</option>\r\n\t\t\t\t\t\t<option
+        value=\"FM^+691\" >FSM (+691)</option>\r\n\t\t\t\t\t\t<option value=\"MD^+373\"
+        >MDA (+373)</option>\r\n\t\t\t\t\t\t<option value=\"MC^+377\" >MCO (+377)</option>\r\n\t\t\t\t\t\t<option
+        value=\"MN^+976\" >MNG (+976)</option>\r\n\t\t\t\t\t\t<option value=\"ME^+382\"
+        >MNE (+382)</option>\r\n\t\t\t\t\t\t<option value=\"MS^+664\" >MSR (+664)</option>\r\n\t\t\t\t\t\t<option
+        value=\"MA^+212\" >MAR (+212)</option>\r\n\t\t\t\t\t\t<option value=\"MZ^+258\"
+        >MOZ (+258)</option>\r\n\t\t\t\t\t\t<option value=\"MM^+95\" >MMR (+95)</option>\r\n\t\t\t\t\t\t<option
+        value=\"NA^+264\" >NAM (+264)</option>\r\n\t\t\t\t\t\t<option value=\"NR^+674\"
+        >NRU (+674)</option>\r\n\t\t\t\t\t\t<option value=\"NP^+977\" >NPL (+977)</option>\r\n\t\t\t\t\t\t<option
+        value=\"NL^+31\" >NLD (+31)</option>\r\n\t\t\t\t\t\t<option value=\"AN^+599\"
+        >ANT (+599)</option>\r\n\t\t\t\t\t\t<option value=\"NC^+687\" >NCL (+687)</option>\r\n\t\t\t\t\t\t<option
+        value=\"NZ^+64\" >NZL (+64)</option>\r\n\t\t\t\t\t\t<option value=\"NI^+505\"
+        >NIC (+505)</option>\r\n\t\t\t\t\t\t<option value=\"NE^+227\" >NER (+227)</option>\r\n\t\t\t\t\t\t<option
+        value=\"NG^+234\" >NGA (+234)</option>\r\n\t\t\t\t\t\t<option value=\"NU^+683\"
+        >NIU (+683)</option>\r\n\t\t\t\t\t\t<option value=\"NF^+672\" >NFK (+672)</option>\r\n\t\t\t\t\t\t<option
+        value=\"KP^+850\" >PRK (+850)</option>\r\n\t\t\t\t\t\t<option value=\"MP^+670\"
+        >TLS (+670)</option>\r\n\t\t\t\t\t\t<option value=\"NO^+47\" >NOR (+47)</option>\r\n\t\t\t\t\t\t<option
+        value=\"OM^+968\" >OMN (+968)</option>\r\n\t\t\t\t\t\t<option value=\"PK^+92\"
+        >PAK (+92)</option>\r\n\t\t\t\t\t\t<option value=\"PW^+680\" >PLW (+680)</option>\r\n\t\t\t\t\t\t<option
+        value=\"PA^+507\" >PAN (+507)</option>\r\n\t\t\t\t\t\t<option value=\"PG^+675\"
+        >PNG (+675)</option>\r\n\t\t\t\t\t\t<option value=\"PY^+595\" >PRY (+595)</option>\r\n\t\t\t\t\t\t<option
+        value=\"PE^+51\" >PER (+51)</option>\r\n\t\t\t\t\t\t<option value=\"PH^+63\"
+        >PHL (+63)</option>\r\n\t\t\t\t\t\t<option value=\"PN^+872\" >PCN (+872)</option>\r\n\t\t\t\t\t\t<option
+        value=\"PL^+48\" >POL (+48)</option>\r\n\t\t\t\t\t\t<option value=\"PT^+351\"
+        >PRT (+351)</option>\r\n\t\t\t\t\t\t<option value=\"PR^+787\" >PRI (+787)</option>\r\n\t\t\t\t\t\t<option
+        value=\"QA^+974\" >QAT (+974)</option>\r\n\t\t\t\t\t\t<option value=\"RE^+262\"
+        >MYT (+262)</option>\r\n\t\t\t\t\t\t<option value=\"RO^+40\" >ROU (+40)</option>\r\n\t\t\t\t\t\t<option
+        value=\"RU^+7\" >RUS (+7)</option>\r\n\t\t\t\t\t\t<option value=\"RW^+250\"
+        >RWA (+250)</option>\r\n\t\t\t\t\t\t<option value=\"KN^+869\" >KNA (+869)</option>\r\n\t\t\t\t\t\t<option
+        value=\"LC^+758\" >LCA (+758)</option>\r\n\t\t\t\t\t\t<option value=\"VC^+784\"
+        >VCT (+784)</option>\r\n\t\t\t\t\t\t<option value=\"WS^+685\" >WSM (+685)</option>\r\n\t\t\t\t\t\t<option
+        value=\"SM^+378\" >SMR (+378)</option>\r\n\t\t\t\t\t\t<option value=\"ST^+239\"
+        >STP (+239)</option>\r\n\t\t\t\t\t\t<option value=\"SA^+966\" >SAU (+966)</option>\r\n\t\t\t\t\t\t<option
+        value=\"SN^+221\" >SEN (+221)</option>\r\n\t\t\t\t\t\t<option value=\"RS^+381\"
+        >SRB (+381)</option>\r\n\t\t\t\t\t\t<option value=\"SC^+248\" >SYC (+248)</option>\r\n\t\t\t\t\t\t<option
+        value=\"SL^+232\" >SLE (+232)</option>\r\n\t\t\t\t\t\t<option value=\"SG^+65\"
+        >SGP (+65)</option>\r\n\t\t\t\t\t\t<option value=\"SK^+421\" >SVK (+421)</option>\r\n\t\t\t\t\t\t<option
+        value=\"SI^+386\" >SVN (+386)</option>\r\n\t\t\t\t\t\t<option value=\"SB^+677\"
+        >SLB (+677)</option>\r\n\t\t\t\t\t\t<option value=\"SO^+252\" >SOM (+252)</option>\r\n\t\t\t\t\t\t<option
+        value=\"ZA^+27\" >ZAF (+27)</option>\r\n\t\t\t\t\t\t<option value=\"GS^+44\"
+        >IMN (+44)</option>\r\n\t\t\t\t\t\t<option value=\"KR^+82\" >KOR (+82)</option>\r\n\t\t\t\t\t\t<option
+        value=\"SS^+211\" >SSD (+211)</option>\r\n\t\t\t\t\t\t<option value=\"ES^+34\"
+        >ESP (+34)</option>\r\n\t\t\t\t\t\t<option value=\"LK^+94\" >LKA (+94)</option>\r\n\t\t\t\t\t\t<option
+        value=\"SH^+290\" >SHN (+290)</option>\r\n\t\t\t\t\t\t<option value=\"PM^+508\"
+        >SPM (+508)</option>\r\n\t\t\t\t\t\t<option value=\"SD^+249\" >SDN (+249)</option>\r\n\t\t\t\t\t\t<option
+        value=\"SR^+597\" >SUR (+597)</option>\r\n\t\t\t\t\t\t<option value=\"SJ^+47\"
+        >NOR (+47)</option>\r\n\t\t\t\t\t\t<option value=\"SZ^+268\" >SWZ (+268)</option>\r\n\t\t\t\t\t\t<option
+        value=\"SE^+46\" >SWE (+46)</option>\r\n\t\t\t\t\t\t<option value=\"CH^+41\"
+        >CHE (+41)</option>\r\n\t\t\t\t\t\t<option value=\"SY^+963\" >SYR (+963)</option>\r\n\t\t\t\t\t\t<option
+        value=\"TW^+886\" >TWN (+886)</option>\r\n\t\t\t\t\t\t<option value=\"TJ^+7\"
+        >RUS (+7)</option>\r\n\t\t\t\t\t\t<option value=\"TZ^+255\" >TZA (+255)</option>\r\n\t\t\t\t\t\t<option
+        value=\"TH^+66\" >THA (+66)</option>\r\n\t\t\t\t\t\t<option value=\"TG^+228\"
+        >TGO (+228)</option>\r\n\t\t\t\t\t\t<option value=\"TK^+64\" >NZL (+64)</option>\r\n\t\t\t\t\t\t<option
+        value=\"TO^+676\" >TON (+676)</option>\r\n\t\t\t\t\t\t<option value=\"TT^+868\"
+        >TTO (+868)</option>\r\n\t\t\t\t\t\t<option value=\"TN^+216\" >TUN (+216)</option>\r\n\t\t\t\t\t\t<option
+        value=\"TR^+90\" >TUR (+90)</option>\r\n\t\t\t\t\t\t<option value=\"TM^+993\"
+        >TKM (+993)</option>\r\n\t\t\t\t\t\t<option value=\"TC^+649\" >TCA (+649)</option>\r\n\t\t\t\t\t\t<option
+        value=\"TV^+688\" >TUV (+688)</option>\r\n\t\t\t\t\t\t<option value=\"UG^+256\"
+        >UGA (+256)</option>\r\n\t\t\t\t\t\t<option value=\"UA^+380\" >UKR (+380)</option>\r\n\t\t\t\t\t\t<option
+        value=\"AE^+971\" >ARE (+971)</option>\r\n\t\t\t\t\t\t<option value=\"GB^+44\"
+        >IMN (+44)</option>\r\n\t\t\t\t\t\t<option value=\"US^+1\" >PRI (+1)</option>\r\n\t\t\t\t\t\t<option
+        value=\"UM^+1\" >PRI (+1)</option>\r\n\t\t\t\t\t\t<option value=\"UY^+598\"
+        >URY (+598)</option>\r\n\t\t\t\t\t\t<option value=\"UZ^+998\" >UZB (+998)</option>\r\n\t\t\t\t\t\t<option
+        value=\"VU^+678\" >VUT (+678)</option>\r\n\t\t\t\t\t\t<option value=\"VA^+39\"
+        >ITA (+39)</option>\r\n\t\t\t\t\t\t<option value=\"VE^+58\" >VEN (+58)</option>\r\n\t\t\t\t\t\t<option
+        value=\"VN^+84\" >VNM (+84)</option>\r\n\t\t\t\t\t\t<option value=\"VG^+1\"
+        >PRI (+1)</option>\r\n\t\t\t\t\t\t<option value=\"VI^+1\" >PRI (+1)</option>\r\n\t\t\t\t\t\t<option
+        value=\"WF^+681\" >WLF (+681)</option>\r\n\t\t\t\t\t\t<option value=\"EH^+212\"
+        >MAR (+212)</option>\r\n\t\t\t\t\t\t<option value=\"YE^+967\" >YEM (+967)</option>\r\n\t\t\t\t\t\t<option
+        value=\"YU^+381\" >SRB (+381)</option>\r\n\t\t\t\t\t\t<option value=\"ZM^+260\"
+        >ZMB (+260)</option>\r\n\t\t\t\t\t\t<option value=\"ZW^+263\" >ZWE (+263)</option>\r\n\t\t\t\t\t</select>\r\n\t\t<input
+        type=\"text\" class=\"bdr p10px w50 bsbb\" name=\"mobile_phone\" id=\"mobile_phone\"
+        value=\"\" onkeypress=\"return isNumberKey(event);\" maxlength=\"10\" placeholder=\"Enter
+        your Mobile\"/>\r\n\t\t</li>\r\n\t\t<li>\r\n\t\t<select style=\"width:100%;\"
+        id=\"member_type\" name=\"member_type\">\r\n\t\t<option value=\"\">Select
+        Member Type</option>\r\n\t\t<option value=\"3\" >Agent</option>\r\n\t\t<option
+        value=\"4\" >Builder</option>\r\n\t\t<option value=\"1\" >Individual</option>\r\n\t\t</select>\r\n\t\t<input
+        type=\"hidden\" name=\"memberID\" id=\"memberID\" value=\"\">\r\n\t\t</li>\r\n\t\t\t</ul>\r\n\t<p
+        class=\"mt10px mb15px\">\r\n\t<span class=\"dn tac\" id=\"loading_proc_req\"></span>\r\n\t<input
+        type=\"hidden\" name=\"req_captcha_value\" id=\"req_captcha_value\" value=\"4881\"
+        >\r\n\t<input type=\"hidden\" name=\"member_id\" id=\"member_id\" value=\"\"
+        />\r\n\t<input type=\"hidden\" name=\"post_requirement\" id=\"post_requirement\"
+        value=\"1\" />\r\n\t<input type=\"hidden\" name=\"src_type\" id=\"src_type\"
+        value=\"7\" />\r\n\t<input type=\"hidden\" name=\"id\" value=\"\" />\r\n\t<button
+        class=\"white ffrc xxxlarge ts0 ttu bdr0 br3px p10px w300px db m0a tac darkbg3
+        darkbdr3 send_req\" type=\"button\" onclick=\"SubmitRequirement('#tell_us_requirement');\">Post
+        your Requirement </button>\r\n\t</p>\r\n\t</div>\r\n\t</form>\r\n\t</div>\r\n\t</div>\r\n\t</div>\r\n\t<br/>\r\n\t</div>\r\n\t</div>\r\n\t\t<div
+        class=\"fw pt30px\">\r\n\t\t<h2 class=\"bdrb xxxlarge mb10px pb5px bn mt20px\">Popular
+        Searches</h2> \r\n\t\t<ul class=\"w100 fo gray ac-pb7px ac-fl ac-w33\">\r\n\t\t<li><a
+        class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/office-space-for-rent.htm\"
+        title=\"Office Space for Rent in Mumbai\">Office Space for Rent in Mumbai</a></li><li><a
+        class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/flats-apartments-for-rent.htm\"
+        title=\"Flats for Rent in Mumbai\">Flats for Rent in Mumbai</a></li><li><a
+        class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/commercial-lands-for-rent.htm\"
+        title=\"Commercial Lands & Plots for Rent in Mumbai\">Commercial Lands & Plots
+        for Rent in Mumbai</a></li><li><a class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/hotel-restaurant-for-rent.htm\"
+        title=\"Hotel & Restaurant for Rent in Mumbai\">Hotel & Restaurant for Rent
+        in Mumbai</a></li><li><a class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/serviced-apartment-for-rent.htm\"
+        title=\"Serviced Apartments for Rent in Mumbai\">Serviced Apartments for Rent
+        in Mumbai</a></li><li><a class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/society-house-for-rent.htm\"
+        title=\"Society Housing for Rent in Mumbai\">Society Housing for Rent in Mumbai</a></li><li><a
+        class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-abhinav-nagar.htm\"
+        title=\"Property for Rent in Abhinav Nagar\">Property for Rent in Abhinav
+        Nagar</a></li><li><a class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-altamount-road.htm\"
+        title=\"Property for Rent in Altamount Road\">Property for Rent in Altamount
+        Road</a></li><li><a class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-ambarnath-mumbai.htm\"
+        title=\"Property for Rent in Ambarnath\">Property for Rent in Ambarnath</a></li><li><a
+        class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-amboli.htm\"
+        title=\"Property for Rent in Amboli\">Property for Rent in Amboli</a></li><li><a
+        class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-anand-nagar.htm\"
+        title=\"Property for Rent in Anand Nagar\">Property for Rent in Anand Nagar</a></li><li><a
+        class=\"blue\" href=\"https://www.realestateindia.com/mumbai-property/property-for-rent-in-andheri.htm\"
+        title=\"Property for Rent in Andheri\">Property for Rent in Andheri</a></li>\t\t</ul>
+        \r\n\t\t</div>\r\n\t\t</section>\r\n</div>\r\n\r\n<div class=\"phXid\" id=\"photonXid\"
+        style=\"display:none\">\r\n<div class=\"menuBg\">\r\n<ul class=\"photonTabs\">\r\n<li
+        id=\"pictures\" name=\"Photos\">Photos</li>\r\n<div class=\"tabLine\"></div>\r\n</ul>\r\n<i
+        id=\"phXidCross\" class=\"xidIcn photoCross\"></i>\r\n</div>\r\n<p class=\"cb\"></p>\r\n\r\n<div
+        class=\"imgViewPort\">\r\n\t<i class=\"xidIcn sLeft imgPrevNext\" id=\"phImgPrev\"></i>\r\n\t<div
+        id = \"photonBkgndImg\" style = \"display:none;margin: 0% auto;text-align:
+        center;\"><img src=\"\" class=\"bgfff bdr p10px\"></div>\r\n<div id=\"photonLoader\"
+        class=\"xidLoader\"></div>\r\n<div class=\"imgArea\"><!-- Image Container
+        -->\r\n<img class=\"xid_img_size bgfff bdr p10px\" src=\"https://static.realestateindia.com/images/i0.gif\"
+        style=\"display:none;\" height=\"\" width=\"\" alt=\"\" /></div> \r\n<iframe
+        class=\"xid_img_size\" id=\"xid_img_size\" scrolling=\"yes\" style=\"display:none;border:0px;\"
+        src=\"about:blank\"  wmode=\"transparent\" type=\"application/x-shockwave-flash\"></iframe>\r\n\r\n<!--
+        Zoom Box -->\r\n<div class=\"onImg bgfff btlr5px bblr5px\">\r\n<div title=\"Zoom
+        In\" id=\"phXidzoomIn\" class=\"xidIcn bgIcn\"><i class=\"xidIcn zIn\"></i></div>\r\n<div
+        title=\"Zoom Out\" id=\"phXidzoomOut\" class=\"xidIcn bgIcn mt5\"><i class=\"xidIcn
+        zOut\"></i></div>\r\n<div title=\"Reset Image\" id=\"phXidreset\" class=\"xidIcn
+        bgIcn mt5\"><i class=\"xidIcn reset\"></i></div>\r\n</div>\r\n<!-- Zoom Box
+        Ends -->\r\n\t<i class=\"xidIcn sRight imgPrevNext\" id=\"phImgNext\"></i>\r\n\t</div>\r\n\r\n<p
+        class=\"cb\"></p>\r\n<div class=\"slideBar\">\r\n<div class=\"photoCaption\"><!--
+        Photo Caption Container -->\r\n<span id=\"phImgNum\" class=\"ml10 lf\">Photos
+        1 of 1</span> <span id=\"phImgLabel\">Photo</span>\r\n</div>\r\n<div class=\"rel
+        thumbsWrpr\"><!-- Thumbnail Container -->\r\n<div class=\"filmStrip\">\r\n<ul
+        class=\"imgSlider\">\r\n\t\t<li class=\"iUnsel\" rel=\"0\" attr=\"pictures\"><img
+        src=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_6.jpg\"
+        data=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_6.jpg\"
+        alt=\"Elevation\" width=\"\" height=\"\" /></li>\r\n\t\t\t\t<li class=\"iUnsel\"
+        rel=\"1\" attr=\"pictures\"><img src=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_2.jpg\"
+        data=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_2.jpg\"
+        alt=\"Elevation\" width=\"\" height=\"\" /></li>\r\n\t\t\t\t<li class=\"iUnsel\"
+        rel=\"2\" attr=\"pictures\"><img src=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_4.jpg\"
+        data=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_4.jpg\"
+        alt=\"Elevation\" width=\"\" height=\"\" /></li>\r\n\t\t\t\t<li class=\"iUnsel\"
+        rel=\"3\" attr=\"pictures\"><img src=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_5.jpg\"
+        data=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_5.jpg\"
+        alt=\"Elevation\" width=\"\" height=\"\" /></li>\r\n\t\t\t\t<li class=\"iUnsel\"
+        rel=\"4\" attr=\"pictures\"><img src=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_7.jpg\"
+        data=\"https://dyimg2.realestateindia.com/prop_images/21437/712907_7.jpg\"
+        alt=\"Elevation\" width=\"\" height=\"\" /></li>\r\n\t\t</ul>\r\n</div> \r\n</div>
+        \r\n</div>\r\n</div>\r\n<script src=\"https://static.realestateindia.com/rei/js/jquery.lazyload.js\"></script>
+        \r\n<style>\r\ndiv.features{opacity:0.4;}\r\ndiv.features i span{display:none;}\r\narticle:hover
+        .features{opacity:0.8;}\r\n</style>\r\n\r\n<script>$('article.pr_list').live('click',function(){var
+        dg=$(this).data('url'); $(this).append('<a class=\"ps_c\" href=\"'+dg+'\"
+        target=\"_blank\" />'); $('a.ps_c',this)[0].click(); $('.ps_c',this).remove();})\r\n$('article
+        a,article input').live('click',function(e){e.stopPropagation();}) </script>\r\n<div
+        id=\"popup_rei\">\r\n</div>\r\n<div id=\"requestCall\">\r\n\t<p id=\"requestCallButton\"
+        class=\"w90px h90px\"><a href=\"javascript:void(0);\" onclick=\"jQuery('#requestCallButton').hide();$('#requestCallFormNewUser').slideDown();\"><img
+        src=\"https://static.realestateindia.com/images/request_a_call_fixed.gif\"
+        width=\"\" height=\"\" alt=\"Request a call\" /></a></p>\r\n\t<div class=\"br5px\"
+        id=\"requestCallFormNewUser\" style=\"display:none;\">\r\n\t<form method=\"post\"
+        name=\"request_call_form\" id =\"request_call_form\" action=\"https://www.realestateindia.com/advertise/request_call_inquiry.php\"
+        onsubmit=\"return request_call_valid(this);\">\r\n<span id=\"main_req_id_container\"></span>\r\n\r\n\t<p
+        style=\"padding-top:5px;\"><button type=\"submit\" class=\"b\">Submit <i class=\"icon-ok
+        ml2px\"></i></button><button type=\"button\" class=\"b\" onclick=\"jQuery('#requestCallFormNewUser,
+        #requestCallFormExistingMember').slideUp(); $('#requestCallButton').show();\">Cancel
+        <i class=\"icon-remove ml2px\"></i></button></p>\r\n\t</form>\r\n</div>\r\n</div>\r\n<footer
+        class=\"bgf7f7f7 bdrt\"> \r\n\r\n\t<div class=\"fw fo pt7px\">\r\n\t<ul class=\"fr
+        fo ac-fl ac-mr10px mt7px\">\r\n\t<li><a href=\"https://www.facebook.com/realestateindiacom\"
+        title=\"Follow Us on Facebook\" class=\"si facebook-icon\" rel=\"nofollow\"
+        target=\"_blank\"></a></li>\r\n\t<li><a href=\"https://www.realestateindia.com/blog/\"
+        title=\"View RealEstateIndia Blog\" class=\"si blogger-icon\" rel=\"nofollow\"
+        target=\"_blank\"></a></li>\r\n\t<li><a href=\"https://plus.google.com/+realestateindiacom\"
+        title=\"Follow Us on Google+\" class=\"si googleplus-icon\" rel=\"nofollow\"
+        target=\"_blank\"></a></li>\r\n\t<li><a href=\"https://www.pinterest.com/indianproperty/\"
+        title=\"RealEstateIndia on Pinterest\" class=\"si pinterest-icon\" rel=\"nofollow\"
+        target=\"_blank\"></a></li>\r\n\t<li><a href=\"https://twitter.com/propertydir\"
+        title=\"Follow Us on Twitter\" class=\"si twitter-icon\" rel=\"nofollow\"
+        target=\"_blank\"></a></li>\r\n\t<li><a href=\"https://www.youtube.com/user/Realestateindiacom\"
+        title=\"Subscribe RealEstateIndia on YouTube\" class=\"si youtube-icon\" rel=\"nofollow\"
+        target=\"_blank\"></a></li>\r\n\t</ul>\r\n\t\r\n\t<ul class=\"fl fo ac-fl
+        ac-mr10px\">\r\n\t<li class=\"xxlarge pt7px\">Download Mobile App : </li>\r\n\t<li><a
+        href=\"https://play.google.com/store/apps/details?id=com.realestateindia.com&hl=en\"
+        title=\"Google Play\" target=\"_blank\" rel=\"nofollow\"><img src=\"https://static.realestateindia.com/rei/images/google-play-store-small.png\"
+        alt=\"Google Play\" title=\"Google Play\" target=\"_blank\" rel=\"nofollow\"
+        /></a></li>\r\n\t<li><a href=\"https://itunes.apple.com/us/app/realestateindia/id1107497296?ls=1&mt=8\"
+        title=\"Apple Store\" target=\"_blank\" rel=\"nofollow\"><img src=\"https://static.realestateindia.com/rei/images/ios-app-store-small.png\"
+        alt=\"Apple Store\" title=\"Apple Store\" /></a></li>\r\n\t</ul>\r\n\t\r\n\t</div>\r\n\t\r\n<div
+        class=\"bg333 pt20px pb20px\">\r\n<div class=\"fw\">\r\n<ul class=\"fo ac-fl
+        fc-pl0 fc-mlo ac-ml10px ac-pl10px small uo ffos dul ts0\" style=\"line-height:1.9em;\">\r\n<li
+        class=\"w130px bdrr bdr777 dashed\"> <b class=\"b white large mb5px db\">General
+        Links</b>\r\n<ul>\r\n<li><a href=\"https://www.realestateindia.com\" title=\"Home\">Home</a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/aboutus.htm\" title=\"About Us\">About
+        Us</a></li>\r\n<li><a href=\"https://www.realestateindia.com/contactus.htm\"
+        title=\"Contact Us\">Contact Us</a></li>\r\n<li><a href=\"https://www.realestateindia.com/feedback.htm\"
+        title=\"Feedback\">Feedback</a></li>\r\n<li><a href=\"https://www.realestateindia.com/complaint.htm\"
+        title=\"Complaints\">Complaints</a></li>\r\n<li><a href=\"https://www.realestateindia.com/terms-conditions.htm\"
+        title=\"Terms & Conditions\">Terms &amp; Conditions</a></li>\r\n<li><a href=\"https://www.realestateindia.com/testimonials.htm\"
+        title=\"Testimonials\">Testimonials</a></li>\r\n<li><a href=\"https://www.realestateindia.com/sitemap.htm\"
+        title=\"Site Map\">Sitemap</a></li>\r\n</ul>\r\n</li>\r\n<li class=\"w300px
+        bdrr bdr777 dashed\"> <b class=\"b white large mb5px db\">Real Estate Links</b>\r\n<ul
+        class=\"ac-fl ac-w50\">\r\n<li><a href=\"https://www.realestateindia.com/download-mobile-apps.htm\"
+        title=\"Download Mobile Apps\">Download Mobile Apps</a></li>\r\n<li><a href=\"https://www.realestateindia.com/projects/\"
+        title=\"New Projects\">New Projects</a></li>\r\n<li><a href=\"https://www.realestateindia.com/property-lead/\"
+        title=\"Property Leads\">Property Leads</a></li>\r\n<li><a href=\"https://www.realestateindia.com/services/realestate-agent.htm\"
+        title=\"Real Estate Agents\">Real Estate Agents</a></li>\r\n<li><a href=\"https://www.realestateindia.com/services/\"
+        title=\"Real Estate Serivces\">Real Estate Serivces</a></li>\r\n<li><a href=\"https://www.realestateindia.com/post-project.php\"
+        title=\"Post Your Project\">Post Your Project</a></li>\r\n<li><a href=\"https://www.realestateindia.com/faq.htm\"
+        title=\"FAQ\">FAQ</a></li>\r\n<li><a href=\"https://www.realestateindia.com/registration.php\"
+        title=\"Register With Us\">Register With Us</a></li>\r\n<li><a href=\"https://www.realestateindia.com/property-for-sale/\"
+        title=\"Property for Sale\">Property for Sale</a></li>\r\n<li><a href=\"https://www.realestateindia.com/property-for-rent/\"
+        title=\"Property for Rent\">Property for Rent</a></li>\r\n<li><a href=\"https://www.realestateindia.com/services/builders.htm\"
+        title=\"Builders in India\">Builders in India</a></li>\r\n<li><a href=\"https://www.realestateindia.com/buy/requirement.php\"
+        title=\"Post Your Requirement\">Post Your Requirement</a></li>\r\n<li><a href=\"https://www.realestateindia.com/post-property-for-sale-rent.php\"
+        title=\"Post Your Property Free\">Post Your Property Free </a></li>\r\n<li><a
+        href=\"https://www.realestateindia.com/advertise/\" title=\"Advertise With
+        Us\">Advertise With Us</a></li>\r\n</ul>\r\n</li>\r\n<li class=\"w300px bdrr
+        bdr777 dashed\"> <b class=\"b white large mb5px db\">Property in India</b>\r\n<ul
+        class=\"ac-fl ac-w50\">\r\n<li><a href=\"https://www.realestateindia.com/delhi-property/property-for-sale.htm\">Porperty
+        in New Delhi</a></li>\r\n<li><a href=\"https://www.realestateindia.com/mumbai-property/property-for-sale.htm\">Porperty
+        in Mumbai</a></li>\r\n<li><a href=\"https://www.realestateindia.com/gurgaon-property/property-for-sale.htm\">Porperty
+        in Gurgaon</a></li>\r\n<li><a href=\"https://www.realestateindia.com/noida-property/property-for-sale.htm\">Porperty
+        in Noida</a></li>\r\n<li><a href=\"https://www.realestateindia.com/bangalore-property/property-for-sale.htm\">Porperty
+        in Bangalore</a></li>\r\n<li><a href=\"https://www.realestateindia.com/ahmedabad-property/property-for-sale.htm\">Porperty
+        in Ahmedabad</a></li>\r\n<li><a href=\"https://www.realestateindia.com/kolkata-property/property-for-sale.htm\">Porperty
+        in Kolkata</a></li>\r\n<li><a href=\"https://www.realestateindia.com/chennai-property/property-for-sale.htm\">Porperty
+        in Chennai</a></li>\r\n<li><a href=\"https://www.realestateindia.com/pune-property/property-for-sale.htm\">Porperty
+        in Pune</a></li>\r\n<li><a href=\"https://www.realestateindia.com/hyderabad-property/property-for-sale.htm\">Porperty
+        in Hyderabad</a></li>\r\n<li><a href=\"https://www.realestateindia.com/thane-property/property-for-sale.htm\">Porperty
+        in Thane</a></li>\r\n<li><a href=\"https://www.realestateindia.com/greaternoida-property/property-for-sale.htm\">Porperty
+        in Greater Noida</a></li>\r\n<li><a href=\"https://www.realestateindia.com/ghaziabad-property/property-for-sale.htm\">Porperty
+        in Ghaziabad</a></li>\r\n<li><a href=\"https://www.realestateindia.com/faridabad-property/property-for-sale.htm\">Porperty
+        in Faridabad</a></li>\r\n<li><a href=\"https://www.realestateindia.com/bhiwadi-property/property-for-sale.htm\">Porperty
+        in Bhiwadi</a></li>\r\n<li><a href=\"https://www.realestateindia.com/bhubaneswar-property/property-for-sale.htm\">Porperty
+        in Bhubaneswar</a></li>\r\n</ul>\r\n</li>\r\n\r\n<li class=\"w110px\"> <b
+        class=\"b white large mb5px db\">Latest Projects</b>\r\n<ul>\r\n<li><a href=\"https://www.realestateindia.com/pune-property/residential-projects.htm\"
+        title=\"Projects in Pune\">Pune</a></li>\r\n<li><a href=\"https://www.realestateindia.com/bangalore-property/residential-projects.htm\"
+        title=\"Projects in Bangalore\">Bangalore</a></li>\r\n<li><a href=\"https://www.realestateindia.com/mumbai-property/residential-projects.htm\"
+        title=\"Projects in Mumbai\">Mumbai</a></li>\r\n<li><a href=\"https://www.realestateindia.com/gurgaon-property/residential-projects.htm\"
+        title=\"Projects in Gurgaon\">Gurgaon</a></li>\r\n<li><a href=\"https://www.realestateindia.com/noida-property/residential-projects.htm\"
+        title=\"Projects in Noida\">Noida</a></li>\r\n<li><a href=\"https://www.realestateindia.com/vadodara-property/residential-projects.htm\"
+        title=\"Projects in Vadodara\">Vadodara</a></li>\r\n<li><a href=\"https://www.realestateindia.com/thane-property/residential-projects.htm\"
+        title=\"Projects in Thane\">Thane</a></li>\r\n<li><a href=\"https://www.realestateindia.com/nashik-property/residential-projects.htm\"
+        title=\"Projects in Nashik\">Nashik</a></li>\r\n</ul>\r\n</li>\r\n\r\n</ul>\r\n</div>\r\n</div>\r\n\t<div
+        class=\"bg333 bdrt bdr666 fl w100 pr\">\r\n\t<div class=\"fw tac\">\r\n\t<p
+        class=\"fr white large pt7px pb5px\">Web Design by\r\n\tWeblinkIndia.NET \r\n\t</p>\r\n<p
+        class=\"fl white large pt7px pb5px\">All Rights Reserved - RealEstateIndia.Com
+        (2007) </p>\r\n\t<div class=\"footer-logo pr\"><a href=\"https://www.weblink.in\"
+        class=\"dib p7px15px\" target=\"_blank\"><img src=\"https://static.realestateindia.com/rei/images/wl-footer-logo.png\"
+        class=\"vam\"></a> </div> \r\n\t</div>\r\n</div>\r\n\r\n</footer>\r\n<script>\r\n$(document).ready(function(){\r\n
+        $('a.more').on('click',function(){\r\n   $(this).siblings('.viewmore').toggle();
+        \r\n\t//$('.viewmore').toggle();\r\n\tif($(this).text()==\"... [-]\"){\r\n\t\t
+        $(this).text('... [+]');\t\r\n\t}\r\n\telse{\r\n\t\t$(this).text('... [-]');\r\n\t}\r\n})\r\n});\r\n$(document).on('click',
+        function(e) {\r\n    var elem = $(e.target).closest('#select_city'),\r\n        box
+        \ = $(e.target).closest('#show_city');\r\n    if ( elem.length ) {\r\n        e.preventDefault();\r\n
+        \       $('#show_city').toggle();\r\n    }else if (!box.length){\r\n        $('#show_city').hide();\r\n
+        \   }\r\n});\r\n</script>\r\n<script language=\"javascript\" src=\"https://static.realestateindia.com/rei/js/menu_panel.js\"
+        type=\"text/javascript\"></script>\r\n\t\t<script language=\"javascript\"
+        src=\"https://static.realestateindia.com/rei/js/jquery.validate.min.js\" type=\"text/javascript\"></script>\r\n\t\t\t\t<script
+        language=\"javascript\" src=\"https://static.realestateindia.com/rei/js/inner-search.js\"
+        type=\"text/javascript\"></script>\r\n\t\t\t\t<script language=\"javascript\"
+        src=\"https://static.realestateindia.com/rei/js/custom.js\" type=\"text/javascript\"></script>\r\n\t\t\t\t<script
+        language=\"javascript\" src=\"https://static.realestateindia.com/rei/js/select2/select2.js\"
+        type=\"text/javascript\"></script>\r\n\t\t\t\t<script language=\"javascript\"
+        src=\"https://static.realestateindia.com/rei/js/mobile_verify_popup.js\" type=\"text/javascript\"></script>\r\n\t\t\t\t<script
+        language=\"javascript\" src=\"https://static.realestateindia.com/rei/js/fancybox/jquery.fancybox.js\"
+        type=\"text/javascript\"></script>\r\n\t\t\t\t<script language=\"javascript\"
+        src=\"https://static.realestateindia.com/rei/js/jquery.easing.js\" type=\"text/javascript\"></script>\r\n\t\t\t\t<script
+        language=\"javascript\" src=\"https://static.realestateindia.com/rei/js/jquery.cycle2.js\"
+        type=\"text/javascript\"></script>\r\n\t\t\t\t<script language=\"javascript\"
+        src=\"https://static.realestateindia.com/rei/js/jsCarousel.js\" type=\"text/javascript\"></script>\r\n\t\t<script
+        language=\"javascript\" src=\"https://static.realestateindia.com/rei/js/request_call.js\"
+        type=\"text/javascript\"></script>\r\n\t\r\n<script type=\"text/javascript\">\r\n$('.fancy_dealer').fancybox({\"type\"
+        : \"iframe\", \"width\" : 670, \"height\" : 415});\r\n</script>\r\n\r\n<script
+        type=\"text/javascript\">\r\n(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\r\n(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new
+        Date();a=s.createElement(o),\r\nm=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\r\n})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');\r\nga('create',
+        'UA-16625285-5', 'auto');\r\nga('set', 'contentGroup1', 'propertydetails-sale-rent');ga('send',
+        'pageview');\r\n</script>\r\n\r\n<script>\r\n$('.panel .heading').click(function(){\r\n
+        \   $(this).parent().find('.accordion_details').slideToggle();\r\n\t$(this).toggleClass('open');\r\n});\t\r\n\r\n$('.map-container')\r\n.click(function(){\r\n$(this).find('iframe').addClass('clicked')})\r\n.mouseleave(function(){\r\n$(this).find('iframe').removeClass('clicked')});\t\r\n</script>\r\n</div>\r\n</body>\r\n</html><script
+        type=\"text/javascript\" src=\"https://static.realestateindia.com/js/popup_box.js\"></script>
+        \r\n<script type=\"text/javascript\">\r\n$(window).scroll(function() {\r\n\tif
+        ($(window).scrollTop() >= 125) {\r\n\t\t$('.hide_div').show();\r\n\t\t$('.header_fixed3').addClass(\"header_fixed\");\r\n\t}
+        else {\r\n\t\t$('.hide_div').hide();\r\n\t\t$('.header_fixed3').removeClass('header_fixed');\r\n\t}\r\n})\r\n\r\n$(function(){
+        // document ready\r\n   if (!!$('#sticky-form').length) { // make sure \"#sticky\"
+        element exists\r\n      var el = $('#sticky-form');\r\n      var stickyTop
+        = $('#sticky-form').offset().top; // returns number\r\n      var footerTop
+        = $('#property-view').offset().top; // returns number\r\n      var stickyHeight
+        = $('#sticky-form').height();\r\n      var limit = footerTop - stickyHeight
+        - 20;\r\n      $(window).scroll(function(){ // scroll event\r\n          var
+        windowTop = $(window).scrollTop(); // returns number            \r\n          if
+        (stickyTop < windowTop){\r\n             el.css({ position: 'fixed', top:
+        0 });\r\n          }\r\n          else {\r\n             el.css('position','static');\r\n
+        \         }            \r\n          if (limit < windowTop) {\r\n          var
+        diff = limit - windowTop;\r\n          el.css({top: diff});\r\n          }
+        \    \r\n        });\r\n   }\r\n});\r\n\r\n$(\"a[rel='prop_det_inq']\").fancybox({\r\n\t'width'\t\t\t\t:
+        600,\r\n\t'minHeight'\t\t    : 420,\r\n\t'height'\t\t\t: 420,\r\n\t'maxHeight'\t\t\t:
+        420,\r\n\t'autoScale'     \t: false,\r\n\t'transitionIn'\t\t: 'elastic',\r\n\t'transitionOut'\t\t:
+        'elastic',\r\n\t'type'\t\t\t\t: 'iframe',\r\n\tarrows\t\t\t\t: false\r\n});\r\n</script>
+        \    \r\n<script>$('div.pr_list').live('click',function(){var dg=$(this).data('url');
+        $(this).append('<a class=\"ps_c\" href=\"'+dg+'\" target=\"_blank\" />');
+        $('a.ps_c',this)[0].click(); $('.ps_c',this).remove();})\r\n$('div a,div input').live('click',function(e){e.stopPropagation();})
+        </script>\r\n\r\n<script>\r\n jQuery('.maps').click(function () {\r\n jQuery('.maps
+        iframe').css(\"pointer-events\", \"auto\");\r\n   });\r\n jQuery( \".maps\"
+        ).mouseleave(function() {\r\n\tjQuery('.maps iframe').css(\"pointer-events\",
+        \"none\"); \r\n });\r\n</script>\r\n"
+    http_version: 
+  recorded_at: Sun, 24 Dec 2017 15:35:08 GMT
+recorded_with: VCR 3.0.3

@@ -40,6 +40,7 @@ module PropertyWebScraper
       # considered using
       # -1 to indicate value could not be retrieved
       # but no longer convinced..
+      listing.year_construction = property_hash['year_construction'].presence || 0
       listing.constructed_area = property_hash['constructed_area'].presence || 0
       listing.count_bedrooms = property_hash['count_bedrooms'].presence || 0
       listing.count_bathrooms = property_hash['count_bathrooms'].presence || 0

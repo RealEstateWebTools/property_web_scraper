@@ -1,0 +1,106 @@
+[{
+  "name": "cerdfw",
+  "defaultValues": {
+    "country":
+    {
+      "value": "USA"
+    },
+    "area_unit":
+    {
+      "value": "sqft"
+    },
+    "currency":
+    {
+      "value": "USD"
+    },
+    "for_rent_short_term":
+    {
+      "value": "false"
+    },
+    "locale_code":
+    {
+      "value": "en"
+    }
+  },
+  "floatFields": {
+    "constructed_area": {
+      "cssLocator": "div > div.bfg-grid-container.bfg-mb30 > div.bfg-grid-40.bfg-grid-parent > div > div:nth-child(2) > div:nth-child(2) > div:nth-child(2) > div > div"
+    },
+    "price_float": {
+      "cssLocator": ".bfg-details2-price",
+      "stripPunct": "true",
+      "stripString": "$"
+    },
+    "latitude":
+    {
+      "scriptRegEx": "LatLng[^\\)]*",
+      "splitTextCharacter": ",",
+      "splitTextArrayId": "0",
+      "stripString": "LatLng("
+    },
+    "longitude":
+    {
+      "scriptRegEx": "LatLng[^\\)]*",
+      "splitTextCharacter": ",",
+      "splitTextArrayId": "1",
+      "stripString": "LatLng("
+    }
+  },
+  "intFields": {
+    "year_construction": {
+      "cssLocator": "div > div:nth-child(2) > div > div > div:nth-child(1) > div:nth-child(4) > div > div.bfg-details2-desc"
+    },
+    "count_bedrooms": {
+      "cssLocator": "div > div.bfg-grid-container.bfg-mb30 > div.bfg-grid-40.bfg-grid-parent > div > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div > div"
+    },
+    "count_bathrooms": {
+      "cssLocator": "div > div.bfg-grid-container.bfg-mb30 > div.bfg-grid-40.bfg-grid-parent > div > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > div > div"
+    } 
+  },
+  "textFields": {
+    "reference": {
+      "cssLocator": ".bfg-details2-mlsnum"
+    },
+    "title": {
+      "cssLocator": ".main_title"
+    },
+    "description": {
+      "xpath": "//meta[@property='og:description']/@content"
+    },
+    "city": {
+      "cssLocator": ".bfg-details2-city"
+    },
+    "address_string": {
+      "cssLocator": ".bfg-details2-address"
+    },
+    "street_address": {
+      "cssLocator": ".bfg-details2-address"
+    },
+    "price_string": {
+      "cssLocator": ".bfg-details2-price"
+    }
+  },
+  "images": [
+    {
+      "cssLocator": ".bfg-grid-60 img",
+      "cssAttr": "src"
+    }
+  ],
+  "booleanFields": {
+    "for_rent": {
+      "cssLocator": "div > div:nth-child(2) > div > div > div:nth-child(1) > div:nth-child(2) > div > div.bfg-details2-desc",
+      "evaluator": "include?",
+      "evaluatorParam": "For Rent"
+    },
+    "for_rent_long_term": {
+      "cssLocator": ".txt-deposit",
+      "evaluator": "include?",
+      "evaluatorParam": "For Rent"
+    },
+    "for_sale": {
+      "cssLocator": "div > div:nth-child(2) > div > div > div:nth-child(1) > div:nth-child(2) > div > div.bfg-details2-desc",
+      "evaluator": "include?",
+      "evaluatorParam": "For Sale"
+    }
+  }
+}]
