@@ -1,10 +1,21 @@
 <!-- <h5>Result:</h5> -->
 <p>Property info retrieved..:</p>
+<div>
+  <button type="button" class="btn btn-success">
+    <%= link_to "Single Page view", single_property_view_path(url: @listing.import_url) %>
+  </button>
+  <button type="button" class="btn btn-success">  <%= link_to "JSON view", retriever_as_json_path(url: @listing.import_url) %>
+  </button>
+</div>
 <table class="table">
   <% @listing_attributes.each do |listing_attribute| %>
     <tr>
-      <th><%= listing_attribute  %></th>
-      <td><%= @listing[listing_attribute]  %></td>
+      <th>
+        <%= listing_attribute  %>
+      </th>
+      <td>
+        <%= @listing[listing_attribute]  %>
+      </td>
     </tr>
   <% end %>
   <tr>
@@ -26,7 +37,10 @@
     </div>
   <% end %>
 </div>
-
-  <div>
+<div>
+  <button type="button" class="btn btn-success">
     <%= link_to "Single Page view", single_property_view_path(url: @listing.import_url) %>
-  </div>
+  </button>
+  <button type="button" class="btn btn-success">  <%= link_to "JSON view", retriever_as_json_path(url: @listing.import_url) %>
+  </button>
+</div>

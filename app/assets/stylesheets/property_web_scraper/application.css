@@ -20,3 +20,7 @@
   margin: 10px;
   font-size: large;
 }
+
+.btn a {
+  color: white;
+}

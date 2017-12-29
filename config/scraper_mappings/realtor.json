@@ -41,6 +41,14 @@
       "xpath": "//meta[@property='place:location:latitude']/@content"
     }
   },
+  "intFields": {
+    "count_bedrooms": {
+      "xpath": "//*[@id='ldp-property-meta']//li[@data-label='property-meta-beds']"
+    },
+    "count_bathrooms": {
+      "xpath": "//*[@id='ldp-property-meta']//li[@data-label='property-meta-bath']"
+    } 
+  },
   "textFields":
   {
     "reference":

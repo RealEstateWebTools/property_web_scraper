@@ -31,11 +31,10 @@ module PropertyWebScraper
         expect(retrieved_property.longitude).to eq(-119.051509)
         expect(retrieved_property.latitude).to eq(35.302092)
 
+        expect(retrieved_property.count_bedrooms).to eq(3)
+        expect(retrieved_property.count_bathrooms).to eq(2)
 
 
-
-
-        
         expect(retrieved_property.reference).to eq('602458820')
         expect(retrieved_property.title).to eq('5804 Cedar Glen Ln')
         expect(retrieved_property.constructed_area).to eq(1133)
