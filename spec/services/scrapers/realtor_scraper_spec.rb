@@ -22,6 +22,7 @@ module PropertyWebScraper
         expect(retrieved_property.as_json['import_history']).not_to be_present
         # expect(retrieved_property.as_json).not_to have_attributes("import_history")
 
+
         expect(retrieved_property.main_image_url).to eq('https://ap.rdcpix.com/1181386804/6af1cc185beff7ea3b6e5804e4b18854l-m0xd-w640_h480_q80.jpg')
 
         expect(retrieved_property.description).to eq('View 6 photos of this 3 bed, 2 bath, 1,133 Sq. Ft. condo/townhome/row home/co-op at 5804 Cedar Glen Ln, Bakersfield, CA 93313 on sale now for $144,950.')
@@ -34,6 +35,8 @@ module PropertyWebScraper
         expect(retrieved_property.currency).to eq('USD')
         expect(retrieved_property.price_string).to eq('$144,950')
         expect(retrieved_property.price_float).to eq(144_950)
+        expect(retrieved_property.image_urls.count).to eq(7)
+        expect(retrieved_property.for_sale).to eq(true)
       end
     end
   end

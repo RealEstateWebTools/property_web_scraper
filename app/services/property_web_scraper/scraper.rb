@@ -138,8 +138,15 @@ module PropertyWebScraper
         scraper_mapping.booleanFields.keys.each do |mapping_key|
           mapping = scraper_mapping.booleanFields[mapping_key]
           retrieved_text = retrieve_target_text doc, mapping, uri
+          evaluator_text = mapping['evaluatorParam']
+
+          if mapping['caseInsensitive']
+            retrieved_text = retrieved_text.downcase
+            evaluator_text = evaluator_text.downcase
+          end
+
           # target_element = doc.css(mapping["cssLocator"])[mapping["cssCountId"].to_i] || ""
-          property_hash[mapping_key] = retrieved_text.strip.send(mapping['evaluator'], mapping['evaluatorParam'])
+          property_hash[mapping_key] = retrieved_text.strip.send(mapping['evaluator'], evaluator_text)
         end
       end
 

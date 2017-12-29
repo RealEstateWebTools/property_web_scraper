@@ -14,6 +14,9 @@
     "currency":
     {
       "value": "USD"
+    },
+    "for_rent_short_term": {
+      "value": "false"
     }
   },
   "floatFields":
@@ -82,13 +85,33 @@
     }
   },
   "booleanFields":
-  {},
-  "extraFields":
   {
-    "images":
+    "for_rent_long_term":
     {
-      "imagesCssLocator": "#ldpHeroCarousel > div.owl-stage-outer > div > div > div > img"
+      "xpath": "//span[@data-label='property-meta-status']",
+      "evaluator": "include?",
+      "caseInsensitive": true,
+      "evaluatorParam": "rent"
+    },
+    "for_rent":
+    {
+      "xpath": "//span[@data-label='property-meta-status']",
+      "evaluator": "include?",
+      "caseInsensitive": true,
+      "evaluatorParam": "rent"
+    },
+    "for_sale":
+    {
+      "xpath": "//span[@data-label='property-meta-status']",
+      "evaluator": "include?",
+      "caseInsensitive": true,
+      "evaluatorParam": "sale"
     }
-  }
+  },
+  "images": [
+  {
+    "cssLocator": "#ldpPhotoGallery img",
+    "cssAttr": "data-src"
+  }]
 
 }]

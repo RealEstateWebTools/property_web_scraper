@@ -45,6 +45,7 @@ and run the ff commands from the console:
 rails property_web_scraper:install:migrations
 rails db:create
 rails db:migrate
+rails property_web_scraper:db:seed
 ```
 
 
