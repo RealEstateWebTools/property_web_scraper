@@ -1,14 +1,20 @@
 # PropertyWebScraper
 
+Please help support this project by making a contribution to PropertyWebBuilder here:
+[https://opencollective.com/property_web_builder](https://opencollective.com/property_web_builder)
+
 [![Build Status](https://api.travis-ci.org/RealEstateWebTools/property_web_scraper.svg?branch=master)](https://api.travis-ci.org/RealEstateWebTools/property_web_scraper)
 
 This project was created while I was working on another open source product called [PropertyWebBuilder](https://github.com/etewiah/property_web_builder) which allows real estate agents to create their own website with ease.  I wanted to provide a way to allow people to import their listings from other websites and found there was no easy way to do this.
 
 The aim of PropertyWebScraper is to make it easy for anyone to import real estate data from any website.  As of June 2017, it is a proof of concept.  We hope to improve the usefulness of this project over the next few weeks by adding support for as many real estate websites as possible.
 
-You can read more about PropertyWebBuilder here: [http://propertywebbuilder.com](http://propertywebbuilder.com)
+You can read more about PropertyWebBuilder here: [http://propertywebbuilder.com](http://propertywebbuilder.com) or deploy it on heroku by clicking below:
 
-##[Demo](https://real-estate-web-scraper.herokuapp.com/)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/etewiah/pwb-for-heroku)
+
+
+## [Demo of PropertyWebScraper ](https://real-estate-web-scraper.herokuapp.com/)
 
 You can try out a demo at [https://real-estate-web-scraper.herokuapp.com](https://real-estate-web-scraper.herokuapp.com/)
 
@@ -35,7 +41,7 @@ And then execute:
 $ bundle
 ```
 
-Mount the PropertyWebScraper by adding the following to your routes.rb file:
+Mount PropertyWebScraper by adding the following to your routes.rb file:
 ```ruby
 mount PropertyWebScraper::Engine => '/'
 ```
@@ -56,6 +62,8 @@ If you like it, please star it and spread the word on [Twitter](https://twitter.
 
 Please consider making a contribution to the development of PropertyWebScraper.  If you wish to pay for specific enhancements, please email me directly (opensource at propertywebbuilder.com).
 
+Or make a contribution to PropertyWebBuilder here:
+[https://opencollective.com/property_web_builder](https://opencollective.com/property_web_builder)
 
 ---
 
