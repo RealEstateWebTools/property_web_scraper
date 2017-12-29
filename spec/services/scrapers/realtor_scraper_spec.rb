@@ -16,8 +16,10 @@ module PropertyWebScraper
     it 'scrapes and save realtor property page correctly' do
       VCR.use_cassette('scrapers/realtor') do
         web_scraper = PropertyWebScraper::Scraper.new('realtor')
+        import_host_slug = "not_important"
         listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
-        retrieved_property = web_scraper.retrieve_and_save listing, 1
+        retrieved_property = web_scraper.retrieve_and_save listing, import_host_slug
+
 
         expect(retrieved_property.as_json['import_history']).not_to be_present
         # expect(retrieved_property.as_json).not_to have_attributes("import_history")
@@ -28,7 +30,13 @@ module PropertyWebScraper
         expect(retrieved_property.description).to eq('View 6 photos of this 3 bed, 2 bath, 1,133 Sq. Ft. condo/townhome/row home/co-op at 5804 Cedar Glen Ln, Bakersfield, CA 93313 on sale now for $144,950.')
         expect(retrieved_property.longitude).to eq(-119.051509)
         expect(retrieved_property.latitude).to eq(35.302092)
-        expect(retrieved_property.reference).to eq('21701902')
+
+
+
+
+
+        
+        expect(retrieved_property.reference).to eq('602458820')
         expect(retrieved_property.title).to eq('5804 Cedar Glen Ln')
         expect(retrieved_property.constructed_area).to eq(1133)
 

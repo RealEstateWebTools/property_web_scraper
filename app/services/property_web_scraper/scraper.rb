@@ -162,11 +162,12 @@ module PropertyWebScraper
         css_elements = doc.css(mapping['cssLocator'])
         css_elements.each do |element|
           # TODO - allow passing in of element to be evaluated
-          if mapping['cssAttr'] && element.attr(mapping['cssAttr'])
-            img_url = element.attr(mapping['cssAttr'])
-          else
-            img_url = element.text
-          end
+          # if mapping['cssAttr'] && element.attr(mapping['cssAttr'])
+          #   img_url = element.attr(mapping['cssAttr'])
+          # else
+          #   img_url = element.text
+          # end
+          img_url = get_text_from_css css_elements, mapping
 
           # ensure_url_is_absolute
           # TODO - move below into custom method
@@ -275,6 +276,13 @@ module PropertyWebScraper
 
     def get_text_from_css(css_elements, mapping)
       css_retrieved_text = css_elements.text
+      if mapping['cssAttr'] && css_elements.attr(mapping['cssAttr'])
+        css_retrieved_text = css_elements.attr(mapping['cssAttr']).text
+        # byebug
+      else
+        css_retrieved_text = css_elements.text
+      end
+
       if mapping['cssCountId'].present?
         # in this case we have multiple elements matched
         # and the cssCountId refers to where in the list of matched elements

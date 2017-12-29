@@ -24,6 +24,7 @@ module PropertyWebScraper
                 :reference, :price_string, :price_float,
                 :title, :description,
                 :area_unit, :plot_area, :constructed_area,
+                :year_construction,
                 :count_bedrooms, :count_bathrooms,
                 :count_toilets, :count_garages,
                 :currency,

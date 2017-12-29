@@ -45,7 +45,9 @@
   {
     "reference":
     {
-      "cssLocator": "#ldp-listing-provider-info > table tr:nth-child(3) > td:nth-child(2)"
+      // "xpath": "//div[@data-listingid]"
+      "cssLocator": ".js-tracking",
+      "cssAttr": "data-listingid"
     },
     "title":
     {
