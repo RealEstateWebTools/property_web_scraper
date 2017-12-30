@@ -68,5 +68,11 @@ Or make a contribution to PropertyWebBuilder here:
 ---
 
 ## License
+
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
+## Disclaimer
+
+While scraping can sometimes be used as a legitimate way to access all kinds of data on the internet, it’s also important to consider the legal implications. There are cases where scraping data may be considered illegal, or open you to the possibility of being sued. 
+
+I created this tool in part as a learning exercise and am sharing it in case others find it useful. If you do decide to use this tool to scrape a website it is your responsibilty to ensure that what you are doing is legal.
