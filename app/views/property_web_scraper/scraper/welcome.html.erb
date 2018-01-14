@@ -15,11 +15,11 @@
       <%= submit_tag("Go") %>
     <% end %> -->
     <br>
-    <%= form_tag("/scrapers/submit.js", method: "post", remote: true, authenticity_token: true) do %>
+    <%= form_tag("#{root_path}scrapers/submit.js", method: "post", remote: true, authenticity_token: true) do %>
       <br>
       <div>
         <p>
-          Please enter the url for a property for sale or for rent: 
+          Please enter the url for a property for sale or for rent:
           </p>
         <%# label_tag(:import_url, "Webpage URL:") %>
         <span class="url_input">
