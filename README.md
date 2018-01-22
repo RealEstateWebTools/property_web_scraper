@@ -7,7 +7,7 @@ Please help support this project by making a contribution to PropertyWebBuilder 
 
 This project was created while I was working on another open source product called [PropertyWebBuilder](https://github.com/etewiah/property_web_builder) which allows real estate agents to create their own website with ease.  I wanted to provide a way to allow people to import their listings from other websites and found there was no easy way to do this.
 
-The aim of PropertyWebScraper is to make it easy for anyone to import real estate data from any website.  As of June 2017, it is a proof of concept.  We hope to improve the usefulness of this project over the next few weeks by adding support for as many real estate websites as possible.
+The aim of PropertyWebScraper is to make it easy for anyone to import real estate data from any website.  Support for more and more websites will be added over time.
 
 You can read more about PropertyWebBuilder here: [http://propertywebbuilder.com](http://propertywebbuilder.com) or deploy it on heroku by clicking below:
 
@@ -17,6 +17,10 @@ You can read more about PropertyWebBuilder here: [http://propertywebbuilder.com]
 ## [Demo of PropertyWebScraper ](https://real-estate-web-scraper.herokuapp.com/)
 
 You can try out a demo at [https://real-estate-web-scraper.herokuapp.com](https://real-estate-web-scraper.herokuapp.com/)
+
+## Support for importing properties from an MLS
+
+PropertyWebScraper also supports connecting to different MLSs (Multiple Listing Services) in the US using RETS and Web Services.  This functionality is currently experimental and has only been implemented for 3 MLSs.  If there is a particular MLS for which you need support, open an issue with the details.   
 
 ## Rails Version
 
