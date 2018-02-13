@@ -121,7 +121,7 @@
   "images": [
   {
     "cssLocator": "#ldpPhotoGallery img",
-    "cssAttr": "data-src"
+    "xmlAttr": "data-src"
   }]
 
 }]

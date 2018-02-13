@@ -31,18 +31,12 @@ module PropertyWebScraper
         expect(retrieved_property.reference).to eq('20176813')
         
 
-
-
-
         expect(retrieved_property.image_urls[0]).to eq("http://www.wyomingmls.com/images/property/wyo20176813a.jpg")
         expect(retrieved_property.image_urls.count).to eq(10)
 
         # expect(retrieved_property.title).to eq('5804 Cedar Glen Ln')
         expect(retrieved_property.constructed_area).to eq(1056)
         expect(retrieved_property.count_bedrooms).to eq(3)
-
-
-        
 
         expect(retrieved_property.currency).to eq('USD')
         expect(retrieved_property.price_string).to eq('$33,500')

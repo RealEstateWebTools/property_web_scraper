@@ -167,7 +167,7 @@ module PropertyWebScraper
           # else
           #   img_url = element.text
           # end
-          img_url = get_text_from_css css_elements, mapping
+          img_url = get_text_from_css element, mapping
 
           # ensure_url_is_absolute
           # TODO - move below into custom method
@@ -278,9 +278,11 @@ module PropertyWebScraper
       css_retrieved_text = css_elements.text
       if mapping['cssAttr'] && css_elements.attr(mapping['cssAttr'])
         css_retrieved_text = css_elements.attr(mapping['cssAttr']).text
-        # byebug
-      else
-        css_retrieved_text = css_elements.text
+      elsif mapping['xmlAttr'] && css_elements.attr(mapping['xmlAttr'])
+        # xmlAttr for cases like idealister where element returned 
+        # is xml
+        css_retrieved_text = css_elements.attr(mapping['xmlAttr'])
+        # css_retrieved_text = css_elements.text
       end
 
       if mapping['cssCountId'].present?

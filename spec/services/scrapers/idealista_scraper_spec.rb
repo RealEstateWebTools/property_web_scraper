@@ -19,7 +19,9 @@ module PropertyWebScraper
         listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
         retrieved_property = web_scraper.retrieve_and_save listing, 1
 
+# byebug
 
+        expect(retrieved_property.image_urls[18]).to eq("https://img3.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/4b/a5/e7/720671.jpg")
         expect(retrieved_property.for_sale).to eq(true)
         expect(retrieved_property.latitude).to eq(40.732845)
         expect(retrieved_property.longitude).to eq(-3.5815072)
