@@ -97,7 +97,7 @@
     {
       "cssLocator": "#sidebar > div.propertytour > a > img",
       // "stripString": "_max_135x100",
-      "cssAttr": "src"
+      "xmlAttr": "src"
     }
   ]
 

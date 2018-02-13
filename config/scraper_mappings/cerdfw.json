@@ -83,7 +83,7 @@
   "images": [
     {
       "cssLocator": ".bfg-grid-60 img",
-      "cssAttr": "src"
+      "xmlAttr": "src"
     }
   ],
   "booleanFields": {

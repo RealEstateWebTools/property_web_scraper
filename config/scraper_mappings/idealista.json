@@ -63,7 +63,9 @@
   "images": [
     {
       "cssLocator": "#grid-multimedia img",
-      "cssAttr": "data-service",
+      // element returned from above is XML with some extra fields I could make use of like:
+      // name="title" value="Imagen Salón de dúplex en calle Subida Amargura, 2, El Molar"
+      "xmlAttr": "data-service",
       "stripString": ",WEB_DETAIL"
     }
   ],

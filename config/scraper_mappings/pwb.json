@@ -94,7 +94,7 @@
   "images": [
     {
       "cssLocator": "#propCarousel > div > div > img",
-      "cssAttr": "src"
+      "xmlAttr": "src"
     }
   ]
 }]
