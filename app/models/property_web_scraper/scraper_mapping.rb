@@ -12,6 +12,6 @@ module PropertyWebScraper
     # is used in corresponding json file
     set_filenames 'pwb', 'mlslistings', 'realtor', 'fotocasa',
       'idealista', 'zoopla', 'rightmove', 'wyomingmls', 'carusoimmobiliare',
-      'forsalebyowner', 'realestateindia', 'cerdfw'
+      'forsalebyowner', 'realestateindia', 'cerdfw', 'pisos'
   end
 end
