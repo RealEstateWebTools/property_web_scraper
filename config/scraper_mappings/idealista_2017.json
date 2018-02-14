@@ -19,10 +19,10 @@
   },
   "floatFields": {
     "constructed_area": {
-      "cssLocator": ".info-features.txt-big > span:nth-child(1) > span"
+      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(2) > span"
     },
     "price_float": {
-      "cssLocator": ".ide-container-detail > section > div > div.info-data > span > span",
+      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(1) > span",
       "stripPunct": "true"
     },
     "latitude":
@@ -51,13 +51,13 @@
       "splitTextArrayId": "1"
     },
     "title": {
-      "cssLocator": "title"
+      "cssLocator": "#main > div > div > section > h1 > span"
     },
     "description": {
-      "cssLocator": ".adCommentsLanguage"
+      "cssLocator": "#details > div.commentsContainer > div"
     },
     "price_string": {
-      "cssLocator": ".ide-container-detail > section > div > div.info-data > span > span"
+      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(1) > span"
     }
   },
   "images": [
