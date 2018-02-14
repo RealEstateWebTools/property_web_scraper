@@ -1,0 +1,40 @@
+[{
+  "name": "pisos",
+  "defaultValues": {
+    "country": {
+      "value": "Spain"
+    },
+    "area_unit": {
+      "value": "sqmt"
+    },
+    "currency": {
+      "value": "EUR"
+    },
+    "for_rent_short_term": {
+      "value": "false"
+    },
+    "locale_code": {
+      "value": "es"
+    }
+  },
+  "floatFields": {
+  },
+  "textFields": {
+    "reference": {
+
+    },
+    "title": {
+      "cssLocator": "title"
+    },
+    "description": {
+    },
+    "price_string": {
+      "cssLocator": ".jsPrecioH1"
+    }
+  },
+  "images": [
+  ],
+  "booleanFields": {
+
+  }
+}]

@@ -11,8 +11,10 @@ import_hosts_data_array = [
   { slug: 'forsalebyowner', scraper_name: 'forsalebyowner', host: 'www.forsalebyowner.com' },
   { slug: 'cerdfw', scraper_name: 'cerdfw', host: 'cerdfw.com' },
   { slug: 'realestateindia', scraper_name: 'realestateindia', host: 'www.realestateindia.com' },
-  { slug: 'fotocasa', scraper_name: 'fotocasa', host: 'www.fotocasa.es' }
+  { slug: 'fotocasa', scraper_name: 'fotocasa', host: 'www.fotocasa.es' },
+  { slug: 'pisos', scraper_name: 'pisos', host: 'www.pisos.com' }
 ]
+# when above is updated, will also have to add scraper_name to list in scraper_mapping model
 
 import_hosts_data_array.each do |import_host_data|
   unless PropertyWebScraper::ImportHost.exists?(host: import_host_data[:host])
