@@ -25,7 +25,6 @@ module PropertyWebScraper
         listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
         retrieved_property = web_scraper.retrieve_and_save listing, 1
 
-# byebug
         expect(retrieved_property.for_sale).to eq(false)
         expect(retrieved_property.for_rent).to eq(true)
 
@@ -37,8 +36,13 @@ module PropertyWebScraper
         expect(retrieved_property.title).to eq("Acogedor piso en Anton Martin")
         # expect(retrieved_property.address_string).to eq("School Road, Birmingham, B14")
         expect(retrieved_property.currency).to eq('EUR')
+
+        expect(retrieved_property.features.length).to eq(16)
+        expect(retrieved_property.image_urls.length).to eq(18)
+
+
         # expect(retrieved_property.price_string).to eq('£995 pcm')
-        # expect(retrieved_property.price_float).to eq(995.0)
+        expect(retrieved_property.price_float).to eq(1700.0)
       end
     end
   end
