@@ -14,7 +14,7 @@ module PropertyWebScraper
     end
 
     it 'scrapes and save idealista property page correctly' do
-      VCR.use_cassette('scrapers/idealista_2018_02') do
+      VCR.use_cassette('scrapers/idealista_2018_01') do
         # import_url =
         web_scraper = PropertyWebScraper::Scraper.new('idealista')
         listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
