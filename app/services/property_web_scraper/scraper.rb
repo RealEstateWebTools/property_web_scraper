@@ -100,8 +100,19 @@ module PropertyWebScraper
 
       if scraper_mapping.images
         scraper_mapping.images.each do |image_mapping|
+          # TODO: make this function useful for where there are multiple selectors / mappings 
+          # for images.  Right now it works for only one selector which matches multiple items
           retrieved_array = retrieve_images_array doc, image_mapping, uri
           property_hash["image_urls"] = retrieved_array
+        end
+      end
+
+      if scraper_mapping.features
+        scraper_mapping.features.each do |feature_mapping|
+          # TODO: make this function useful for where there are multiple selectors / mappings 
+          # for features.  Right now it works for only one selector which matches multiple items
+          retrieved_array = retrieve_features_array doc, feature_mapping, uri
+          property_hash["features"] = retrieved_array
         end
       end
 
@@ -159,6 +170,34 @@ module PropertyWebScraper
     end
 
     private
+
+    def retrieve_features_array(doc, mapping, uri)
+      retrieved_array = []
+      if mapping['cssLocator'].present?
+        css_elements = doc.css(mapping['cssLocator'])
+        css_elements.each do |element|
+          feature_text = get_text_from_css element, mapping
+          retrieved_array.push feature_text
+        end
+      end
+
+      # TODO - support xpath for features
+      # if mapping['xpath'].present?
+      #   css_elements = doc.css(mapping['xpath'])
+      #   css_elements.each do |element|
+      #     retrieved_array.push element.text
+      #   end
+      # end
+
+      trimmed_and_stripped_array = []
+      retrieved_array.each do |string_to_clean|
+        cleaned_string = clean_up_string string_to_clean, mapping
+        trimmed_and_stripped_array.push cleaned_string
+        # string_to_clean.sub("_max_135x100", "")
+      end
+      trimmed_and_stripped_array
+    end
+
 
     def retrieve_images_array(doc, mapping, uri)
       retrieved_array = []

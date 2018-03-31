@@ -47,7 +47,7 @@ module PropertyWebScraper
                       for_rent_short_term for_rent_long_term
                       street_address address_string locale_code 
                       city province region
-                      postal_code )
+                      postal_code features )
       std_attributes.each do |attribute|
         listing[attribute] = property_hash[attribute]
       end
