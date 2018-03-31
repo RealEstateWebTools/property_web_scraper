@@ -1,0 +1,111 @@
+[{
+  "name": "inmo1",
+  "defaultValues": {
+    "country": {
+      "value": "Spain"
+    },
+    "area_unit": {
+      "value": "sqmt"
+    },
+    "currency": {
+      "value": "EUR"
+    },
+    "for_rent_short_term": {
+      "value": "false"
+    },
+    "locale_code": {
+      "value": "es"
+    }
+  },
+  "floatFields":
+  {
+    "constructed_area": {
+      "cssLocator": "div.wp-block.property.list.no-border > div > div > ul > li:nth-child(1)"
+    },
+    "price_float":
+    {
+      "cssLocator": "#homepageCarousel > div > div.item.item-dark.active > div > span",
+      "stripFirstChar": "true",
+      "stripPunct": "true"
+    },
+    "latitude":
+    {
+      // below is actually "latitude:[^\,]*" but had to escape the \
+      "scriptRegEx": "latitude[^\\}]*",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1"
+    },
+    "longitude":
+    {
+      "scriptRegEx": "longitude[^\\}]*",
+      "splitTextCharacter": ":",
+      "splitTextArrayId": "1"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "cssLocator": "div.wp-block.property.list.no-border > div > div > ul > li:nth-child(2)"
+    },
+    "count_bathrooms": {
+      "cssLocator": "div.wp-block.property.list.no-border > div > div > ul > li:nth-child(3)"
+    } 
+  },
+  "textFields": {
+    "postal_code":
+    {
+      "scriptRegEx": "postal_code[^\\,]*",
+      "splitTextCharacter": "\"",
+      "splitTextArrayId": "2"
+    },
+    "title":
+    {
+      "cssLocator": "body > div.body-wrap.body-boxed > div.pg-opt > div > div > div:nth-child(1) > h2"
+    },
+    "reference": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "1"
+    },
+    "property_type": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "7"
+    },
+    "city": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "9"
+    },
+    "region": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "11"
+    },
+    "description": {
+      "cssLocator": ".wp-section > div > div > div.col-md-9 > div:nth-child(2) > div:nth-child(1) > span"
+      // "cssCountId": "1"
+    }
+  },
+  "booleanFields": {
+    "for_sale": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "5",
+      "evaluator": "include?",
+      "evaluatorParam": "Sale"
+    },
+    "for_rent": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "5",
+      "evaluator": "include?",
+      "evaluatorParam": "Rent"
+    },
+    "for_rent_long_term": {
+      "cssLocator": ".table-striped tbody tr td",
+      "cssCountId": "5",
+      "evaluator": "include?",
+      "evaluatorParam": "Rent"
+    }
+  },
+  "images": [
+    {
+      "cssLocator": "#homepageCarousel > div > div > img",
+      "xmlAttr": "src"
+    }
+  ]
+}]

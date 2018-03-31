@@ -6,9 +6,13 @@ module PropertyWebScraper
   class Scraper
     attr_accessor :scraper_mapping
 
-    def initialize(scraper_mapping_name)
-      self.scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name(scraper_mapping_name)
-      raise ArgumentError, 'Not valid scraper' if self.scraper_mapping.blank?
+    def initialize(scraper_mapping_name, scraper_mapping=nil)
+      if scraper_mapping.present?
+        self.scraper_mapping = scraper_mapping
+      else
+        self.scraper_mapping = PropertyWebScraper::ScraperMapping.find_by_name(scraper_mapping_name)
+        raise ArgumentError, 'Not valid scraper' if self.scraper_mapping.blank?
+      end
     end
 
     # def retrieve_from_api
@@ -279,7 +283,7 @@ module PropertyWebScraper
       if mapping['cssAttr'] && css_elements.attr(mapping['cssAttr'])
         css_retrieved_text = css_elements.attr(mapping['cssAttr']).text
       elsif mapping['xmlAttr'] && css_elements.attr(mapping['xmlAttr'])
-        # xmlAttr for cases like idealister where element returned 
+        # xmlAttr for cases like idealister where element returned
         # is xml
         css_retrieved_text = css_elements.attr(mapping['xmlAttr'])
         # css_retrieved_text = css_elements.text
