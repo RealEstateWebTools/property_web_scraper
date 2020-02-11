@@ -10,7 +10,7 @@ PATH
       money-rails (~> 1)
       nokogiri
       rack-cors
-      rails (>= 5.0.0)
+      rails (>= 6.0.2)
       rets
       ruby_odata
 
@@ -320,6 +320,7 @@ DEPENDENCIES
   property_web_scraper!
   pry
   pry-byebug
+  rails (~> 6.0.2)
   rspec-rails
   rubocop
   simplecov
