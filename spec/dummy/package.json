@@ -10,6 +10,6 @@
     "vuetify": "^0.17.5"
   },
   "devDependencies": {
-    "webpack-dev-server": "^2.9.7"
+    "webpack-dev-server": "^3.11.0"
   }
 }
