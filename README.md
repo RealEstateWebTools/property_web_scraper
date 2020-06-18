@@ -1,17 +1,8 @@
 # PropertyWebScraper
 
-Please help support this project by making a contribution to PropertyWebBuilder here:
-[https://opencollective.com/property_web_builder](https://opencollective.com/property_web_builder)
+I am currently unable to keep this project updated as I am busy with my new project [https://singlepropertypages.com/](https://singlepropertypages.com/)
 
-[![Build Status](https://api.travis-ci.org/RealEstateWebTools/property_web_scraper.svg?branch=master)](https://api.travis-ci.org/RealEstateWebTools/property_web_scraper)
-
-This project was created while I was working on another open source product called [PropertyWebBuilder](https://github.com/etewiah/property_web_builder) which allows real estate agents to create their own website with ease.  I wanted to provide a way to allow people to import their listings from other websites and found there was no easy way to do this.
-
-The aim of PropertyWebScraper is to make it easy for anyone to import real estate data from any website.  Support for more and more websites will be added over time.
-
-You can read more about PropertyWebBuilder here: [http://propertywebbuilder.com](http://propertywebbuilder.com) or deploy it on heroku by clicking below:
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/etewiah/pwb-for-heroku)
+Please get in touch if you are interested in taking this project forward.
 
 
 ## [Demo of PropertyWebScraper ](https://real-estate-web-scraper.herokuapp.com/)
