@@ -9,6 +9,10 @@ Please get in touch if you are interested in taking this project forward.
 
 You can try out a demo at [https://real-estate-web-scraper.herokuapp.com](https://real-estate-web-scraper.herokuapp.com/)
 
+To use Property Web Scraper as a service you would make calls like:
+
+[https://real-estate-web-scraper.herokuapp.com/retriever/as_json?url=https%3A%2F%2Fwww.rightmove.co.uk%2Fproperty-for-sale%2Fproperty-68790657.html](https://real-estate-web-scraper.herokuapp.com/retriever/as_json?url=https%3A%2F%2Fwww.rightmove.co.uk%2Fproperty-for-sale%2Fproperty-68790657.html)
+
 ## Support for importing properties from an MLS
 
 PropertyWebScraper also supports connecting to different MLSs (Multiple Listing Services) in the US using RETS and Web Services.  This functionality is currently experimental and has only been implemented for 3 MLSs.  If there is a particular MLS for which you need support, open an issue with the details.   
