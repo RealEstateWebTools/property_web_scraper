@@ -1,11 +1,15 @@
-# PropertyWebScraper
+# PWB as used by [https://propertysquares.com/](https://propertysquares.com/)
 
-I am currently unable to keep this project updated as I am busy with my new project [https://singlepropertypages.com/](https://singlepropertypages.com/)
+Great new for anyone interested in this project, a US appeals court has recently reaffirmed that web scraping is legal!!
 
-Please get in touch if you are interested in taking this project forward.
+https://techcrunch.com/2022/04/18/web-scraping-legal-court/amp/
+
+I am currently a bit busy with this project (which also also allows you to scrape real estate websites ;) [https://propertysquares.com/](https://propertysquares.com/) but will return to update it shortly.
+
+Please get in touch if you are interested in helping me take this project forward.
 
 
-## [Demo of PropertyWebScraper ](https://real-estate-web-scraper.herokuapp.com/)
+## [Demo of PropertyWebScraper ](https://propertysquares.com/)
 
 You can try out a demo at [https://real-estate-web-scraper.herokuapp.com](https://real-estate-web-scraper.herokuapp.com/)
 
