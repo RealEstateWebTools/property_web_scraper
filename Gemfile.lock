@@ -289,7 +289,7 @@ GEM
       sprockets (>= 3.0.0)
     thor (1.0.1)
     thread_safe (0.3.6)
-    tzinfo (1.2.6)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
     unf (0.1.4)
       unf_ext
