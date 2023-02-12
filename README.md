@@ -4,7 +4,7 @@ Great new for anyone interested in this project, a US appeals court has recently
 
 https://techcrunch.com/2022/04/18/web-scraping-legal-court/amp/
 
-I am currently a bit busy with this project (which also also allows you to scrape real estate websites ;) [https://propertysquares.com/](https://propertysquares.com/) but will return to update it shortly.
+I am currently a bit busy with other projects but hope to return to update it shortly.
 
 Please get in touch if you are interested in helping me take this project forward.
 
