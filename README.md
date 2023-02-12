@@ -1,4 +1,4 @@
-# PWB as used by [https://propertysquares.com/](https://propertysquares.com/)
+# PWB as used by [https://homestocompare.com/](https://homestocompare.com/)
 
 Great new for anyone interested in this project, a US appeals court has recently reaffirmed that web scraping is legal!!
 
@@ -9,9 +9,11 @@ I am currently a bit busy with this project (which also also allows you to scrap
 Please get in touch if you are interested in helping me take this project forward.
 
 
-## [Demo of PropertyWebScraper ](https://propertysquares.com/)
+## [Demo of PropertyWebScraper ](https://homestocompare.com/)
 
-You can try out a demo at [https://real-estate-web-scraper.herokuapp.com](https://real-estate-web-scraper.herokuapp.com/)
+Previously there was a demo at [https://real-estate-web-scraper.herokuapp.com](https://real-estate-web-scraper.herokuapp.com/)
+
+I have had to take that down as heroku has cancelled thier free tier.  You can see it being used in production here though: [https://homestocompare.com/](https://homestocompare.com/)
 
 To use Property Web Scraper as a service you would make calls like:
 
