@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'faraday', '~> 2.0'
   s.add_dependency 'active_hash'
   s.add_dependency 'rack-cors', '~> 2.0'
+  s.add_dependency 'sprockets-rails'
 
   s.add_development_dependency 'debug'
 
