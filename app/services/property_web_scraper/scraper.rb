@@ -135,7 +135,7 @@ module PropertyWebScraper
             retrieved_text = retrieved_text.tr('.', '').tr(',', '')
           end
           if mapping['stripFirstChar']
-            retrieved_text = retrieved_text.strip.last(-1) || ''
+            retrieved_text = retrieved_text.strip[1..] || ''
           end
           property_hash[mapping_key] = retrieved_text.strip.to_f
         end

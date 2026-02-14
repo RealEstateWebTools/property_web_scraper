@@ -1,3 +1,4 @@
+require 'ostruct'
 require 'nokogiri'
 require 'open-uri'
 require 'faraday'
