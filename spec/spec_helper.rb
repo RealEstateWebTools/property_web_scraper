@@ -21,5 +21,5 @@ RSpec.configure do |config|
   config.infer_base_class_for_anonymous_controllers = false
   config.order = 'random'
 
-  config.fixture_path = "#{PropertyWebScraper::Engine.root}/spec/fixtures"
+  config.fixture_paths = ["#{PropertyWebScraper::Engine.root}/spec/fixtures"]
 end
