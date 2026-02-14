@@ -1,6 +1,3 @@
-require_dependency 'property_web_scraper/application_controller'
-# scraper endpoints save to firebase
-
 module PropertyWebScraper
   class ScraperController < ApplicationController
     # below to avoid ActionController::InvalidAuthenticityToken error when posting from chrome extension
@@ -87,15 +84,6 @@ module PropertyWebScraper
       end
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
       @listing = web_scraper.process_url uri.to_s, import_host
-
-      fb_instance_id = Rails.application.secrets.fb_instance_id
-      base_uri = "https://#{fb_instance_id}.firebaseio.com/"
-      firebase = Firebase::Client.new(base_uri)
-
-      response = firebase.push("client-props/#{client_id}", @listing)
-
-      @props_hash = response.body
-      # byebug
 
       render json: {
         success: true,

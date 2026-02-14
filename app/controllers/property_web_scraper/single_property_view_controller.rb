@@ -1,5 +1,3 @@
-require_dependency 'property_web_scraper/application_controller'
-
 module PropertyWebScraper
   class SinglePropertyViewController < ApplicationController
     # below to avoid ActionController::InvalidAuthenticityToken error when posting from chrome extension
