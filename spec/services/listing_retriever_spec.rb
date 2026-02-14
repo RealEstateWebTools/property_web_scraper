@@ -2,11 +2,11 @@ require 'spec_helper'
 
 module PropertyWebScraper
   RSpec.describe 'Listing retriever' do
-    let(:valid_import_url) { 'https://www.idealista.com/inmueble/1678322/' }
+    let(:valid_import_url) { 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/' }
     let(:invalid_import_url) { 'https://www.google.com' }
-    # before :all do
-    #   load File.join(PropertyWebScraper::Engine.root, 'db', 'seeds', 'import_hosts.rb')
-    # end
+    before :all do
+      load File.join(PropertyWebScraper::Engine.root, 'db', 'seeds', 'import_hosts.rb')
+    end
 
 
     it 'detects invalid urls' do
@@ -24,10 +24,12 @@ module PropertyWebScraper
     end
 
     it 'retrieves valid listing' do
-      listing_retriever = PropertyWebScraper::ListingRetriever.new(valid_import_url)
-      result = listing_retriever.retrieve 
-      expect(result.success).to eq(true)
-      expect(result.retrieved_listing.import_host_slug).to eq("idealista")      
+      VCR.use_cassette('scrapers/idealista_2018_01') do
+        listing_retriever = PropertyWebScraper::ListingRetriever.new(valid_import_url)
+        result = listing_retriever.retrieve
+        expect(result.success).to eq(true)
+        expect(result.retrieved_listing.import_host_slug).to eq("idealista")
+      end
     end
   end
 end
