@@ -1,0 +1,11 @@
+--output-dir doc
+--readme README.md
+--title "PropertyWebScraper Documentation"
+--markup markdown
+--protected
+--no-private
+app/**/*.rb
+lib/**/*.rb
+-
+README.md
+CHANGELOG.md

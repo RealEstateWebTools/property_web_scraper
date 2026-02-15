@@ -6,7 +6,7 @@
 <title>
   Class: PropertyWebScraper::Scraper
   
-    &mdash; Documentation by YARD 0.9.38
+    &mdash; PropertyWebScraper Documentation
   
 </title>
 
@@ -452,7 +452,7 @@
     
 <p>Retrieves or refreshes a listing for the given URL.</p>
 
-<p>Finds an existing listing by <code>import_url</code> or creates one. If the listing is older than the import host’s <code>stale_age_duration</code> it is re-scraped from the source website.</p>
+<p>Finds an existing listing by +import_url+ or creates one. If the listing is older than the import host’s +stale_age_duration+ it is re-scraped from the source website.</p>
 
 
   </div>
@@ -520,28 +520,33 @@
       <pre class="lines">
 
 
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79</pre>
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/property_web_scraper/scraper.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'app/services/property_web_scraper/scraper.rb', line 41</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_process_url'>process_url</span><span class='lparen'>(</span><span class='id identifier rubyid_import_url'>import_url</span><span class='comma'>,</span> <span class='id identifier rubyid_import_host'>import_host</span><span class='rparen'>)</span>
+  <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PropertyWebScraper: Scraping </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_import_url'>import_url</span><span class='embexpr_end'>}</span><span class='tstring_content'> (host: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_import_host'>import_host</span><span class='period'>.</span><span class='id identifier rubyid_slug'>slug</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_start_time'>start_time</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_current'>current</span>
   <span class='id identifier rubyid_listing'>listing</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../PropertyWebScraper.html" title="PropertyWebScraper (module)">PropertyWebScraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Listing.html" title="PropertyWebScraper::Listing (class)">Listing</a></span></span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='label'>import_url:</span> <span class='id identifier rubyid_import_url'>import_url</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_first_or_create'>first_or_create</span>
   <span class='id identifier rubyid_expiry_duration'>expiry_duration</span> <span class='op'>=</span> <span class='id identifier rubyid_import_host'>import_host</span><span class='period'>.</span><span class='id identifier rubyid_stale_age_duration'>stale_age_duration</span>
   <span class='comment'># For datetime, yesterday is &lt; today
@@ -556,6 +561,7 @@
     <span class='id identifier rubyid_import_host'>import_host</span><span class='period'>.</span><span class='id identifier rubyid_last_retrieval_at'>last_retrieval_at</span> <span class='op'>=</span> <span class='const'>DateTime</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span>
     <span class='id identifier rubyid_import_host'>import_host</span><span class='period'>.</span><span class='id identifier rubyid_save!'>save!</span>
   <span class='kw'>end</span>
+  <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PropertyWebScraper: Completed scraping </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_import_url'>import_url</span><span class='embexpr_end'>}</span><span class='tstring_content'> in </span><span class='embexpr_beg'>#{</span><span class='lparen'>(</span><span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_current'>current</span> <span class='op'>-</span> <span class='id identifier rubyid_start_time'>start_time</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_round'>round</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>s</span><span class='tstring_end'>&quot;</span></span>
   <span class='id identifier rubyid_listing'>listing</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -643,17 +649,17 @@
       <pre class="lines">
 
 
-86
-87
-88
-89
-90
-91
-92
-93</pre>
+67
+68
+69
+70
+71
+72
+73
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/property_web_scraper/scraper.rb', line 86</span>
+      <pre class="code"><span class="info file"># File 'app/services/property_web_scraper/scraper.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_retrieve_and_save'>retrieve_and_save</span><span class='lparen'>(</span><span class='id identifier rubyid_listing'>listing</span><span class='comma'>,</span> <span class='id identifier rubyid_import_host_slug'>import_host_slug</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_retrieved_properties'>retrieved_properties</span> <span class='op'>=</span> <span class='id identifier rubyid_retrieve_from_webpage'>retrieve_from_webpage</span> <span class='id identifier rubyid_listing'>listing</span><span class='period'>.</span><span class='id identifier rubyid_import_url'>import_url</span>
@@ -734,6 +740,25 @@
       <pre class="lines">
 
 
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
 102
 103
 104
@@ -818,28 +843,13 @@
 183
 184
 185
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195
-196
-197
-198
-199
-200
-201
-202</pre>
+186</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/property_web_scraper/scraper.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'app/services/property_web_scraper/scraper.rb', line 83</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_retrieve_from_webpage'>retrieve_from_webpage</span><span class='lparen'>(</span><span class='id identifier rubyid_import_url'>import_url</span><span class='rparen'>)</span>
+  <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PropertyWebScraper: Fetching page </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_import_url'>import_url</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='id identifier rubyid_properties'>properties</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='comment'># nov 2017 - only 1 property is ever returned currently
 </span>
@@ -858,10 +868,12 @@
     <span class='comment'># page_to_parse = open(import_url)
 </span>  <span class='kw'>rescue</span> <span class='const'>OpenURI</span><span class='op'>::</span><span class='const'>HTTPRedirect</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_redirect'>redirect</span>
     <span class='id identifier rubyid_uri'>uri</span> <span class='op'>=</span> <span class='id identifier rubyid_redirect'>redirect</span><span class='period'>.</span><span class='id identifier rubyid_uri'>uri</span> <span class='comment'># assigned from the &quot;Location&quot; response header
-</span>    <span class='kw'>retry</span> <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_tries'>tries</span> <span class='op'>-=</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+</span>    <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PropertyWebScraper: Redirect to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uri'>uri</span><span class='embexpr_end'>}</span><span class='tstring_content'> (</span><span class='embexpr_beg'>#{</span><span class='int'>3</span> <span class='op'>-</span> <span class='id identifier rubyid_tries'>tries</span> <span class='op'>+</span> <span class='int'>1</span><span class='embexpr_end'>}</span><span class='tstring_content'> of 3)</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>retry</span> <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_tries'>tries</span> <span class='op'>-=</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='op'>&gt;</span> <span class='int'>0</span>
     <span class='id identifier rubyid_raise'>raise</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_doc'>doc</span> <span class='op'>=</span> <span class='const'>Nokogiri</span><span class='op'>::</span><span class='const'>HTML</span><span class='lparen'>(</span><span class='id identifier rubyid_page_to_parse'>page_to_parse</span><span class='rparen'>)</span>
+  <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PropertyWebScraper: Parsed document size: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_doc'>doc</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_bytesize'>bytesize</span><span class='embexpr_end'>}</span><span class='tstring_content'> bytes</span><span class='tstring_end'>&quot;</span></span>
 
   <span class='kw'>if</span> <span class='id identifier rubyid_scraper_mapping'>scraper_mapping</span><span class='period'>.</span><span class='id identifier rubyid_defaultValues'>defaultValues</span>
     <span class='id identifier rubyid_scraper_mapping'>scraper_mapping</span><span class='period'>.</span><span class='id identifier rubyid_defaultValues'>defaultValues</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_mapping_key'>mapping_key</span><span class='op'>|</span>
@@ -950,7 +962,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Feb 15 12:48:15 2026 by
+  Generated on Sun Feb 15 22:14:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.38 (ruby-3.4.3).
 </div>

@@ -6,7 +6,7 @@
 <title>
   Class: PropertyWebScraper::ApplicationRecord
   
-    &mdash; Documentation by YARD 0.9.38
+    &mdash; PropertyWebScraper Documentation
   
 </title>
 
@@ -69,12 +69,10 @@
   <dl>
     <dt>Inherits:</dt>
     <dd>
-      <span class="inheritName">ActiveRecord::Base</span>
+      <span class="inheritName">Object</span>
       
         <ul class="fullTree">
           <li>Object</li>
-          
-            <li class="next">ActiveRecord::Base</li>
           
             <li class="next">PropertyWebScraper::ApplicationRecord</li>
           
@@ -88,6 +86,11 @@
   
   
   
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="FirestoreModel.html" title="PropertyWebScraper::FirestoreModel (module)">FirestoreModel</a></span></dd>
+  </dl>
   
   
 
@@ -106,7 +109,7 @@
     
 <p>Abstract base class for all PropertyWebScraper models.</p>
 
-<p>All models in this engine inherit from this class rather than directly from <code>ActiveRecord::Base</code>, ensuring proper table name prefixing within the engine namespace.</p>
+<p>All models in this engine inherit from this class, which provides a Firestore-backed ActiveRecord-compatible API via FirestoreModel.</p>
 
 
   </div>
@@ -127,11 +130,22 @@
 
 
   
+  
+  
+  
+  
+  
+  <h2>Method Summary</h2>
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="FirestoreModel.html" title="PropertyWebScraper::FirestoreModel (module)">FirestoreModel</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="FirestoreModel.html#[]-instance_method" title="PropertyWebScraper::FirestoreModel#[] (method)">#[]</a></span>, <span class='object_link'><a href="FirestoreModel.html#[]=-instance_method" title="PropertyWebScraper::FirestoreModel#[]= (method)">#[]=</a></span>, <span class='object_link'><a href="FirestoreModel.html#_assign_attributes_from_firestore-instance_method" title="PropertyWebScraper::FirestoreModel#_assign_attributes_from_firestore (method)">#_assign_attributes_from_firestore</a></span>, <span class='object_link'><a href="FirestoreModel.html#as_json-instance_method" title="PropertyWebScraper::FirestoreModel#as_json (method)">#as_json</a></span>, <span class='object_link'><a href="FirestoreModel.html#destroy-instance_method" title="PropertyWebScraper::FirestoreModel#destroy (method)">#destroy</a></span>, <span class='object_link'><a href="FirestoreModel.html#initialize-instance_method" title="PropertyWebScraper::FirestoreModel#initialize (method)">#initialize</a></span>, <span class='object_link'><a href="FirestoreModel.html#new_record%3F-instance_method" title="PropertyWebScraper::FirestoreModel#new_record? (method)">#new_record?</a></span>, <span class='object_link'><a href="FirestoreModel.html#persisted%3F-instance_method" title="PropertyWebScraper::FirestoreModel#persisted? (method)">#persisted?</a></span>, <span class='object_link'><a href="FirestoreModel.html#reload-instance_method" title="PropertyWebScraper::FirestoreModel#reload (method)">#reload</a></span>, <span class='object_link'><a href="FirestoreModel.html#save!-instance_method" title="PropertyWebScraper::FirestoreModel#save! (method)">#save!</a></span>, <span class='object_link'><a href="FirestoreModel.html#update_column-instance_method" title="PropertyWebScraper::FirestoreModel#update_column (method)">#update_column</a></span>, <span class='object_link'><a href="FirestoreModel.html#validate!-instance_method" title="PropertyWebScraper::FirestoreModel#validate! (method)">#validate!</a></span></p>
+
+  
 
 </div>
 
       <div id="footer">
-  Generated on Sun Feb 15 12:48:15 2026 by
+  Generated on Sun Feb 15 22:14:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.38 (ruby-3.4.3).
 </div>

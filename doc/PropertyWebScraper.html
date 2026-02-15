@@ -6,7 +6,7 @@
 <title>
   Module: PropertyWebScraper
   
-    &mdash; Documentation by YARD 0.9.38
+    &mdash; PropertyWebScraper Documentation
   
 </title>
 
@@ -79,7 +79,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/property_web_scraper.rb<span class="defines">,<br />
-  lib/property_web_scraper/engine.rb,<br /> lib/property_web_scraper/version.rb,<br /> app/models/property_web_scraper/listing.rb,<br /> app/services/property_web_scraper/scraper.rb,<br /> app/models/property_web_scraper/import_host.rb,<br /> app/models/property_web_scraper/pwb_listing.rb,<br /> app/jobs/property_web_scraper/application_job.rb,<br /> app/models/property_web_scraper/scraper_mapping.rb,<br /> app/models/property_web_scraper/application_record.rb,<br /> app/helpers/property_web_scraper/application_helper.rb,<br /> app/mailers/property_web_scraper/application_mailer.rb,<br /> app/services/property_web_scraper/listing_retriever.rb,<br /> app/controllers/property_web_scraper/scraper_controller.rb,<br /> app/controllers/property_web_scraper/application_controller.rb,<br /> app/controllers/property_web_scraper/api/v1/listings_controller.rb,<br /> app/controllers/property_web_scraper/single_property_view_controller.rb</span>
+  app/models/property_web_scraper/listing.rb,<br /> app/services/property_web_scraper/scraper.rb,<br /> app/models/property_web_scraper/import_host.rb,<br /> app/models/property_web_scraper/pwb_listing.rb,<br /> app/jobs/property_web_scraper/application_job.rb,<br /> app/models/property_web_scraper/scraper_mapping.rb,<br /> app/services/property_web_scraper/url_validator.rb,<br /> app/models/property_web_scraper/application_record.rb,<br /> app/helpers/property_web_scraper/application_helper.rb,<br /> app/mailers/property_web_scraper/application_mailer.rb,<br /> app/services/property_web_scraper/listing_retriever.rb,<br /> app/controllers/property_web_scraper/scraper_controller.rb,<br /> app/controllers/property_web_scraper/application_controller.rb,<br /> app/services/property_web_scraper/scraped_content_sanitizer.rb,<br /> app/controllers/property_web_scraper/api/v1/listings_controller.rb,<br /> app/controllers/property_web_scraper/single_property_view_controller.rb,<br /> lib/property_web_scraper/engine.rb,<br /> lib/property_web_scraper/version.rb,<br /> lib/property_web_scraper/firestore_model.rb,<br /> lib/property_web_scraper/firestore_client.rb</span>
 </dd>
   </dl>
   
@@ -102,11 +102,11 @@
 <p class="children">
   
     
-      <strong class="modules">Modules:</strong> <span class='object_link'><a href="PropertyWebScraper/ApplicationHelper.html" title="PropertyWebScraper::ApplicationHelper (module)">ApplicationHelper</a></span>
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="PropertyWebScraper/ApplicationHelper.html" title="PropertyWebScraper::ApplicationHelper (module)">ApplicationHelper</a></span>, <span class='object_link'><a href="PropertyWebScraper/FirestoreClient.html" title="PropertyWebScraper::FirestoreClient (module)">FirestoreClient</a></span>, <span class='object_link'><a href="PropertyWebScraper/FirestoreModel.html" title="PropertyWebScraper::FirestoreModel (module)">FirestoreModel</a></span>
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="PropertyWebScraper/ApplicationController.html" title="PropertyWebScraper::ApplicationController (class)">ApplicationController</a></span>, <span class='object_link'><a href="PropertyWebScraper/ApplicationJob.html" title="PropertyWebScraper::ApplicationJob (class)">ApplicationJob</a></span>, <span class='object_link'><a href="PropertyWebScraper/ApplicationMailer.html" title="PropertyWebScraper::ApplicationMailer (class)">ApplicationMailer</a></span>, <span class='object_link'><a href="PropertyWebScraper/ApplicationRecord.html" title="PropertyWebScraper::ApplicationRecord (class)">ApplicationRecord</a></span>, <span class='object_link'><a href="PropertyWebScraper/Engine.html" title="PropertyWebScraper::Engine (class)">Engine</a></span>, <span class='object_link'><a href="PropertyWebScraper/ImportHost.html" title="PropertyWebScraper::ImportHost (class)">ImportHost</a></span>, <span class='object_link'><a href="PropertyWebScraper/Listing.html" title="PropertyWebScraper::Listing (class)">Listing</a></span>, <span class='object_link'><a href="PropertyWebScraper/ListingRetriever.html" title="PropertyWebScraper::ListingRetriever (class)">ListingRetriever</a></span>, <span class='object_link'><a href="PropertyWebScraper/PwbListing.html" title="PropertyWebScraper::PwbListing (class)">PwbListing</a></span>, <span class='object_link'><a href="PropertyWebScraper/Scraper.html" title="PropertyWebScraper::Scraper (class)">Scraper</a></span>, <span class='object_link'><a href="PropertyWebScraper/ScraperController.html" title="PropertyWebScraper::ScraperController (class)">ScraperController</a></span>, <span class='object_link'><a href="PropertyWebScraper/ScraperMapping.html" title="PropertyWebScraper::ScraperMapping (class)">ScraperMapping</a></span>, <span class='object_link'><a href="PropertyWebScraper/SinglePropertyViewController.html" title="PropertyWebScraper::SinglePropertyViewController (class)">SinglePropertyViewController</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="PropertyWebScraper/ApplicationController.html" title="PropertyWebScraper::ApplicationController (class)">ApplicationController</a></span>, <span class='object_link'><a href="PropertyWebScraper/ApplicationJob.html" title="PropertyWebScraper::ApplicationJob (class)">ApplicationJob</a></span>, <span class='object_link'><a href="PropertyWebScraper/ApplicationMailer.html" title="PropertyWebScraper::ApplicationMailer (class)">ApplicationMailer</a></span>, <span class='object_link'><a href="PropertyWebScraper/ApplicationRecord.html" title="PropertyWebScraper::ApplicationRecord (class)">ApplicationRecord</a></span>, <span class='object_link'><a href="PropertyWebScraper/Engine.html" title="PropertyWebScraper::Engine (class)">Engine</a></span>, <span class='object_link'><a href="PropertyWebScraper/ImportHost.html" title="PropertyWebScraper::ImportHost (class)">ImportHost</a></span>, <span class='object_link'><a href="PropertyWebScraper/Listing.html" title="PropertyWebScraper::Listing (class)">Listing</a></span>, <span class='object_link'><a href="PropertyWebScraper/ListingRetriever.html" title="PropertyWebScraper::ListingRetriever (class)">ListingRetriever</a></span>, <span class='object_link'><a href="PropertyWebScraper/PwbListing.html" title="PropertyWebScraper::PwbListing (class)">PwbListing</a></span>, <span class='object_link'><a href="PropertyWebScraper/ScrapedContentSanitizer.html" title="PropertyWebScraper::ScrapedContentSanitizer (class)">ScrapedContentSanitizer</a></span>, <span class='object_link'><a href="PropertyWebScraper/Scraper.html" title="PropertyWebScraper::Scraper (class)">Scraper</a></span>, <span class='object_link'><a href="PropertyWebScraper/ScraperController.html" title="PropertyWebScraper::ScraperController (class)">ScraperController</a></span>, <span class='object_link'><a href="PropertyWebScraper/ScraperMapping.html" title="PropertyWebScraper::ScraperMapping (class)">ScraperMapping</a></span>, <span class='object_link'><a href="PropertyWebScraper/SinglePropertyViewController.html" title="PropertyWebScraper::SinglePropertyViewController (class)">SinglePropertyViewController</a></span>, <span class='object_link'><a href="PropertyWebScraper/UrlValidator.html" title="PropertyWebScraper::UrlValidator (class)">UrlValidator</a></span>
     
   
 </p>
@@ -149,7 +149,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Feb 15 12:48:15 2026 by
+  Generated on Sun Feb 15 22:14:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.38 (ruby-3.4.3).
 </div>

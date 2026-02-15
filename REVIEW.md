@@ -60,11 +60,11 @@ The Vuetify layout with unescaped `<%==` in script tags was removed as part of t
 #### ~~Overly Broad Exception Catching~~ — FIXED (b3278cb9)
 All `rescue Exception` blocks were changed to `rescue StandardError`.
 
-#### Silent Error Swallowing
-Multiple rescue blocks in `scraper.rb` catch exceptions and discard them silently — no logging, no re-raising, no record of what went wrong.
+#### ~~Silent Error Swallowing~~ — FIXED (ef2e32a0)
+Rescue blocks now log exceptions via `Rails.logger`.
 
-#### No Logging
-Zero use of `Rails.logger` anywhere in the codebase. There is no way to diagnose failures, track scraping activity, or monitor performance.
+#### ~~No Logging~~ — FIXED (ef2e32a0)
+`Rails.logger` calls added for scraping attempts, results, and failures.
 
 ### Data Integrity
 
@@ -91,8 +91,8 @@ The Firestore migration removed the money-rails monetized columns. Pricing now u
 #### ~~Massive Commented-Out Code~~ — FIXED (b3278cb9, 8910e5dc)
 Dead commented-out code was removed across controllers, models, and views. Legacy theme layouts (`spp_lite`, `spp_modern`, `spp_vuetify`) were deleted entirely.
 
-#### Duplicated Logic
-URL validation and parsing is reimplemented in four places:
+#### ~~Duplicated Logic~~ — FIXED (ef2e32a0)
+URL validation and parsing was reimplemented in four places (now consolidated in `UrlValidator`):
 1. `ApplicationController#uri_from_url`
 2. `ScraperController#retrieve_as_json`
 3. `SinglePropertyViewController#show`
@@ -113,8 +113,8 @@ The legacy frontend (Bootstrap 4 alpha, jQuery, Tether, Vue/Vuetify, Font Awesom
 
 ### Tests
 
-#### VCR Allows Real HTTP Calls
-`spec/support/vcr_setup.rb` sets `allow_http_connections_when_no_cassette = true`. This means if a cassette is missing, tests silently hit live websites — which could pass locally but fail in CI, or produce flaky results.
+#### ~~VCR Allows Real HTTP Calls~~ — FIXED (ef2e32a0)
+`allow_http_connections_when_no_cassette` is now `false` in `spec/support/vcr_setup.rb`.
 
 #### Stale Cassettes
 Some cassettes date from 2018 (e.g., `idealista_2018_01.yml`). The websites have certainly changed their HTML structure since then, meaning tests pass against old HTML but live scraping likely fails.
@@ -133,13 +133,8 @@ Some cassettes date from 2018 (e.g., `idealista_2018_01.yml`). The websites have
 | Pisos.com | 1 | Marked TODO |
 | RealEstateIndia | 0 | Zero assertions |
 
-#### No Error Path Testing
-No tests for:
-- Network timeouts or connection failures
-- Malformed or unexpected HTML
-- HTTP 429 (rate limited) or 503 (service unavailable) responses
-- Invalid regex patterns in scraper mappings
-- Missing required fields in scraper mappings
+#### ~~No Error Path Testing~~ — FIXED (ef2e32a0)
+Error-path specs now cover network timeouts, malformed HTML, missing fields, unsupported URLs, and HTTP error responses.
 
 ### Configuration
 
@@ -165,17 +160,17 @@ The migration to Firestore removed the PostgreSQL schema. Firestore models decla
 
 | Feature | Notes |
 |---------|-------|
-| **Authentication / Authorization** | No user accounts, API keys, or access control. Debug pages (`/stash`) are publicly accessible. |
+| ~~**Authentication / Authorization**~~ | ~~DONE (ef2e32a0). API key authentication via `authenticate_api_key!`.~~ |
 | **Rate Limiting** | No throttling on scraping requests or API endpoints. `pause_between_calls` column exists but is never read. |
-| **Logging / Monitoring** | Zero instrumentation. No way to know what's being scraped, what's failing, or how often. |
+| ~~**Logging / Monitoring**~~ | ~~DONE (ef2e32a0). `Rails.logger` calls for scraping attempts, results, and failures.~~ |
 | **Effective Caching** | `stale_age_duration` is hardcoded to `1.day` despite a configurable DB column. No HTTP caching headers on API responses. |
-| **Input Sanitization** | Scraped HTML is stored and rendered as-is. No sanitization pipeline before storage or display. |
+| ~~**Input Sanitization**~~ | ~~DONE (ef2e32a0). `ScrapedContentSanitizer` strips HTML and blocks dangerous URI schemes.~~ |
 | **Pagination** | API returns unbounded results. No limit/offset support. |
 | **Search / Filtering** | No way to query listings by location, price, type, bedrooms, etc. |
 | **Background Processing** | All scraping is synchronous in the request cycle. No ActiveJob/Sidekiq integration. Long scrapes block the web server. |
 | **Retry / Resilience** | No exponential backoff, circuit breakers, or graceful degradation for unreachable sites. |
 | **API Documentation** | No Swagger/OpenAPI spec despite having a versioned API endpoint. |
-| **Proper Model Associations** | `Listing` has `import_host_slug` but no `belongs_to :import_host`. Just a denormalized string with no foreign key. |
+| ~~**Proper Model Associations**~~ | ~~DONE (ef2e32a0). `Listing#import_host` provides memoised lookup by slug.~~ |
 | **Soft Delete** | `deleted_at` column exists in schema but no soft-delete logic implemented. |
 | **Internationalization** | Translation columns exist (`title_es`, `title_de`, etc.) and `I18n.t` is used in one view, but no locale files are provided. |
 
@@ -189,24 +184,24 @@ The migration to Firestore removed the PostgreSQL schema. Firestore models decla
 2. ~~**Remove hardcoded Google Maps API key**~~ — DONE (3263ef6f, removed in 8910e5dc)
 3. ~~**Fix `rescue Exception`**~~ — DONE (b3278cb9)
 4. ~~**Fix XPath bug**~~ — DONE (b3278cb9)
-5. **Disable real HTTP in tests** — Set `allow_http_connections_when_no_cassette = false` in `spec/support/vcr_setup.rb`.
+5. ~~**Disable real HTTP in tests**~~ — DONE (ef2e32a0). `allow_http_connections_when_no_cassette` is already `false` in `spec/support/vcr_setup.rb`.
 6. **Fix gemspec email** — `etewiah@hotmail.cim` → `etewiah@hotmail.com`.
 
 ### Architectural Improvements (High Priority)
 
-7. **Add a sanitization layer** — Sanitize all scraped text before database storage, not just at render time. Create a `ScrapedContentSanitizer` service.
+7. ~~**Add a sanitization layer**~~ — DONE (ef2e32a0). `ScrapedContentSanitizer` strips HTML and blocks dangerous URI schemes before persistence.
 
 8. **Move scraping to background jobs** — Wrap `ListingRetriever#retrieve` in an ActiveJob. Return a job ID to the client and let them poll for results. This prevents long HTTP requests from blocking the server.
 
-9. **Add logging throughout** — Add `Rails.logger.info/warn/error` calls for: scraping attempts (URL, host), scraping results (fields found, duration), scraping failures (exception class, message, URL), and cache hits/misses.
+9. ~~**Add logging throughout**~~ — DONE (ef2e32a0). `Rails.logger` calls added for scraping attempts, results, and failures.
 
-10. **Extract shared URL validation** — Create a single `UrlValidator` service used by all controllers. Return a result object instead of mixed return types (URI, empty string, nil).
+10. ~~**Extract shared URL validation**~~ — DONE (ef2e32a0). `UrlValidator` service returns a result object with URI, ImportHost, and error info.
 
 11. ~~**Consolidate pricing**~~ — DONE (cd329df0). Firestore migration removed money-rails columns; now uses `price_string` + `price_float` only.
 
-12. **Add proper associations** — `Listing` references `ImportHost` via `import_host_slug` but there is no formal association or lookup validation.
+12. ~~**Add proper associations**~~ — DONE (ef2e32a0). `Listing#import_host` method provides memoised lookup by `import_host_slug`.
 
-13. **Add API authentication** — At minimum, a simple API key scheme checked via `before_action`. Consider token-based auth for the Chrome extension instead of disabling CSRF.
+13. ~~**Add API authentication**~~ — DONE (ef2e32a0). `authenticate_api_key!` supports `X-Api-Key` header and `api_key` query parameter with backwards-compatible skip.
 
 ### Code Quality (Medium Priority)
 
@@ -221,7 +216,7 @@ The migration to Firestore removed the PostgreSQL schema. Firestore models decla
 
 20. **Regenerate stale VCR cassettes** — Especially the 2018-era ones. Document the regeneration process.
 
-21. **Add error path tests** — Test network timeouts, malformed HTML, missing fields, unsupported URL patterns, and HTTP error responses.
+21. ~~**Add error path tests**~~ — DONE (ef2e32a0). Specs cover network timeouts, malformed HTML, missing fields, unsupported URLs, and HTTP error responses.
 
 22. **Complete incomplete scraper specs** — Add assertions to RealEstateIndia and Pisos.com specs or remove them.
 
@@ -242,4 +237,4 @@ The migration to Firestore removed the PostgreSQL schema. Firestore models decla
 ---
 
 *Review conducted: February 2026*
-*Last updated: February 2026 — marked items fixed in commits b3278cb9, 8910e5dc, cd329df0, 5bde3fa6*
+*Last updated: February 2026 — marked items fixed in commits b3278cb9, 8910e5dc, cd329df0, 5bde3fa6, ef2e32a0*

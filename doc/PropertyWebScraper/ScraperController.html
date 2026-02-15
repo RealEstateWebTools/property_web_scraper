@@ -6,7 +6,7 @@
 <title>
   Class: PropertyWebScraper::ScraperController
   
-    &mdash; Documentation by YARD 0.9.38
+    &mdash; PropertyWebScraper Documentation
   
 </title>
 
@@ -117,6 +117,22 @@
   
 
 </div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="MIN_CLIENT_ID_LENGTH-constant" class="">MIN_CLIENT_ID_LENGTH =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>5</span></pre></dd>
+      
+    </dl>
+  
+
 
 
 
@@ -271,76 +287,31 @@
       <pre class="lines">
 
 
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138
-139
-140
-141
-142
-143
-144
-145
-146
-147
-148
-149
-150
-151
-152
-153
-154
-155
-156
-157
-158
-159
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179
-180
-181
-182</pre>
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/property_web_scraper/scraper_controller.rb', line 120</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/property_web_scraper/scraper_controller.rb', line 94</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ajax_submit'>ajax_submit</span>
-  <span class='comment'># scraper_name = params[:scraper][:scraper_name]
-</span>  <span class='id identifier rubyid_import_url'>import_url</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:import_url</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
+  <span class='id identifier rubyid_import_url'>import_url</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:import_url</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
 
   <span class='id identifier rubyid_listing_retriever'>listing_retriever</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../PropertyWebScraper.html" title="PropertyWebScraper (module)">PropertyWebScraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="ListingRetriever.html" title="PropertyWebScraper::ListingRetriever (class)">ListingRetriever</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="ListingRetriever.html#initialize-instance_method" title="PropertyWebScraper::ListingRetriever#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_import_url'>import_url</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_listing_retriever'>listing_retriever</span><span class='period'>.</span><span class='id identifier rubyid_retrieve'>retrieve</span>
@@ -352,54 +323,11 @@
 </span><span class='words_sep'>                               </span><span class='tstring_content'>price_string</span><span class='words_sep'> </span><span class='tstring_content'>price_float</span><span class='words_sep'> </span><span class='tstring_content'>area_unit</span><span class='words_sep'> </span><span class='tstring_content'>address_string</span><span class='words_sep'> </span><span class='tstring_content'>currency</span><span class='words_sep'>
 </span><span class='words_sep'>                               </span><span class='tstring_content'>country</span><span class='words_sep'> </span><span class='tstring_content'>longitude</span><span class='words_sep'> </span><span class='tstring_content'>latitude</span><span class='words_sep'> </span><span class='tstring_content'>main_image_url</span><span class='words_sep'> </span><span class='tstring_content'>for_rent</span><span class='words_sep'> </span><span class='tstring_content'>for_sale</span><span class='words_sep'>
 </span><span class='words_sep'>                               </span><span class='tstring_content'>count_bedrooms</span><span class='words_sep'> </span><span class='tstring_content'>count_bathrooms</span><span class='words_sep'> </span><span class='tstring_end'>)</span></span>
-    <span class='comment'># above used to display /views/property_web_scraper/scraper/_retrieve_results.html.erb
-</span>  <span class='kw'>else</span>
+  <span class='kw'>else</span>
     <span class='ivar'>@error_message</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_error_message'>error_message</span>
   <span class='kw'>end</span>
 
-  <span class='comment'># begin
-</span>  <span class='comment'>#   uri = URI.parse import_url
-</span>  <span class='comment'># rescue URI::InvalidURIError =&gt; error
-</span>  <span class='comment'>#   uri = &quot;&quot;
-</span>  <span class='comment'># end
-</span>  <span class='comment'># @listing = {}
-</span>  <span class='comment'># if uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
-</span>  <span class='comment'>#   # find import_host with meta data from db
-</span>  <span class='comment'>#   import_host = PropertyWebScraper::ImportHost.find_by_host(uri.host)
-</span>  <span class='comment'>#   if import_host
-</span>  <span class='comment'>#     @success = true
-</span>  <span class='comment'>#     web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
-</span>  <span class='comment'>#     @listing = web_scraper.process_url import_url, import_host
-</span>  <span class='comment'>#     @listing_attributes = %w(reference title description
-</span>  <span class='comment'>#                              price_string price_float area_unit address_string currency
-</span>  <span class='comment'>#                              country longitude latitude main_image_url for_rent for_sale
-</span>  <span class='comment'>#                              count_bedrooms count_bathrooms )
-</span>  <span class='comment'>#     # above used to display /views/property_web_scraper/scraper/_retrieve_results.html.erb
-</span>  <span class='comment'>#   else
-</span>  <span class='comment'>#     @success = false
-</span>  <span class='comment'>#     @error_message = &lt;&lt;-HTML
-</span>  <span class='comment'>#     &lt;div class=&quot;error&quot;&gt;
-</span>  <span class='comment'>#     Sorry, unable to retrieve property details from this url.
-</span>  <span class='comment'>#       Please try a url from
-</span>  <span class='comment'>#     &lt;span&gt;&lt;a href=&quot;https://www.idealista.com&quot;&gt;
-</span>  <span class='comment'>#     https://www.idealista.com&lt;/a&gt;&lt;/span&gt;
-</span>  <span class='comment'>#     &lt;span&gt;&lt;a href=&quot;http://www.mlslistings.com&quot;&gt;
-</span>  <span class='comment'>#     http://www.mlslistings.com&lt;/a&gt;&lt;/span&gt;
-</span>  <span class='comment'>#     &lt;span&gt;&lt;a href=&quot;http://www.realtor.com&quot;&gt;
-</span>  <span class='comment'>#     http://www.realtor.com&lt;/a&gt;&lt;/span&gt;
-</span>  <span class='comment'>#     or
-</span>  <span class='comment'>#     &lt;span&gt;&lt;a href=&quot;https://www.zoopla.co.uk&quot;&gt;
-</span>  <span class='comment'>#     https://www.zoopla.co.uk&lt;/a&gt;&lt;/span&gt;
-</span>  <span class='comment'>#     &lt;/div&gt;
-</span>  <span class='comment'>#     HTML
-</span>
-  <span class='comment'>#   end
-</span>  <span class='comment'># else
-</span>  <span class='comment'>#   @error_message = &#39;Please enter a valid url&#39;
-</span>  <span class='comment'>#   @success = false
-</span>  <span class='comment'># end
-</span>  <span class='comment'># redirect_to &quot;/scrapers/#{scraper_name}&quot;
-</span>  <span class='id identifier rubyid_render'>render</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>scraper_retrieve_results</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>layout:</span> <span class='kw'>false</span>
+  <span class='id identifier rubyid_render'>render</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ajax_submit</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>layout:</span> <span class='kw'>false</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -434,6 +362,27 @@
       <pre class="lines">
 
 
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
 45
 46
 47
@@ -443,28 +392,13 @@
 51
 52
 53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69</pre>
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/property_web_scraper/scraper_controller.rb', line 45</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/property_web_scraper/scraper_controller.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_config_as_json'>config_as_json</span>
-  <span class='id identifier rubyid_import_host'>import_host</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../PropertyWebScraper.html" title="PropertyWebScraper (module)">PropertyWebScraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="ImportHost.html" title="PropertyWebScraper::ImportHost (class)">ImportHost</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_by_host'>find_by_host</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>www.realtor.com</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_import_host'>import_host</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../PropertyWebScraper.html" title="PropertyWebScraper (module)">PropertyWebScraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="ImportHost.html" title="PropertyWebScraper::ImportHost (class)">ImportHost</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_by_host'>find_by_host</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:host</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>www.realtor.com</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='kw'>unless</span> <span class='id identifier rubyid_import_host'>import_host</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='lbrace'>{</span>
       <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span>
@@ -473,6 +407,12 @@
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_scraper_mapping'>scraper_mapping</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../PropertyWebScraper.html" title="PropertyWebScraper (module)">PropertyWebScraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="ScraperMapping.html" title="PropertyWebScraper::ScraperMapping (class)">ScraperMapping</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_by_name'>find_by_name</span><span class='lparen'>(</span><span class='id identifier rubyid_import_host'>import_host</span><span class='period'>.</span><span class='id identifier rubyid_scraper_name'>scraper_name</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_scraper_mapping'>scraper_mapping</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='lbrace'>{</span>
+      <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span>
+      <span class='label'>key:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>scraper_mapping</span><span class='tstring_end'>&quot;</span></span>
+    <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
 
   <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_config'>config</span> <span class='op'>+=</span> <span class='lparen'>(</span><span class='id identifier rubyid_reform_config'>reform_config</span> <span class='id identifier rubyid_scraper_mapping'>scraper_mapping</span><span class='period'>.</span><span class='id identifier rubyid_attributes'>attributes</span><span class='lbracket'>[</span><span class='symbol'>:defaultValues</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -507,7 +447,7 @@
     <p class="note returns_void">This method returns an undefined value.</p>
 <p>Retrieves a property listing by URL and returns it as JSON.</p>
 
-<p>Expects a <code>url</code> parameter. Returns error JSON when the URL is missing, invalid, or belongs to an unsupported host.</p>
+<p>Expects a +url+ parameter. Returns error JSON when the URL is missing, invalid, or belongs to an unsupported host.</p>
 
 
   </div>
@@ -521,6 +461,21 @@
       <pre class="lines">
 
 
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
 77
 78
 79
@@ -530,60 +485,23 @@
 83
 84
 85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112</pre>
+86</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/property_web_scraper/scraper_controller.rb', line 77</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/property_web_scraper/scraper_controller.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_retrieve_as_json'>retrieve_as_json</span>
-
-  <span class='kw'>unless</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>url</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PropertyWebScraper: retrieve_as_json called with url=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>url</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_validation'>validation</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../PropertyWebScraper.html" title="PropertyWebScraper (module)">PropertyWebScraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="UrlValidator.html" title="PropertyWebScraper::UrlValidator (class)">UrlValidator</a></span></span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="UrlValidator.html#call-class_method" title="PropertyWebScraper::UrlValidator.call (method)">call</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>url</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_validation'>validation</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='lbrace'>{</span>
       <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span>
-      <span class='label'>error_message:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Please provide a url</span><span class='tstring_end'>&quot;</span></span>
+      <span class='label'>error_message:</span> <span class='id identifier rubyid_validation'>validation</span><span class='period'>.</span><span class='id identifier rubyid_error_message'>error_message</span>
     <span class='rbrace'>}</span>
   <span class='kw'>end</span>
-  <span class='id identifier rubyid_uri'>uri</span> <span class='op'>=</span> <span class='id identifier rubyid_uri_from_url'>uri_from_url</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>url</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
-  <span class='kw'>unless</span> <span class='id identifier rubyid_uri'>uri</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>URI</span><span class='op'>::</span><span class='const'>HTTP</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_uri'>uri</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>URI</span><span class='op'>::</span><span class='const'>HTTPS</span><span class='rparen'>)</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='lbrace'>{</span>
-      <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span>
-      <span class='label'>error_message:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Please provide a valid url</span><span class='tstring_end'>&quot;</span></span>
-    <span class='rbrace'>}</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_import_host'>import_host</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../PropertyWebScraper.html" title="PropertyWebScraper (module)">PropertyWebScraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="ImportHost.html" title="PropertyWebScraper::ImportHost (class)">ImportHost</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_by_host'>find_by_host</span><span class='lparen'>(</span><span class='id identifier rubyid_uri'>uri</span><span class='period'>.</span><span class='id identifier rubyid_host'>host</span><span class='rparen'>)</span>
-  <span class='kw'>unless</span> <span class='id identifier rubyid_import_host'>import_host</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_render'>render</span> <span class='label'>json:</span> <span class='lbrace'>{</span>
-      <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span>
-      <span class='label'>error_message:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sorry, the url provided is currently not supported</span><span class='tstring_end'>&quot;</span></span>
-    <span class='rbrace'>}</span>
-  <span class='kw'>end</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>client_id</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>client_id</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='int'>5</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_uri'>uri</span> <span class='op'>=</span> <span class='id identifier rubyid_validation'>validation</span><span class='period'>.</span><span class='id identifier rubyid_uri'>uri</span>
+  <span class='id identifier rubyid_import_host'>import_host</span> <span class='op'>=</span> <span class='id identifier rubyid_validation'>validation</span><span class='period'>.</span><span class='id identifier rubyid_import_host'>import_host</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>client_id</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>client_id</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='const'><span class='object_link'><a href="#MIN_CLIENT_ID_LENGTH-constant" title="PropertyWebScraper::ScraperController::MIN_CLIENT_ID_LENGTH (constant)">MIN_CLIENT_ID_LENGTH</a></span></span><span class='rparen'>)</span>
     <span class='id identifier rubyid_client_id'>client_id</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>client_id</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
   <span class='kw'>else</span>
     <span class='id identifier rubyid_client_id'>client_id</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>pwb</span><span class='tstring_end'>&quot;</span></span> <span class='op'>+</span> <span class='const'>SecureRandom</span><span class='period'>.</span><span class='id identifier rubyid_urlsafe_base64'>urlsafe_base64</span><span class='lparen'>(</span><span class='int'>8</span><span class='rparen'>)</span>
@@ -628,18 +546,14 @@
       <pre class="lines">
 
 
-35
-36
-37
-38</pre>
+16
+17</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/property_web_scraper/scraper_controller.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/property_web_scraper/scraper_controller.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_welcome'>welcome</span>
-  <span class='comment'># :nocov:
-</span>  <span class='comment'># scraper_configs_coll = PropertyWebScraper::ImportHost.all
-</span><span class='kw'>end</span></pre>
+<span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -650,7 +564,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Feb 15 12:48:15 2026 by
+  Generated on Sun Feb 15 22:14:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.38 (ruby-3.4.3).
 </div>
