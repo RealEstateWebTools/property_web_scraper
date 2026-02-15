@@ -20,7 +20,7 @@ module PropertyWebScraper
       private
 
       def build_client
-        project_id = ENV.fetch('FIRESTORE_PROJECT_ID')
+        project_id = ENV.fetch('FIRESTORE_PROJECT_ID', 'property-web-scraper-dev')
 
         if ENV['FIRESTORE_EMULATOR_HOST']
           Google::Cloud::Firestore.new(project_id: project_id)
