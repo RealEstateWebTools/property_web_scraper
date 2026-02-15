@@ -10,6 +10,8 @@ spec/dummy/tmp/
 spec/dummy/.byebug_history
 spec/dummy/config/secrets.yml
 .byebug_history
+.env
+.env.local
 
 spec/dummy/node_modules
 .yardoc/

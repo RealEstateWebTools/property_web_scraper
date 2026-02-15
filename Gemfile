@@ -9,6 +9,7 @@ gem 'rails', '~> 7.2.0'
 gem 'puma'
 
 group :development, :test do
+  gem 'dotenv-rails', '~> 3.0'
   gem 'simplecov', require: false
   gem 'rubocop', require: false
   gem 'yard', require: false
