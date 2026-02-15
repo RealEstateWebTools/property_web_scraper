@@ -85,6 +85,26 @@ module PropertyWebScraper
 
     validate :image_urls_are_array
 
+    # Returns the associated {ImportHost} for this listing.
+    #
+    # Looks up ImportHost by +import_host_slug+ (which is the document ID).
+    # Memoized; cleared on +import_host_slug=+ or +reload+.
+    #
+    # @return [ImportHost, nil]
+    def import_host
+      @_import_host ||= import_host_slug.present? ? ImportHost.find(import_host_slug) : nil
+    end
+
+    def import_host_slug=(value)
+      @_import_host = nil
+      super
+    end
+
+    def reload
+      @_import_host = nil
+      super
+    end
+
     # Validates that +image_urls+ is an Array.
     #
     # @return [void]
@@ -132,6 +152,7 @@ module PropertyWebScraper
     # @param property_hash [Hash] scraped property data keyed by attribute name
     # @return [void]
     def self.update_from_hash(listing, property_hash)
+      property_hash = ScrapedContentSanitizer.call(property_hash)
       std_attributes = %w(reference title description
                       price_string price_float area_unit currency
                       country longitude latitude main_image_url for_rent for_sale image_urls

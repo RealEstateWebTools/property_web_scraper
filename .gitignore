@@ -12,6 +12,7 @@ spec/dummy/config/secrets.yml
 .byebug_history
 .env
 .env.local
+config/firebase-credentials.json
 
 spec/dummy/node_modules
 .yardoc/

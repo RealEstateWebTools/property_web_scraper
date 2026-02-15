@@ -100,10 +100,12 @@ module PropertyWebScraper
         # page_to_parse = open(import_url)
       rescue OpenURI::HTTPRedirect => redirect
         uri = redirect.uri # assigned from the "Location" response header
+        Rails.logger.warn "PropertyWebScraper: Redirect to #{uri} (#{3 - tries + 1} of 3)"
         retry if (tries -= 1) > 0
         raise
       end
       doc = Nokogiri::HTML(page_to_parse)
+      Rails.logger.info "PropertyWebScraper: Parsed document size: #{doc.to_s.bytesize} bytes"
 
       if scraper_mapping.defaultValues
         scraper_mapping.defaultValues.keys.each do |mapping_key|

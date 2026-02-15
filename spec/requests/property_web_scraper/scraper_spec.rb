@@ -96,6 +96,55 @@ module PropertyWebScraper
       end
     end
 
+    describe 'API authentication' do
+      around(:each) do |example|
+        ClimateControl.modify(PROPERTY_SCRAPER_API_KEY: 'test-secret-key') do
+          example.run
+        end
+      end
+
+      it 'returns 401 without api key on retrieve_as_json' do
+        post '/retriever/as_json', params: { url: 'https://www.idealista.com/inmueble/123/' }
+        expect(response).to have_http_status(:unauthorized)
+        json = JSON.parse(response.body)
+        expect(json['error_message']).to eq('Unauthorized')
+      end
+
+      it 'returns 401 with wrong api key on retrieve_as_json' do
+        post '/retriever/as_json',
+             params: { url: 'https://www.idealista.com/inmueble/123/' },
+             headers: { 'X-Api-Key' => 'wrong-key' }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'returns 401 without api key on config_as_json' do
+        get '/config/as_json'
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'succeeds with correct api key via header' do
+        get '/config/as_json', headers: { 'X-Api-Key' => 'test-secret-key' }
+        expect(response).not_to have_http_status(:unauthorized)
+      end
+
+      it 'succeeds with correct api key via query param' do
+        get '/config/as_json', params: { api_key: 'test-secret-key' }
+        expect(response).not_to have_http_status(:unauthorized)
+      end
+
+      it 'does not require auth on welcome' do
+        get '/'
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    describe 'authentication skipped when env var unset' do
+      it 'allows access without api key' do
+        get '/config/as_json'
+        expect(response).not_to have_http_status(:unauthorized)
+      end
+    end
+
     describe 'POST /scrapers/submit' do
       it 'processes a valid submission' do
         VCR.use_cassette('scrapers/idealista_2018_01') do

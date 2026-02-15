@@ -49,5 +49,35 @@ module PropertyWebScraper
         expect(result.retrieved_listing.import_host_slug).to eq("idealista")
       end
     end
+
+    describe 'error path handling' do
+      it 'captures OpenURI::HTTPError gracefully' do
+        allow_any_instance_of(PropertyWebScraper::Scraper).to receive(:process_url)
+          .and_raise(OpenURI::HTTPError.new('404 Not Found', StringIO.new))
+        listing_retriever = PropertyWebScraper::ListingRetriever.new(valid_import_url)
+        result = listing_retriever.retrieve
+        expect(result.success).to eq(false)
+        expect(result.error_message).to include('404')
+      end
+
+      it 'captures Net::OpenTimeout gracefully' do
+        allow_any_instance_of(PropertyWebScraper::Scraper).to receive(:process_url)
+          .and_raise(Net::OpenTimeout, 'execution expired')
+        listing_retriever = PropertyWebScraper::ListingRetriever.new(valid_import_url)
+        result = listing_retriever.retrieve
+        expect(result.success).to eq(false)
+        expect(result.error_message).to include('execution expired')
+      end
+
+      it 'handles special characters in URLs' do
+        url_with_special = 'https://www.idealista.com/inmueble/hello%20world/'
+        listing_retriever = PropertyWebScraper::ListingRetriever.new(url_with_special)
+        allow_any_instance_of(PropertyWebScraper::Scraper).to receive(:process_url)
+          .and_raise(StandardError, 'page not found')
+        result = listing_retriever.retrieve
+        expect(result.success).to eq(false)
+        expect(result.error_message).to eq('page not found')
+      end
+    end
   end
 end
