@@ -38,6 +38,84 @@ rails db:migrate
 rails property_web_scraper:db:seed
 ```
 
+## Development Setup
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/RealEstateWebTools/property_web_scraper.git
+cd property_web_scraper
+bundle install
+```
+
+Create and migrate the test database, then seed it:
+
+```bash
+cd spec/dummy
+rails db:create db:migrate
+cd ../..
+bundle exec rails runner "load 'db/seeds/import_hosts.rb'"
+```
+
+Run the test suite:
+
+```bash
+bundle exec rspec
+```
+
+## Architecture Overview
+
+**Models:**
+
+- `Listing` -- core model storing scraped property data (price, location, images, features)
+- `ImportHost` -- maps a website hostname to its scraper configuration
+- `PwbListing` -- extends Listing with PropertyWebBuilder-compatible JSON serialization
+- `ScraperMapping` -- loads JSON scraper configs from `config/scraper_mappings/` via ActiveHash
+
+**Services:**
+
+- `Scraper` -- fetches an HTML page and extracts property fields using a ScraperMapping
+- `ListingRetriever` -- validates a URL, resolves the ImportHost, and delegates to Scraper
+
+**Controllers:**
+
+- `ScraperController` -- welcome page, config endpoint, JSON retrieval, AJAX form handler
+- `SinglePropertyViewController` -- renders a single property page with map
+- `Api::V1::ListingsController` -- REST JSON endpoint returning PwbListing data
+
+**Config Mappings:**
+
+JSON files in `config/scraper_mappings/` define CSS selectors, XPath expressions, and regex patterns for each supported website.
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/config/as_json` | Returns scraper field configuration for realtor.com |
+| GET/POST | `/retriever/as_json` | Scrapes a property URL and returns listing JSON |
+| GET | `/api/v1/listings?url=...` | Returns a PwbListing-formatted JSON array |
+
+All endpoints accept a `url` parameter and return JSON with a `success` boolean and either the listing data or an `error_message`.
+
+## Running Tests
+
+```bash
+# Full suite
+bundle exec rspec
+
+# Models only
+bundle exec rspec spec/models
+
+# Services only
+bundle exec rspec spec/services
+
+# Request specs only
+bundle exec rspec spec/requests
+
+# A single spec file
+bundle exec rspec spec/models/property_web_scraper/listing_spec.rb
+```
+
 ## Contribute and spread the love
 
 We encourage you to contribute to this project and file issues for any problems you encounter.

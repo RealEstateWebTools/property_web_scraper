@@ -1,5 +1,15 @@
 module PropertyWebScraper
+  # REST API for retrieving property listings as JSON.
+  #
+  # Returns listings in a format compatible with PropertyWebBuilder,
+  # converting each {Listing} to a {PwbListing} before serialization.
   class Api::V1::ListingsController < ApplicationController
+    # Retrieves a property by URL and returns it as a PwbListing JSON array.
+    #
+    # Expects a +url+ query parameter. Returns error JSON when the URL
+    # is missing, invalid, or belongs to an unsupported host.
+    #
+    # @return [void]
     def retrieve
 
       unless params["url"]

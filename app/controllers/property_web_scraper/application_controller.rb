@@ -4,6 +4,13 @@ module PropertyWebScraper
 
     private
 
+    # Safely parses a URL string into a URI object.
+    #
+    # Returns an empty string when the URL is malformed, allowing callers
+    # to check +uri.is_a?(URI::HTTP)+ to detect failures.
+    #
+    # @param import_url [String] the URL to parse
+    # @return [URI::HTTP, URI::HTTPS, String] the parsed URI or +""+ on failure
     def uri_from_url import_url
       begin
         uri = URI.parse import_url
