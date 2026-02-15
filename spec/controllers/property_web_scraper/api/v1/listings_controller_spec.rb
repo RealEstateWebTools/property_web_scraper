@@ -26,14 +26,21 @@ module PropertyWebScraper
       end
 
       it 'succeeds with correct api key via header' do
+        dummy_listing = PropertyWebScraper::Listing.new(id: 'stub-1')
+        scraper = instance_double(PropertyWebScraper::Scraper, process_url: dummy_listing)
+        allow(PropertyWebScraper::Scraper).to receive(:new).and_return(scraper)
+        allow(PropertyWebScraper::PwbListing).to receive(:find).and_return(PropertyWebScraper::PwbListing.new(id: 'stub-1'))
         get '/api/v1/listings',
             params: { url: 'https://www.idealista.com/inmueble/123/' },
             headers: { 'X-Api-Key' => 'test-secret-key' }
-        # Should not be 401 (may be other error due to missing VCR cassette, but not auth error)
         expect(response).not_to have_http_status(:unauthorized)
       end
 
       it 'succeeds with correct api key via query param' do
+        dummy_listing = PropertyWebScraper::Listing.new(id: 'stub-1')
+        scraper = instance_double(PropertyWebScraper::Scraper, process_url: dummy_listing)
+        allow(PropertyWebScraper::Scraper).to receive(:new).and_return(scraper)
+        allow(PropertyWebScraper::PwbListing).to receive(:find).and_return(PropertyWebScraper::PwbListing.new(id: 'stub-1'))
         get '/api/v1/listings',
             params: { url: 'https://www.idealista.com/inmueble/123/', api_key: 'test-secret-key' }
         expect(response).not_to have_http_status(:unauthorized)
