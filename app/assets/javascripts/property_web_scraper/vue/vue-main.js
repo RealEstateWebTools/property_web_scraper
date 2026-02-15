@@ -7,7 +7,7 @@
 //   // // var pwbGM = Vue.component('gmap-map', VueGoogleMaps);
   // Vue.use(VueGoogleMaps, {
   //   load: {
-  //     key: 'AIzaSyCPorm8YzIaUGhKfe5cvpgofZ_gdT8hdZw'
+  //     key: process.env.GOOGLE_MAPS_API_KEY
   //     // v: '3.26', // Google Maps API version
   //     // libraries: 'places',   // If you want to use places input
   //   }
