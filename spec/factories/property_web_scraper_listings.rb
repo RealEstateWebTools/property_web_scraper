@@ -1,5 +1,7 @@
 FactoryBot.define do
   factory :property_web_scraper_listing, class: 'PropertyWebScraper::Listing' do
+    to_create { |instance| instance.save! }
+
     sequence(:title) { |n| "Property Listing #{n}" }
     sequence(:import_url) { |n| "https://www.idealista.com/inmueble/#{10000 + n}/" }
     price_float { 250_000.0 }
@@ -12,7 +14,7 @@ FactoryBot.define do
     count_toilets { 1 }
     count_garages { 1 }
     constructed_area { 120 }
-    area_unit { :sqmt }
+    area_unit { 'sqmt' }
     image_urls { [] }
     description { 'A lovely property.' }
 

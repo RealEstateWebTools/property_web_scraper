@@ -14,24 +14,10 @@ jobs:
       matrix:
         ruby-version: ['3.2', '3.3']
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: pwb_dummy_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     env:
       RAILS_ENV: test
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/pwb_dummy_test
+      FIRESTORE_EMULATOR_HOST: localhost:8080
+      FIRESTORE_PROJECT_ID: test-project
 
     steps:
       - uses: actions/checkout@v4
@@ -41,10 +27,16 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
 
-      - name: Setup database
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install and start Firestore emulator
         run: |
-          cd spec/dummy
-          bundle exec rails db:schema:load
+          npm install -g firebase-tools
+          firebase emulators:start --only firestore --project test-project &
+          sleep 5
 
       - name: Run specs
         run: bundle exec rspec

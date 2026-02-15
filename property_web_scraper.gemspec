@@ -18,9 +18,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir['spec/**/*']
 
   s.add_dependency 'rails', '>= 7.2'
-  s.add_dependency 'money-rails', '~> 3.0'
-
-  s.add_dependency 'flag_shih_tzu'
+  s.add_dependency 'google-cloud-firestore', '~> 2.16'
 
   s.add_dependency 'nokogiri', '>= 1.13'
   s.add_dependency 'faraday', '~> 2.0'
@@ -31,8 +29,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'stimulus-rails', '>= 1.3'
 
   s.add_development_dependency 'debug'
-
-  s.add_development_dependency 'pg', '~> 1.5'
 
   s.add_development_dependency 'rspec-rails', '~> 8.0'
   s.add_development_dependency 'factory_bot_rails', '~> 6.0'

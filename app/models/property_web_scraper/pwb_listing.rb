@@ -5,8 +5,6 @@ module PropertyWebScraper
   # +property_photos+ helper so the JSON output matches the format
   # expected by the PropertyWebBuilder front-end.
   class PwbListing < Listing
-    enum area_unit: { sqmt: 0, sqft: 1 }
-
     # Returns a JSON-safe hash including computed pricing and photo fields.
     #
     # @param options [Hash, nil] additional options merged into the +super+ call
@@ -41,9 +39,6 @@ module PropertyWebScraper
         return 0
       end
     end
-
-    # a field exists in db for above and below but for now prefer to
-    # make decision here
 
     # Returns the monthly rental price when the property is for long-term rent, otherwise 0.
     #

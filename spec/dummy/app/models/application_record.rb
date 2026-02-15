@@ -1,3 +1,4 @@
-class ApplicationRecord < ActiveRecord::Base
-  self.abstract_class = true
+class ApplicationRecord
+  # Dummy app base class — the engine provides its own ApplicationRecord
+  # backed by Firestore, not ActiveRecord.
 end

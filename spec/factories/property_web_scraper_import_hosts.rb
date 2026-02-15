@@ -1,5 +1,7 @@
 FactoryBot.define do
   factory :property_web_scraper_import_host, class: 'PropertyWebScraper::ImportHost' do
+    to_create { |instance| instance.save! }
+
     sequence(:host) { |n| "www.example#{n}.com" }
     sequence(:scraper_name) { |n| "scraper#{n}" }
     sequence(:slug) { |n| "example#{n}" }
