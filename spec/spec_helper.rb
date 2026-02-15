@@ -1,6 +1,5 @@
 # as per: https://www.viget.com/articles/rails-engine-testing-with-rspec-capybara-and-factorygirl
 ENV['RAILS_ENV'] ||= 'test'
-ENV['FIRESTORE_EMULATOR_HOST'] ||= 'localhost:8080'
 ENV['FIRESTORE_PROJECT_ID'] ||= 'test-project'
 
 require File.expand_path('../dummy/config/environment.rb', __FILE__)
@@ -18,6 +17,9 @@ Rails.backtrace_cleaner.remove_silencers!
 # Load support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
+# Inject in-memory Firestore backend so tests run without the Java emulator.
+PropertyWebScraper::FirestoreClient.instance_variable_set(:@client, InMemoryFirestore::Client.new)
+
 RSpec.configure do |config|
   config.mock_with :rspec
   config.infer_base_class_for_anonymous_controllers = false
@@ -26,7 +28,8 @@ RSpec.configure do |config|
 
   config.fixture_paths = ["#{PropertyWebScraper::Engine.root}/spec/fixtures"]
 
-  # Clear Firestore listings collection between tests
+  # Mirror the original cleanup: only clear the listings collection.
+  # Shared contexts (e.g. import_hosts) manage their own lifecycle.
   config.after(:each) do
     client = PropertyWebScraper::FirestoreClient.client
     client.col('listings').list_documents.each { |doc| doc.delete }
