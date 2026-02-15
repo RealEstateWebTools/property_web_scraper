@@ -6,7 +6,7 @@
 <title>
   Module: PropertyWebScraper::ApplicationHelper
   
-    &mdash; Documentation by YARD 0.9.38
+    &mdash; PropertyWebScraper Documentation
   
 </title>
 
@@ -71,6 +71,11 @@
   
   
   
+  <dl>
+      <dt>Includes:</dt>
+      <dd>ActionView::Helpers::SanitizeHelper</dd>
+  </dl>
+  
   
 
   
@@ -101,12 +106,135 @@
 
 
 
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
 
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#sanitize_html-instance_method" title="#sanitize_html (instance method)">#<strong>sanitize_html</strong>(html)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Sanitizes HTML content, allowing only safe tags and attributes.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="sanitize_html-instance_method">
+  
+    #<strong>sanitize_html</strong>(html)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Sanitizes HTML content, allowing only safe tags and attributes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>html</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the HTML string to sanitize</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>sanitized HTML</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+10
+11
+12
+13</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/helpers/property_web_scraper/application_helper.rb', line 10</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_sanitize_html'>sanitize_html</span><span class='lparen'>(</span><span class='id identifier rubyid_html'>html</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_sanitize'>sanitize</span><span class='lparen'>(</span><span class='id identifier rubyid_html'>html</span><span class='comma'>,</span> <span class='label'>tags:</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>p</span><span class='words_sep'> </span><span class='tstring_content'>br</span><span class='words_sep'> </span><span class='tstring_content'>b</span><span class='words_sep'> </span><span class='tstring_content'>i</span><span class='words_sep'> </span><span class='tstring_content'>u</span><span class='words_sep'> </span><span class='tstring_content'>em</span><span class='words_sep'> </span><span class='tstring_content'>strong</span><span class='words_sep'> </span><span class='tstring_content'>a</span><span class='words_sep'> </span><span class='tstring_content'>ul</span><span class='words_sep'> </span><span class='tstring_content'>ol</span><span class='words_sep'> </span><span class='tstring_content'>li</span><span class='words_sep'> </span><span class='tstring_content'>h1</span><span class='words_sep'> </span><span class='tstring_content'>h2</span><span class='words_sep'> </span><span class='tstring_content'>h3</span><span class='words_sep'> </span><span class='tstring_content'>h4</span><span class='words_sep'> </span><span class='tstring_content'>h5</span><span class='words_sep'> </span><span class='tstring_content'>h6</span><span class='words_sep'> </span><span class='tstring_content'>div</span><span class='words_sep'> </span><span class='tstring_content'>span</span><span class='words_sep'> </span><span class='tstring_content'>table</span><span class='words_sep'> </span><span class='tstring_content'>tr</span><span class='words_sep'> </span><span class='tstring_content'>td</span><span class='words_sep'> </span><span class='tstring_content'>th</span><span class='words_sep'> </span><span class='tstring_content'>thead</span><span class='words_sep'> </span><span class='tstring_content'>tbody</span><span class='words_sep'> </span><span class='tstring_content'>img</span><span class='tstring_end'>]</span></span><span class='comma'>,</span>
+                  <span class='label'>attributes:</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>href</span><span class='words_sep'> </span><span class='tstring_content'>src</span><span class='words_sep'> </span><span class='tstring_content'>alt</span><span class='words_sep'> </span><span class='tstring_content'>title</span><span class='words_sep'> </span><span class='tstring_content'>class</span><span class='words_sep'> </span><span class='tstring_content'>style</span><span class='words_sep'> </span><span class='tstring_content'>target</span><span class='tstring_end'>]</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
 
 </div>
 
       <div id="footer">
-  Generated on Sun Feb 15 12:48:15 2026 by
+  Generated on Sun Feb 15 22:14:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.38 (ruby-3.4.3).
 </div>

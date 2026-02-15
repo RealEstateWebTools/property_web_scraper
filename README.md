@@ -23,7 +23,7 @@ Then execute:
 $ bundle
 ```
 
-Set the required Firestore environment variables:
+Set the required environment variables:
 
 ```bash
 export FIRESTORE_PROJECT_ID=your-gcp-project-id
@@ -31,6 +31,9 @@ export FIRESTORE_PROJECT_ID=your-gcp-project-id
 export FIRESTORE_CREDENTIALS=/path/to/service-account.json
 # Development/test: use the Firestore emulator instead
 export FIRESTORE_EMULATOR_HOST=localhost:8080
+
+# Optional: protect API endpoints with a shared key
+export PROPERTY_SCRAPER_API_KEY=your-secret-api-key
 ```
 
 Mount PropertyWebScraper by adding the following to your routes.rb file:
@@ -84,9 +87,12 @@ FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle 
 
 - `Scraper` -- fetches an HTML page and extracts property fields using a ScraperMapping
 - `ListingRetriever` -- validates a URL, resolves the ImportHost, and delegates to Scraper
+- `UrlValidator` -- shared URL validation returning a result object with URI, ImportHost, and error info
+- `ScrapedContentSanitizer` -- strips HTML tags and blocks dangerous URI schemes before persistence
 
 **Controllers:**
 
+- `ApplicationController` -- base controller providing `authenticate_api_key!` for API authentication
 - `ScraperController` -- welcome page, config endpoint, JSON retrieval, AJAX form handler
 - `SinglePropertyViewController` -- renders a single property page with map
 - `Api::V1::ListingsController` -- REST JSON endpoint returning PwbListing data
@@ -104,6 +110,19 @@ JSON files in `config/scraper_mappings/` define CSS selectors, XPath expressions
 | GET | `/api/v1/listings?url=...` | Returns a PwbListing-formatted JSON array |
 
 All endpoints accept a `url` parameter and return JSON with a `success` boolean and either the listing data or an `error_message`.
+
+## Authentication
+
+API endpoints can be protected with a shared API key. Set the `PROPERTY_SCRAPER_API_KEY` environment variable to enable authentication. When set, requests must include the key in one of:
+
+- **Header:** `X-Api-Key: your-secret-api-key`
+- **Query parameter:** `?api_key=your-secret-api-key`
+
+If `PROPERTY_SCRAPER_API_KEY` is not set, authentication is skipped for backwards compatibility.
+
+## Data Sanitization
+
+All scraped content is automatically sanitized by `ScrapedContentSanitizer` before it is persisted via `Listing.update_from_hash`. The sanitizer strips HTML tags from text fields (title, description, address, etc.), rejects URLs with dangerous schemes (`javascript:`, `data:`), and converts protocol-relative URLs to HTTPS.
 
 ## Running Tests
 

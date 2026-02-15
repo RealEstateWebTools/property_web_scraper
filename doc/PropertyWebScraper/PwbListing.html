@@ -6,7 +6,7 @@
 <title>
   Class: PropertyWebScraper::PwbListing
   
-    &mdash; Documentation by YARD 0.9.38
+    &mdash; PropertyWebScraper Documentation
   
 </title>
 
@@ -74,8 +74,6 @@
         <ul class="fullTree">
           <li>Object</li>
           
-            <li class="next">ActiveRecord::Base</li>
-          
             <li class="next"><span class='object_link'><a href="ApplicationRecord.html" title="PropertyWebScraper::ApplicationRecord (class)">ApplicationRecord</a></span></li>
           
             <li class="next"><span class='object_link'><a href="Listing.html" title="PropertyWebScraper::Listing (class)">Listing</a></span></li>
@@ -110,7 +108,7 @@
     
 <p>Extended listing with PropertyWebBuilder-compatible serialization.</p>
 
-<p>Inherits from <span class='object_link'><a href="Listing.html" title="PropertyWebScraper::Listing (class)">Listing</a></span> and adds computed pricing methods and a <code>property_photos</code> helper so the JSON output matches the format expected by the PropertyWebBuilder front-end.</p>
+<p>Inherits from <span class='object_link'><a href="Listing.html" title="PropertyWebScraper::Listing (class)">Listing</a></span> and adds computed pricing methods and a +property_photos+ helper so the JSON output matches the format expected by the PropertyWebBuilder front-end.</p>
 
 
   </div>
@@ -223,7 +221,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Converts <code>image_urls</code> into an array of photo hashes.</p>
+<p>Converts +image_urls+ into an array of photo hashes.</p>
 </div></span>
   
 </li>
@@ -242,7 +240,7 @@
   
   
   <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Listing.html" title="PropertyWebScraper::Listing (class)">Listing</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="Listing.html#image_urls_are_array-instance_method" title="PropertyWebScraper::Listing#image_urls_are_array (method)">#image_urls_are_array</a></span>, <span class='object_link'><a href="Listing.html#update_from_hash-class_method" title="PropertyWebScraper::Listing.update_from_hash (method)">update_from_hash</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="Listing.html#image_urls_are_array-instance_method" title="PropertyWebScraper::Listing#image_urls_are_array (method)">#image_urls_are_array</a></span>, <span class='object_link'><a href="Listing.html#import_host-instance_method" title="PropertyWebScraper::Listing#import_host (method)">#import_host</a></span>, <span class='object_link'><a href="Listing.html#import_host_slug=-instance_method" title="PropertyWebScraper::Listing#import_host_slug= (method)">#import_host_slug=</a></span>, <span class='object_link'><a href="Listing.html#reload-instance_method" title="PropertyWebScraper::Listing#reload (method)">#reload</a></span>, <span class='object_link'><a href="Listing.html#update_from_hash-class_method" title="PropertyWebScraper::Listing.update_from_hash (method)">update_from_hash</a></span></p>
 
   
   
@@ -250,6 +248,17 @@
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="FirestoreModel.html" title="PropertyWebScraper::FirestoreModel (module)">FirestoreModel</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="FirestoreModel.html#[]-instance_method" title="PropertyWebScraper::FirestoreModel#[] (method)">#[]</a></span>, <span class='object_link'><a href="FirestoreModel.html#[]=-instance_method" title="PropertyWebScraper::FirestoreModel#[]= (method)">#[]=</a></span>, <span class='object_link'><a href="FirestoreModel.html#_assign_attributes_from_firestore-instance_method" title="PropertyWebScraper::FirestoreModel#_assign_attributes_from_firestore (method)">#_assign_attributes_from_firestore</a></span>, <span class='object_link'><a href="FirestoreModel.html#destroy-instance_method" title="PropertyWebScraper::FirestoreModel#destroy (method)">#destroy</a></span>, <span class='object_link'><a href="FirestoreModel.html#initialize-instance_method" title="PropertyWebScraper::FirestoreModel#initialize (method)">#initialize</a></span>, <span class='object_link'><a href="FirestoreModel.html#new_record%3F-instance_method" title="PropertyWebScraper::FirestoreModel#new_record? (method)">#new_record?</a></span>, <span class='object_link'><a href="FirestoreModel.html#persisted%3F-instance_method" title="PropertyWebScraper::FirestoreModel#persisted? (method)">#persisted?</a></span>, <span class='object_link'><a href="FirestoreModel.html#reload-instance_method" title="PropertyWebScraper::FirestoreModel#reload (method)">#reload</a></span>, <span class='object_link'><a href="FirestoreModel.html#save!-instance_method" title="PropertyWebScraper::FirestoreModel#save! (method)">#save!</a></span>, <span class='object_link'><a href="FirestoreModel.html#update_column-instance_method" title="PropertyWebScraper::FirestoreModel#update_column (method)">#update_column</a></span>, <span class='object_link'><a href="FirestoreModel.html#validate!-instance_method" title="PropertyWebScraper::FirestoreModel#validate! (method)">#validate!</a></span></p>
+
   
 
   <div id="instance_method_details" class="method_details_list">
@@ -290,7 +299,7 @@
       
         &mdash;
         <div class='inline'>
-<p>additional options merged into the <code>super</code> call</p>
+<p>additional options merged into the +super+ call</p>
 </div>
       
     </li>
@@ -317,6 +326,11 @@
       <pre class="lines">
 
 
+12
+13
+14
+15
+16
 17
 18
 19
@@ -330,15 +344,10 @@
 27
 28
 29
-30
-31
-32
-33
-34
-35</pre>
+30</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/property_web_scraper/pwb_listing.rb', line 17</span>
+      <pre class="code"><span class="info file"># File 'app/models/property_web_scraper/pwb_listing.rb', line 12</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_as_json'>as_json</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='label'>only:</span> <span class='lbracket'>[</span>
@@ -403,16 +412,16 @@
       <pre class="lines">
 
 
-54
-55
-56
-57
-58
-59
-60</pre>
+46
+47
+48
+49
+50
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/property_web_scraper/pwb_listing.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'app/models/property_web_scraper/pwb_listing.rb', line 46</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_price_rental_monthly_current'>price_rental_monthly_current</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_for_rent_long_term'>for_rent_long_term</span>
@@ -465,16 +474,16 @@
       <pre class="lines">
 
 
+35
+36
+37
+38
+39
 40
-41
-42
-43
-44
-45
-46</pre>
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/property_web_scraper/pwb_listing.rb', line 40</span>
+      <pre class="code"><span class="info file"># File 'app/models/property_web_scraper/pwb_listing.rb', line 35</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_price_sale_current'>price_sale_current</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_for_sale'>for_sale</span>
@@ -500,7 +509,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Converts <code>image_urls</code> into an array of photo hashes.</p>
+<p>Converts +image_urls+ into an array of photo hashes.</p>
 
 
   </div>
@@ -519,7 +528,7 @@
       
         &mdash;
         <div class='inline'>
-<p>e.g. <tt>[{ url: “https://…” }, …]</tt></p>
+<p>e.g. +[{ url: “https://…” }, …]+</p>
 </div>
       
     </li>
@@ -532,19 +541,19 @@
       <pre class="lines">
 
 
+57
+58
+59
+60
+61
+62
+63
+64
 65
-66
-67
-68
-69
-70
-71
-72
-73
-74</pre>
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/property_web_scraper/pwb_listing.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'app/models/property_web_scraper/pwb_listing.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_property_photos'>property_photos</span>
   <span class='id identifier rubyid_property_photos'>property_photos</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -566,7 +575,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Feb 15 12:48:15 2026 by
+  Generated on Sun Feb 15 22:14:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.38 (ruby-3.4.3).
 </div>

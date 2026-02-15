@@ -6,7 +6,7 @@
 <title>
   File: README
   
-    &mdash; Documentation by YARD 0.9.38
+    &mdash; PropertyWebScraper Documentation
   
 </title>
 
@@ -70,7 +70,7 @@
 </li><li>
 <p>Rails &gt;= 7.1</p>
 </li><li>
-<p>PostgreSQL</p>
+<p>Google Cloud Firestore (or local emulator)</p>
 </li></ul>
 
 <h2 id="installation">Installation</h2>
@@ -80,11 +80,21 @@
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_gem'>gem</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>property_web_scraper</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>git:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://github.com/RealEstateWebTools/property_web_scraper</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>branch:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>master</span><span class='tstring_end'>&#39;</span></span>
 </code></pre>
 
-<p>Also, be sure to use Postgres as your database (by having the “pg” gem and Postgres installed locally).</p>
-
 <p>Then execute:</p>
 
 <pre class="code ruby"><code class="ruby">$ bundle
+</code></pre>
+
+<p>Set the required environment variables:</p>
+
+<pre class="code ruby"><code class="ruby">export FIRESTORE_PROJECT_ID=your-gcp-project-id
+# Production: path to your service account JSON key
+export FIRESTORE_CREDENTIALS=/path/to/service-account.json
+# Development/test: use the Firestore emulator instead
+export FIRESTORE_EMULATOR_HOST=localhost:8080
+
+# Optional: protect API endpoints with a shared key
+export PROPERTY_SCRAPER_API_KEY=your-secret-api-key
 </code></pre>
 
 <p>Mount PropertyWebScraper by adding the following to your routes.rb file:</p>
@@ -92,12 +102,9 @@
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_mount'>mount</span> <span class='const'><span class='object_link'><a href="PropertyWebScraper.html" title="PropertyWebScraper (module)">PropertyWebScraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PropertyWebScraper/Engine.html" title="PropertyWebScraper::Engine (class)">Engine</a></span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/</span><span class='tstring_end'>&#39;</span></span>
 </code></pre>
 
-<p>And run the following commands from the console:</p>
+<p>Seed the initial scraper host data:</p>
 
-<pre class="code ruby"><code class="ruby">rails property_web_scraper:install:migrations
-rails db:create
-rails db:migrate
-rails property_web_scraper:db:seed
+<pre class="code ruby"><code class="ruby">rails property_web_scraper:db:seed
 </code></pre>
 
 <h2 id="development-setup">Development Setup</h2>
@@ -109,17 +116,20 @@ cd property_web_scraper
 bundle install
 </code></pre>
 
-<p>Create and migrate the test database, then seed it:</p>
+<p>Start the Firestore emulator and seed data:</p>
 
-<pre class="code ruby"><code class="ruby">cd spec/dummy
-rails db:create db:migrate
-cd ../..
+<pre class="code ruby"><code class="ruby">firebase emulators:start --only firestore --project test-project &amp;
+sleep 5
+export FIRESTORE_EMULATOR_HOST=localhost:8080
+export FIRESTORE_PROJECT_ID=test-project
 bundle exec rails runner &quot;load &#39;db/seeds/import_hosts.rb&#39;&quot;
 </code></pre>
 
 <p>Run the test suite:</p>
 
-<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_exec'>exec</span> <span class='id identifier rubyid_rspec'>rspec</span>
+<pre class="code ruby"><code class="ruby">firebase emulators:start --only firestore --project test-project &amp;
+sleep 5
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec
 </code></pre>
 
 <h2 id="architecture-overview">Architecture Overview</h2>
@@ -140,10 +150,16 @@ bundle exec rails runner &quot;load &#39;db/seeds/import_hosts.rb&#39;&quot;
 <p><code>Scraper</code> – fetches an HTML page and extracts property fields using a ScraperMapping</p>
 </li><li>
 <p><code>ListingRetriever</code> – validates a URL, resolves the ImportHost, and delegates to Scraper</p>
+</li><li>
+<p><code>UrlValidator</code> – shared URL validation returning a result object with URI, ImportHost, and error info</p>
+</li><li>
+<p><code>ScrapedContentSanitizer</code> – strips HTML tags and blocks dangerous URI schemes before persistence</p>
 </li></ul>
 
 <p><strong>Controllers:</strong></p>
 <ul><li>
+<p><code>ApplicationController</code> – base controller providing <code>authenticate_api_key!</code> for API authentication</p>
+</li><li>
 <p><code>ScraperController</code> – welcome page, config endpoint, JSON retrieval, AJAX form handler</p>
 </li><li>
 <p><code>SinglePropertyViewController</code> – renders a single property page with map</p>
@@ -186,22 +202,45 @@ bundle exec rails runner &quot;load &#39;db/seeds/import_hosts.rb&#39;&quot;
 
 <p>All endpoints accept a <code>url</code> parameter and return JSON with a <code>success</code> boolean and either the listing data or an <code>error_message</code>.</p>
 
+<h2 id="authentication">Authentication</h2>
+
+<p>API endpoints can be protected with a shared API key. Set the <code>PROPERTY_SCRAPER_API_KEY</code> environment variable to enable authentication. When set, requests must include the key in one of:</p>
+<ul><li>
+<p><strong>Header:</strong> <code>X-Api-Key: your-secret-api-key</code></p>
+</li><li>
+<p><strong>Query parameter:</strong> <code>?api_key=your-secret-api-key</code></p>
+</li></ul>
+
+<p>If <code>PROPERTY_SCRAPER_API_KEY</code> is not set, authentication is skipped for backwards compatibility.</p>
+
+<h2 id="data-sanitization">Data Sanitization</h2>
+
+<p>All scraped content is automatically sanitized by <code>ScrapedContentSanitizer</code> before it is persisted via <code>Listing.update_from_hash</code>. The sanitizer strips HTML tags from text fields (title, description, address, etc.), rejects URLs with dangerous schemes (<code>javascript:</code>, <code>data:</code>), and converts protocol-relative URLs to HTTPS.</p>
+
 <h2 id="running-tests">Running Tests</h2>
 
-<pre class="code ruby"><code class="ruby"><span class='comment'># Full suite
-</span><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_exec'>exec</span> <span class='id identifier rubyid_rspec'>rspec</span>
+<p>Start the Firestore emulator before running any tests:</p>
 
-<span class='comment'># Models only
-</span><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_exec'>exec</span> <span class='id identifier rubyid_rspec'>rspec</span> <span class='id identifier rubyid_spec'>spec</span><span class='op'>/</span><span class='id identifier rubyid_models'>models</span>
+<pre class="code ruby"><code class="ruby">firebase emulators:start --only firestore --project test-project &amp;
+sleep 5
+</code></pre>
 
-<span class='comment'># Services only
-</span><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_exec'>exec</span> <span class='id identifier rubyid_rspec'>rspec</span> <span class='id identifier rubyid_spec'>spec</span><span class='op'>/</span><span class='id identifier rubyid_services'>services</span>
+<p>Then run specs with the emulator environment variables:</p>
 
-<span class='comment'># Request specs only
-</span><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_exec'>exec</span> <span class='id identifier rubyid_rspec'>rspec</span> <span class='id identifier rubyid_spec'>spec</span><span class='op'>/</span><span class='id identifier rubyid_requests'>requests</span>
+<pre class="code ruby"><code class="ruby"># Full suite
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec
 
-<span class='comment'># A single spec file
-</span><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_exec'>exec</span> <span class='id identifier rubyid_rspec'>rspec</span> <span class='id identifier rubyid_spec'>spec</span><span class='op'>/</span><span class='id identifier rubyid_models'>models</span><span class='op'>/</span><span class='id identifier rubyid_property_web_scraper'>property_web_scraper</span><span class='op'>/</span><span class='id identifier rubyid_listing_spec'>listing_spec</span><span class='period'>.</span><span class='id identifier rubyid_rb'>rb</span>
+# Models only
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/models
+
+# Services only
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/services
+
+# Firestore library specs
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/lib
+
+# A single spec file
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/models/property_web_scraper/listing_spec.rb
 </code></pre>
 
 <h2 id="contribute-and-spread-the-love">Contribute and spread the love</h2>
@@ -225,7 +264,7 @@ bundle exec rails runner &quot;load &#39;db/seeds/import_hosts.rb&#39;&quot;
 </div></div>
 
       <div id="footer">
-  Generated on Sun Feb 15 12:48:15 2026 by
+  Generated on Sun Feb 15 22:14:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.38 (ruby-3.4.3).
 </div>
