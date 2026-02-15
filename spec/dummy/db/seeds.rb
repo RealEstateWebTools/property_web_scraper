@@ -206,5 +206,5 @@ listings_data.each do |data|
   end
 end
 
-puts "Seeded #{PropertyWebScraper::ImportHost.count} import hosts"
-puts "Seeded #{PropertyWebScraper::Listing.count} listings"
+puts "Seeded import hosts"
+puts "Seeded #{listings_data.size} listings"
