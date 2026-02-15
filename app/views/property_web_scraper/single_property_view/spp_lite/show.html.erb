@@ -21,7 +21,7 @@
     <div class="row">
       <div class="col s12 m12">
         <h3>Description</h3>
-        <%== @listing.description %>
+        <%= sanitize_html(@listing.description) %>
           <br>
           <br>
       </div>

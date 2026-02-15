@@ -5,7 +5,7 @@ VCR.configure do |vc|
   # https://relishapp.com/vcr/vcr/v/3-0-3/docs/configuration/ignore-request
   vc.ignore_localhost = true
 
-  vc.allow_http_connections_when_no_cassette = true
+  vc.allow_http_connections_when_no_cassette = false
   # your HTTP request service.
   vc.hook_into :webmock
 end

@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = 'property_web_scraper'
   s.version     = PropertyWebScraper::VERSION
   s.authors     = ['Ed Tewiah']
-  s.email       = ['etewiah@hotmail.cim']
+  s.email       = ['etewiah@hotmail.com']
   s.homepage    = ''
   s.summary     = 'Web based UI to make scraping data from real estate websites super simple.'
   s.description = 'PropertyWebScraper makes it easy for anyone to scrape data from real estate websites.'
@@ -22,19 +22,17 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'flag_shih_tzu'
 
-  s.add_dependency 'nokogiri'
+  s.add_dependency 'nokogiri', '>= 1.13'
   s.add_dependency 'faraday', '~> 2.0'
   s.add_dependency 'active_hash'
   s.add_dependency 'rack-cors', '~> 3.0'
   s.add_dependency 'sprockets-rails'
-  s.add_dependency 'ostruct'
 
   s.add_development_dependency 'debug'
 
   s.add_development_dependency 'pg', '~> 1.5'
 
   s.add_development_dependency 'rspec-rails', '~> 8.0'
-  s.add_development_dependency 'capybara', '~> 3.39'
   s.add_development_dependency 'factory_bot_rails', '~> 6.0'
   s.add_development_dependency 'vcr', '~> 6.0'
   s.add_development_dependency 'webmock', '~> 3.19'

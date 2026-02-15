@@ -32,6 +32,7 @@ module PropertyWebScraper
     # @return [OpenStruct] with +success+ (Boolean), +error_message+ (String),
     #   and +retrieved_listing+ ({Listing}) fields
     def retrieve
+      Rails.logger.info "PropertyWebScraper: ListingRetriever attempting #{import_url}"
       result = OpenStruct.new(:success => false, :error_message => "not processed")
       import_uri = get_import_uri
       unless import_uri.is_a?(URI::HTTP) || import_uri.is_a?(URI::HTTPS)
@@ -50,7 +51,10 @@ module PropertyWebScraper
         retrieved_listing = web_scraper.process_url import_url, import_host
         result.retrieved_listing = retrieved_listing
         result.success = true
-      rescue Exception => e
+        Rails.logger.info "PropertyWebScraper: ListingRetriever succeeded for #{import_url}"
+      rescue StandardError => e
+        Rails.logger.error "PropertyWebScraper: ListingRetriever#retrieve failed for #{import_url}: #{e.class} - #{e.message}"
+        Rails.logger.error e.backtrace&.first(10)&.join("\n")
         result.error_message = e.message
       end
       return result

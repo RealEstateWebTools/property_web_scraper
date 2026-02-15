@@ -29,28 +29,6 @@ module PropertyWebScraper
       end
     end
 
-    # def retrieve_from_api
-    #   conn = Faraday.new(:url => import_url) do |faraday|
-    #     # faraday.basic_auth('', '')
-    #     faraday.request  :url_encoded             # form-encode POST params
-    #     faraday.response :logger                  # log requests to STDOUT
-    #     faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
-    #   end
-    #   response = conn.get "/api_public/v1/props.json"
-
-    #   response_as_json = JSON.parse response.body
-    #   retrieved_properties = []
-    #   count = 0
-    #   response_as_json["data"].each do |property|
-    #     if count < 100
-    #       mapped_property = ImportMapper.new("api_pwb").map_property(property["attributes"])
-    #       retrieved_properties.push mapped_property
-    #     end
-    #     count += 1
-    #   end
-    #   return retrieved_properties
-    # end
-
     # Retrieves or refreshes a listing for the given URL.
     #
     # Finds an existing listing by +import_url+ or creates one. If the
@@ -61,6 +39,8 @@ module PropertyWebScraper
     # @param import_host [ImportHost] the host record for this URL
     # @return [Listing] the persisted listing
     def process_url(import_url, import_host)
+      Rails.logger.info "PropertyWebScraper: Scraping #{import_url} (host: #{import_host.slug})"
+      start_time = Time.current
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
       expiry_duration = import_host.stale_age_duration
       # For datetime, yesterday is < today
@@ -75,6 +55,7 @@ module PropertyWebScraper
         import_host.last_retrieval_at = DateTime.now
         import_host.save!
       end
+      Rails.logger.info "PropertyWebScraper: Completed scraping #{import_url} in #{(Time.current - start_time).round(2)}s"
       listing
     end
 
@@ -100,6 +81,7 @@ module PropertyWebScraper
     # @param import_url [String] the URL to fetch
     # @return [Array<Hash>] array containing a single property hash
     def retrieve_from_webpage(import_url)
+      Rails.logger.info "PropertyWebScraper: Fetching page #{import_url}"
       properties = []
       # nov 2017 - only 1 property is ever returned currently
 
@@ -264,7 +246,7 @@ module PropertyWebScraper
       end
 
       if mapping['xpath'].present?
-        css_elements = doc.css(mapping['xpath'])
+        css_elements = doc.xpath(mapping['xpath'])
         css_elements.each do |element|
           retrieved_array.push element.text
         end
@@ -301,20 +283,6 @@ module PropertyWebScraper
         # but in future this might change
         retrieved_text = get_text_from_css css_elements, mapping
       end
-      # unless mapping['splitTextCharacter'].nil?
-      #   # - cannot use .present? above as splitTextCharacter is sometimes " "
-      #   # mapping["splitTextCharacter"].present?
-      #   #
-      #   # in this case the element's text need to be split by the splitTextCharacter
-      #   # splitTextArrayId refers to where in the resulting array
-      #   # the correct item is
-      #   begin
-      #     splitTextCharacter = mapping['splitTextCharacter'] || ' '
-      #     splitTextArrayId = mapping['splitTextArrayId'].to_i
-      #     retrieved_text = retrieved_text.split(splitTextCharacter)[splitTextArrayId]
-      #   rescue Exception => e
-      #   end
-      # end
       retrieved_text = clean_up_string retrieved_text, mapping
     end
 
@@ -332,7 +300,8 @@ module PropertyWebScraper
           string_to_clean = string_to_clean.split(splitTextCharacter)[splitTextArrayId]
           # in case above returns nil
           string_to_clean = string_to_clean || ''
-        rescue Exception => e
+        rescue StandardError => e
+          Rails.logger.error "PropertyWebScraper: clean_up_string failed: #{e.message}"
         end
       end
       if mapping['stripString'].present?
@@ -367,7 +336,8 @@ module PropertyWebScraper
         begin
           css_count_id = mapping['cssCountId'].to_i
           css_retrieved_text = css_elements[css_count_id].text || ''
-        rescue Exception => e
+        rescue StandardError => e
+          Rails.logger.error "PropertyWebScraper: get_text_from_css failed: #{e.message}"
         end
       end
       css_retrieved_text

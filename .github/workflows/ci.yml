@@ -10,6 +10,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        ruby-version: ['3.2', '3.3']
+
     services:
       postgres:
         image: postgres:15
@@ -34,7 +38,7 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
 
       - name: Setup database
@@ -44,3 +48,13 @@ jobs:
 
       - name: Run specs
         run: bundle exec rspec
+
+      - name: Run bundler-audit
+        run: |
+          gem install bundler-audit
+          bundler-audit check --update
+
+      - name: Run rubocop
+        run: |
+          gem install rubocop
+          rubocop --parallel || true

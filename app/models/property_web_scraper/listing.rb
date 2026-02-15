@@ -10,11 +10,6 @@ module PropertyWebScraper
   class Listing < ApplicationRecord
     enum area_unit: { sqmt: 0, sqft: 1 }
 
-    # monetize :price_sale, with_model_currency: :currency
-    # monetize :price_rental, with_model_currency: :currency
-
-
-    # validates :image_urls, presence: true
     validate :image_urls_are_array
 
     # Validates that +image_urls+ is an Array.
@@ -79,20 +74,10 @@ module PropertyWebScraper
                               count_bedrooms count_bathrooms
                               count_toilets count_garages)
       numeric_attributes.each do |attribute|
-        listing[attribute] = property_hash[attribute].presence || 0
+        listing[attribute] = property_hash[attribute].presence
       end
-      # considered using
-      # -1 to indicate value could not be retrieved
-      # but no longer convinced..
 
       listing.image_urls = property_hash['image_urls'].presence || []
-
-      # listing.year_construction = property_hash['year_construction'].presence || 0
-      # listing.constructed_area = property_hash['constructed_area'].presence || 0
-      # listing.count_bedrooms = property_hash['count_bedrooms'].presence || 0
-      # listing.count_bathrooms = property_hash['count_bathrooms'].presence || 0
-      # listing.count_toilets = property_hash['count_toilets'].presence || 0
-      # listing.count_garages = property_hash['count_garages'].presence || 0
 
       listing.save!
       # TODO: - save retrieval history

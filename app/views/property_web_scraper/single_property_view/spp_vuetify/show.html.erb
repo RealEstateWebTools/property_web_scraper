@@ -78,7 +78,7 @@
       <v-flex xs12 sm12>
         <div class="">
           <h3>Description</h3>
-          <%== @listing.description %>
+          <%= sanitize_html(@listing.description) %>
             <br>
             <br>
             <social-sharing class="text-xs-center" inline-template>
