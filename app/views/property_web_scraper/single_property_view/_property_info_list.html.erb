@@ -1,22 +1,41 @@
-<div class="product-info">
-  <div class="wp-block property list no-border">
-    <div class="wp-block-content clearfix">
-      <br>
-      <br>
-      <h3><%= I18n.t("property.details") %></h3>
-      <br>
-      <table class="table table-bordered table-striped ">
-        <tbody>
-          <tr>
-            <td><strong>Reference:</strong></td>
-            <td>
-              <%=  @listing.reference %>
-            </td>
-          </tr>
-
- 
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+<h3><%= I18n.t("property.details", default: "Property Details") %></h3>
+<table class="table table-bordered table-striped">
+  <tbody>
+    <% if @listing.reference.present? %>
+      <tr>
+        <td><strong>Reference:</strong></td>
+        <td><%= @listing.reference %></td>
+      </tr>
+    <% end %>
+    <% if @listing.price_string.present? %>
+      <tr>
+        <td><strong>Price:</strong></td>
+        <td><%= @listing.price_string %></td>
+      </tr>
+    <% end %>
+    <% if @listing.count_bedrooms.present? && @listing.count_bedrooms.to_i > 0 %>
+      <tr>
+        <td><strong>Bedrooms:</strong></td>
+        <td><%= @listing.count_bedrooms %></td>
+      </tr>
+    <% end %>
+    <% if @listing.count_bathrooms.present? && @listing.count_bathrooms.to_i > 0 %>
+      <tr>
+        <td><strong>Bathrooms:</strong></td>
+        <td><%= @listing.count_bathrooms %></td>
+      </tr>
+    <% end %>
+    <% if @listing.constructed_area.present? && @listing.constructed_area.to_i > 0 %>
+      <tr>
+        <td><strong>Area:</strong></td>
+        <td><%= @listing.constructed_area %> <%= @listing.area_unit %></td>
+      </tr>
+    <% end %>
+    <% if @listing.address_string.present? %>
+      <tr>
+        <td><strong>Address:</strong></td>
+        <td><%= @listing.address_string %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

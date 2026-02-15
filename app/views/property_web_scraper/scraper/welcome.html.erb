@@ -1,72 +1,56 @@
 <div class="row">
-  <div class="col-sm-12">
-    <h3 style="margin: 20px 0px">
+  <div class="col-12">
+    <h3 class="my-4">
       Easily retrieve details of properties for sale or rent in a standard format
     </h3>
     <p>Allows you to monitor price changes, export data, analyze trends etc.</p>
-    <!--     <% form_tag("/scrapers/submit", method: "post") do %>
-      <div>
-        <%= label_tag(:import_url, "Host to scrape:") %>
-        <span class="url_input">
-          <%# collection_select(:scraper, :scraper_name, @scraper_configs_coll, :id, :host) %>
-        </span>
-      </div>
-      <br>
-      <%= submit_tag("Go") %>
-    <% end %> -->
-    <br>
-    <%= form_tag("#{root_path}scrapers/submit.js", method: "post", remote: true, authenticity_token: true) do %>
-      <br>
-      <div>
-        <p>
-          Please enter the url for a property for sale or for rent:
-          </p>
-        <%# label_tag(:import_url, "Webpage URL:") %>
-        <span class="url_input">
-          <%= text_field_tag(:import_url) %>
-        </span>
-        <%= submit_tag("Retrieve property info") %>
+
+    <%= form_tag(scrapers_submit_path, method: "post", data: { turbo_frame: "retrieve-results" }) do %>
+      <div class="mb-3">
+        <p>Please enter the url for a property for sale or for rent:</p>
+        <div class="input-group">
+          <span class="url_input">
+            <%= text_field_tag(:import_url, nil, class: "form-control", placeholder: "https://www.idealista.com/inmueble/...") %>
+          </span>
+          <%= submit_tag("Retrieve property info", class: "btn btn-primary") %>
+        </div>
       </div>
     <% end %>
-    <br>
-    <br>
-    <div id="retrieve-results"></div>
-    <br>
-    <br>
-    <div class="card card-outline-info mb-3 text-center">
-      <div class="card-block">
-        <blockquote class="card-blockquote">
+
+    <turbo-frame id="retrieve-results"></turbo-frame>
+
+    <div class="card border-info mb-3 text-center mt-4">
+      <div class="card-body">
+        <blockquote class="blockquote">
           <p>Help us improve this product by giving us some feedback:</p>
         </blockquote>
-        <p>
-          <form action="https://formspree.io/pws@propertywebbuilder.com" method="POST">
-            <div class="form-group row">
-              <label for="example-url-input" class="col-2 col-form-label">Url you would like to scrape</label>
-              <div class="col-10">
-                <input class="form-control" type="url" value="" id="example-url-input">
-              </div>
+        <form action="https://formspree.io/pws@propertywebbuilder.com" method="POST">
+          <div class="mb-3 row">
+            <label for="example-url-input" class="col-sm-2 col-form-label">Url you would like to scrape</label>
+            <div class="col-sm-10">
+              <input class="form-control" type="url" value="" id="example-url-input" name="scrape_url">
             </div>
-            <div class="form-group row">
-              <label for="example-bool-input" class="col-2 col-form-label">Would you pay for this service?</label>
-              <div class="col-10">
-                <input class="form-control" type="bool" value="" id="example-bool-input">
-              </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="example-bool-input" class="col-sm-2 col-form-label">Would you pay for this service?</label>
+            <div class="col-sm-10">
+              <input class="form-control" type="text" value="" id="example-bool-input" name="would_pay">
             </div>
-            <div class="form-group row">
-              <label for="example-email-input" class="col-2 col-form-label">Email</label>
-              <div class="col-10">
-                <input class="form-control" type="email" value="" id="example-email-input">
-              </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="example-email-input" class="col-sm-2 col-form-label">Email</label>
+            <div class="col-sm-10">
+              <input class="form-control" type="email" value="" id="example-email-input" name="email">
             </div>
-            <div class="form-group row">
-              <label for="example-text-input" class="col-2 col-form-label">Any other comments:</label>
-              <div class="col-10">
-                <input class="form-control" type="text" value="" id="example-text-input">
-              </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="example-text-input" class="col-sm-2 col-form-label">Any other comments:</label>
+            <div class="col-sm-10">
+              <input class="form-control" type="text" value="" id="example-text-input" name="comments">
             </div>
-            <input type="submit" value="Send">
-          </form>
-        </p>
+          </div>
+          <input type="submit" value="Send" class="btn btn-outline-secondary">
+        </form>
       </div>
     </div>
   </div>
