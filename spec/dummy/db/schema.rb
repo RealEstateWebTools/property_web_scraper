@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_14_234247) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_14_234247) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -122,5 +122,4 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_14_234247) do
     t.index ["price_float"], name: "index_property_web_scraper_listings_on_price_float"
     t.index ["reference"], name: "index_property_web_scraper_listings_on_reference"
   end
-
 end
