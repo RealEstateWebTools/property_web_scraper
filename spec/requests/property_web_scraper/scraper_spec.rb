@@ -26,6 +26,8 @@ module PropertyWebScraper
         json = JSON.parse(response.body)
         expect(json['success']).to eq(false)
         expect(json['key']).to eq('import_host')
+        # Re-seed the deleted record to avoid polluting other tests
+        PropertyWebScraper::ImportHost.create!(slug: 'realtor', scraper_name: 'realtor', host: 'www.realtor.com')
       end
     end
 

@@ -137,6 +137,7 @@ module PropertyWebScraper
         end
         @persisted = true
       end
+      _assign_attributes_from_firestore(data.transform_keys(&:to_s))
       self
     end
 

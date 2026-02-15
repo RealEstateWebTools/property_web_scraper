@@ -8,19 +8,19 @@ module PropertyWebScraper
       it 'renders error for missing url' do
         get '/single_property_view'
         expect(response).to have_http_status(200)
-        expect(response.body).to include('not valid')
+        expect(response.body).to include('provide a url')
       end
 
       it 'renders error for an invalid url' do
         get '/single_property_view', params: { url: 'not a valid url' }
         expect(response).to have_http_status(200)
-        expect(response.body).to include('not valid')
+        expect(response.body).to include('valid url')
       end
 
       it 'renders error for an unsupported host' do
         get '/single_property_view', params: { url: 'https://www.google.com/search' }
         expect(response).to have_http_status(200)
-        expect(response.body).to include('unable to retrieve')
+        expect(response.body).to include('not supported')
       end
 
       it 'renders property view on success (idealista)' do
