@@ -97,7 +97,7 @@ module PropertyWebScraper
 
     def import_host_slug=(value)
       @_import_host = nil
-      super
+      @import_host_slug = value
     end
 
     def reload

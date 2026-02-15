@@ -35,8 +35,13 @@ jobs:
       - name: Install and start Firestore emulator
         run: |
           npm install -g firebase-tools
+          echo '{"emulators":{"firestore":{"port":8080}}}' > firebase.json
           firebase emulators:start --only firestore --project test-project &
-          sleep 5
+          # Wait for emulator to be ready
+          for i in $(seq 1 30); do
+            curl -s http://localhost:8080/ > /dev/null 2>&1 && break
+            sleep 2
+          done
 
       - name: Run specs
         run: bundle exec rspec
