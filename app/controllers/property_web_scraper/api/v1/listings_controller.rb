@@ -32,11 +32,6 @@ module PropertyWebScraper
           error_message: "Sorry, the url provided is currently not supported"
         }
       end
-      # if params["client_id"] && (params["client_id"].length > 5)
-      #   client_id = params["client_id"]
-      # else
-      #   client_id = "pwb" + SecureRandom.urlsafe_base64(8)
-      # end
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
       listing = web_scraper.process_url uri.to_s, import_host
 

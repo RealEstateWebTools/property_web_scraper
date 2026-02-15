@@ -6,6 +6,6 @@
     <% end %>
 
   <% else %>
-    <%= @error_message.html_safe %>
+    <%= sanitize_html(@error_message) %>
   <% end %>
 </p>

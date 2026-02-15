@@ -79,13 +79,13 @@ module PropertyWebScraper
         expect(listing.for_sale).to eq(true)
       end
 
-      it 'defaults numeric attributes to 0 when blank' do
+      it 'leaves numeric attributes nil when blank' do
         property_hash['count_bedrooms'] = nil
         property_hash['count_bathrooms'] = ''
         Listing.update_from_hash(listing, property_hash)
         listing.reload
-        expect(listing.count_bedrooms).to eq(0)
-        expect(listing.count_bathrooms).to eq(0)
+        expect(listing.count_bedrooms).to be_nil
+        expect(listing.count_bathrooms).to be_nil
       end
 
       it 'defaults image_urls to empty array when blank' do

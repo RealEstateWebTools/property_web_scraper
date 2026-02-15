@@ -21,14 +21,11 @@ module PropertyWebScraper
 
     # Returns how long a cached listing is considered fresh.
     #
-    # Currently hard-coded to 1 day. Future versions will read from the
-    # +stale_age+ database column.
+    # Reads from the +stale_age+ database column, defaulting to +"1.day"+.
     #
     # @return [ActiveSupport::Duration]
     def stale_age_duration
-      duration_string = "1.day"
-      # self.stale_age || "1.day"
-      # https://stackoverflow.com/questions/34506174/convert-string-to-activesupportduration
+      duration_string = self.stale_age.presence || "1.day"
       duration_parts = duration_string.split('.')
       duration_parts.first.to_i.send(duration_parts.last)
     end

@@ -4,9 +4,6 @@ module PropertyWebScraper
   # Fetches a listing by URL, builds map marker data, and renders
   # the themed show template.
   class SinglePropertyViewController < ApplicationController
-    # below to avoid ActionController::InvalidAuthenticityToken error when posting from chrome extension
-    # protect_from_forgery with: :null_session
-
     # Displays a single scraped property with map and images.
     #
     # Expects a +url+ query parameter. Renders an error view when the
@@ -14,13 +11,8 @@ module PropertyWebScraper
     #
     # @return [void]
     def show
-      # scraper_name = params[:scraper][:scraper_name]
       import_url = params[:url] || ""
-      begin
-        uri = URI.parse import_url.strip
-      rescue URI::InvalidURIError => error
-        uri = ""
-      end
+      uri = uri_from_url(import_url.strip)
       @listing = {}
       if uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
         # find import_host with meta data from db
@@ -70,13 +62,13 @@ module PropertyWebScraper
         @error_message = 'Url is not valid'
         return render '/property_web_scraper/single_property_view/error', layout: false
       end
-      @main_image_url = "https://placeholdit.co//i/500x250?bg=111111&text="
-      if @listing.image_urls.length > 0
+      @main_image_url = "https://placehold.co/500x250?text=No+Image"
+      if @listing.image_urls.present?
         @main_image_url = @listing.image_urls[0]
       end
 
-       # "http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg"
-      theme_name = "spp_vuetify"
+      allowed_themes = %w[spp_lite spp_vue_mod spp_vuetify spp_modern]
+      theme_name = allowed_themes.include?(params[:theme]) ? params[:theme] : "spp_vuetify"
       render "/property_web_scraper/single_property_view/#{theme_name}/show", layout: "property_web_scraper/#{theme_name}"
     end
 

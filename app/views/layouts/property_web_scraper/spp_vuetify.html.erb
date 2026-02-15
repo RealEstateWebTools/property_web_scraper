@@ -34,7 +34,7 @@
     <script>
       var PWSAPP = PWSAPP || {};
       
-        var carouselPhotos = <%== @listing.image_urls.to_json %>;
+        var carouselPhotos = <%= @listing.image_urls.to_json %>;
         PWSAPP.vueData = {
           title: "rrrr",
           carouselPhotos: carouselPhotos
