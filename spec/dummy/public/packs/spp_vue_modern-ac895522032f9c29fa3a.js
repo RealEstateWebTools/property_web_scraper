@@ -31175,7 +31175,7 @@ __WEBPACK_IMPORTED_MODULE_0_vue_dist_vue_esm__["a" /* default */].use(__WEBPACK_
 
 __WEBPACK_IMPORTED_MODULE_0_vue_dist_vue_esm__["a" /* default */].use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyCPorm8YzIaUGhKfe5cvpgofZ_gdT8hdZw'
+    key: '' // Set GOOGLE_MAPS_API_KEY environment variable
     // v: '3.26', // Google Maps API version
     // libraries: 'places',   // If you want to use places input
   }
