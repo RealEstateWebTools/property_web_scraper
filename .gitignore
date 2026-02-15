@@ -12,3 +12,4 @@ spec/dummy/config/secrets.yml
 .byebug_history
 
 spec/dummy/node_modules
+.yardoc/
