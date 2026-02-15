@@ -8,7 +8,7 @@ Web based UI to make scraping data from real estate websites super simple.
 
 - Ruby >= 3.1
 - Rails >= 7.1
-- PostgreSQL
+- Google Cloud Firestore (or local emulator)
 
 ## Installation
 
@@ -18,11 +18,19 @@ Install into an existing Rails project by adding this line to your application's
 gem 'property_web_scraper', git: 'https://github.com/RealEstateWebTools/property_web_scraper', branch: 'master'
 ```
 
-Also, be sure to use Postgres as your database (by having the "pg" gem and Postgres installed locally).
-
 Then execute:
 ```bash
 $ bundle
+```
+
+Set the required Firestore environment variables:
+
+```bash
+export FIRESTORE_PROJECT_ID=your-gcp-project-id
+# Production: path to your service account JSON key
+export FIRESTORE_CREDENTIALS=/path/to/service-account.json
+# Development/test: use the Firestore emulator instead
+export FIRESTORE_EMULATOR_HOST=localhost:8080
 ```
 
 Mount PropertyWebScraper by adding the following to your routes.rb file:
@@ -30,11 +38,8 @@ Mount PropertyWebScraper by adding the following to your routes.rb file:
 mount PropertyWebScraper::Engine => '/'
 ```
 
-And run the following commands from the console:
+Seed the initial scraper host data:
 ```bash
-rails property_web_scraper:install:migrations
-rails db:create
-rails db:migrate
 rails property_web_scraper:db:seed
 ```
 
@@ -48,19 +53,22 @@ cd property_web_scraper
 bundle install
 ```
 
-Create and migrate the test database, then seed it:
+Start the Firestore emulator and seed data:
 
 ```bash
-cd spec/dummy
-rails db:create db:migrate
-cd ../..
+firebase emulators:start --only firestore --project test-project &
+sleep 5
+export FIRESTORE_EMULATOR_HOST=localhost:8080
+export FIRESTORE_PROJECT_ID=test-project
 bundle exec rails runner "load 'db/seeds/import_hosts.rb'"
 ```
 
 Run the test suite:
 
 ```bash
-bundle exec rspec
+firebase emulators:start --only firestore --project test-project &
+sleep 5
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec
 ```
 
 ## Architecture Overview
@@ -99,21 +107,30 @@ All endpoints accept a `url` parameter and return JSON with a `success` boolean 
 
 ## Running Tests
 
+Start the Firestore emulator before running any tests:
+
+```bash
+firebase emulators:start --only firestore --project test-project &
+sleep 5
+```
+
+Then run specs with the emulator environment variables:
+
 ```bash
 # Full suite
-bundle exec rspec
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec
 
 # Models only
-bundle exec rspec spec/models
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/models
 
 # Services only
-bundle exec rspec spec/services
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/services
 
-# Request specs only
-bundle exec rspec spec/requests
+# Firestore library specs
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/lib
 
 # A single spec file
-bundle exec rspec spec/models/property_web_scraper/listing_spec.rb
+FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/models/property_web_scraper/listing_spec.rb
 ```
 
 ## Contribute and spread the love
