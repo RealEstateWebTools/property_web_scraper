@@ -7,7 +7,6 @@ gemspec
 
 gem 'rails', '~> 7.2.0'
 gem 'puma'
-gem 'jquery-rails'
 
 group :development, :test do
   gem 'simplecov', require: false

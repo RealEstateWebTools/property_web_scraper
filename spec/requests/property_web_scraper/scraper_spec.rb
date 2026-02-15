@@ -101,8 +101,9 @@ module PropertyWebScraper
         VCR.use_cassette('scrapers/idealista_2018_01') do
           post '/scrapers/submit',
                params: { import_url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/' },
-               headers: { 'Accept' => 'text/javascript', 'Content-Type' => 'application/x-www-form-urlencoded' }
+               headers: { 'Accept' => 'text/html', 'Content-Type' => 'application/x-www-form-urlencoded' }
           expect(response).to have_http_status(200)
+          expect(response.body).to include('turbo-frame')
         end
       end
     end

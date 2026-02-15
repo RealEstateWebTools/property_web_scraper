@@ -1,35 +1,23 @@
-<!-- <h5>Result:</h5> -->
-<p>Property info retrieved..:</p>
-<div>
-  <button type="button" class="btn btn-success">
-    <%= link_to "Single Page view", single_property_view_path(url: @listing.import_url) %>
-  </button>
-  <button type="button" class="btn btn-success">  <%= link_to "JSON view", retriever_as_json_path(url: @listing.import_url) %>
-  </button>
+<p>Property info retrieved:</p>
+<div class="mb-3">
+  <%= link_to "Single Page view", single_property_view_path(url: @listing.import_url), class: "btn btn-success me-2" %>
+  <%= link_to "JSON view", retriever_as_json_path(url: @listing.import_url), class: "btn btn-success" %>
 </div>
-<table class="table">
-  <% @listing_attributes.each do |listing_attribute| %>
-    <tr>
-      <th>
-        <%= listing_attribute  %>
-      </th>
-      <td>
-        <%= @listing[listing_attribute]  %>
-      </td>
-    </tr>
-  <% end %>
-  <tr>
-    <th>Url</th>
-    <td>
-      <%= link_to @listing.import_url, @listing.import_url, target: "_blank" %>
-    </td>
-  </tr>
-  <thead>
-  </thead>
+<table class="table table-striped">
   <tbody>
+    <% @listing_attributes.each do |listing_attribute| %>
+      <tr>
+        <th><%= listing_attribute %></th>
+        <td><%= @listing[listing_attribute] %></td>
+      </tr>
+    <% end %>
+    <tr>
+      <th>Url</th>
+      <td><%= link_to @listing.import_url, @listing.import_url, target: "_blank" %></td>
+    </tr>
   </tbody>
 </table>
-<div style="display: block;">
+<div class="mb-3">
   <strong>Images</strong>
   <% @image_urls.each do |listing_image_url| %>
     <div>
@@ -38,9 +26,6 @@
   <% end %>
 </div>
 <div>
-  <button type="button" class="btn btn-success">
-    <%= link_to "Single Page view", single_property_view_path(url: @listing.import_url) %>
-  </button>
-  <button type="button" class="btn btn-success">  <%= link_to "JSON view", retriever_as_json_path(url: @listing.import_url) %>
-  </button>
+  <%= link_to "Single Page view", single_property_view_path(url: @listing.import_url), class: "btn btn-success me-2" %>
+  <%= link_to "JSON view", retriever_as_json_path(url: @listing.import_url), class: "btn btn-success" %>
 </div>

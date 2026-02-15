@@ -118,7 +118,7 @@ module PropertyWebScraper
         @error_message = result.error_message
       end
 
-      render 'scraper_retrieve_results', layout: false
+      render 'ajax_submit', layout: false
     end
 
     private

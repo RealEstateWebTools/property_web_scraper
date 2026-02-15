@@ -3,7 +3,7 @@ PropertyWebScraper::Engine.routes.draw do
 
   get '/single_property_view' => 'single_property_view#show'
 
-  post '/scrapers/submit' => 'scraper#ajax_submit'
+  post '/scrapers/submit' => 'scraper#ajax_submit', as: :scrapers_submit
   post '/retriever/as_json' => 'scraper#retrieve_as_json'
   get '/retriever/as_json' => 'scraper#retrieve_as_json'
   get '/config/as_json' => 'scraper#config_as_json'

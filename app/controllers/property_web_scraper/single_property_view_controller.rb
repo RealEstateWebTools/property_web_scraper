@@ -1,8 +1,8 @@
 module PropertyWebScraper
-  # Renders a single property page using the Vuetify theme.
+  # Renders a single property page.
   #
   # Fetches a listing by URL, builds map marker data, and renders
-  # the themed show template.
+  # the show template.
   class SinglePropertyViewController < ApplicationController
     # Displays a single scraped property with map and images.
     #
@@ -39,7 +39,6 @@ module PropertyWebScraper
             @markers.push marker
           end
 
-
         else
           @error_message = <<-HTML
           <div class="error">
@@ -67,14 +66,7 @@ module PropertyWebScraper
         @main_image_url = @listing.image_urls[0]
       end
 
-      allowed_themes = %w[spp_lite spp_vue_mod spp_vuetify spp_modern]
-      theme_name = allowed_themes.include?(params[:theme]) ? params[:theme] : "spp_vuetify"
-      render "/property_web_scraper/single_property_view/#{theme_name}/show", layout: "property_web_scraper/#{theme_name}"
+      render '/property_web_scraper/single_property_view/show'
     end
-
-    private
-
-
-
   end
 end

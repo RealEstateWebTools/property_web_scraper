@@ -1,5 +1,7 @@
 require 'money-rails'
 require 'rack/cors'
+require 'turbo-rails'
+require 'stimulus-rails'
 
 module PropertyWebScraper
   # Rails engine configuration for PropertyWebScraper.
@@ -16,12 +18,6 @@ module PropertyWebScraper
     #   app.middleware.use MyEngine::Middleware
     # end
 
-    initializer "property_web_scraper.assets.precompile" do |app|
-      app.config.assets.precompile += %w( property_web_scraper/spp_vuetify.css property_web_scraper/spp_vuetify.js )
-    end
-    # seems above is the preferred way of setting up precompilation in an engine
-    # http://edgeguides.rubyonrails.org/engines.html#separate-assets-precompiling
-    # config.assets.precompile += %w( property_web_scraper/spp_vuetify.css property_web_scraper/spp_vuetify.js )
 
 
     config.generators do |g|
