@@ -2,6 +2,10 @@ require 'money-rails'
 require 'rack/cors'
 
 module PropertyWebScraper
+  # Rails engine configuration for PropertyWebScraper.
+  #
+  # Isolates the engine namespace, registers asset precompilation paths,
+  # and configures generators for RSpec and FactoryBot.
   class Engine < ::Rails::Engine
     isolate_namespace PropertyWebScraper
 

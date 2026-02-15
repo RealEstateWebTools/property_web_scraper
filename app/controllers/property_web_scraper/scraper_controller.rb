@@ -1,4 +1,8 @@
 module PropertyWebScraper
+  # Main web controller for the scraper UI and JSON endpoints.
+  #
+  # Provides a welcome page, a config endpoint for the Chrome extension,
+  # a JSON retrieval endpoint, and an AJAX form submission handler.
   class ScraperController < ApplicationController
     # below to avoid ActionController::InvalidAuthenticityToken error when posting from chrome extension
     protect_from_forgery with: :null_session
@@ -25,10 +29,18 @@ module PropertyWebScraper
     #   # }
     # end
 
+    # Renders the scraper welcome/landing page.
+    #
+    # @return [void]
     def welcome
       # @scraper_configs_coll = PropertyWebScraper::ImportHost.all
     end
 
+    # Returns the scraper configuration for realtor.com as JSON.
+    #
+    # Used by the Chrome extension to understand which fields to extract.
+    #
+    # @return [void]
     def config_as_json
       import_host = PropertyWebScraper::ImportHost.find_by_host("www.realtor.com")
       unless import_host.present?
@@ -55,6 +67,12 @@ module PropertyWebScraper
       }
     end
 
+    # Retrieves a property listing by URL and returns it as JSON.
+    #
+    # Expects a +url+ parameter. Returns error JSON when the URL is
+    # missing, invalid, or belongs to an unsupported host.
+    #
+    # @return [void]
     def retrieve_as_json
 
       unless params["url"]
@@ -92,6 +110,12 @@ module PropertyWebScraper
       }
     end
 
+    # Handles the AJAX form submission from the scraper UI.
+    #
+    # Delegates to {ListingRetriever} and renders a JS partial with the
+    # result or error message.
+    #
+    # @return [void]
     def ajax_submit
       # scraper_name = params[:scraper][:scraper_name]
       import_url = params[:import_url].strip
@@ -153,7 +177,7 @@ module PropertyWebScraper
       #   @success = false
       # end
       # redirect_to "/scrapers/#{scraper_name}"
-      render '/property_web_scraper/scraper_retrieve_results.js.erb', layout: false
+      render 'scraper_retrieve_results', layout: false
     end
 
     private

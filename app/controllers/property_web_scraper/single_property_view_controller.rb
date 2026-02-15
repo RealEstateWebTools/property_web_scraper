@@ -1,8 +1,18 @@
 module PropertyWebScraper
+  # Renders a single property page using the Vuetify theme.
+  #
+  # Fetches a listing by URL, builds map marker data, and renders
+  # the themed show template.
   class SinglePropertyViewController < ApplicationController
     # below to avoid ActionController::InvalidAuthenticityToken error when posting from chrome extension
     # protect_from_forgery with: :null_session
 
+    # Displays a single scraped property with map and images.
+    #
+    # Expects a +url+ query parameter. Renders an error view when the
+    # URL is missing, invalid, or belongs to an unsupported host.
+    #
+    # @return [void]
     def show
       # scraper_name = params[:scraper][:scraper_name]
       import_url = params[:url] || ""

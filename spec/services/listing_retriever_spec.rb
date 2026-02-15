@@ -4,10 +4,8 @@ module PropertyWebScraper
   RSpec.describe 'Listing retriever' do
     let(:valid_import_url) { 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/' }
     let(:invalid_import_url) { 'https://www.google.com' }
-    before :all do
-      load File.join(PropertyWebScraper::Engine.root, 'db', 'seeds', 'import_hosts.rb')
-    end
 
+    include_context 'with seeded import hosts'
 
     it 'detects invalid urls' do
       listing_retriever = PropertyWebScraper::ListingRetriever.new("not a url")
@@ -16,11 +14,31 @@ module PropertyWebScraper
       expect(result.error_message).to eq("Invalid Url")
     end
 
+    it 'returns Invalid Url for an empty string' do
+      listing_retriever = PropertyWebScraper::ListingRetriever.new("")
+      result = listing_retriever.retrieve
+      expect(result.success).to eq(false)
+      expect(result.error_message).to eq("Invalid Url")
+    end
+
     it 'detects unsupported urls' do
       listing_retriever = PropertyWebScraper::ListingRetriever.new(invalid_import_url)
-      result = listing_retriever.retrieve 
+      result = listing_retriever.retrieve
       expect(result.success).to eq(false)
       expect(result.error_message).to eq("Unsupported Url")
+    end
+
+    it 'captures scraper exceptions gracefully' do
+      allow_any_instance_of(PropertyWebScraper::Scraper).to receive(:process_url).and_raise(StandardError, 'connection error')
+      listing_retriever = PropertyWebScraper::ListingRetriever.new(valid_import_url)
+      result = listing_retriever.retrieve
+      expect(result.success).to eq(false)
+      expect(result.error_message).to eq('connection error')
+    end
+
+    it 'exposes import_url via accessor' do
+      listing_retriever = PropertyWebScraper::ListingRetriever.new(valid_import_url)
+      expect(listing_retriever.import_url).to eq(valid_import_url)
     end
 
     it 'retrieves valid listing' do

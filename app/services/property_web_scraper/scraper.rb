@@ -3,9 +3,23 @@ require 'open-uri'
 require 'faraday'
 
 module PropertyWebScraper
+  # Fetches and parses property data from real estate websites.
+  #
+  # Uses a {ScraperMapping} JSON configuration to know which CSS selectors,
+  # XPath expressions, or regex patterns to apply when extracting fields
+  # from an HTML page.
+  #
+  # @example Scraping a single URL
+  #   scraper = Scraper.new('idealista')
+  #   listing = scraper.process_url(url, import_host)
   class Scraper
     attr_accessor :scraper_mapping
 
+    # Initializes the scraper with a mapping configuration.
+    #
+    # @param scraper_mapping_name [String, nil] name used to look up the mapping via {ScraperMapping.find_by_name}
+    # @param scraper_mapping [ScraperMapping, nil] pre-loaded mapping object (takes precedence)
+    # @raise [ArgumentError] if no valid mapping can be found
     def initialize(scraper_mapping_name, scraper_mapping=nil)
       if scraper_mapping.present?
         self.scraper_mapping = scraper_mapping
@@ -37,6 +51,15 @@ module PropertyWebScraper
     #   return retrieved_properties
     # end
 
+    # Retrieves or refreshes a listing for the given URL.
+    #
+    # Finds an existing listing by +import_url+ or creates one. If the
+    # listing was last retrieved more than 24 seconds ago it is re-scraped
+    # from the source website.
+    #
+    # @param import_url [String] the property page URL
+    # @param import_host [ImportHost] the host record for this URL
+    # @return [Listing] the persisted listing
     def process_url(import_url, import_host)
       # TODO - use import_host.stale_age_duration or query_param to decide if to refresh
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
@@ -58,6 +81,11 @@ module PropertyWebScraper
       listing
     end
 
+    # Scrapes the listing page and persists the extracted data.
+    #
+    # @param listing [Listing] the listing to update
+    # @param import_host_slug [String] slug identifying the import host
+    # @return [Listing] the updated listing
     def retrieve_and_save(listing, import_host_slug)
       retrieved_properties = retrieve_from_webpage listing.import_url
       listing.import_host_slug = import_host_slug
@@ -67,6 +95,13 @@ module PropertyWebScraper
       listing
     end
 
+    # Fetches and parses an HTML page into a property hash.
+    #
+    # Applies the scraper mapping's CSS/XPath/regex rules to extract
+    # text fields, numeric fields, boolean fields, images, and features.
+    #
+    # @param import_url [String] the URL to fetch
+    # @return [Array<Hash>] array containing a single property hash
     def retrieve_from_webpage(import_url)
       properties = []
       # nov 2017 - only 1 property is ever returned currently
@@ -100,7 +135,7 @@ module PropertyWebScraper
 
       if scraper_mapping.images
         scraper_mapping.images.each do |image_mapping|
-          # TODO: make this function useful for where there are multiple selectors / mappings 
+          # TODO: make this function useful for where there are multiple selectors / mappings
           # for images.  Right now it works for only one selector which matches multiple items
           retrieved_array = retrieve_images_array doc, image_mapping, uri
           property_hash["image_urls"] = retrieved_array
@@ -109,7 +144,7 @@ module PropertyWebScraper
 
       if scraper_mapping.features
         scraper_mapping.features.each do |feature_mapping|
-          # TODO: make this function useful for where there are multiple selectors / mappings 
+          # TODO: make this function useful for where there are multiple selectors / mappings
           # for features.  Right now it works for only one selector which matches multiple items
           retrieved_array = retrieve_features_array doc, feature_mapping, uri
           property_hash["features"] = retrieved_array

@@ -1,6 +1,14 @@
 require 'active_hash'
 module PropertyWebScraper
-  # https://github.com/zilkey/active_hash
+  # Loads scraper configuration from JSON files using ActiveHash.
+  #
+  # Each JSON file in +config/scraper_mappings/+ defines CSS selectors,
+  # XPath expressions, regex patterns, and field mappings used by
+  # {Scraper} to extract property data from a specific website.
+  #
+  # @example Finding a mapping
+  #   mapping = ScraperMapping.find_by_name('idealista')
+  #   mapping.textFields  #=> { "title" => { "cssLocator" => "..." }, ... }
   class ScraperMapping < ActiveJSON::Base
     # set_filename "config"
     # not possible to set primary_key like so:

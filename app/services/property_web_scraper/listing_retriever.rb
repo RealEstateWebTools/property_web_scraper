@@ -4,15 +4,33 @@ require 'open-uri'
 require 'faraday'
 
 module PropertyWebScraper
+  # High-level service for retrieving a property listing by URL.
+  #
+  # Validates the URL, resolves the matching {ImportHost}, delegates
+  # to {Scraper}, and wraps the result in an +OpenStruct+ with
+  # +success+, +error_message+, and +retrieved_listing+ fields.
+  #
+  # @example
+  #   result = ListingRetriever.new('https://www.idealista.com/inmueble/123/').retrieve
+  #   if result.success
+  #     result.retrieved_listing  #=> Listing
+  #   else
+  #     result.error_message      #=> "Unsupported Url"
+  #   end
   class ListingRetriever
     # TODO - add logic to retrieve
     # from db or scraper depending on expiry
     attr_accessor :import_url
 
+    # @param import_url [String] the property page URL to retrieve
     def initialize(import_url)
       @import_url = import_url
     end
 
+    # Validates the URL, finds the import host, and scrapes the listing.
+    #
+    # @return [OpenStruct] with +success+ (Boolean), +error_message+ (String),
+    #   and +retrieved_listing+ ({Listing}) fields
     def retrieve
       result = OpenStruct.new(:success => false, :error_message => "not processed")
       import_uri = get_import_uri
