@@ -38,9 +38,19 @@ module PropertyWebScraper
       it 'refreshes a stale listing' do
         VCR.use_cassette('scrapers/idealista_2018_01', allow_playback_repeats: true) do
           listing = scraper.process_url(import_url, import_host)
-          listing.update_column(:last_retrieved_at, 1.hour.ago)
+          listing.update_column(:last_retrieved_at, 2.days.ago)
           refreshed = scraper.process_url(import_url, import_host)
           expect(refreshed.last_retrieved_at).to be > 1.minute.ago
+        end
+      end
+
+      it 'does not re-fetch a recently retrieved listing' do
+        VCR.use_cassette('scrapers/idealista_2018_01') do
+          listing = scraper.process_url(import_url, import_host)
+          original_retrieved_at = listing.last_retrieved_at
+          # Second call should use cache (no VCR interaction needed)
+          cached = scraper.process_url(import_url, import_host)
+          expect(cached.last_retrieved_at).to eq(original_retrieved_at)
         end
       end
     end

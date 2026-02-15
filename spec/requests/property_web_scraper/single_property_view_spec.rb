@@ -23,9 +23,23 @@ module PropertyWebScraper
         expect(response.body).to include('unable to retrieve')
       end
 
-      it 'renders property view on success' do
+      it 'renders property view on success (idealista)' do
         VCR.use_cassette('scrapers/idealista_2018_01') do
           get '/single_property_view', params: { url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/' }
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      it 'renders property view on success (rightmove)' do
+        VCR.use_cassette('scrapers/rightmove') do
+          get '/single_property_view', params: { url: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html' }
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      it 'renders property view on success (realtor)' do
+        VCR.use_cassette('scrapers/realtor') do
+          get '/single_property_view', params: { url: 'http://www.realtor.com/realestateandhomes-detail/5804-Cedar-Glen-Ln_Bakersfield_CA_93313_M12147-18296' }
           expect(response).to have_http_status(200)
         end
       end

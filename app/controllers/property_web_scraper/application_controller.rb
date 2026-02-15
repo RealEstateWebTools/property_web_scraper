@@ -1,4 +1,5 @@
 module PropertyWebScraper
+  # Base controller for all PropertyWebScraper controllers.
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
 
