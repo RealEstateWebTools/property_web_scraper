@@ -33,7 +33,8 @@ module PropertyWebScraper
     #
     # @return [void]
     def welcome
-      # @scraper_configs_coll = PropertyWebScraper::ImportHost.all
+      # :nocov:
+      # scraper_configs_coll = PropertyWebScraper::ImportHost.all
     end
 
     # Returns the scraper configuration for realtor.com as JSON.

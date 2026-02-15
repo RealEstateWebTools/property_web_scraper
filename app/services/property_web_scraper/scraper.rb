@@ -17,7 +17,7 @@ module PropertyWebScraper
 
     # Initializes the scraper with a mapping configuration.
     #
-    # @param scraper_mapping_name [String, nil] name used to look up the mapping via {ScraperMapping.find_by_name}
+    # @param scraper_mapping_name [String, nil] name used to look up the mapping via ScraperMapping.find_by_name
     # @param scraper_mapping [ScraperMapping, nil] pre-loaded mapping object (takes precedence)
     # @raise [ArgumentError] if no valid mapping can be found
     def initialize(scraper_mapping_name, scraper_mapping=nil)
@@ -54,23 +54,20 @@ module PropertyWebScraper
     # Retrieves or refreshes a listing for the given URL.
     #
     # Finds an existing listing by +import_url+ or creates one. If the
-    # listing was last retrieved more than 24 seconds ago it is re-scraped
-    # from the source website.
+    # listing is older than the import host's +stale_age_duration+ it is
+    # re-scraped from the source website.
     #
     # @param import_url [String] the property page URL
     # @param import_host [ImportHost] the host record for this URL
     # @return [Listing] the persisted listing
     def process_url(import_url, import_host)
-      # TODO - use import_host.stale_age_duration or query_param to decide if to refresh
       listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
-      expiry_duration = 24.seconds
-      # expiry_duration = 1.minute
+      expiry_duration = import_host.stale_age_duration
       # For datetime, yesterday is < today
       recent = (DateTime.now.utc - expiry_duration)
 
       listing_retrieved_recently = listing.last_retrieved_at.present? && (listing.last_retrieved_at > recent)
 
-      # TODO - add specs for stale_age calculation
       if listing.last_retrieved_at.blank? || !listing_retrieved_recently
         # if listing has not been retrieved within time defined by stale age
         # retrieve from source rather than db

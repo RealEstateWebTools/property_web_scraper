@@ -51,12 +51,47 @@ module PropertyWebScraper
         expect(json['error_message']).to include('not supported')
       end
 
-      it 'returns listing on success' do
+      it 'returns listing on success (idealista)' do
         VCR.use_cassette('scrapers/idealista_2018_01') do
           post '/retriever/as_json', params: { url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/' }
           json = JSON.parse(response.body)
           expect(json['success']).to eq(true)
           expect(json['listing']).to be_present
+        end
+      end
+
+      it 'returns listing on success (rightmove)' do
+        VCR.use_cassette('scrapers/rightmove') do
+          post '/retriever/as_json', params: { url: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html' }
+          json = JSON.parse(response.body)
+          expect(json['success']).to eq(true)
+          expect(json['listing']).to be_present
+        end
+      end
+
+      it 'returns listing on success (realtor)' do
+        VCR.use_cassette('scrapers/realtor') do
+          post '/retriever/as_json', params: { url: 'http://www.realtor.com/realestateandhomes-detail/5804-Cedar-Glen-Ln_Bakersfield_CA_93313_M12147-18296' }
+          json = JSON.parse(response.body)
+          expect(json['success']).to eq(true)
+          expect(json['listing']).to be_present
+        end
+      end
+
+      it 'returns listing on success (zoopla)' do
+        VCR.use_cassette('scrapers/zoopla') do
+          post '/retriever/as_json', params: { url: 'https://www.zoopla.co.uk/for-sale/details/43719239' }
+          json = JSON.parse(response.body)
+          expect(json['success']).to eq(true)
+          expect(json['listing']).to be_present
+        end
+      end
+
+      it 'preserves client_id when provided' do
+        VCR.use_cassette('scrapers/idealista_2018_01') do
+          post '/retriever/as_json', params: { url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/', client_id: 'my_custom_client_id' }
+          json = JSON.parse(response.body)
+          expect(json['client_id']).to eq('my_custom_client_id')
         end
       end
     end

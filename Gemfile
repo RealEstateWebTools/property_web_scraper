@@ -12,4 +12,5 @@ gem 'jquery-rails'
 group :development, :test do
   gem 'simplecov', require: false
   gem 'rubocop', require: false
+  gem 'yard', require: false
 end
