@@ -20,7 +20,15 @@ module PropertyWebScraper
         if import_host
           @success = true
           web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
-          @listing = web_scraper.process_url import_url, import_host
+          begin
+            @listing = web_scraper.process_url import_url, import_host
+          rescue OpenURI::HTTPError => e
+            @error_message = "Could not retrieve property: the website returned #{e.message}"
+            return render '/property_web_scraper/single_property_view/error', layout: false
+          rescue StandardError => e
+            @error_message = "Could not retrieve property: #{e.message}"
+            return render '/property_web_scraper/single_property_view/error', layout: false
+          end
 
           @markers = []
 
