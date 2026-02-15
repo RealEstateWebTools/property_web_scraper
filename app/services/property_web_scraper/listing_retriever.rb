@@ -34,18 +34,15 @@ module PropertyWebScraper
     def retrieve
       Rails.logger.info "PropertyWebScraper: ListingRetriever attempting #{import_url}"
       result = OpenStruct.new(:success => false, :error_message => "not processed")
-      import_uri = get_import_uri
-      unless import_uri.is_a?(URI::HTTP) || import_uri.is_a?(URI::HTTPS)
-        result.error_message = "Invalid Url"
+      validation = PropertyWebScraper::UrlValidator.call(import_url)
+      unless validation.valid?
+        result.error_message = case validation.error_code
+                               when UrlValidator::UNSUPPORTED then "Unsupported Url"
+                               else "Invalid Url"
+                               end
         return result
       end
-      import_host = PropertyWebScraper::ImportHost.find_by_host(import_uri.host)
-
-
-      unless import_host
-        result.error_message = "Unsupported Url"
-        return result
-      end
+      import_host = validation.import_host
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
       begin
         retrieved_listing = web_scraper.process_url import_url, import_host
@@ -58,16 +55,6 @@ module PropertyWebScraper
         result.error_message = e.message
       end
       return result
-    end
-
-    private
-
-    def get_import_uri
-      begin
-        uri = URI.parse import_url
-      rescue URI::InvalidURIError => error
-        uri = ""
-      end
     end
 
   end

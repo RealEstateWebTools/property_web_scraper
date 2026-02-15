@@ -8,6 +8,7 @@ module PropertyWebScraper
 
     # below to avoid ActionController::InvalidAuthenticityToken error when posting from chrome extension
     protect_from_forgery with: :null_session
+    before_action :authenticate_api_key!, only: [:retrieve_as_json, :config_as_json]
 
     # Renders the scraper welcome/landing page.
     #
@@ -59,27 +60,16 @@ module PropertyWebScraper
     #
     # @return [void]
     def retrieve_as_json
-
-      unless params["url"]
+      Rails.logger.info "PropertyWebScraper: retrieve_as_json called with url=#{params['url']}"
+      validation = PropertyWebScraper::UrlValidator.call(params["url"])
+      unless validation.valid?
         return render json: {
           success: false,
-          error_message: "Please provide a url"
+          error_message: validation.error_message
         }
       end
-      uri = uri_from_url params["url"].strip
-      unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
-        return render json: {
-          success: false,
-          error_message: "Please provide a valid url"
-        }
-      end
-      import_host = PropertyWebScraper::ImportHost.find_by_host(uri.host)
-      unless import_host
-        return render json: {
-          success: false,
-          error_message: "Sorry, the url provided is currently not supported"
-        }
-      end
+      uri = validation.uri
+      import_host = validation.import_host
       if params["client_id"] && (params["client_id"].length > MIN_CLIENT_ID_LENGTH)
         client_id = params["client_id"]
       else

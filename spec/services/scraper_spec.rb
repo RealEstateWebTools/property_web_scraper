@@ -65,5 +65,46 @@ module PropertyWebScraper
         end
       end
     end
+
+    describe '#retrieve_from_webpage error paths' do
+      let(:scraper) { PropertyWebScraper::Scraper.new('idealista') }
+      let(:test_url) { 'https://www.idealista.com/inmueble/99999/' }
+
+      it 'raises OpenURI::HTTPError on 404' do
+        stub_request(:get, test_url).to_return(status: [404, 'Not Found'], body: '')
+        expect { scraper.retrieve_from_webpage(test_url) }.to raise_error(OpenURI::HTTPError, /404/)
+      end
+
+      it 'raises OpenURI::HTTPError on 500' do
+        stub_request(:get, test_url).to_return(status: [500, 'Internal Server Error'], body: '')
+        expect { scraper.retrieve_from_webpage(test_url) }.to raise_error(OpenURI::HTTPError, /500/)
+      end
+
+      it 'raises on network timeout' do
+        stub_request(:get, test_url).to_timeout
+        expect { scraper.retrieve_from_webpage(test_url) }.to raise_error(Net::OpenTimeout)
+      end
+
+      it 'handles empty HTML gracefully' do
+        stub_request(:get, test_url).to_return(status: 200, body: '', headers: { 'Content-Type' => 'text/html' })
+        result = scraper.retrieve_from_webpage(test_url)
+        expect(result).to be_an(Array)
+        expect(result.first).to be_a(Hash)
+      end
+
+      it 'handles malformed HTML gracefully' do
+        stub_request(:get, test_url).to_return(status: 200, body: '<div><p>unclosed', headers: { 'Content-Type' => 'text/html' })
+        result = scraper.retrieve_from_webpage(test_url)
+        expect(result).to be_an(Array)
+        expect(result.first).to be_a(Hash)
+      end
+
+      it 'raises after too many redirects' do
+        redirect_url = 'https://www.idealista.com/redirect/1'
+        stub_request(:get, test_url).to_return(status: 302, headers: { 'Location' => redirect_url })
+        stub_request(:get, redirect_url).to_return(status: 302, headers: { 'Location' => redirect_url })
+        expect { scraper.retrieve_from_webpage(test_url) }.to raise_error(OpenURI::HTTPRedirect)
+      end
+    end
   end
 end

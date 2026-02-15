@@ -96,6 +96,43 @@ module PropertyWebScraper
       end
     end
 
+    describe '#import_host' do
+      include_context 'with seeded import hosts'
+
+      it 'returns nil when import_host_slug is blank' do
+        listing = create(:property_web_scraper_listing, import_host_slug: nil)
+        expect(listing.import_host).to be_nil
+      end
+
+      it 'returns the ImportHost when slug is valid' do
+        listing = create(:property_web_scraper_listing, import_host_slug: 'idealista')
+        expect(listing.import_host).to be_a(ImportHost)
+        expect(listing.import_host.host).to eq('www.idealista.com')
+      end
+
+      it 'memoizes the result' do
+        listing = create(:property_web_scraper_listing, import_host_slug: 'idealista')
+        first_call = listing.import_host
+        second_call = listing.import_host
+        expect(first_call).to equal(second_call)
+      end
+
+      it 'clears memo on import_host_slug reassignment' do
+        listing = create(:property_web_scraper_listing, import_host_slug: 'idealista')
+        listing.import_host # populate memo
+        listing.import_host_slug = 'realtor'
+        expect(listing.import_host.host).to eq('www.realtor.com')
+      end
+
+      it 'clears memo on reload' do
+        listing = create(:property_web_scraper_listing, import_host_slug: 'idealista')
+        listing.import_host # populate memo
+        listing.reload
+        # After reload, should re-fetch (still returns same host)
+        expect(listing.import_host.host).to eq('www.idealista.com')
+      end
+    end
+
     describe '#as_json' do
       let(:listing) { create(:property_web_scraper_listing, :with_location, :with_images) }
 

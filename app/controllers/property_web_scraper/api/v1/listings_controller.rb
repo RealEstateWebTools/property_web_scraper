@@ -4,6 +4,8 @@ module PropertyWebScraper
   # Returns listings in a format compatible with PropertyWebBuilder,
   # converting each {Listing} to a {PwbListing} before serialization.
   class Api::V1::ListingsController < ApplicationController
+    before_action :authenticate_api_key!
+
     # Retrieves a property by URL and returns it as a PwbListing JSON array.
     #
     # Expects a +url+ query parameter. Returns error JSON when the URL
@@ -11,27 +13,16 @@ module PropertyWebScraper
     #
     # @return [void]
     def retrieve
-
-      unless params["url"]
+      Rails.logger.info "PropertyWebScraper: Api::V1::Listings#retrieve called with url=#{params['url']}"
+      validation = PropertyWebScraper::UrlValidator.call(params["url"])
+      unless validation.valid?
         return render json: {
           success: false,
-          error_message: "Please provide a url"
+          error_message: validation.error_message
         }
       end
-      uri = uri_from_url params["url"].strip
-      unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
-        return render json: {
-          success: false,
-          error_message: "Please provide a valid url"
-        }
-      end
-      import_host = PropertyWebScraper::ImportHost.find_by_host(uri.host)
-      unless import_host
-        return render json: {
-          success: false,
-          error_message: "Sorry, the url provided is currently not supported"
-        }
-      end
+      uri = validation.uri
+      import_host = validation.import_host
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
       listing = web_scraper.process_url uri.to_s, import_host
 

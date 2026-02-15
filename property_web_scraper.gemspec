@@ -34,4 +34,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'factory_bot_rails', '~> 6.0'
   s.add_development_dependency 'vcr', '~> 6.0'
   s.add_development_dependency 'webmock', '~> 3.19'
+  s.add_development_dependency 'climate_control', '~> 1.0'
 end

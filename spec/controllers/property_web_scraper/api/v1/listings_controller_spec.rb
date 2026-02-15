@@ -4,6 +4,51 @@ module PropertyWebScraper
   RSpec.describe 'Api::V1::Listings', type: :request do
     include_context 'with seeded import hosts'
 
+    describe 'API authentication' do
+      around(:each) do |example|
+        ClimateControl.modify(PROPERTY_SCRAPER_API_KEY: 'test-secret-key') do
+          example.run
+        end
+      end
+
+      it 'returns 401 without api key' do
+        get '/api/v1/listings', params: { url: 'https://www.idealista.com/inmueble/123/' }
+        expect(response).to have_http_status(:unauthorized)
+        json = JSON.parse(response.body)
+        expect(json['error_message']).to eq('Unauthorized')
+      end
+
+      it 'returns 401 with wrong api key' do
+        get '/api/v1/listings',
+            params: { url: 'https://www.idealista.com/inmueble/123/' },
+            headers: { 'X-Api-Key' => 'wrong-key' }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'succeeds with correct api key via header' do
+        get '/api/v1/listings',
+            params: { url: 'https://www.idealista.com/inmueble/123/' },
+            headers: { 'X-Api-Key' => 'test-secret-key' }
+        # Should not be 401 (may be other error due to missing VCR cassette, but not auth error)
+        expect(response).not_to have_http_status(:unauthorized)
+      end
+
+      it 'succeeds with correct api key via query param' do
+        get '/api/v1/listings',
+            params: { url: 'https://www.idealista.com/inmueble/123/', api_key: 'test-secret-key' }
+        expect(response).not_to have_http_status(:unauthorized)
+      end
+    end
+
+    describe 'authentication skipped when env var unset' do
+      it 'allows access without api key' do
+        get '/api/v1/listings'
+        # Should get a validation error, not 401
+        json = JSON.parse(response.body)
+        expect(json['error_message']).to include('provide a url')
+      end
+    end
+
     describe 'GET /api/v1/listings' do
       it 'returns error when url parameter is missing' do
         get '/api/v1/listings'

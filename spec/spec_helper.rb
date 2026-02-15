@@ -10,6 +10,7 @@ require 'factory_bot_rails'
 # http://www.thegreatcodeadventure.com/stubbing-with-vcr/
 require 'vcr'
 require 'webmock/rspec'
+require 'climate_control'
 WebMock.disable_net_connect!(allow_localhost: true)
 
 Rails.backtrace_cleaner.remove_silencers!
