@@ -1,3 +1,5 @@
+require 'property_web_scraper/firestore_client'
+require 'property_web_scraper/firestore_model'
 require 'property_web_scraper/engine'
 
 # Top-level namespace for the PropertyWebScraper Rails engine.

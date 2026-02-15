@@ -1,4 +1,3 @@
-require 'money-rails'
 require 'rack/cors'
 require 'turbo-rails'
 require 'stimulus-rails'

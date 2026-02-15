@@ -1,5 +1,7 @@
 # as per: https://www.viget.com/articles/rails-engine-testing-with-rspec-capybara-and-factorygirl
 ENV['RAILS_ENV'] ||= 'test'
+ENV['FIRESTORE_EMULATOR_HOST'] ||= 'localhost:8080'
+ENV['FIRESTORE_PROJECT_ID'] ||= 'test-project'
 
 require File.expand_path('../dummy/config/environment.rb', __FILE__)
 require 'rspec/rails'
@@ -17,10 +19,15 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
   config.mock_with :rspec
-  config.use_transactional_fixtures = true
   config.infer_base_class_for_anonymous_controllers = false
   config.order = 'random'
   config.include FactoryBot::Syntax::Methods
 
   config.fixture_paths = ["#{PropertyWebScraper::Engine.root}/spec/fixtures"]
+
+  # Clear Firestore listings collection between tests
+  config.after(:each) do
+    client = PropertyWebScraper::FirestoreClient.client
+    client.col('listings').list_documents.each { |doc| doc.delete }
+  end
 end

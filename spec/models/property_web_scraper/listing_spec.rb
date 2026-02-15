@@ -28,7 +28,7 @@ module PropertyWebScraper
       end
 
       it 'accepts sqft' do
-        listing = create(:property_web_scraper_listing, area_unit: :sqft)
+        listing = create(:property_web_scraper_listing, area_unit: 'sqft')
         expect(listing.area_unit).to eq('sqft')
       end
     end

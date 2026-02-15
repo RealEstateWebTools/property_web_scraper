@@ -8,7 +8,80 @@ module PropertyWebScraper
   #   listing = Listing.where(import_url: url).first_or_create
   #   Listing.update_from_hash(listing, property_hash)
   class Listing < ApplicationRecord
-    enum area_unit: { sqmt: 0, sqft: 1 }
+    firestore_collection :listings
+
+    # Property identification
+    attribute :reference, :string
+    attribute :import_url, :string
+    attribute :import_host_slug, :string
+    attribute :re_agent_id, :integer
+
+    # Pricing
+    attribute :price_string, :string
+    attribute :price_float, :float
+    attribute :currency, :string
+
+    # Property details
+    attribute :title, :string
+    attribute :description, :string
+    attribute :locale_code, :string
+    attribute :area_unit, :string, default: 'sqmt'
+    attribute :plot_area, :float, default: 0.0
+    attribute :constructed_area, :float, default: 0.0
+    attribute :year_construction, :integer, default: 0
+    attribute :count_bedrooms, :integer, default: 0
+    attribute :count_bathrooms, :float, default: 0.0
+    attribute :count_toilets, :integer, default: 0
+    attribute :count_garages, :integer, default: 0
+    attribute :energy_rating, :integer
+    attribute :energy_performance, :float
+
+    # Multilingual titles/descriptions
+    attribute :title_es, :string
+    attribute :description_es, :string
+    attribute :title_de, :string
+    attribute :description_de, :string
+    attribute :title_fr, :string
+    attribute :description_fr, :string
+    attribute :title_it, :string
+    attribute :description_it, :string
+
+    # Status flags
+    attribute :furnished, :boolean, default: false
+    attribute :sold, :boolean, default: false
+    attribute :reserved, :boolean, default: false
+    attribute :for_rent_short_term, :boolean, default: false
+    attribute :for_rent_long_term, :boolean, default: false
+    attribute :for_sale, :boolean, default: false
+    attribute :for_rent, :boolean, default: false
+
+    # Dates
+    attribute :deleted_at, :datetime
+    attribute :active_from, :datetime
+    attribute :available_to_rent_from, :datetime
+    attribute :available_to_rent_till, :datetime
+    attribute :last_retrieved_at, :datetime
+
+    # Location
+    attribute :address_string, :string
+    attribute :street_number, :string
+    attribute :street_name, :string
+    attribute :street_address, :string
+    attribute :postal_code, :string
+    attribute :province, :string
+    attribute :city, :string
+    attribute :region, :string
+    attribute :country, :string
+    attribute :latitude, :float
+    attribute :longitude, :float
+
+    # Media and extras
+    attribute :main_image_url, :string
+    attribute :image_urls, :array, default: []
+    attribute :related_urls, :array, default: []
+    attribute :features, :array, default: []
+    attribute :unknown_fields, :array, default: []
+    attribute :import_history, :hash, default: {}
 
     validate :image_urls_are_array
 
@@ -80,7 +153,6 @@ module PropertyWebScraper
       listing.image_urls = property_hash['image_urls'].presence || []
 
       listing.save!
-      # TODO: - save retrieval history
     end
   end
 end
