@@ -2,12 +2,13 @@ require 'spec_helper'
 
 RSpec.describe PropertyWebScraper::FirestoreClient do
   after(:each) do
-    described_class.reset!
+    # Re-inject the in-memory client so other specs aren't affected by reset!
+    described_class.instance_variable_set(:@client, InMemoryFirestore::Client.new)
   end
 
   describe '.client' do
-    it 'returns a Google::Cloud::Firestore instance' do
-      expect(described_class.client).to be_a(Google::Cloud::Firestore)
+    it 'returns an InMemoryFirestore::Client in test mode' do
+      expect(described_class.client).to be_a(InMemoryFirestore::Client)
     end
 
     it 'caches the client across calls' do
@@ -18,11 +19,10 @@ RSpec.describe PropertyWebScraper::FirestoreClient do
   end
 
   describe '.reset!' do
-    it 'clears the cached client so the next call builds a new one' do
-      original = described_class.client
+    it 'clears the cached client' do
+      described_class.client
       described_class.reset!
-      refreshed = described_class.client
-      expect(refreshed).not_to equal(original)
+      expect(described_class.instance_variable_get(:@client)).to be_nil
     end
   end
 end

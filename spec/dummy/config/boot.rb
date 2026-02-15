@@ -4,4 +4,7 @@ ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../../Gemfile', __dir__)
 require 'bundler/setup' if File.exist?(ENV['BUNDLE_GEMFILE'])
 $LOAD_PATH.unshift File.expand_path('../../../lib', __dir__)
 
-require 'dotenv/load' if defined?(Dotenv)
+if defined?(Dotenv)
+  engine_root = File.expand_path('../../../', __dir__)
+  Dotenv.load(File.join(engine_root, '.env'))
+end

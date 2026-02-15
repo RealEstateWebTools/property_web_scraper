@@ -28,6 +28,22 @@ module PropertyWebScraper
       class_attribute :_document_id_field, instance_writer: false
 
       attr_accessor :id
+
+      # Override methods after ActiveModel::API so our versions take
+      # precedence in the MRO.
+      define_method(:initialize) do |attrs = {}|
+        @persisted = false
+        apply_defaults
+        super(attrs)
+      end
+
+      define_method(:persisted?) do
+        @persisted
+      end
+
+      define_method(:new_record?) do
+        !persisted?
+      end
     end
 
     class_methods do
@@ -104,26 +120,9 @@ module PropertyWebScraper
       end
     end
 
-    def initialize(attrs = {})
-      @persisted = false
-      apply_defaults
-      attrs.each do |key, value|
-        setter = "#{key}="
-        send(setter, value) if respond_to?(setter)
-      end
-    end
-
-    def persisted?
-      @persisted
-    end
-
-    def new_record?
-      !persisted?
-    end
-
     def save!
       validate!
-      data = serializable_attributes
+      data = firestore_attributes
       if persisted?
         collection_ref.doc(id).set(data)
       else
@@ -179,7 +178,7 @@ module PropertyWebScraper
 
     def as_json(options = nil)
       options ||= {}
-      attrs = serializable_attributes
+      attrs = firestore_attributes
 
       if options[:only]
         only_keys = options[:only].map(&:to_s)
@@ -213,7 +212,7 @@ module PropertyWebScraper
       end
     end
 
-    def serializable_attributes
+    def firestore_attributes
       attrs = {}
       self.class._attribute_definitions.each_key do |name|
         attrs[name] = send(name)

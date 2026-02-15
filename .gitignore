@@ -16,3 +16,4 @@ config/firebase-credentials.json
 
 spec/dummy/node_modules
 .yardoc/
+firebase/creds.json

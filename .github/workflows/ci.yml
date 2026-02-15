@@ -16,7 +16,6 @@ jobs:
 
     env:
       RAILS_ENV: test
-      FIRESTORE_EMULATOR_HOST: localhost:8080
       FIRESTORE_PROJECT_ID: test-project
 
     steps:
@@ -26,22 +25,6 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install and start Firestore emulator
-        run: |
-          npm install -g firebase-tools
-          echo '{"emulators":{"firestore":{"port":8080}}}' > firebase.json
-          firebase emulators:start --only firestore --project test-project &
-          # Wait for emulator to be ready
-          for i in $(seq 1 30); do
-            curl -s http://localhost:8080/ > /dev/null 2>&1 && break
-            sleep 2
-          done
 
       - name: Run specs
         run: bundle exec rspec
