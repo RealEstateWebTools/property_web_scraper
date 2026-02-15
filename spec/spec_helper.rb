@@ -1,6 +1,7 @@
 # as per: https://www.viget.com/articles/rails-engine-testing-with-rspec-capybara-and-factorygirl
 ENV['RAILS_ENV'] ||= 'test'
 ENV['FIRESTORE_PROJECT_ID'] ||= 'test-project'
+ENV['FIRESTORE_COLLECTION_PREFIX'] = ''
 
 require File.expand_path('../dummy/config/environment.rb', __FILE__)
 require 'rspec/rails'

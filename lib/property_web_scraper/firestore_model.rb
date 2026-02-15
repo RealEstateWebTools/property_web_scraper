@@ -63,7 +63,8 @@ module PropertyWebScraper
       end
 
       def collection_ref
-        FirestoreClient.client.col(_collection_name)
+        prefix = ENV.fetch('FIRESTORE_COLLECTION_PREFIX', '')
+        FirestoreClient.client.col("#{prefix}#{_collection_name}")
       end
 
       def find(id)
