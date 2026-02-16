@@ -1,0 +1,19 @@
+---
+interface Props {
+  grade: string;
+  size?: 'sm' | 'md';
+}
+const { grade, size = 'sm' } = Astro.props;
+
+const colorMap: Record<string, { bg: string; text: string }> = {
+  A: { bg: 'bg-green-100', text: 'text-green-700' },
+  B: { bg: 'bg-blue-100', text: 'text-blue-700' },
+  C: { bg: 'bg-amber-100', text: 'text-amber-700' },
+  F: { bg: 'bg-red-100', text: 'text-red-700' },
+};
+const colors = colorMap[grade] || colorMap.F;
+const sizeClass = size === 'md' ? 'px-3 py-1 text-sm' : 'px-2 py-0.5 text-xs';
+---
+<span class={`inline-block rounded font-medium ${colors.bg} ${colors.text} ${sizeClass}`}>
+  {grade}
+</span>

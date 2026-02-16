@@ -1,0 +1,209 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import StatCard from '../../../components/admin/StatCard.astro';
+import QualityBadge from '../../../components/admin/QualityBadge.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+import { findByName } from '@lib/extractor/mapping-loader.js';
+import { getScraperStats, getRecentExtractions } from '@lib/services/extraction-stats.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+
+const { name } = Astro.params;
+if (!name) return Astro.redirect('/admin/scrapers');
+
+const stats = await getScraperStats(name);
+const mapping = findByName(name);
+
+// Get recent extractions for this scraper
+const allExtractions = await getRecentExtractions(200);
+const scraperExtractions = allExtractions.filter(e => e.scraperName === name).slice(0, 20);
+
+const avgRatePercent = Math.round(stats.avgExtractionRate * 100);
+const expectedPercent = stats.expectedExtractionRate != null
+  ? Math.round(stats.expectedExtractionRate * 100)
+  : null;
+
+// Sort field success rates worst-first
+const fieldHealthEntries = Object.entries(stats.fieldSuccessRates)
+  .sort(([, a], [, b]) => a - b);
+
+function rateColor(rate: number): string {
+  if (rate >= 0.8) return 'text-green-700 bg-green-50';
+  if (rate >= 0.2) return 'text-amber-700 bg-amber-50';
+  return 'text-red-700 bg-red-50';
+}
+
+function timeAgo(ts: number): string {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+  return `${Math.floor(diff / 86400000)}d ago`;
+}
+
+function truncate(str: string, len: number): string {
+  return str.length > len ? str.slice(0, len) + '...' : str;
+}
+
+const mappingJson = mapping ? JSON.stringify(mapping, null, 2) : null;
+---
+<AdminLayout title={`${name} — Scraper Detail`} activePage="scrapers">
+  <!-- Breadcrumb -->
+  <nav class="text-sm text-gray-500 mb-4">
+    <a href="/admin" class="hover:underline no-underline text-gray-500">Dashboard</a>
+    <span class="mx-1">/</span>
+    <a href="/admin/scrapers" class="hover:underline no-underline text-gray-500">Scrapers</a>
+    <span class="mx-1">/</span>
+    <span class="text-gray-800 font-medium">{name}</span>
+  </nav>
+
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <h1 class="text-2xl font-bold font-mono">{name}</h1>
+    {stats.loaded ? (
+      <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">loaded</span>
+    ) : (
+      <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">not loaded</span>
+    )}
+  </div>
+
+  <!-- Stat cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Quality Grade</p>
+      <div class="mt-2">
+        {stats.lastQualityGrade
+          ? <QualityBadge grade={stats.lastQualityGrade} size="md" />
+          : <span class="text-2xl font-bold text-gray-400">—</span>
+        }
+      </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Extraction Rate</p>
+      <p class="text-2xl font-bold mt-1">{stats.extractionCount > 0 ? `${avgRatePercent}%` : '—'}</p>
+      {expectedPercent != null && (
+        <p class="text-xs text-gray-400 mt-1">Expected: {expectedPercent}%</p>
+      )}
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Total Extractions</p>
+      <p class="text-2xl font-bold mt-1">{stats.extractionCount}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Fields Defined</p>
+      <p class="text-2xl font-bold mt-1">{stats.fieldCount}</p>
+      <p class="text-xs text-gray-400 mt-1">
+        {stats.hasImages ? 'images' : 'no images'}
+        {stats.hasFeatures ? ', features' : ''}
+      </p>
+    </div>
+  </div>
+
+  <!-- Field Health -->
+  {fieldHealthEntries.length > 0 && (
+    <div class="bg-white rounded-lg shadow mb-8">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold">Field Health</h2>
+        <p class="text-xs text-gray-500 mt-1">Per-field success rate across all extractions. Sorted worst-first.</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-500 border-b border-gray-200">
+              <th class="py-2 px-5 font-medium">Field</th>
+              <th class="py-2 px-5 font-medium">Success Rate</th>
+              <th class="py-2 px-5 font-medium">Bar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fieldHealthEntries.map(([field, rate]) => (
+              <tr class="border-b border-gray-100">
+                <td class="py-2 px-5 font-mono text-xs">{field}</td>
+                <td class={`py-2 px-5 text-xs font-medium ${rateColor(rate)}`}>
+                  {Math.round(rate * 100)}%
+                </td>
+                <td class="py-2 px-5">
+                  <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div
+                      class={`h-2 rounded-full ${rate >= 0.8 ? 'bg-green-500' : rate >= 0.2 ? 'bg-amber-500' : 'bg-red-500'}`}
+                      style={`width: ${Math.round(rate * 100)}%`}
+                    ></div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )}
+
+  <!-- Recent Extractions -->
+  <div class="bg-white rounded-lg shadow mb-8">
+    <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="font-semibold">Recent Extractions</h2>
+      {scraperExtractions.length > 0 && (
+        <a href={`/admin/extractions?scraper=${name}`} class="text-sm text-blue-600 hover:underline no-underline">View all &rarr;</a>
+      )}
+    </div>
+    <div class="overflow-x-auto">
+      {scraperExtractions.length === 0 ? (
+        <div class="p-8 text-center text-gray-400 text-sm">No extractions yet for this scraper</div>
+      ) : (
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-500 border-b border-gray-200">
+              <th class="py-2 px-4 font-medium">Time</th>
+              <th class="py-2 px-4 font-medium">Quality</th>
+              <th class="py-2 px-4 font-medium">Rate</th>
+              <th class="py-2 px-4 font-medium">Fields</th>
+              <th class="py-2 px-4 font-medium">Title</th>
+              <th class="py-2 px-4 font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {scraperExtractions.map((ext) => (
+              <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-2 px-4 text-xs text-gray-500 whitespace-nowrap">{timeAgo(ext.timestamp)}</td>
+                <td class="py-2 px-4"><QualityBadge grade={ext.qualityGrade} /></td>
+                <td class="py-2 px-4 text-xs">{Math.round(ext.extractionRate * 100)}%</td>
+                <td class="py-2 px-4 text-xs">{ext.populatedExtractableFields}/{ext.extractableFields}</td>
+                <td class="py-2 px-4 text-xs max-w-[200px] truncate" title={ext.title}>
+                  {truncate(ext.title, 40)}
+                </td>
+                <td class="py-2 px-4">
+                  <a href={`/admin/extractions/${ext.id}`} class="text-blue-600 hover:underline no-underline text-xs">View</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  </div>
+
+  <!-- Raw Mapping -->
+  {mappingJson && (
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <button id="toggle-mapping" class="font-semibold text-left w-full flex items-center gap-2 cursor-pointer bg-transparent border-0 p-0" type="button">
+          <i class="bi bi-chevron-down" id="mapping-icon"></i> Raw Mapping
+        </button>
+      </div>
+      <div class="hidden p-5" id="mapping-content">
+        <pre class="bg-gray-50 rounded p-4 text-xs font-mono overflow-x-auto max-h-[500px] overflow-y-auto">{mappingJson}</pre>
+      </div>
+    </div>
+  )}
+
+  <script>
+    document.getElementById('toggle-mapping')?.addEventListener('click', () => {
+      const content = document.getElementById('mapping-content');
+      const icon = document.getElementById('mapping-icon');
+      content?.classList.toggle('hidden');
+      icon?.classList.toggle('bi-chevron-down');
+      icon?.classList.toggle('bi-chevron-up');
+    });
+  </script>
+</AdminLayout>

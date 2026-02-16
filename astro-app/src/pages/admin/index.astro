@@ -1,39 +1,43 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import StatCard from '../../components/admin/StatCard.astro';
-import LogTable from '../../components/admin/LogTable.astro';
+import QualityBadge from '../../components/admin/QualityBadge.astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
-import { queryLogs, getLogStats } from '@lib/services/activity-logger.js';
-import { allMappingNames, findByName } from '@lib/extractor/mapping-loader.js';
+import { getLogStats } from '@lib/services/activity-logger.js';
+import { allMappingNames } from '@lib/extractor/mapping-loader.js';
 import { getStoreStats } from '@lib/services/listing-store.js';
-import { getRateLimiterStats } from '@lib/services/rate-limiter.js';
-import { getRuntimeConfig } from '@lib/services/runtime-config.js';
-import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
+import { getSystemOverview, getAllScraperStats } from '@lib/services/extraction-stats.js';
 
 const auth = authenticateAdmin(Astro.request);
 if (!auth.authorized) return Astro.redirect('/admin/login');
 
 const logStats = getLogStats();
-const recentLogs = queryLogs({ limit: 10 });
 const mappingNames = allMappingNames();
 const storeStats = getStoreStats();
-const rateLimiterStats = getRateLimiterStats();
-const config = getRuntimeConfig();
+const overview = await getSystemOverview();
+const scraperStats = await getAllScraperStats();
 
-// Build scraper status
-const scraperHosts = new Map<string, string[]>();
-for (const [host, entry] of Object.entries(LOCAL_HOST_MAP)) {
-  if (!host.startsWith('www.')) continue; // skip non-www duplicates
-  const existing = scraperHosts.get(entry.scraper_name) || [];
-  existing.push(host);
-  scraperHosts.set(entry.scraper_name, existing);
+const avgRatePercent = Math.round(overview.avgExtractionRate * 100);
+const dominantGrade = (['A', 'B', 'C', 'F'] as const).reduce((best, g) =>
+  overview.gradeDistribution[g] > overview.gradeDistribution[best] ? g : best, 'F' as const);
+
+const activeScrapers = scraperStats.filter(s => s.extractionCount > 0);
+const scrapersWithExtractions = activeScrapers
+  .sort((a, b) => a.avgExtractionRate - b.avgExtractionRate);
+
+const totalGrades = overview.gradeDistribution.A + overview.gradeDistribution.B + overview.gradeDistribution.C + overview.gradeDistribution.F;
+
+function timeAgo(ts: number): string {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+  return `${Math.floor(diff / 86400000)}d ago`;
 }
 
-const scrapers = mappingNames.map((name) => ({
-  name,
-  loaded: findByName(name) !== null,
-  hosts: scraperHosts.get(name) || [],
-}));
+function truncate(str: string, len: number): string {
+  return str.length > len ? str.slice(0, len) + '...' : str;
+}
 ---
 <AdminLayout title="Dashboard — Admin" activePage="dashboard">
   <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
@@ -41,78 +45,160 @@ const scrapers = mappingNames.map((name) => ({
   <!-- Stat cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     <StatCard
-      title="Scrapers Loaded"
-      value={mappingNames.length}
-      subtitle={`${scrapers.filter(s => s.hosts.length > 0).length} with host mapping`}
-      icon="bi-cpu"
-      color="text-green-600"
-    />
-    <StatCard
-      title="Listings"
+      title="Total Extractions"
       value={storeStats.count}
       subtitle="In-memory store"
-      icon="bi-house"
+      icon="bi-collection"
       color="text-blue-600"
     />
     <StatCard
-      title="Rate Limiter"
-      value={`${rateLimiterStats.activeClients} clients`}
-      subtitle={`Max ${config.maxRequests} req/min`}
-      icon="bi-speedometer"
-      color="text-orange-600"
+      title="Average Quality"
+      value={overview.totalExtractions > 0 ? `${avgRatePercent}%` : '—'}
+      subtitle={overview.totalExtractions > 0 ? `Dominant grade: ${dominantGrade}` : 'No extractions yet'}
+      icon="bi-graph-up"
+      color="text-green-600"
     />
     <StatCard
-      title="Log Buffer"
-      value={`${logStats.totalEntries}/${logStats.capacity}`}
-      subtitle={logStats.byLevel.error > 0 ? `${logStats.byLevel.error} errors` : 'No errors'}
-      icon="bi-journal-text"
+      title="Errors"
+      value={logStats.byLevel.error}
+      subtitle={logStats.byLevel.warn > 0 ? `${logStats.byLevel.warn} warnings` : 'No warnings'}
+      icon="bi-exclamation-triangle"
       color={logStats.byLevel.error > 0 ? 'text-red-600' : 'text-gray-600'}
+    />
+    <StatCard
+      title="Active Scrapers"
+      value={activeScrapers.length}
+      subtitle={`of ${mappingNames.length} total`}
+      icon="bi-cpu"
+      color="text-orange-600"
     />
   </div>
 
-  <!-- Recent activity -->
-  <div class="bg-white rounded-lg shadow mb-8">
-    <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
-      <h2 class="font-semibold">Recent Activity</h2>
-      <a href="/admin/logs" class="text-sm text-blue-600 hover:underline no-underline">View all logs &rarr;</a>
+  <!-- Grade distribution bar -->
+  {totalGrades > 0 && (
+    <div class="bg-white rounded-lg shadow mb-8 p-5">
+      <h2 class="font-semibold mb-3">Quality Distribution</h2>
+      <div class="flex rounded-lg overflow-hidden h-8">
+        {overview.gradeDistribution.A > 0 && (
+          <div
+            class="bg-green-500 flex items-center justify-center text-white text-xs font-medium"
+            style={`width: ${(overview.gradeDistribution.A / totalGrades) * 100}%`}
+            title={`A: ${overview.gradeDistribution.A}`}
+          >
+            A: {overview.gradeDistribution.A}
+          </div>
+        )}
+        {overview.gradeDistribution.B > 0 && (
+          <div
+            class="bg-blue-500 flex items-center justify-center text-white text-xs font-medium"
+            style={`width: ${(overview.gradeDistribution.B / totalGrades) * 100}%`}
+            title={`B: ${overview.gradeDistribution.B}`}
+          >
+            B: {overview.gradeDistribution.B}
+          </div>
+        )}
+        {overview.gradeDistribution.C > 0 && (
+          <div
+            class="bg-amber-500 flex items-center justify-center text-white text-xs font-medium"
+            style={`width: ${(overview.gradeDistribution.C / totalGrades) * 100}%`}
+            title={`C: ${overview.gradeDistribution.C}`}
+          >
+            C: {overview.gradeDistribution.C}
+          </div>
+        )}
+        {overview.gradeDistribution.F > 0 && (
+          <div
+            class="bg-red-500 flex items-center justify-center text-white text-xs font-medium"
+            style={`width: ${(overview.gradeDistribution.F / totalGrades) * 100}%`}
+            title={`F: ${overview.gradeDistribution.F}`}
+          >
+            F: {overview.gradeDistribution.F}
+          </div>
+        )}
+      </div>
     </div>
-    <div class="p-2">
-      <LogTable entries={recentLogs.entries} compact={true} />
-    </div>
-  </div>
+  )}
 
-  <!-- Scraper status -->
-  <div class="bg-white rounded-lg shadow">
-    <div class="px-5 py-4 border-b border-gray-200">
-      <h2 class="font-semibold">Scraper Status</h2>
+  <!-- Two-column layout: Recent Extractions + Scraper Health -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Recent Extractions -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h2 class="font-semibold">Recent Extractions</h2>
+        <a href="/admin/extractions" class="text-sm text-blue-600 hover:underline no-underline">View all &rarr;</a>
+      </div>
+      <div class="overflow-x-auto">
+        {overview.recentExtractions.length === 0 ? (
+          <div class="p-8 text-center text-gray-400 text-sm">No extractions yet</div>
+        ) : (
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-gray-500 border-b border-gray-200">
+                <th class="py-2 px-4 font-medium">Time</th>
+                <th class="py-2 px-4 font-medium">Scraper</th>
+                <th class="py-2 px-4 font-medium">Quality</th>
+                <th class="py-2 px-4 font-medium">Fields</th>
+                <th class="py-2 px-4 font-medium">Title</th>
+              </tr>
+            </thead>
+            <tbody>
+              {overview.recentExtractions.map((ext) => (
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                  <td class="py-2 px-4 text-xs text-gray-500 whitespace-nowrap">{timeAgo(ext.timestamp)}</td>
+                  <td class="py-2 px-4 font-mono text-xs">{ext.scraperName}</td>
+                  <td class="py-2 px-4"><QualityBadge grade={ext.qualityGrade} /></td>
+                  <td class="py-2 px-4 text-xs">{ext.populatedExtractableFields}/{ext.extractableFields}</td>
+                  <td class="py-2 px-4 text-xs max-w-[150px] truncate">
+                    <a href={`/admin/extractions/${ext.id}`} class="text-blue-600 hover:underline no-underline" title={ext.title}>
+                      {truncate(ext.title || ext.id, 30)}
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="text-left text-gray-500 border-b border-gray-200">
-            <th class="py-2 px-5 font-medium">Scraper</th>
-            <th class="py-2 px-5 font-medium">Status</th>
-            <th class="py-2 px-5 font-medium">Hosts</th>
-          </tr>
-        </thead>
-        <tbody>
-          {scrapers.map((s) => (
-            <tr class="border-b border-gray-100">
-              <td class="py-2 px-5 font-mono text-sm">{s.name}</td>
-              <td class="py-2 px-5">
-                {s.loaded ? (
-                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">loaded</span>
-                ) : (
-                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">not loaded</span>
-                )}
-              </td>
-              <td class="py-2 px-5 text-gray-500">
-                {s.hosts.length > 0 ? s.hosts.join(', ') : <span class="text-gray-400 italic">no host mapping</span>}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+    <!-- Scraper Health -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h2 class="font-semibold">Scraper Health</h2>
+        <a href="/admin/scrapers" class="text-sm text-blue-600 hover:underline no-underline">View all &rarr;</a>
+      </div>
+      <div class="overflow-x-auto">
+        {scrapersWithExtractions.length === 0 ? (
+          <div class="p-8 text-center text-gray-400 text-sm">No scraper activity yet</div>
+        ) : (
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-gray-500 border-b border-gray-200">
+                <th class="py-2 px-4 font-medium">Scraper</th>
+                <th class="py-2 px-4 font-medium">Last Grade</th>
+                <th class="py-2 px-4 font-medium">Avg Rate</th>
+                <th class="py-2 px-4 font-medium">Extractions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scrapersWithExtractions.map((s) => (
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                  <td class="py-2 px-4">
+                    <a href={`/admin/scrapers/${s.name}`} class="font-mono text-xs text-blue-600 hover:underline no-underline">{s.name}</a>
+                  </td>
+                  <td class="py-2 px-4">
+                    {s.lastQualityGrade ? <QualityBadge grade={s.lastQualityGrade} /> : <span class="text-gray-400 text-xs">n/a</span>}
+                  </td>
+                  <td class="py-2 px-4 text-xs">{Math.round(s.avgExtractionRate * 100)}%</td>
+                  <td class="py-2 px-4 text-xs">{s.extractionCount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
+
   </div>
 </AdminLayout>
