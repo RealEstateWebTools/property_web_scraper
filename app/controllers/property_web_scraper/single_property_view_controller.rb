@@ -17,7 +17,7 @@ module PropertyWebScraper
       @listing = {}
       unless validation.valid?
         @error_message = validation.error_message
-        return render '/property_web_scraper/single_property_view/error', layout: false
+        return render '/property_web_scraper/single_property_view/error'
       end
 
       import_host = validation.import_host
@@ -28,10 +28,10 @@ module PropertyWebScraper
         @listing = web_scraper.process_url import_url.strip, import_host, html: html
       rescue OpenURI::HTTPError => e
         @error_message = "Could not retrieve property: the website returned #{e.message}"
-        return render '/property_web_scraper/single_property_view/error', layout: false
+        return render '/property_web_scraper/single_property_view/error'
       rescue StandardError => e
         @error_message = "Could not retrieve property: #{e.message}"
-        return render '/property_web_scraper/single_property_view/error', layout: false
+        return render '/property_web_scraper/single_property_view/error'
       end
 
       @markers = []

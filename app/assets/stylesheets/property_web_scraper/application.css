@@ -11,45 +11,228 @@
   font-size: large;
 }
 
-/* ── Single-property hero ── */
-.pws-hero {
-  position: relative;
-  background-size: cover;
-  background-position: center;
-  min-height: 400px;
+/* ═══════════════════════════════════════
+   PROPERTY DETAIL PAGE
+   ═══════════════════════════════════════ */
+
+.pws-property-page {
+  padding-top: 1rem;
+  padding-bottom: 3rem;
+}
+
+/* ── Breadcrumb ── */
+.pws-breadcrumb {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #fff;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 1.25rem;
 }
-.pws-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
+.pws-breadcrumb a {
+  color: #555;
+  text-decoration: none;
 }
-.pws-hero > * {
+.pws-breadcrumb a:hover {
+  color: #0d6efd;
+}
+.pws-breadcrumb .bi-chevron-right {
+  font-size: 0.65rem;
+}
+
+/* ── Gallery card ── */
+.pws-gallery-card {
+  border-radius: 0.75rem;
+  overflow: hidden;
   position: relative;
-  z-index: 1;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.pws-gallery-img {
+  max-height: 450px;
+  object-fit: cover;
+}
+.pws-gallery-count {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 0.3rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+}
+
+/* ── Section card (description, map, etc.) ── */
+.pws-section-card {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.pws-section-card h5 {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+.pws-description-text {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #444;
+}
+
+/* ── Info sidebar ── */
+.pws-info-sidebar {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 1.5rem;
+  position: sticky;
+  top: 1rem;
+}
+.pws-property-title {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #222;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+.pws-property-badges .badge {
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+}
+
+/* ── Price block ── */
+.pws-price-block {
+  background: #f0f7ff;
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+.pws-price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0d6efd;
+}
+.pws-currency {
+  font-size: 0.85rem;
+  color: #666;
+  margin-left: 0.35rem;
+}
+
+/* ── Key stats grid ── */
+.pws-key-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.pws-key-stat {
+  text-align: center;
+  padding: 0.75rem 0.5rem;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+}
+.pws-key-stat i {
+  display: block;
+  font-size: 1.25rem;
+  color: #0d6efd;
+  margin-bottom: 0.25rem;
+}
+.pws-key-stat-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #222;
+}
+.pws-key-stat-label {
+  display: block;
+  font-size: 0.72rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ── Detail list (replaces old table) ── */
+.pws-detail-list {
+  margin-bottom: 1rem;
+  border-top: 1px solid #eee;
+}
+.pws-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.88rem;
+}
+.pws-detail-label {
+  color: #888;
+  font-weight: 500;
+}
+.pws-detail-value {
+  color: #333;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ── Property actions ── */
+.pws-property-actions {
+  margin-bottom: 1rem;
+}
+
+/* ── Share row ── */
+.pws-share-row {
+  display: flex;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eee;
+}
+.pws-share-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f0f2f5;
+  color: #555;
+  text-decoration: none;
+  margin-left: 0.35rem;
+  font-size: 0.9rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.pws-share-link:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* ── Listings table ── */
+.pws-listings-table {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.pws-listings-table thead th {
+  background: #f8f9fa;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #666;
+  border-bottom: 2px solid #eee;
+}
+.pws-listings-table td {
+  font-size: 0.9rem;
+  vertical-align: middle;
 }
 
 /* ── Map ── */
 .pws-map {
-  min-height: 350px;
+  min-height: 300px;
   width: 100%;
-}
-
-/* ── Social links ── */
-.pws-social a {
-  display: inline-block;
-  margin: 0 6px;
-  font-size: 1.4rem;
-  color: #555;
-  text-decoration: none;
-}
-.pws-social a:hover {
-  color: #0d6efd;
+  border-radius: 0.5rem;
 }
 
 /* ═══════════════════════════════════════
