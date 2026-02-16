@@ -248,7 +248,20 @@ export const POST: APIRoute = async ({ request }) => {
         fields_extracted: fieldsExtracted,
         fields_available: fieldsAvailable,
         scraper_used: importHost.scraper_name,
+        diagnostics: result.diagnostics,
       };
+
+      if (fieldsExtracted === 0) {
+        logActivity({
+          level: 'warn',
+          category: 'extraction',
+          message: `Extraction returned 0 fields for ${importHost.scraper_name}`,
+          sourceUrl: url,
+          scraperName: importHost.scraper_name,
+          fieldsFound: 0,
+          fieldsAvailable,
+        });
+      }
 
       logActivity({
         level: 'info',
