@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { retrieveListing } from '@lib/services/listing-retriever.js';
+import { fetchHtml } from '@lib/services/html-fetcher.js';
 import { initKV, generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
@@ -24,7 +25,12 @@ if (Astro.request.method === 'POST') {
     return Astro.redirect('/extract/error?reason=missing_url');
   }
 
-  const result = await retrieveListing(importUrl);
+  const fetchResult = await fetchHtml(importUrl);
+  if (!fetchResult.success || !fetchResult.html) {
+    return Astro.redirect(`/extract/error?reason=error&url=${encodeURIComponent(importUrl)}&message=${encodeURIComponent(fetchResult.error || 'Failed to fetch page')}`);
+  }
+
+  const result = await retrieveListing(importUrl, fetchResult.html);
 
   if (!result.success || !result.retrievedListing) {
     const reason = result.errorMessage === 'Unsupported Url' ? 'unsupported' : 'error';
