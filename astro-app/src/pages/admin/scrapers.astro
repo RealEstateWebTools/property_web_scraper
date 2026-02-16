@@ -1,0 +1,284 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+import { allMappingNames, findByName } from '@lib/extractor/mapping-loader.js';
+import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+
+const mappingNames = allMappingNames();
+
+const scraperHosts = new Map<string, string[]>();
+for (const [host, entry] of Object.entries(LOCAL_HOST_MAP)) {
+  if (!host.startsWith('www.')) continue;
+  const existing = scraperHosts.get(entry.scraper_name) || [];
+  existing.push(host);
+  scraperHosts.set(entry.scraper_name, existing);
+}
+
+const scrapers = mappingNames.map((name) => {
+  const mapping = findByName(name);
+  const textFields = Object.keys(mapping?.textFields ?? {});
+  const intFields = Object.keys(mapping?.intFields ?? {});
+  const floatFields = Object.keys(mapping?.floatFields ?? {});
+  const booleanFields = Object.keys(mapping?.booleanFields ?? {});
+  const allFields = [...textFields, ...intFields, ...floatFields, ...booleanFields];
+  const defaultValues = Object.keys(mapping?.defaultValues ?? {});
+
+  return {
+    name,
+    loaded: mapping !== null,
+    hosts: scraperHosts.get(name) || [],
+    fieldCount: allFields.length,
+    fields: allFields,
+    defaultValues,
+    hasImages: (mapping?.images ?? []).length > 0,
+    hasFeatures: (mapping?.features ?? []).length > 0,
+  };
+});
+---
+<AdminLayout title="Scrapers — Admin" activePage="scrapers">
+  <h1 class="text-2xl font-bold mb-6">Scraper Management</h1>
+
+  <!-- Summary cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Total Scrapers</p>
+      <p class="text-2xl font-bold">{scrapers.length}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">With Host Mapping</p>
+      <p class="text-2xl font-bold">{scrapers.filter(s => s.hosts.length > 0).length}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">With Image Extraction</p>
+      <p class="text-2xl font-bold">{scrapers.filter(s => s.hasImages).length}</p>
+    </div>
+  </div>
+
+  <!-- Scraper list -->
+  <div class="bg-white rounded-lg shadow mb-8">
+    <div class="px-5 py-4 border-b border-gray-200">
+      <h2 class="font-semibold">All Scrapers</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-200">
+            <th class="py-2 px-5 font-medium">Scraper</th>
+            <th class="py-2 px-5 font-medium">Status</th>
+            <th class="py-2 px-5 font-medium">Fields</th>
+            <th class="py-2 px-5 font-medium">Images</th>
+            <th class="py-2 px-5 font-medium">Hosts</th>
+            <th class="py-2 px-5 font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {scrapers.map((s) => (
+            <tr class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="py-2 px-5 font-mono text-sm">{s.name}</td>
+              <td class="py-2 px-5">
+                {s.loaded ? (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">loaded</span>
+                ) : (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">not loaded</span>
+                )}
+              </td>
+              <td class="py-2 px-5 text-gray-600">{s.fieldCount}</td>
+              <td class="py-2 px-5">
+                {s.hasImages ? (
+                  <span class="text-green-600">yes</span>
+                ) : (
+                  <span class="text-gray-400">no</span>
+                )}
+              </td>
+              <td class="py-2 px-5 text-gray-500 text-xs">
+                {s.hosts.length > 0 ? s.hosts.join(', ') : <span class="text-gray-400 italic">none</span>}
+              </td>
+              <td class="py-2 px-5">
+                <button
+                  class="test-btn px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition"
+                  data-scraper={s.name}
+                  data-fields={JSON.stringify(s.fields)}
+                  data-defaults={JSON.stringify(s.defaultValues)}
+                >
+                  Test
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Interactive test panel -->
+  <div class="bg-white rounded-lg shadow" id="test-panel">
+    <div class="px-5 py-4 border-b border-gray-200">
+      <h2 class="font-semibold">Interactive Extraction Test</h2>
+    </div>
+    <div class="p-5 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Scraper</label>
+          <select id="test-scraper" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Select a scraper...</option>
+            {scrapers.map((s) => (
+              <option value={s.name}>{s.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Source URL</label>
+          <input
+            id="test-url"
+            type="text"
+            placeholder="https://www.example.com/listing/123"
+            class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">HTML Content</label>
+        <textarea
+          id="test-html"
+          rows="8"
+          placeholder="Paste HTML here..."
+          class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+        ></textarea>
+      </div>
+      <div class="flex items-center gap-3">
+        <button
+          id="run-test"
+          class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition"
+        >
+          Run Extraction
+        </button>
+        <span id="test-status" class="text-sm text-gray-500"></span>
+      </div>
+
+      <!-- Results -->
+      <div id="test-results" class="hidden">
+        <h3 class="text-sm font-semibold text-gray-700 mb-2">Extraction Results</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border border-gray-200 rounded">
+            <thead>
+              <tr class="text-left text-gray-500 bg-gray-50">
+                <th class="py-2 px-3 font-medium">Field</th>
+                <th class="py-2 px-3 font-medium">Value</th>
+                <th class="py-2 px-3 font-medium">Type</th>
+              </tr>
+            </thead>
+            <tbody id="results-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div id="test-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Handle "Test" button clicks in the scraper table
+    document.querySelectorAll('.test-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const scraper = (btn as HTMLElement).dataset.scraper || '';
+        const selectEl = document.getElementById('test-scraper') as HTMLSelectElement;
+        selectEl.value = scraper;
+        document.getElementById('test-panel')?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // Run extraction test
+    document.getElementById('run-test')?.addEventListener('click', async () => {
+      const scraper = (document.getElementById('test-scraper') as HTMLSelectElement).value;
+      const sourceUrl = (document.getElementById('test-url') as HTMLInputElement).value;
+      const html = (document.getElementById('test-html') as HTMLTextAreaElement).value;
+
+      const statusEl = document.getElementById('test-status')!;
+      const resultsEl = document.getElementById('test-results')!;
+      const errorEl = document.getElementById('test-error')!;
+      const bodyEl = document.getElementById('results-body')!;
+
+      resultsEl.classList.add('hidden');
+      errorEl.classList.add('hidden');
+
+      if (!scraper || !sourceUrl || !html) {
+        errorEl.textContent = 'Please fill in scraper, source URL, and HTML content.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      statusEl.textContent = 'Running...';
+
+      try {
+        const res = await fetch('/admin/scrapers/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scraper, html, sourceUrl }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorEl.textContent = data.error || 'Request failed';
+          errorEl.classList.remove('hidden');
+          statusEl.textContent = '';
+          return;
+        }
+
+        if (!data.success) {
+          errorEl.textContent = data.errorMessage || 'Extraction failed';
+          errorEl.classList.remove('hidden');
+          statusEl.textContent = '';
+          return;
+        }
+
+        const props = data.properties[0] || {};
+        bodyEl.innerHTML = '';
+
+        const entries = Object.entries(props).sort(([a], [b]) => a.localeCompare(b));
+        for (const [key, value] of entries) {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-gray-100';
+
+          const tdField = document.createElement('td');
+          tdField.className = 'py-2 px-3 font-mono text-xs';
+          tdField.textContent = key;
+
+          const tdValue = document.createElement('td');
+          tdValue.className = 'py-2 px-3 text-xs max-w-md truncate';
+          if (Array.isArray(value)) {
+            tdValue.textContent = `Array(${value.length})`;
+            tdValue.title = JSON.stringify(value, null, 2);
+          } else if (typeof value === 'string' && value.length > 100) {
+            tdValue.textContent = value.substring(0, 100) + '...';
+            tdValue.title = value;
+          } else {
+            tdValue.textContent = String(value);
+          }
+
+          const tdType = document.createElement('td');
+          tdType.className = 'py-2 px-3 text-xs text-gray-400';
+          tdType.textContent = Array.isArray(value) ? 'array' : typeof value;
+
+          tr.appendChild(tdField);
+          tr.appendChild(tdValue);
+          tr.appendChild(tdType);
+          bodyEl.appendChild(tr);
+        }
+
+        resultsEl.classList.remove('hidden');
+        statusEl.textContent = `Extracted ${entries.length} fields`;
+      } catch (err) {
+        errorEl.textContent = 'Network error: ' + (err instanceof Error ? err.message : String(err));
+        errorEl.classList.remove('hidden');
+        statusEl.textContent = '';
+      }
+    });
+  </script>
+</AdminLayout>
