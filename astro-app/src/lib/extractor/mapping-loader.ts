@@ -4,6 +4,9 @@ export interface FieldMapping {
   cssLocator?: string;
   xpath?: string;
   scriptRegEx?: string;
+  flightDataPath?: string;
+  scriptJsonPath?: string;
+  scriptJsonVar?: string;
   urlPathPart?: string;
   cssAttr?: string;
   xmlAttr?: string;

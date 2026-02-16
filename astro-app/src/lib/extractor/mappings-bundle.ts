@@ -19,6 +19,7 @@ import pisosRaw from '../../../scraper_mappings/pisos.json?raw';
 import inmo1Raw from '../../../scraper_mappings/inmo1.json?raw';
 import weebrixRaw from '../../../scraper_mappings/weebrix.json?raw';
 import ukJittyRaw from '../../../scraper_mappings/uk_jitty.json?raw';
+import rightmoveV2Raw from '../../../scraper_mappings/rightmove_v2.json?raw';
 
 function parse(raw: string): ScraperMapping {
   const parsed = JSON5.parse(raw);
@@ -43,6 +44,7 @@ const mappings: Record<string, ScraperMapping> = {
   inmo1: parse(inmo1Raw),
   weebrix: parse(weebrixRaw),
   uk_jitty: parse(ukJittyRaw),
+  rightmove_v2: parse(rightmoveV2Raw),
 };
 
 export default mappings;

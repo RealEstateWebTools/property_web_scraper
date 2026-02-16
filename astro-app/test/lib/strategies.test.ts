@@ -105,5 +105,117 @@ describe('Strategies', () => {
       }, uri);
       expect(text).toBe('123');
     });
+
+    it('uses flightDataPath strategy for simple key', () => {
+      const html = `
+        <html><body>
+          <script>self.__next_f.push([1, "1:{\\"beds\\":3,\\"price\\":500000}\\n"])</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, { flightDataPath: 'price' }, uri);
+      expect(text).toBe('500000');
+    });
+
+    it('uses flightDataPath strategy for nested path', () => {
+      const html = `
+        <html><body>
+          <script>self.__next_f.push([1, "5:{\\"location\\":{\\"latitude\\":51.5074,\\"longitude\\":-0.1278}}\\n"])</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, { flightDataPath: 'location.latitude' }, uri);
+      expect(text).toBe('51.5074');
+    });
+
+    it('flightDataPath returns empty string when path not found', () => {
+      const html = `
+        <html><body>
+          <script>self.__next_f.push([1, "1:{\\"beds\\":3}\\n"])</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, { flightDataPath: 'nonexistent' }, uri);
+      expect(text).toBe('');
+    });
+
+    it('flightDataPath applies post-processing', () => {
+      const html = `
+        <html><body>
+          <script>self.__next_f.push([1, "1:{\\"ref\\":\\"ABC-12345.html\\"}\\n"])</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        flightDataPath: 'ref',
+        stripString: '.html',
+      }, uri);
+      expect(text).toBe('ABC-12345');
+    });
+
+    it('uses scriptJsonPath strategy for window.VAR = {...}', () => {
+      const html = `
+        <html><body>
+          <script>window.PAGE_MODEL = {"propertyData":{"id":"12345","bedrooms":3}}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        scriptJsonVar: 'PAGE_MODEL',
+        scriptJsonPath: 'propertyData.bedrooms',
+      }, uri);
+      expect(text).toBe('3');
+    });
+
+    it('uses scriptJsonPath for deeply nested values', () => {
+      const html = `
+        <html><body>
+          <script>window.DATA = {"location":{"coords":{"lat":51.5,"lng":-0.1}}}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        scriptJsonVar: 'DATA',
+        scriptJsonPath: 'location.coords.lat',
+      }, uri);
+      expect(text).toBe('51.5');
+    });
+
+    it('scriptJsonPath returns empty string when path not found', () => {
+      const html = `
+        <html><body>
+          <script>window.MODEL = {"a":1}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        scriptJsonVar: 'MODEL',
+        scriptJsonPath: 'nonexistent.path',
+      }, uri);
+      expect(text).toBe('');
+    });
+
+    it('scriptJsonPath applies post-processing', () => {
+      const html = `
+        <html><body>
+          <script>window.PM = {"price":"£105,000"}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        scriptJsonVar: 'PM',
+        scriptJsonPath: 'price',
+        stripString: '£',
+      }, uri);
+      expect(text).toBe('105,000');
+    });
   });
 });
