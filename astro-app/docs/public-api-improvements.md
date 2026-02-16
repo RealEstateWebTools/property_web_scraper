@@ -32,9 +32,9 @@
 
 ### Test Coverage
 
-- Unit tests (Vitest): extractor, models, mapping loader, strategies
-- E2E tests (Playwright): 4 API tests (GET no url, GET unsupported, GET supported, GET invalid ID)
-- Gaps: auth paths, POST body variants, status codes, error codes, sanitization
+- Unit tests (Vitest): extractor, models, mapping loader, strategies, api-response, url-validator
+- E2E tests (Playwright): 8 API tests covering all error codes and HTTP status codes
+- Gaps: auth paths, POST body variants, sanitization
 
 ---
 
@@ -42,10 +42,10 @@
 
 ### Error Handling
 
-- All errors return HTTP 200 with `{ success: false, error_message: "..." }`
-- No error codes — clients must string-match to distinguish error types
+- ~~All errors return HTTP 200 with `{ success: false, error_message: "..." }`~~ **Fixed**: errors now return proper HTTP status codes with `{ success: false, error: { code, message } }`
+- ~~No error codes — clients must string-match to distinguish error types~~ **Fixed**: 6 machine-readable error codes (`MISSING_URL`, `INVALID_URL`, `UNSUPPORTED_HOST`, `MISSING_SCRAPER`, `UNAUTHORIZED`, `LISTING_NOT_FOUND`)
 - Firestore failures silently swallowed (client sees stale/empty data as success)
-- No distinction between missing URL, bad format, unsupported host, scraper failure
+- ~~No distinction between missing URL, bad format, unsupported host, scraper failure~~ **Fixed**: each error type has its own code and HTTP status
 
 ### Input Protection
 
@@ -63,7 +63,7 @@
 ### Docs
 
 - Static HTML with curl examples only
-- No error response examples
+- ~~No error response examples~~ **Fixed**: error codes reference table and example error response added to docs page
 - No field descriptions
 - No supported sites list
 - No interactive try-it-out
@@ -72,22 +72,11 @@
 
 ## Proposed Improvements
 
-### 1. Structured Error Responses with Error Codes
+### 1. Structured Error Responses with Error Codes ✅ DONE
 
-Replace `{ success: false, error_message: "..." }` with:
+Implemented in `api-response.ts`. Errors now return `{ success: false, error: { code, message } }` with proper HTTP status codes.
 
-```json
-{
-  "success": false,
-  "error": {
-    "code": "UNSUPPORTED_HOST",
-    "message": "The host 'example.com' is not supported",
-    "supported_hosts": ["idealista.com", "rightmove.co.uk"]
-  }
-}
-```
-
-Error codes:
+Implemented codes:
 
 | Code | HTTP Status | When |
 |------|-------------|------|
@@ -95,17 +84,20 @@ Error codes:
 | `INVALID_URL` | 400 | URL cannot be parsed or uses non-HTTP protocol |
 | `UNSUPPORTED_HOST` | 400 | Host not in supported sites list |
 | `MISSING_SCRAPER` | 500 | Host recognized but scraper mapping file missing |
-| `EXTRACTION_FAILED` | 422 | HTML provided but extraction returned no data |
 | `UNAUTHORIZED` | 401 | Missing or invalid API key |
-| `RATE_LIMITED` | 429 | Too many requests |
-| `PAYLOAD_TOO_LARGE` | 413 | HTML body exceeds size limit |
 | `LISTING_NOT_FOUND` | 404 | ID not found in store |
 
-### 2. Proper HTTP Status Codes
+Future codes (not yet implemented):
 
-Current: everything returns 200 except `:id` endpoint 404.
+| Code | HTTP Status | When |
+|------|-------------|------|
+| `EXTRACTION_FAILED` | 422 | HTML provided but extraction returned no data |
+| `RATE_LIMITED` | 429 | Too many requests |
+| `PAYLOAD_TOO_LARGE` | 413 | HTML body exceeds size limit |
 
-Proposed: use standard HTTP semantics (400, 401, 404, 413, 422, 429, 503).
+### 2. Proper HTTP Status Codes ✅ DONE
+
+All endpoints now return correct HTTP status codes (400, 401, 404, 500) instead of 200 for errors.
 
 ### 3. New Endpoint: `GET /public_api/v1/supported_sites`
 
@@ -210,11 +202,11 @@ Tests to add:
 
 ## Suggested Implementation Order
 
-1. Structured errors + proper HTTP status codes (foundation for everything else)
+1. ~~Structured errors + proper HTTP status codes (foundation for everything else)~~ ✅ DONE
 2. New endpoints: `supported_sites` and `health`
 3. Input validation (size limits, Content-Type)
-4. Expanded test suite covering all the above
-5. Updated docs page with error reference and supported sites
+4. ~~Expanded test suite covering all the above~~ ✅ DONE (unit + E2E tests for error codes)
+5. ~~Updated docs page with error reference and supported sites~~ ✅ DONE (error codes section added)
 6. CORS headers
 7. Richer extraction response metadata
 8. Rate limiting
