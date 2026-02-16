@@ -98,6 +98,37 @@ module PropertyWebScraper
       end
     end
 
+    describe 'POST /retriever/as_json with html parameter' do
+      let(:html) do
+        path = File.join(PropertyWebScraper::Engine.root, 'spec', 'fixtures', 'vcr', 'scrapers', 'idealista_2018_01.yml')
+        cassette = YAML.safe_load(File.read(path), permitted_classes: [Symbol])
+        cassette['http_interactions'].first['response']['body']['string']
+      end
+
+      it 'extracts from provided HTML without HTTP fetch' do
+        post '/retriever/as_json', params: {
+          url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+          html: html
+        }
+        json = JSON.parse(response.body)
+        expect(json['success']).to eq(true)
+        expect(json['listing']).to be_present
+      end
+
+      it 'extracts from uploaded HTML file' do
+        file = Rack::Test::UploadedFile.new(
+          StringIO.new(html), 'text/html', false, original_filename: 'page.html'
+        )
+        post '/retriever/as_json', params: {
+          url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+          html_file: file
+        }
+        json = JSON.parse(response.body)
+        expect(json['success']).to eq(true)
+        expect(json['listing']).to be_present
+      end
+    end
+
     describe 'API authentication' do
       around(:each) do |example|
         ClimateControl.modify(PROPERTY_SCRAPER_API_KEY: 'test-secret-key') do

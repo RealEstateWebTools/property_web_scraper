@@ -55,6 +55,52 @@ module PropertyWebScraper
       end
     end
 
+    describe '#process_url with html: keyword' do
+      include_context 'with seeded import hosts'
+
+      let(:import_host) { PropertyWebScraper::ImportHost.find_by_host('www.idealista.com') }
+      let(:import_url) { 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/' }
+      let(:scraper) { PropertyWebScraper::Scraper.new('idealista') }
+      let(:html) do
+        path = File.join(PropertyWebScraper::Engine.root, 'spec', 'fixtures', 'vcr', 'scrapers', 'idealista_2018_01.yml')
+        cassette = YAML.safe_load(File.read(path), permitted_classes: [Symbol])
+        cassette['http_interactions'].first['response']['body']['string']
+      end
+
+      it 'extracts data from provided HTML without making HTTP requests' do
+        listing = scraper.process_url(import_url, import_host, html: html)
+        expect(listing).to be_a(PropertyWebScraper::Listing)
+        expect(listing.title).to eq('Piso en venta en goya, 54, Goya, Madrid')
+        expect(listing.price_float).to eq(990000.0)
+        # No VCR cassette needed — proves no HTTP call was made
+      end
+
+      it 'does not log the direct HTTP fetch warning when html is provided' do
+        expect(Rails.logger).not_to receive(:warn).with(/Direct HTTP fetch/)
+        scraper.process_url(import_url, import_host, html: html)
+      end
+    end
+
+    describe '#retrieve_and_save with html: keyword' do
+      include_context 'with seeded import hosts'
+
+      let(:import_url) { 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/' }
+      let(:scraper) { PropertyWebScraper::Scraper.new('idealista') }
+      let(:html) do
+        path = File.join(PropertyWebScraper::Engine.root, 'spec', 'fixtures', 'vcr', 'scrapers', 'idealista_2018_01.yml')
+        cassette = YAML.safe_load(File.read(path), permitted_classes: [Symbol])
+        cassette['http_interactions'].first['response']['body']['string']
+      end
+
+      it 'uses HtmlExtractor when html is provided' do
+        listing = PropertyWebScraper::Listing.where(import_url: import_url).first_or_create
+        result = scraper.retrieve_and_save(listing, 'idealista', html: html)
+        expect(result.title).to eq('Piso en venta en goya, 54, Goya, Madrid')
+        expect(result.price_float).to eq(990000.0)
+        expect(result.reference).to eq('38604738')
+      end
+    end
+
     describe '#retrieve_from_webpage' do
       it 'returns a property hash with parsed fields' do
         VCR.use_cassette('scrapers/idealista_2018_01') do

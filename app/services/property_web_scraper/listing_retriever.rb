@@ -23,8 +23,10 @@ module PropertyWebScraper
     attr_accessor :import_url
 
     # @param import_url [String] the property page URL to retrieve
-    def initialize(import_url)
+    # @param html [String, nil] pre-rendered HTML; when provided, skips HTTP fetch
+    def initialize(import_url, html: nil)
       @import_url = import_url
+      @html = html
     end
 
     # Validates the URL, finds the import host, and scrapes the listing.
@@ -45,7 +47,7 @@ module PropertyWebScraper
       import_host = validation.import_host
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
       begin
-        retrieved_listing = web_scraper.process_url import_url, import_host
+        retrieved_listing = web_scraper.process_url import_url, import_host, html: @html
         result.retrieved_listing = retrieved_listing
         result.success = true
         Rails.logger.info "PropertyWebScraper: ListingRetriever succeeded for #{import_url}"

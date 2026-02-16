@@ -56,6 +56,31 @@ module PropertyWebScraper
       end
     end
 
+    describe 'POST /api/v1/listings with html parameter' do
+      let(:html) do
+        path = File.join(PropertyWebScraper::Engine.root, 'spec', 'fixtures', 'vcr', 'scrapers', 'idealista_2018_01.yml')
+        cassette = YAML.safe_load(File.read(path), permitted_classes: [Symbol])
+        cassette['http_interactions'].first['response']['body']['string']
+      end
+
+      it 'extracts from provided HTML without HTTP fetch' do
+        post '/api/v1/listings', params: {
+          url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+          html: html
+        }
+        json = JSON.parse(response.body)
+        expect(json['success']).to eq(true)
+        expect(json['listings']).to be_an(Array)
+        expect(json['listings'].length).to eq(1)
+      end
+
+      it 'returns error when url is missing even with html' do
+        post '/api/v1/listings', params: { html: '<html></html>' }
+        json = JSON.parse(response.body)
+        expect(json['success']).to eq(false)
+      end
+    end
+
     describe 'GET /api/v1/listings' do
       it 'returns error when url parameter is missing' do
         get '/api/v1/listings'

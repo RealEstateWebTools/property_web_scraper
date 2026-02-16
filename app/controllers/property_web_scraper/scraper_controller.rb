@@ -75,8 +75,9 @@ module PropertyWebScraper
       else
         client_id = "pwb" + SecureRandom.urlsafe_base64(8)
       end
+      html = extract_html_input
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
-      @listing = web_scraper.process_url uri.to_s, import_host
+      @listing = web_scraper.process_url uri.to_s, import_host, html: html
 
       render json: {
         success: true,
@@ -93,8 +94,9 @@ module PropertyWebScraper
     # @return [void]
     def ajax_submit
       import_url = params[:import_url].strip
+      html = extract_html_input
 
-      listing_retriever = PropertyWebScraper::ListingRetriever.new(import_url)
+      listing_retriever = PropertyWebScraper::ListingRetriever.new(import_url, html: html)
       result = listing_retriever.retrieve
       if result.success
         @success = result.success
