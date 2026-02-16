@@ -321,4 +321,95 @@ describe('Strategies', () => {
       expect(text.text).toBe('4');
     });
   });
+
+  describe('fallback strategy chains', () => {
+    it('returns primary result when primary matches', () => {
+      const html = '<div><span class="price">$500,000</span><span class="alt-price">$499,999</span></div>';
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const result = retrieveTargetText($, html, {
+        cssLocator: 'span.price',
+        fallbacks: [{ cssLocator: 'span.alt-price' }],
+      }, uri);
+      expect(result.text).toBe('$500,000');
+      expect(result.strategyIndex).toBe(0);
+    });
+
+    it('falls back to first fallback when primary is empty', () => {
+      const html = '<div><span class="alt-price">$499,999</span></div>';
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const result = retrieveTargetText($, html, {
+        cssLocator: 'span.price',
+        fallbacks: [{ cssLocator: 'span.alt-price' }],
+      }, uri);
+      expect(result.text).toBe('$499,999');
+      expect(result.strategyIndex).toBe(1);
+    });
+
+    it('tries multiple fallbacks in order', () => {
+      const html = '<div><span class="third">Found it</span></div>';
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const result = retrieveTargetText($, html, {
+        cssLocator: 'span.first',
+        fallbacks: [
+          { cssLocator: 'span.second' },
+          { cssLocator: 'span.third' },
+        ],
+      }, uri);
+      expect(result.text).toBe('Found it');
+      expect(result.strategyIndex).toBe(2);
+    });
+
+    it('returns empty with strategyIndex 0 when all strategies fail', () => {
+      const html = '<div>nothing</div>';
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const result = retrieveTargetText($, html, {
+        cssLocator: 'span.missing',
+        fallbacks: [{ cssLocator: 'span.also-missing' }],
+      }, uri);
+      expect(result.text).toBe('');
+      expect(result.strategyIndex).toBe(0);
+    });
+
+    it('works without fallbacks defined', () => {
+      const html = '<div><h1>Title</h1></div>';
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const result = retrieveTargetText($, html, {
+        cssLocator: 'h1',
+      }, uri);
+      expect(result.text).toBe('Title');
+      expect(result.strategyIndex).toBe(0);
+    });
+
+    it('fallback can use a different strategy type than primary', () => {
+      const html = `
+        <html><body>
+          <script type="application/ld+json">{"@type":"RealEstateListing","name":"JSON-LD Title"}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const result = retrieveTargetText($, html, {
+        cssLocator: 'h1.title',
+        fallbacks: [{ jsonLdPath: 'name' }],
+      }, uri);
+      expect(result.text).toBe('JSON-LD Title');
+      expect(result.strategyIndex).toBe(1);
+    });
+
+    it('includes strategy description from the matching strategy', () => {
+      const html = '<div><span class="alt">Fallback value</span></div>';
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const result = retrieveTargetText($, html, {
+        cssLocator: 'span.primary',
+        fallbacks: [{ cssLocator: 'span.alt' }],
+      }, uri);
+      expect(result.strategyDescription).toBe('cssLocator:span.alt');
+    });
+  });
 });

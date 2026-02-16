@@ -9,6 +9,7 @@ import {
   getStoreStats,
   clearListingStore,
   initKV,
+  findListingByUrl,
 } from '../../src/lib/services/listing-store.js';
 import { Listing } from '../../src/lib/models/listing.js';
 import type { ExtractionDiagnostics } from '../../src/lib/extractor/html-extractor.js';
@@ -193,6 +194,44 @@ describe('listing-store', () => {
       expect(getStoreStats().count).toBe(0);
       expect(await getListing(id)).toBeUndefined();
       expect(await getDiagnostics(id)).toBeUndefined();
+    });
+  });
+
+  describe('findListingByUrl', () => {
+    it('finds listing ID by URL after storing', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({ import_url: 'https://www.rightmove.co.uk/properties/123' });
+      await storeListing(id, listing);
+
+      const foundId = findListingByUrl('https://www.rightmove.co.uk/properties/123');
+      expect(foundId).toBe(id);
+    });
+
+    it('finds listing regardless of query params (dedup key)', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({ import_url: 'https://www.rightmove.co.uk/properties/123' });
+      await storeListing(id, listing);
+
+      const foundId = findListingByUrl('https://www.rightmove.co.uk/properties/123?utm_source=google');
+      expect(foundId).toBe(id);
+    });
+
+    it('returns undefined for unknown URL', () => {
+      expect(findListingByUrl('https://www.unknown.com/page')).toBeUndefined();
+    });
+
+    it('clears URL index on clearListingStore', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({ import_url: 'https://example.com/listing/1' });
+      await storeListing(id, listing);
+
+      expect(findListingByUrl('https://example.com/listing/1')).toBe(id);
+
+      clearListingStore();
+      expect(findListingByUrl('https://example.com/listing/1')).toBeUndefined();
     });
   });
 

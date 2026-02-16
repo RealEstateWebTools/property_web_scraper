@@ -242,4 +242,141 @@ describe('HtmlExtractor', () => {
       expect(props).toHaveProperty('title');
     });
   });
+
+  describe('weighted quality scoring in diagnostics', () => {
+    it('includes weightedExtractionRate in diagnostics', () => {
+      const html = loadFixture('idealista_2018_01');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        scraperMappingName: 'idealista',
+      });
+
+      const diag = result.diagnostics!;
+      expect(diag.weightedExtractionRate).toBeDefined();
+      expect(diag.weightedExtractionRate).toBeGreaterThan(0);
+      expect(diag.weightedExtractionRate).toBeLessThanOrEqual(1);
+    });
+
+    it('includes criticalFieldsMissing in diagnostics', () => {
+      const html = loadFixture('idealista_2018_01');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        scraperMappingName: 'idealista',
+      });
+
+      const diag = result.diagnostics!;
+      expect(diag.criticalFieldsMissing).toBeDefined();
+      expect(Array.isArray(diag.criticalFieldsMissing)).toBe(true);
+    });
+
+    it('reports critical fields missing when extraction finds no data', () => {
+      const result = extractFromHtml({
+        html: '<html><body></body></html>',
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMappingName: 'idealista',
+      });
+
+      const diag = result.diagnostics!;
+      expect(diag.criticalFieldsMissing!.length).toBeGreaterThan(0);
+      expect(diag.criticalFieldsMissing).toContain('title');
+    });
+  });
+
+  describe('content analysis in diagnostics', () => {
+    it('includes contentAnalysis in diagnostics', () => {
+      const html = loadFixture('rightmove');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        scraperMappingName: 'rightmove',
+      });
+
+      const ca = result.diagnostics!.contentAnalysis!;
+      expect(ca).toBeDefined();
+      expect(ca.htmlLength).toBeGreaterThan(0);
+      expect(typeof ca.hasScriptTags).toBe('boolean');
+      expect(typeof ca.jsonLdCount).toBe('number');
+      expect(Array.isArray(ca.scriptJsonVarsFound)).toBe(true);
+      expect(typeof ca.appearsBlocked).toBe('boolean');
+      expect(typeof ca.appearsJsOnly).toBe('boolean');
+    });
+
+    it('detects known script vars in rightmove fixture', () => {
+      const html = loadFixture('rightmove');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        scraperMappingName: 'rightmove',
+      });
+
+      const ca = result.diagnostics!.contentAnalysis!;
+      // The fixture contains dataLayer
+      expect(ca.scriptJsonVarsFound.length).toBeGreaterThan(0);
+    });
+
+    it('detects blocked page', () => {
+      const html = '<html><body>Please verify you are human. Captcha required.</body></html>';
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMappingName: 'idealista',
+      });
+
+      const ca = result.diagnostics!.contentAnalysis!;
+      expect(ca.appearsBlocked).toBe(true);
+    });
+
+    it('does not flag normal page as blocked', () => {
+      const html = loadFixture('idealista_2018_01');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        scraperMappingName: 'idealista',
+      });
+
+      const ca = result.diagnostics!.contentAnalysis!;
+      expect(ca.appearsBlocked).toBe(false);
+    });
+  });
+
+  describe('split schema in result', () => {
+    it('includes splitSchema in extraction result', () => {
+      const html = loadFixture('idealista_2018_01');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        scraperMappingName: 'idealista',
+      });
+
+      expect(result.splitSchema).toBeDefined();
+      expect(result.splitSchema!.assetData).toBeDefined();
+      expect(result.splitSchema!.listingData).toBeDefined();
+      expect(result.splitSchema!.unmapped).toBeDefined();
+    });
+
+    it('places title in assetData', () => {
+      const html = loadFixture('idealista_2018_01');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        scraperMappingName: 'idealista',
+      });
+
+      expect(result.splitSchema!.assetData.title).toBeTruthy();
+    });
+
+    it('places price fields in listingData', () => {
+      const html = loadFixture('idealista_2018_01');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        scraperMappingName: 'idealista',
+      });
+
+      expect(result.splitSchema!.listingData.price_string).toBeTruthy();
+      expect(result.splitSchema!.listingData.for_sale).toBeDefined();
+    });
+  });
 });
