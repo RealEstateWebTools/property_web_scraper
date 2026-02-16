@@ -3,7 +3,7 @@
  * Port of Ruby ApplicationController#authenticate_api_key!
  */
 export function authenticateApiKey(request: Request): { authorized: boolean; errorResponse?: Response } {
-  const expectedKey = process.env.PWS_API_KEY || '';
+  const expectedKey = import.meta.env.PWS_API_KEY || '';
   if (!expectedKey) {
     // No key configured = auth is skipped (backwards compatible)
     return { authorized: true };

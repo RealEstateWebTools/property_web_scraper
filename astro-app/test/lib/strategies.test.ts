@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as cheerio from 'cheerio';
-import { getTextFromCss, getTextFromUrl, retrieveTargetText, cleanUpString, evaluateXPath } from '../../src/lib/extractor/strategies.js';
+import { getTextFromCss, getTextFromUrl, retrieveTargetText, cleanUpString } from '../../src/lib/extractor/strategies.js';
 
 describe('Strategies', () => {
   describe('getTextFromCss', () => {
@@ -69,20 +69,6 @@ describe('Strategies', () => {
         stripString: '.html',
       });
       expect(result).toBe('51775029');
-    });
-  });
-
-  describe('evaluateXPath', () => {
-    it('evaluates an XPath expression on HTML', () => {
-      const html = '<html><head><meta name="description" content="A lovely house" /></head><body></body></html>';
-      const result = evaluateXPath(html, "//meta[@name='description']/@content");
-      expect(result).toBe('A lovely house');
-    });
-
-    it('returns empty string for no matches', () => {
-      const html = '<html><body><p>Hello</p></body></html>';
-      const result = evaluateXPath(html, "//meta[@name='nonexistent']/@content");
-      expect(result).toBe('');
     });
   });
 

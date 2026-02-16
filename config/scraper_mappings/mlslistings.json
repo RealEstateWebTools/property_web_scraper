@@ -27,10 +27,12 @@
       "stripPunct": "true"
     },
     "longitude": {
-      "xpath": "//meta[@property='place:location:longitude']/@content"
+      "cssLocator": "meta[property='place:location:longitude']",
+      "cssAttr": "content"
     },
     "latitude": {
-      "xpath": "//meta[@property='place:location:latitude']/@content"
+      "cssLocator": "meta[property='place:location:latitude']",
+      "cssAttr": "content"
     }
   },
   "textFields": {
@@ -38,7 +40,8 @@
       "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(3) > span"
     },
     "title": {
-      "xpath": "//meta[@property='og:title']/@content"
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content"
     },
     "description": {
       "cssLocator": "#propertyRemarks"
@@ -52,17 +55,20 @@
     //   "xpath": "//meta[@property='mlsl_fb:baths']/@content"
     // },
     "count_bedrooms": {
-      "xpath": "//meta[@property='mlsl_fb:beds']/@content"
+      "cssLocator": "meta[property='mlsl_fb:beds']",
+      "cssAttr": "content"
       // "splitTextCharacter": " ",
       // "splitTextArrayId": "1"
     },
     "main_image_url": {
-      "xpath": "//meta[@property='og:image']/@content"
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
     }
   },
   "booleanFields": {
     "for_sale": {
-      "xpath": "//meta[@property='og:title']/@content",
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
       "evaluator": "include?",
       "evaluatorParam": "For Sale"
     }

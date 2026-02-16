@@ -65,7 +65,8 @@
       "cssLocator": ".main_title"
     },
     "description": {
-      "xpath": "//meta[@property='og:description']/@content"
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
     },
     "city": {
       "cssLocator": ".bfg-details2-city"

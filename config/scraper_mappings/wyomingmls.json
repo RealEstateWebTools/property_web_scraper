@@ -48,7 +48,7 @@
     },
     "price_float":
     {
-      "xpath": "//*[@id='content']/div[2]/div[1]/p/strong/following-sibling::text()",
+      "cssLocator": "#content > div:nth-child(2) > div:nth-child(1) > p",
       "splitTextCharacter": "\r",
       "splitTextArrayId": "1",
       "stripString": "$",
@@ -72,7 +72,7 @@
   {
     "reference":
     {
-      "xpath": "//*[@id='content']/div[2]/div[1]/p/strong/following-sibling::text()",
+      "cssLocator": "#content > div:nth-child(2) > div:nth-child(1) > p",
       "splitTextCharacter": "\r",
       "splitTextArrayId": "0"
     },
@@ -86,7 +86,7 @@
     },
     "price_string":
     {
-      "xpath": "//*[@id='content']/div[2]/div[1]/p/strong/following-sibling::text()",
+      "cssLocator": "#content > div:nth-child(2) > div:nth-child(1) > p",
       "splitTextCharacter": "\r",
       "splitTextArrayId": "1"
     }

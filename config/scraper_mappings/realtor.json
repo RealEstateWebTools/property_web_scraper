@@ -34,19 +34,21 @@
     },
     "longitude":
     {
-      "xpath": "//meta[@property='place:location:longitude']/@content"
+      "cssLocator": "meta[property='place:location:longitude']",
+      "cssAttr": "content"
     },
     "latitude":
     {
-      "xpath": "//meta[@property='place:location:latitude']/@content"
+      "cssLocator": "meta[property='place:location:latitude']",
+      "cssAttr": "content"
     }
   },
   "intFields": {
     "count_bedrooms": {
-      "xpath": "//*[@id='ldp-property-meta']//li[@data-label='property-meta-beds']"
+      "cssLocator": "#ldp-property-meta li[data-label='property-meta-beds']"
     },
     "count_bathrooms": {
-      "xpath": "//*[@id='ldp-property-meta']//li[@data-label='property-meta-bath']"
+      "cssLocator": "#ldp-property-meta li[data-label='property-meta-bath']"
     } 
   },
   "textFields":
@@ -63,7 +65,8 @@
     },
     "description":
     {
-      "xpath": "//meta[@name='description']/@content"
+      "cssLocator": "meta[name='description']",
+      "cssAttr": "content"
     },
     "price_string":
     {
@@ -75,44 +78,49 @@
     },
     "postal_code":
     {
-      "xpath": "//meta[@property='og:postal-code']/@content"
+      "cssLocator": "meta[property='og:postal-code']",
+      "cssAttr": "content"
     },
     "city":
     {
-      "xpath": "//meta[@property='og:locality']/@content"
+      "cssLocator": "meta[property='og:locality']",
+      "cssAttr": "content"
     },
     "region":
     {
-      "xpath": "//meta[@property='og:region']/@content"
+      "cssLocator": "meta[property='og:region']",
+      "cssAttr": "content"
     },
     "address_string":
     {
-      "xpath": "//meta[@property='og:street-address']/@content"
+      "cssLocator": "meta[property='og:street-address']",
+      "cssAttr": "content"
     },
     "main_image_url":
     {
-      "xpath": "//meta[@property='og:image']/@content"
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
     }
   },
   "booleanFields":
   {
     "for_rent_long_term":
     {
-      "xpath": "//span[@data-label='property-meta-status']",
+      "cssLocator": "span[data-label='property-meta-status']",
       "evaluator": "include?",
       "caseInsensitive": true,
       "evaluatorParam": "rent"
     },
     "for_rent":
     {
-      "xpath": "//span[@data-label='property-meta-status']",
+      "cssLocator": "span[data-label='property-meta-status']",
       "evaluator": "include?",
       "caseInsensitive": true,
       "evaluatorParam": "rent"
     },
     "for_sale":
     {
-      "xpath": "//span[@data-label='property-meta-status']",
+      "cssLocator": "span[data-label='property-meta-status']",
       "evaluator": "include?",
       "caseInsensitive": true,
       "evaluatorParam": "sale"

@@ -1,6 +1,6 @@
 import type { CheerioAPI, Cheerio, AnyNode } from 'cheerio';
 import type { FieldMapping } from './mapping-loader.js';
-import { getTextFromCss, cleanUpString, evaluateXPath } from './strategies.js';
+import { getTextFromCss, cleanUpString } from './strategies.js';
 
 /**
  * Extract an array of image URLs from HTML.
@@ -39,39 +39,11 @@ export function extractImages(
     });
   }
 
-  // XPath path
+  // XPath path (no longer supported — all mappings converted to CSS)
   if (mapping.xpath) {
-    const xpathTexts = evaluateXPathMultiple(html, mapping.xpath);
-    retrieved.push(...xpathTexts);
+    console.warn(`[ImageExtractor] XPath is no longer supported, skipping: ${mapping.xpath}`);
   }
 
   // Clean up all results
   return retrieved.map((s) => cleanUpString(s, mapping));
-}
-
-/**
- * Evaluate XPath and return all matching text values.
- */
-function evaluateXPathMultiple(html: string, xpathExpr: string): string[] {
-  // Use JSDOM for XPath evaluation
-  const { JSDOM } = require('jsdom');
-  const dom = new JSDOM(html, { contentType: 'text/html' });
-  const doc = dom.window.document;
-
-  const result = doc.evaluate(
-    xpathExpr,
-    doc,
-    null,
-    dom.window.XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-    null
-  );
-
-  const texts: string[] = [];
-  for (let i = 0; i < result.snapshotLength; i++) {
-    const node = result.snapshotItem(i);
-    if (node) {
-      texts.push(node.nodeValue || node.textContent || '');
-    }
-  }
-  return texts;
 }

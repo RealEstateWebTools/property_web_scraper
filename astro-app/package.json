@@ -6,28 +6,27 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "wrangler pages dev dist",
+    "deploy": "astro build && wrangler pages deploy dist",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@astrojs/node": "^9.0.0",
-    "@google-cloud/firestore": "^7.0.0",
+    "@astrojs/cloudflare": "^12.0.0",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.0.0",
     "bootstrap-icons": "^1.13.1",
     "cheerio": "^1.0.0",
-    "jsdom": "^25.0.0",
     "json5": "^2.2.3",
     "sanitize-html": "^2.13.0",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "@types/jsdom": "^21.1.0",
     "@types/sanitize-html": "^2.13.0",
     "typescript": "^5.6.0",
-    "vitest": "^2.0.0"
+    "vitest": "^2.0.0",
+    "wrangler": "^3.0.0"
   }
 }
