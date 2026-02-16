@@ -10,54 +10,50 @@
   "intFields": {
     "count_bedrooms": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.bedrooms"
+      "scriptJsonPath": "props.initialReduxState.property.bedroomsText"
     },
     "count_bathrooms": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.bathrooms"
+      "scriptJsonPath": "props.initialReduxState.property.bathrooms"
     }
   },
   "floatFields": {
     "price_float": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.price-value"
+      "scriptJsonPath": "props.initialReduxState.property.priceRaw"
     },
     "latitude": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.location.lat"
+      "scriptJsonPath": "props.initialReduxState.property.location.lat"
     },
     "longitude": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.location.lng"
+      "scriptJsonPath": "props.initialReduxState.property.location.lon"
     }
   },
   "textFields": {
     "reference": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.property-id"
+      "scriptJsonPath": "props.initialReduxState.property.id"
     },
     "title": {
       "cssLocator": "title"
     },
     "description": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.description"
+      "scriptJsonPath": "props.initialReduxState.property.description"
     },
     "price_string": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.price"
-    },
-    "postal_code": {
-      "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.postcode"
+      "scriptJsonPath": "props.initialReduxState.property.price"
     },
     "address_string": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.address"
+      "scriptJsonPath": "props.initialReduxState.property.displayAddress"
     },
     "property_type": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.property-type"
+      "scriptJsonPath": "props.initialReduxState.property.humanisedPropertyType"
     },
     "main_image_url": {
       "cssLocator": "meta[property='og:image']",
@@ -71,15 +67,15 @@
   "booleanFields": {
     "for_sale": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.listing-status",
-      "evaluator": "include?",
-      "evaluatorParam": "sale"
+      "scriptJsonPath": "props.initialReduxState.property.forSale",
+      "evaluator": "==",
+      "evaluatorParam": "true"
     },
     "for_rent": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.property.listing-status",
-      "evaluator": "include?",
-      "evaluatorParam": "rent"
+      "scriptJsonPath": "props.initialReduxState.property.forSale",
+      "evaluator": "==",
+      "evaluatorParam": "false"
     }
   }
 }]
