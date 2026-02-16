@@ -1,7 +1,4 @@
-import JSON5 from 'json5';
-import { readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import mappings from './mappings-bundle.js';
 
 export interface FieldMapping {
   cssLocator?: string;
@@ -37,43 +34,22 @@ export interface ScraperMapping {
 
 const mappingCache = new Map<string, ScraperMapping>();
 
-function getMappingsDir(): string {
-  // Resolve from project root (astro-app/)
-  const thisFile = typeof __filename !== 'undefined'
-    ? __filename
-    : fileURLToPath(import.meta.url);
-  const projectRoot = resolve(dirname(thisFile), '..', '..', '..');
-  return resolve(projectRoot, 'scraper_mappings');
-}
-
 export function findByName(name: string): ScraperMapping | null {
   if (mappingCache.has(name)) {
     return mappingCache.get(name)!;
   }
-  const mappingsDir = getMappingsDir();
-  const filePath = resolve(mappingsDir, `${name}.json`);
-  try {
-    const raw = readFileSync(filePath, 'utf-8');
-    const parsed = JSON5.parse(raw);
-    // JSON files wrap in an array: [{ name: ..., ... }]
-    const mapping: ScraperMapping = Array.isArray(parsed) ? parsed[0] : parsed;
-    mappingCache.set(name, mapping);
-    return mapping;
-  } catch {
+  const mapping = mappings[name];
+  if (!mapping) {
     return null;
   }
+  mappingCache.set(name, mapping);
+  return mapping;
 }
 
 export function clearCache(): void {
   mappingCache.clear();
 }
 
-const KNOWN_MAPPINGS = [
-  'pwb', 'mlslistings', 'realtor', 'fotocasa',
-  'idealista', 'zoopla', 'rightmove', 'wyomingmls', 'carusoimmobiliare',
-  'forsalebyowner', 'realestateindia', 'cerdfw', 'pisos', 'inmo1',
-];
-
 export function allMappingNames(): string[] {
-  return [...KNOWN_MAPPINGS];
+  return Object.keys(mappings);
 }

@@ -65,8 +65,7 @@
     },
     "description":
     {
-      // https://stackoverflow.com/questions/45459234/rails-nokogiri-gem-scrap-data-using-itemprop
-      "xpath": "//p[@itemprop = 'description']"
+      "cssLocator": "p[itemprop='description']"
     },
     "price_string":
     {
@@ -80,20 +79,24 @@
     },
     "address_string":
     {
-      "xpath": "//meta[@itemprop = 'streetAddress']/@content"
+      "cssLocator": "meta[itemprop='streetAddress']",
+      "cssAttr": "content"
     },
     "street_address":
     {
-      "xpath": "//meta[@itemprop = 'streetAddress']/@content"
+      "cssLocator": "meta[itemprop='streetAddress']",
+      "cssAttr": "content"
     },
     "main_image_url":
     {
-      "xpath": "//meta[@name='twitter:image:src']/@content"
+      "cssLocator": "meta[name='twitter:image:src']",
+      "cssAttr": "content"
     }
   },
   "images": [
     {
-      "xpath": "//meta[@property='og:image']/@content",
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content",
       "stripString": "_max_135x100"
     }
   ],

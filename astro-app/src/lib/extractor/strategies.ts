@@ -1,5 +1,4 @@
 import * as cheerio from 'cheerio';
-import { JSDOM } from 'jsdom';
 import type { FieldMapping } from './mapping-loader.js';
 
 /**
@@ -79,45 +78,15 @@ export function retrieveTargetText(
     retrievedText = getTextFromCss($, elements, mapping);
   }
 
-  // XPath strategy
+  // XPath strategy (no longer supported — all mappings converted to CSS)
   if (mapping.xpath) {
-    retrievedText = evaluateXPath(html, mapping.xpath);
+    console.warn(`[Extractor] XPath is no longer supported, skipping: ${mapping.xpath}`);
   }
 
   // Post-processing
   retrievedText = cleanUpString(retrievedText, mapping);
 
   return retrievedText;
-}
-
-/**
- * Evaluate XPath expression using JSDOM.
- * Port of Ruby doc.xpath() calls.
- */
-export function evaluateXPath(html: string, xpathExpr: string): string {
-  const dom = new JSDOM(html, { contentType: 'text/html' });
-  const doc = dom.window.document;
-
-  const result = doc.evaluate(
-    xpathExpr,
-    doc,
-    null,
-    dom.window.XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-    null
-  );
-
-  if (result.snapshotLength === 0) return '';
-
-  // Collect all matching nodes
-  const texts: string[] = [];
-  for (let i = 0; i < result.snapshotLength; i++) {
-    const node = result.snapshotItem(i);
-    if (node) {
-      // For attribute nodes, use nodeValue; for element nodes, use textContent
-      texts.push(node.nodeValue || node.textContent || '');
-    }
-  }
-  return texts.join('');
 }
 
 /**

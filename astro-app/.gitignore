@@ -4,3 +4,4 @@ dist/
 .env
 config/firebase-credentials.json
 test-results/
+.wrangler/

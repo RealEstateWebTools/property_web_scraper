@@ -20,7 +20,7 @@ if (listing) {
   }
 }
 
-const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || '';
+const googleMapsApiKey = import.meta.env.GOOGLE_MAPS_API_KEY || '';
 
 const details: [string, any][] = [];
 if (listing) {
