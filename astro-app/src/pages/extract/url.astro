@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { retrieveListing } from '@lib/services/listing-retriever.js';
-import { generateId, storeListing } from '@lib/services/listing-store.js';
+import { initKV, generateId, storeListing } from '@lib/services/listing-store.js';
+
+initKV((Astro.locals as any).runtime?.env?.RESULTS);
 
 const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com'];
 
@@ -30,7 +32,7 @@ if (Astro.request.method === 'POST') {
   }
 
   const id = generateId();
-  storeListing(id, result.retrievedListing);
+  await storeListing(id, result.retrievedListing);
   return Astro.redirect(`/extract/results/${id}`);
 }
 ---

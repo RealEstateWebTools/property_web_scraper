@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getListing } from '@lib/services/listing-store.js';
+import { initKV, getListing } from '@lib/services/listing-store.js';
+
+initKV((Astro.locals as any).runtime?.env?.RESULTS);
 
 const { id } = Astro.params;
-const listing = id ? getListing(id) : undefined;
+const listing = id ? await getListing(id) : undefined;
 
 let markers: Array<{title: string; position: {lat: number; lng: number}}> = [];
 let mainImageUrl = 'https://placehold.co/500x250?text=No+Image';

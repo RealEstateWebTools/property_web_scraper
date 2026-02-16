@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getListing } from '@lib/services/listing-store.js';
+import { initKV, getListing } from '@lib/services/listing-store.js';
+
+initKV((Astro.locals as any).runtime?.env?.RESULTS);
 
 const { id } = Astro.params;
-const listing = id ? getListing(id) : undefined;
+const listing = id ? await getListing(id) : undefined;
 const imageUrls = listing?.image_urls || [];
 const attrs = [
   'reference', 'title', 'description', 'price_string', 'price_float',
