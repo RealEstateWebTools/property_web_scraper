@@ -6,6 +6,7 @@ interface Props {
   compact?: boolean;
 }
 const { entries, compact = false } = Astro.props;
+const colCount = compact ? 3 : 6;
 
 function formatTime(ts: number): string {
   const diff = Date.now() - ts;
@@ -36,31 +37,83 @@ function levelBadge(level: string): string {
       </tr>
     </thead>
     <tbody>
-      {entries.map((entry) => (
-        <tr class="border-b border-gray-100 hover:bg-gray-50">
-          <td class="py-2 px-3 text-gray-500 whitespace-nowrap">{formatTime(entry.timestamp)}</td>
-          <td class="py-2 px-3">
-            <span class={`inline-block px-2 py-0.5 rounded text-xs font-medium ${levelBadge(entry.level)}`}>
-              {entry.level}
-            </span>
-          </td>
-          {!compact && <td class="py-2 px-3 text-gray-500">{entry.category}</td>}
-          {!compact && (
-            <td class="py-2 px-3 text-gray-500 whitespace-nowrap">
-              {entry.method && entry.path ? `${entry.method} ${entry.path}` : ''}
+      {entries.map((entry, idx) => (
+        <>
+          <tr class={`border-b border-gray-100 hover:bg-gray-50 ${entry.diagnostics ? 'cursor-pointer' : ''}`}
+              data-diag-row={entry.diagnostics ? idx : undefined}>
+            <td class="py-2 px-3 text-gray-500 whitespace-nowrap">{formatTime(entry.timestamp)}</td>
+            <td class="py-2 px-3">
+              <span class={`inline-block px-2 py-0.5 rounded text-xs font-medium ${levelBadge(entry.level)}`}>
+                {entry.level}
+              </span>
             </td>
-          )}
-          <td class="py-2 px-3 max-w-md truncate">{entry.message}</td>
-          {!compact && (
-            <td class="py-2 px-3 text-gray-500 whitespace-nowrap">
-              {entry.durationMs !== undefined ? `${entry.durationMs}ms` : ''}
+            {!compact && <td class="py-2 px-3 text-gray-500">{entry.category}</td>}
+            {!compact && (
+              <td class="py-2 px-3 text-gray-500 whitespace-nowrap">
+                {entry.method && entry.path ? `${entry.method} ${entry.path}` : ''}
+              </td>
+            )}
+            <td class="py-2 px-3 max-w-md truncate">
+              {entry.message}
+              {entry.diagnostics && (
+                <span class="ml-2 text-xs text-blue-500"><i class="bi bi-chevron-down"></i> diagnostics</span>
+              )}
             </td>
+            {!compact && (
+              <td class="py-2 px-3 text-gray-500 whitespace-nowrap">
+                {entry.durationMs !== undefined ? `${entry.durationMs}ms` : ''}
+              </td>
+            )}
+          </tr>
+          {entry.diagnostics && (
+            <tr class="hidden" id={`diag-detail-${idx}`}>
+              <td colspan={colCount} class="px-3 py-3 bg-gray-50">
+                <div class="text-xs space-y-2">
+                  <div class="flex flex-wrap gap-3 text-gray-600">
+                    <span>Scraper: <span class="font-mono font-medium">{entry.diagnostics.scraperName}</span></span>
+                    <span>Fields: {entry.diagnostics.populatedFields}/{entry.diagnostics.totalFields} populated</span>
+                  </div>
+                  {entry.diagnostics.emptyFields.length > 0 && (
+                    <div class="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-1 rounded">
+                      <strong>Empty:</strong> {entry.diagnostics.emptyFields.join(', ')}
+                    </div>
+                  )}
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-xs border border-gray-200 rounded">
+                      <thead>
+                        <tr class="text-left text-gray-500 bg-gray-100">
+                          <th class="py-1 px-2 font-medium">Field</th>
+                          <th class="py-1 px-2 font-medium">Section</th>
+                          <th class="py-1 px-2 font-medium">Strategy</th>
+                          <th class="py-1 px-2 font-medium">Raw Text</th>
+                          <th class="py-1 px-2 font-medium">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {entry.diagnostics.fieldTraces.map((trace) => {
+                          const isEmpty = trace.rawText === '' || trace.value === 0 || trace.value === false || trace.value === '';
+                          return (
+                            <tr class={`border-b border-gray-100 ${isEmpty ? 'bg-red-50' : ''}`}>
+                              <td class="py-1 px-2 font-mono">{trace.field}</td>
+                              <td class="py-1 px-2 text-gray-500">{trace.section}</td>
+                              <td class="py-1 px-2 text-gray-500 max-w-[150px] truncate" title={trace.strategy}>{trace.strategy}</td>
+                              <td class="py-1 px-2 max-w-[150px] truncate" title={trace.rawText}>{trace.rawText || 'empty'}</td>
+                              <td class="py-1 px-2 max-w-[150px] truncate" title={String(trace.value)}>{JSON.stringify(trace.value)}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
           )}
-        </tr>
+        </>
       ))}
       {entries.length === 0 && (
         <tr>
-          <td colspan={compact ? 3 : 6} class="py-8 text-center text-gray-400">
+          <td colspan={colCount} class="py-8 text-center text-gray-400">
             No log entries
           </td>
         </tr>
@@ -68,3 +121,20 @@ function levelBadge(level: string): string {
     </tbody>
   </table>
 </div>
+
+<script is:inline>
+document.querySelectorAll('[data-diag-row]').forEach(function(row) {
+  row.addEventListener('click', function() {
+    var idx = row.getAttribute('data-diag-row');
+    var detail = document.getElementById('diag-detail-' + idx);
+    if (detail) {
+      detail.classList.toggle('hidden');
+      var chevron = row.querySelector('.bi-chevron-down, .bi-chevron-up');
+      if (chevron) {
+        chevron.classList.toggle('bi-chevron-down');
+        chevron.classList.toggle('bi-chevron-up');
+      }
+    }
+  });
+});
+</script>

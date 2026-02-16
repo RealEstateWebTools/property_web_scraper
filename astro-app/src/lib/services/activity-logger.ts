@@ -4,6 +4,8 @@
  * No external dependencies — leaf module to avoid circular imports.
  */
 
+import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
+
 export type LogLevel = 'info' | 'warn' | 'error';
 export type LogCategory = 'api_request' | 'extraction' | 'auth' | 'rate_limit' | 'system';
 
@@ -23,6 +25,7 @@ export interface LogEntry {
   fieldsFound?: number;
   fieldsAvailable?: number;
   errorCode?: string;
+  diagnostics?: ExtractionDiagnostics;
 }
 
 export type LogInput = Omit<LogEntry, 'id' | 'timestamp'>;
