@@ -33,6 +33,8 @@ export const LOCAL_HOST_MAP: Record<string, { scraper_name: string; slug: string
   'realestateindia.com': { scraper_name: 'realestateindia', slug: 'realestateindia' },
   'www.forsalebyowner.com': { scraper_name: 'forsalebyowner', slug: 'forsalebyowner' },
   'forsalebyowner.com': { scraper_name: 'forsalebyowner', slug: 'forsalebyowner' },
+  'jitty.com': { scraper_name: 'uk_jitty', slug: 'uk_jitty' },
+  'www.jitty.com': { scraper_name: 'uk_jitty', slug: 'uk_jitty' },
 };
 
 /**
