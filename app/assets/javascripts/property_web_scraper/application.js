@@ -3,3 +3,4 @@
 //= require property_web_scraper/controllers/application
 //= require property_web_scraper/controllers/google_map_controller
 //= require property_web_scraper/controllers/carousel_controller
+//= require property_web_scraper/controllers/scraper_form_controller
