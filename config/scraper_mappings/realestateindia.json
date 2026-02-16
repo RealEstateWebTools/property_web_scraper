@@ -2,94 +2,64 @@
   "name": "realestateindia",
   "defaultValues": {
     "country": {
-      "value": "Spain"
+      "value": "India"
     },
     "area_unit": {
-      "value": "sqmt"
+      "value": "sqyd"
     },
     "currency": {
-      "value": "EUR"
+      "value": "INR"
     },
     "for_rent_short_term": {
       "value": "false"
     },
     "locale_code": {
-      "value": "es"
+      "value": "en"
     }
   },
   "floatFields": {
-    "constructed_area": {
-      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(2) > span"
-    },
     "price_float": {
-      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(1) > span",
+      "cssLocator": "span.red",
+      "cssCountId": "0",
       "stripPunct": "true"
     },
-    "latitude":
-    {
-      // below is actually "latitude:[^\,]*" but had to escape the \
-      "scriptRegEx": "latitude:[^\\,]*",
-      "splitTextCharacter": "\"",
-      "splitTextArrayId": "1"
+    "latitude": {
     },
-    "longitude":
-    {
-      "scriptRegEx": "longitude:[^\\,]*",
-      "splitTextCharacter": "\"",
-      "splitTextArrayId": "1"
+    "longitude": {
     }
   },
   "intFields": {
-    "count_bedrooms": {
-      "cssLocator": "#litRooms > b"
-    },
-    "count_bathrooms": {
-      "cssLocator": "#litBaths"
-    } 
   },
   "textFields": {
-    "reference": {
-      "scriptRegEx": "propertyId:[^\\,]*",
-      "splitTextCharacter": ":",
-      "splitTextArrayId": "1"
-    },
     "title": {
-      "cssLocator": "#property-title > h1"
-    },
-    "description": {
-      "cssLocator": "#details > div.commentsContainer > div"
+      "cssLocator": "h1.xxxlarge",
+      "cssCountId": "0"
     },
     "price_string": {
-      
-      "cssLocator": "#priceContainer"
+      "cssLocator": "span.red",
+      "cssCountId": "0"
     }
   },
   "images": [
-    {
-      "cssLocator": "#grid-multimedia img",
-      "stripString": ",WEB_DETAIL"
-    }
   ],
   "booleanFields": {
     "for_rent": {
-      "cssLocator": ".txt-deposit",
+      "cssLocator": "h1.xxxlarge",
       "evaluator": "include?",
-      "evaluatorParam": "ianza"
+      "caseInsensitive": true,
+      "evaluatorParam": "rent"
     },
     "for_rent_long_term": {
-      "cssLocator": ".txt-deposit",
+      "cssLocator": "h1.xxxlarge",
       "evaluator": "include?",
-      "evaluatorParam": "ianza"
+      "caseInsensitive": true,
+      "evaluatorParam": "rent"
     },
     "for_sale": {
-      "cssLocator": ".txt-mortgage",
+      "cssLocator": "h1.xxxlarge",
       "evaluator": "include?",
-      "evaluatorParam": "hipoteca"
-    }
-  },
-  "extraFields": {
-    "images": {
-      "imagesCssLocator": "#main-multimedia > div > img"
+      "caseInsensitive": true,
+      "evaluatorParam": "sale"
     }
   }
 }]

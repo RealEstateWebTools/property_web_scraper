@@ -1,3 +1,21 @@
+/**
+ * Scraper Validation Manifest
+ *
+ * Workflow for fixing broken scrapers:
+ *
+ * 1. **Identify failures**: Run `npx vitest run test/lib/scraper-validation.test.ts`
+ * 2. **Inspect HTML**: Open `test/fixtures/SCRAPER.html`, find the actual DOM elements
+ * 3. **Fix mapping**: Edit `config/scraper_mappings/SCRAPER.json` with correct selectors
+ * 4. **Update manifest**: Update expected values in `test/fixtures/manifest.ts`
+ * 5. **Verify**: Re-run tests
+ *
+ * Common pitfalls:
+ * - Field in multiple sections → last wins (textFields overwrites intFields)
+ * - No `cssCountId` → Cheerio concatenates ALL matched elements
+ * - Cheerio converts `<br>` → `\n` not `\r`
+ * - `defaultValues` always produces strings (e.g. `for_sale: "true"`)
+ * - Processing order: defaults → images → features → int → float → text → boolean
+ */
 export interface FixtureEntry {
   scraper: string;
   fixture: string | null;
@@ -53,6 +71,7 @@ export const fixtures: FixtureEntry[] = [
       price_string: '$144,950',
       price_float: 144950,
       constructed_area: 1133,
+      count_bedrooms: 3,
       count_bathrooms: 2,
       latitude: 35.302092,
       longitude: -119.051509,
@@ -76,6 +95,10 @@ export const fixtures: FixtureEntry[] = [
       count_bedrooms: 3,
       count_bathrooms: 3,
       price_string: '1.330.000 \u20AC',
+      price_float: 1330000,
+      reference: '145228694',
+      latitude: 0,
+      longitude: 0,
       for_rent: false,
       for_sale: false,
     },
@@ -90,6 +113,9 @@ export const fixtures: FixtureEntry[] = [
       title: '4 bed flat for sale',
       address_string: '38 St. Pauls Square, Birmingham B3',
       constructed_area: 2205,
+      price_float: 875000,
+      price_string: '\u00A3875,000',
+      count_bedrooms: 4,
     },
   },
   {
@@ -100,6 +126,7 @@ export const fixtures: FixtureEntry[] = [
       country: 'Spain',
       currency: 'EUR',
       title: 'Piso en venta en Calle Goya, n\u00BA 54 en Goya por 990.000 \u20AC',
+      price_string: '990.000 \u20AC',
     },
   },
   {
@@ -107,9 +134,15 @@ export const fixtures: FixtureEntry[] = [
     fixture: 'realestateindia',
     sourceUrl: 'https://www.realestateindia.com/property-detail/residential-property-for-sale-in-delhi-12345.htm',
     expected: {
-      country: 'Spain',
-      currency: 'EUR',
-      for_rent: false,
+      country: 'India',
+      currency: 'INR',
+      title: '2 BHK Flats & Apartments for Rent in Andheri West, Mumbai - 10000 Sq. Yards',
+      price_float: 45000,
+      price_string: '45,000',
+      latitude: 0,
+      longitude: 0,
+      for_rent: true,
+      for_rent_long_term: true,
       for_sale: false,
     },
   },
@@ -184,6 +217,9 @@ export const fixtures: FixtureEntry[] = [
       constructed_area: 1056,
       latitude: 42.852044,
       longitude: -106.28227,
+      price_float: 33500,
+      price_string: '$33,500',
+      reference: '20176813',
     },
   },
   {

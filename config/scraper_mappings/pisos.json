@@ -29,7 +29,8 @@
     "description": {
     },
     "price_string": {
-      "cssLocator": ".jsPrecioH1"
+      "cssLocator": ".jsPrecioH1",
+      "cssCountId": "0"
     }
   },
   "images": [

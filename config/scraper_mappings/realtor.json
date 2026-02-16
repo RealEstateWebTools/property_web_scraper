@@ -72,10 +72,6 @@
     {
       "cssLocator": "#ldp-pricewrap > div > div > span"
     },
-    "count_bedrooms":
-    {
-      "cssLocator": "#ldp-property-meta > ul > li:nth-child(1) > span"
-    },
     "postal_code":
     {
       "cssLocator": "meta[property='og:postal-code']",
