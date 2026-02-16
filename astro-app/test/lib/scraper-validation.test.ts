@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { extractFromHtml } from '../../src/lib/extractor/html-extractor.js';
+import { findByName } from '../../src/lib/extractor/mapping-loader.js';
 import { fixtures } from '../fixtures/manifest.js';
 
 function loadFixture(name: string): string {
@@ -40,6 +41,21 @@ describe('Scraper validation', () => {
           expect(props[field]).toEqual(value);
         });
       }
+
+      it('meets expected extraction rate', () => {
+        const diag = result.diagnostics!;
+        expect(diag).toBeDefined();
+        const mapping = findByName(entry.scraper);
+        if (mapping?.expectedExtractionRate != null) {
+          expect(diag.extractionRate).toBeGreaterThanOrEqual(mapping.expectedExtractionRate);
+        }
+      });
+
+      it('meets expected quality grade', () => {
+        const diag = result.diagnostics!;
+        expect(diag).toBeDefined();
+        expect(diag.meetsExpectation).toBe(true);
+      });
     });
   }
 });

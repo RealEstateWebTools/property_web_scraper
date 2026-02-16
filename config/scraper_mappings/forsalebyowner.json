@@ -1,6 +1,7 @@
 [
 {
   "name": "forsalebyowner",
+  "expectedExtractionRate": 0.95,
   "defaultValues":
   {
     "country":

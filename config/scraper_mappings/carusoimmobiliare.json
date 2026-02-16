@@ -1,6 +1,7 @@
 [
 {
   "name": "carusoimmobiliare",
+  "expectedExtractionRate": 0.30,
   "defaultValues":
   {
     "city": {

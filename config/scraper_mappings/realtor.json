@@ -1,6 +1,7 @@
 [
 {
   "name": "realtor",
+  "expectedExtractionRate": 0.85,
   "defaultValues":
   {
     "country":

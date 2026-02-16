@@ -1,5 +1,6 @@
 [{
   "name": "pisos",
+  "expectedExtractionRate": 0.45,
   "defaultValues": {
     "country": {
       "value": "Spain"

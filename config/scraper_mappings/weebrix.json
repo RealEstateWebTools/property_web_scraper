@@ -1,5 +1,6 @@
 [{
   "name": "pwb",
+  "expectedExtractionRate": 0.85,
   "defaultValues": {
     "country": {
       "value": "Spain"
