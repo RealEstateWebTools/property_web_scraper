@@ -1,26 +1,47 @@
 import type { Listing } from '../models/listing.js';
 
 /**
- * In-memory store for extracted listings, keyed by a generated ID.
- * Used by POST handlers to store results before redirecting to the results page.
+ * KV-backed store for extracted listings, with in-memory fallback.
+ * On Cloudflare Workers, each isolate has its own memory, so the in-memory
+ * Map alone cannot persist data across the POST→redirect→GET flow.
+ * KV provides cross-isolate persistence.
  */
-const store = new Map<string, Listing>();
 
+let kv: any = null;
+const store = new Map<string, Listing>();
 let counter = 0;
+
+/** Call once per request with the RESULTS KV binding from Astro.locals.runtime.env */
+export function initKV(kvNamespace: any): void {
+  kv = kvNamespace ?? null;
+}
 
 export function generateId(): string {
   counter++;
   return `${Date.now().toString(36)}-${counter.toString(36)}`;
 }
 
-export function storeListing(id: string, listing: Listing): void {
+export async function storeListing(id: string, listing: Listing): Promise<void> {
   store.set(id, listing);
+  if (kv) {
+    await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 3600 });
+  }
 }
 
-export function getListing(id: string): Listing | undefined {
-  return store.get(id);
+export async function getListing(id: string): Promise<Listing | undefined> {
+  const cached = store.get(id);
+  if (cached) return cached;
+  if (kv) {
+    const data = await kv.get(`listing:${id}`, 'json') as Listing | null;
+    if (data) {
+      store.set(id, data);
+      return data;
+    }
+  }
+  return undefined;
 }
 
-export function getAllListings(): Array<{ id: string; listing: Listing }> {
+export async function getAllListings(): Promise<Array<{ id: string; listing: Listing }>> {
+  // In-memory listings only; KV list is not practical for browsing
   return Array.from(store.entries()).map(([id, listing]) => ({ id, listing }));
 }

@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getAllListings } from '@lib/services/listing-store.js';
+import { initKV, getAllListings } from '@lib/services/listing-store.js';
 
-const entries = getAllListings().reverse();
+initKV((Astro.locals as any).runtime?.env?.RESULTS);
+
+const entries = (await getAllListings()).reverse();
 ---
 <BaseLayout title="Recent Extractions - Property Web Scraper">
 
