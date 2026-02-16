@@ -5,6 +5,7 @@ import { retrieveTargetText } from './strategies.js';
 import { extractImages } from './image-extractor.js';
 import { extractFeatures } from './feature-extractor.js';
 import { booleanEvaluators } from './field-processors.js';
+import { assessQuality, type QualityGrade, type QualityAssessment } from './quality-scorer.js';
 
 export interface FieldTrace {
   field: string;
@@ -20,6 +21,13 @@ export interface ExtractionDiagnostics {
   totalFields: number;
   populatedFields: number;
   emptyFields: string[];
+  extractableFields: number;
+  populatedExtractableFields: number;
+  extractionRate: number;
+  qualityGrade: QualityGrade;
+  qualityLabel: string;
+  expectedExtractionRate?: number;
+  meetsExpectation: boolean;
 }
 
 export interface ExtractionResult {
@@ -217,15 +225,32 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
     .filter(t => t.rawText === '' || t.value === 0 || t.value === false || t.value === '')
     .map(t => t.field);
 
+  // Quality scoring: exclude defaultValues to measure actual extraction success
+  const extractableTraces = traces.filter(t => t.section !== 'defaultValues');
+  const populatedExtractable = extractableTraces.filter(
+    t => t.rawText !== '' && t.value !== 0 && t.value !== false && t.value !== ''
+  );
+  const extractableFields = extractableTraces.length;
+  const populatedExtractableFields = populatedExtractable.length;
+  const extractionRate = extractableFields > 0 ? populatedExtractableFields / extractableFields : 0;
+  const quality: QualityAssessment = assessQuality(extractionRate, mapping.expectedExtractionRate);
+
   const diagnostics: ExtractionDiagnostics = {
     scraperName: mapping.name,
     fieldTraces: traces,
     totalFields: traces.length,
     populatedFields: traces.length - emptyFields.length,
     emptyFields,
+    extractableFields,
+    populatedExtractableFields,
+    extractionRate,
+    qualityGrade: quality.grade,
+    qualityLabel: quality.label,
+    expectedExtractionRate: mapping.expectedExtractionRate,
+    meetsExpectation: quality.meetsExpectation,
   };
 
-  console.log(`[Extractor] ${mapping.name}: ${diagnostics.populatedFields}/${diagnostics.totalFields} fields populated`);
+  console.log(`[Extractor] ${mapping.name}: Grade ${quality.grade} (${quality.label}) — ${populatedExtractableFields}/${extractableFields} extractable fields (${Math.round(extractionRate * 100)}%)`);
   if (emptyFields.length > 0) {
     console.log(`[Extractor] Empty fields: ${emptyFields.join(', ')}`);
   }

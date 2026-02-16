@@ -1,6 +1,7 @@
 [
 {
   "name": "rightmove_v2",
+  "expectedExtractionRate": 0.85,
   "defaultValues":
   {
     "country":

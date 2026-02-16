@@ -1,5 +1,6 @@
 [{
   "name": "idealista_v2",
+  "expectedExtractionRate": 0.90,
   "defaultValues": {
     "country": { "value": "Spain" },
     "area_unit": { "value": "sqm" },

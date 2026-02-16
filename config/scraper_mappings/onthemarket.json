@@ -1,5 +1,6 @@
 [{
   "name": "onthemarket",
+  "expectedExtractionRate": 0.90,
   "defaultValues": {
     "country": { "value": "UK" },
     "area_unit": { "value": "sqft" },

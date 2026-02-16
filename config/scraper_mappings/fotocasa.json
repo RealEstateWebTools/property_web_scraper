@@ -1,5 +1,6 @@
 [{
   "name": "fotocasa",
+  "expectedExtractionRate": 0.35,
   "defaultValues": {
     "country": {
       "value": "Spain"

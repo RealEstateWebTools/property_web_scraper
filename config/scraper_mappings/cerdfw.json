@@ -1,5 +1,6 @@
 [{
   "name": "cerdfw",
+  "expectedExtractionRate": 0.55,
   "defaultValues": {
     "country":
     {

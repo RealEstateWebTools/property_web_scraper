@@ -1,5 +1,6 @@
 [{
   "name": "uk_jitty",
+  "expectedExtractionRate": 0.85,
   "defaultValues": {
     "country": {
       "value": "UK"

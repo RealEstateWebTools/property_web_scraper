@@ -35,6 +35,7 @@ export interface ScraperMapping {
   images?: FieldMapping[];
   features?: FieldMapping[];
   extraFields?: Record<string, FieldMapping>;
+  expectedExtractionRate?: number;
 }
 
 const mappingCache = new Map<string, ScraperMapping>();

@@ -1,5 +1,6 @@
 [{
   "name": "daft",
+  "expectedExtractionRate": 0.90,
   "defaultValues": {
     "country": { "value": "Ireland" },
     "area_unit": { "value": "sqm" },

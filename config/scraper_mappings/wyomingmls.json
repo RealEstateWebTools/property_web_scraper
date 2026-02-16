@@ -1,6 +1,7 @@
 [
 {
   "name": "wyomingmls",
+  "expectedExtractionRate": 0.95,
   "defaultValues":
   {
     "country":

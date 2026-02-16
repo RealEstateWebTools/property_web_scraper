@@ -9,19 +9,30 @@ const listing = id ? await getListing(id) : undefined;
 const diagnostics = id ? await getDiagnostics(id) : undefined;
 const imageUrls = listing?.image_urls || [];
 
+// Quality grade color mapping: A=green, B=blue, C=amber, F=red
+const gradeColors: Record<string, { bg: string; text: string; icon: string }> = {
+  A: { bg: 'bg-green-100', text: 'text-green-900', icon: 'bi-check-circle-fill' },
+  B: { bg: 'bg-blue-100', text: 'text-blue-900', icon: 'bi-check-circle-fill' },
+  C: { bg: 'bg-amber-100', text: 'text-amber-900', icon: 'bi-exclamation-triangle-fill' },
+  F: { bg: 'bg-red-100', text: 'text-red-900', icon: 'bi-x-circle-fill' },
+};
+
 // Determine if extraction actually found data.
-// When diagnostics exist, trust populatedFields. Otherwise, check the listing
-// for meaningful field values (ignoring model defaults like area_unit='sqmt').
+// When diagnostics exist with quality scoring, use extractable field counts.
+// Otherwise, fall back to checking significant fields on the listing.
 const significantFields = ['reference', 'title', 'price_string', 'price_float',
   'address_string', 'longitude', 'latitude', 'count_bedrooms', 'count_bathrooms'];
 const hasFields = diagnostics
-  ? diagnostics.populatedFields > 0
+  ? diagnostics.populatedExtractableFields > 0
   : listing
     ? significantFields.some((attr) => {
         const val = (listing as any)[attr];
         return val != null && val !== '' && val !== 0 && val !== false;
       })
     : false;
+const grade = diagnostics?.qualityGrade || 'F';
+const colors = gradeColors[grade] || gradeColors.F;
+const ratePercent = diagnostics ? Math.round(diagnostics.extractionRate * 100) : 0;
 
 const attrs = [
   'reference', 'title', 'description', 'price_string', 'price_float',
@@ -49,17 +60,29 @@ const attrs = [
         </div>
       ) : (
         <>
-          {hasFields ? (
+          {diagnostics ? (
+            <div>
+              <div class={`flex items-center gap-3 ${colors.bg} ${colors.text} px-5 py-3 rounded-xl mb-2 font-medium`}>
+                <i class={`bi ${colors.icon} text-xl`}></i>
+                Grade {grade}: {diagnostics.qualityLabel} — {diagnostics.populatedExtractableFields}/{diagnostics.extractableFields} fields ({ratePercent}%)
+              </div>
+              {!diagnostics.meetsExpectation && diagnostics.expectedExtractionRate != null && (
+                <div class="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-lg mb-4 text-sm">
+                  <i class="bi bi-exclamation-triangle"></i>
+                  Below expected rate of {Math.round(diagnostics.expectedExtractionRate * 100)}% for {diagnostics.scraperName}
+                </div>
+              )}
+              {diagnostics.meetsExpectation && <div class="mb-4"></div>}
+            </div>
+          ) : hasFields ? (
             <div class="flex items-center gap-3 bg-green-100 text-green-900 px-5 py-3 rounded-xl mb-6 font-medium">
               <i class="bi bi-check-circle-fill text-xl"></i>
-              {diagnostics
-                ? `Extracted ${diagnostics.populatedFields}/${diagnostics.totalFields} fields using ${diagnostics.scraperName}`
-                : 'Property data extracted successfully'}
+              Property data extracted successfully
             </div>
           ) : (
             <div class="flex items-center gap-3 bg-amber-100 text-amber-900 px-5 py-3 rounded-xl mb-6 font-medium">
               <i class="bi bi-exclamation-triangle-fill text-xl"></i>
-              No fields extracted — the scraper mapping may need updating{diagnostics ? ` (${diagnostics.scraperName})` : ''}
+              No fields extracted — the scraper mapping may need updating
             </div>
           )}
 
@@ -152,7 +175,9 @@ const attrs = [
                   <div class="hidden mt-3" id="diagnostics-panel">
                     <div class="text-xs text-gray-500 mb-2">
                       Scraper: <span class="font-mono font-medium">{diagnostics.scraperName}</span> &middot;
-                      {diagnostics.populatedFields}/{diagnostics.totalFields} fields populated
+                      Grade {diagnostics.qualityGrade} &middot;
+                      {diagnostics.populatedExtractableFields}/{diagnostics.extractableFields} extractable fields ({Math.round(diagnostics.extractionRate * 100)}%)
+                      &middot; {diagnostics.populatedFields}/{diagnostics.totalFields} total populated
                     </div>
 
                     {diagnostics.emptyFields.length > 0 && (

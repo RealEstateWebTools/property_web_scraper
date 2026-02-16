@@ -101,6 +101,65 @@ describe('HtmlExtractor', () => {
       expect(diag.emptyFields.length).toBeGreaterThan(0);
       expect(diag.populatedFields).toBeLessThan(diag.totalFields);
     });
+
+    it('includes quality scoring fields in diagnostics', () => {
+      const html = loadFixture('idealista_2018_01');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        scraperMappingName: 'idealista',
+      });
+
+      const diag = result.diagnostics!;
+      expect(diag.extractableFields).toBeGreaterThan(0);
+      expect(diag.populatedExtractableFields).toBeGreaterThan(0);
+      expect(diag.populatedExtractableFields).toBeLessThanOrEqual(diag.extractableFields);
+      expect(diag.extractionRate).toBeGreaterThan(0);
+      expect(diag.extractionRate).toBeLessThanOrEqual(1);
+      expect(['A', 'B', 'C', 'F']).toContain(diag.qualityGrade);
+      expect(diag.qualityLabel).toBeTruthy();
+      expect(typeof diag.meetsExpectation).toBe('boolean');
+    });
+
+    it('excludes defaultValues from extractable field count', () => {
+      const mapping = findByName('idealista');
+      const result = extractFromHtml({
+        html: '<html><body></body></html>',
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMapping: mapping!,
+      });
+
+      const diag = result.diagnostics!;
+      const defaultTraces = diag.fieldTraces.filter(t => t.section === 'defaultValues');
+      expect(defaultTraces.length).toBeGreaterThan(0);
+      expect(diag.extractableFields).toBe(diag.totalFields - defaultTraces.length);
+    });
+
+    it('assigns grade F for empty HTML with no extractable data', () => {
+      const mapping = findByName('idealista');
+      const result = extractFromHtml({
+        html: '',
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMapping: mapping!,
+      });
+
+      const diag = result.diagnostics!;
+      expect(diag.qualityGrade).toBe('F');
+      expect(diag.populatedExtractableFields).toBe(0);
+      expect(diag.extractionRate).toBe(0);
+    });
+
+    it('passes through expectedExtractionRate from mapping', () => {
+      const mapping = findByName('idealista');
+      const result = extractFromHtml({
+        html: '<html></html>',
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMapping: mapping!,
+      });
+
+      const diag = result.diagnostics!;
+      expect(diag.expectedExtractionRate).toBe(mapping!.expectedExtractionRate);
+    });
   });
 
   describe('idealista extraction from raw HTML', () => {
