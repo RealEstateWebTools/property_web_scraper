@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const reason = Astro.url.searchParams.get('reason') || 'error';
+const url = Astro.url.searchParams.get('url') || '';
+const message = Astro.url.searchParams.get('message') || '';
+
+const isUnsupported = reason === 'unsupported';
+const isMissingUrl = reason === 'missing_url';
+
+const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com'];
+---
+<BaseLayout title="Extraction Error - Property Web Scraper">
+
+<section class="max-w-6xl mx-auto px-4 py-12">
+  <div class="flex justify-center">
+    <div class="w-full max-w-lg">
+      <div class="bg-amber-50 rounded-2xl p-6">
+        <div class="text-3xl text-amber-600 mb-3">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+
+        {isMissingUrl ? (
+          <>
+            <h5 class="font-semibold text-amber-900 mb-2">No URL provided</h5>
+            <p class="text-amber-800 text-sm">Please provide a property URL to extract data from.</p>
+          </>
+        ) : isUnsupported ? (
+          <>
+            <h5 class="font-semibold text-amber-900 mb-2">This website isn't supported yet</h5>
+            <p class="text-amber-800 text-sm">We don't have a scraper mapping configured for that host.</p>
+            {url && <p class="text-amber-700 text-xs mt-1 break-all">URL: {url}</p>}
+            <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+              <i class="bi bi-info-circle text-blue-600 mr-1"></i> <strong>Supported sites:</strong>
+              <div class="mt-2">
+                {supportedSites.map((s) => (
+                  <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">{s}</span>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <h5 class="font-semibold text-amber-900 mb-2">Something went wrong</h5>
+            <p class="text-amber-800 text-sm">{message || 'An unknown error occurred.'}</p>
+            {url && <p class="text-amber-700 text-xs mt-1 break-all">URL: {url}</p>}
+            <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+              <i class="bi bi-lightbulb text-blue-600 mr-1"></i> <strong>Tips:</strong> Make sure the URL is a direct link to a single property page.
+              If the site uses JavaScript rendering, try using
+              <a href="/extract/html" class="text-blue-600 hover:underline">Paste HTML</a> or
+              <a href="/extract/upload" class="text-blue-600 hover:underline">Upload File</a> mode.
+            </div>
+          </>
+        )}
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <a href="/extract/url" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Try Again
+          </a>
+          <a href="/sites" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+            <i class="bi bi-globe"></i> View Supported Sites
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</BaseLayout>

@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { retrieveListing } from '@lib/services/listing-retriever.js';
+import { generateId, storeListing } from '@lib/services/listing-store.js';
+
+const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com'];
+
+if (Astro.request.method === 'POST') {
+  const contentType = Astro.request.headers.get('content-type') || '';
+  let importUrl = '';
+
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await Astro.request.formData();
+    importUrl = (formData.get('import_url') as string || '').trim();
+  } else {
+    const body = await Astro.request.text();
+    const params = new URLSearchParams(body);
+    importUrl = (params.get('import_url') || '').trim();
+  }
+
+  if (!importUrl) {
+    return Astro.redirect('/extract/error?reason=missing_url');
+  }
+
+  const result = await retrieveListing(importUrl);
+
+  if (!result.success || !result.retrievedListing) {
+    const reason = result.errorMessage === 'Unsupported Url' ? 'unsupported' : 'error';
+    return Astro.redirect(`/extract/error?reason=${reason}&url=${encodeURIComponent(importUrl)}&message=${encodeURIComponent(result.errorMessage || 'Unknown error')}`);
+  }
+
+  const id = generateId();
+  storeListing(id, result.retrievedListing);
+  return Astro.redirect(`/extract/results/${id}`);
+}
+---
+<BaseLayout title="Extract by URL - Property Web Scraper">
+
+<section class="max-w-6xl mx-auto px-4 py-12">
+  <div class="flex justify-center">
+    <div class="w-full max-w-2xl">
+
+      <!-- Mode switcher -->
+      <div class="flex gap-1 p-1 bg-gray-100 rounded-lg mb-6">
+        <a href="/extract/url" class="flex-1 text-center py-2 px-3 rounded-md text-sm font-medium no-underline bg-white text-blue-600 shadow-sm">
+          <i class="bi bi-link-45deg"></i> Enter URL
+        </a>
+        <a href="/extract/html" class="flex-1 text-center py-2 px-3 rounded-md text-sm font-medium no-underline text-gray-500 hover:text-gray-700 hover:bg-white/60 transition">
+          <i class="bi bi-code-slash"></i> Paste HTML
+        </a>
+        <a href="/extract/upload" class="flex-1 text-center py-2 px-3 rounded-md text-sm font-medium no-underline text-gray-500 hover:text-gray-700 hover:bg-white/60 transition">
+          <i class="bi bi-file-earmark-arrow-up"></i> Upload File
+        </a>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-lg p-8">
+        <h4 class="mb-2 font-semibold text-lg">Extract from URL</h4>
+        <p class="text-xs text-gray-400 mb-5">
+          We'll fetch the page directly. Works best with static HTML sites.
+        </p>
+
+        <form method="post" action="/extract/url">
+          <div class="mb-4">
+            <label for="import_url" class="block text-sm font-semibold mb-1">Property URL</label>
+            <input type="text" name="import_url" id="import_url"
+                   class="w-full px-4 py-2.5 border-[1.5px] border-gray-300 rounded-lg text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition"
+                   placeholder="https://www.idealista.com/inmueble/12345678/" required />
+          </div>
+
+          <button type="submit"
+                  class="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-lg hover:bg-blue-700 transition active:scale-[0.98]">
+            Fetch &amp; Extract
+          </button>
+        </form>
+
+        <div class="mt-5 pt-4 border-t border-gray-100 text-center">
+          <small class="text-gray-400 block mb-2">Works with these sites and any site with a configured mapping:</small>
+          {supportedSites.map((site) => (
+            <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">{site}</span>
+          ))}
+          <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">+ more</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</BaseLayout>

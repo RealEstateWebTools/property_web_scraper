@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllListings } from '@lib/services/listing-store.js';
+
+const entries = getAllListings().reverse();
+---
+<BaseLayout title="Recent Extractions - Property Web Scraper">
+
+<section class="max-w-6xl mx-auto px-4 py-8">
+  <nav class="flex items-center gap-2 text-sm text-gray-400 mb-5">
+    <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <span>Listings</span>
+  </nav>
+
+  <h2 class="text-2xl font-bold mb-6">Recent Extractions</h2>
+
+  {entries.length === 0 ? (
+    <div class="bg-gray-50 rounded-2xl p-8 text-center">
+      <div class="text-3xl text-gray-300 mb-3"><i class="bi bi-inbox"></i></div>
+      <h5 class="font-semibold text-gray-500 mb-2">No extractions yet</h5>
+      <p class="text-gray-400 text-sm mb-4">Extract a property listing to see it here.</p>
+      <a href="/extract/url" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+        <i class="bi bi-plus-circle"></i> Extract a Listing
+      </a>
+    </div>
+  ) : (
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {entries.map(({ id, listing }) => (
+        <a href={`/listings/${id}`} class="block rounded-xl shadow-md overflow-hidden hover:shadow-lg transition no-underline text-gray-800 bg-white">
+          {listing.image_urls?.length > 0 && listing.image_urls[0] ? (
+            <img src={listing.image_urls[0]} alt="Property" class="w-full h-40 object-cover bg-gray-200" />
+          ) : (
+            <div class="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-300 text-3xl">
+              <i class="bi bi-building"></i>
+            </div>
+          )}
+          <div class="p-4">
+            <h5 class="font-semibold text-sm mb-1 line-clamp-2">{listing.title || 'Untitled Property'}</h5>
+            {listing.price_string && (
+              <span class="inline-flex items-center gap-1 bg-blue-600 text-white font-semibold px-2 py-0.5 rounded-full text-xs mb-2">
+                <i class="bi bi-tag-fill"></i> {listing.price_string}
+              </span>
+            )}
+            {listing.address_string && (
+              <p class="text-gray-400 text-xs mt-1 line-clamp-1"><i class="bi bi-geo-alt mr-1"></i>{listing.address_string}</p>
+            )}
+            <div class="flex gap-3 mt-2 text-xs text-gray-500">
+              {listing.count_bedrooms > 0 && <span><i class="bi bi-door-open text-blue-600"></i> {listing.count_bedrooms} beds</span>}
+              {listing.count_bathrooms > 0 && <span><i class="bi bi-droplet text-blue-600"></i> {listing.count_bathrooms} baths</span>}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  )}
+</section>
+
+</BaseLayout>

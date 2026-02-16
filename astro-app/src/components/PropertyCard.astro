@@ -50,10 +50,10 @@ const attrs = [
     )}
 
     <div class="flex flex-wrap gap-2 mb-3">
-      <a href={`/single_property_view?url=${encodeURIComponent(listing.import_url || '')}`} class="bg-blue-600 text-white text-sm px-3 py-1.5 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+      <a href={`/extract/url`} class="bg-blue-600 text-white text-sm px-3 py-1.5 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
         <i class="bi bi-eye"></i> View Full Details
       </a>
-      <a href={`/retriever/as_json?url=${encodeURIComponent(listing.import_url || '')}`} class="border border-gray-300 text-gray-600 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+      <a href={`/api/v1/listings?url=${encodeURIComponent(listing.import_url || '')}`} class="border border-gray-300 text-gray-600 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
         <i class="bi bi-braces"></i> Get JSON
       </a>
     </div>

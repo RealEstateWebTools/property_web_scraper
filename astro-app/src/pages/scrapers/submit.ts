@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request }) => {
     const formData = await request.formData();
     importUrl = (formData.get('import_url') as string || '').trim();
     const htmlFile = formData.get('html_file');
-    if (htmlFile && htmlFile instanceof File) {
+    if (htmlFile && htmlFile instanceof File && htmlFile.size > 0) {
       html = await htmlFile.text();
     } else {
       const htmlParam = formData.get('html') as string;
@@ -28,7 +28,16 @@ export const POST: APIRoute = async ({ request }) => {
     html = params.get('html') || undefined;
   }
 
+  console.log(`[Submit] URL: "${importUrl}"`);
+  console.log(`[Submit] HTML provided: ${html ? `yes (${html.length} chars)` : 'no'}`);
+
   const result = await retrieveListing(importUrl, html);
+
+  console.log(`[Submit] Result: success=${result.success}, hasListing=${!!result.retrievedListing}, error=${result.errorMessage || '(none)'}`);
+  if (result.success && result.retrievedListing) {
+    const l = result.retrievedListing;
+    console.log(`[Submit] Listing: title="${l.title || ''}", price="${l.price_string || ''}", images=${(l.image_urls || []).length}`);
+  }
 
   if (result.success && result.retrievedListing) {
     const listing = result.retrievedListing;
