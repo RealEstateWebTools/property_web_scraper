@@ -1,5 +1,13 @@
 export type QualityGrade = 'A' | 'B' | 'C' | 'F';
 
+export type FieldImportance = 'critical' | 'important' | 'optional';
+
+export interface FieldResult {
+  field: string;
+  populated: boolean;
+  importance: FieldImportance;
+}
+
 export interface GradeResult {
   grade: QualityGrade;
   label: string;
@@ -9,6 +17,8 @@ export interface QualityAssessment extends GradeResult {
   rate: number;
   expectedRate?: number;
   meetsExpectation: boolean;
+  weightedRate?: number;
+  criticalFieldsMissing?: string[];
 }
 
 const gradeThresholds: { min: number; grade: QualityGrade; label: string }[] = [
@@ -17,6 +27,34 @@ const gradeThresholds: { min: number; grade: QualityGrade; label: string }[] = [
   { min: 0.20, grade: 'C', label: 'Partial' },
   { min: 0, grade: 'F', label: 'Failed' },
 ];
+
+export const FIELD_WEIGHTS: Record<FieldImportance, number> = {
+  critical: 3,
+  important: 2,
+  optional: 1,
+};
+
+export const FIELD_IMPORTANCE: Record<string, FieldImportance> = {
+  title: 'critical',
+  price_string: 'critical',
+  price_float: 'critical',
+  latitude: 'important',
+  longitude: 'important',
+  address_string: 'important',
+  count_bedrooms: 'important',
+  count_bathrooms: 'important',
+  description: 'important',
+  image_urls: 'important',
+  reference: 'important',
+};
+
+export function getFieldImportance(fieldName: string): FieldImportance {
+  return FIELD_IMPORTANCE[fieldName] || 'optional';
+}
+
+export function getFieldWeight(fieldName: string): number {
+  return FIELD_WEIGHTS[getFieldImportance(fieldName)];
+}
 
 export function computeQualityGrade(rate: number): GradeResult {
   for (const t of gradeThresholds) {
@@ -31,4 +69,48 @@ export function assessQuality(rate: number, expectedRate?: number): QualityAsses
   const { grade, label } = computeQualityGrade(rate);
   const meetsExpectation = expectedRate != null ? rate >= expectedRate : true;
   return { grade, label, rate, expectedRate, meetsExpectation };
+}
+
+export function assessQualityWeighted(
+  fieldResults: FieldResult[],
+  expectedRate?: number,
+): QualityAssessment {
+  let totalWeight = 0;
+  let populatedWeight = 0;
+  const criticalFieldsMissing: string[] = [];
+
+  for (const fr of fieldResults) {
+    const weight = FIELD_WEIGHTS[fr.importance];
+    totalWeight += weight;
+    if (fr.populated) {
+      populatedWeight += weight;
+    } else if (fr.importance === 'critical') {
+      criticalFieldsMissing.push(fr.field);
+    }
+  }
+
+  const weightedRate = totalWeight > 0 ? populatedWeight / totalWeight : 0;
+  const flatRate = fieldResults.length > 0
+    ? fieldResults.filter(f => f.populated).length / fieldResults.length
+    : 0;
+
+  let { grade, label } = computeQualityGrade(weightedRate);
+
+  // Cap grade at C if any critical fields are missing
+  if (criticalFieldsMissing.length > 0 && (grade === 'A' || grade === 'B')) {
+    grade = 'C';
+    label = 'Partial';
+  }
+
+  const meetsExpectation = expectedRate != null ? flatRate >= expectedRate : true;
+
+  return {
+    grade,
+    label,
+    rate: flatRate,
+    expectedRate,
+    meetsExpectation,
+    weightedRate,
+    criticalFieldsMissing,
+  };
 }

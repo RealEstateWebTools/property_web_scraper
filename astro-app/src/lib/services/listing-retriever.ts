@@ -5,6 +5,9 @@ import { findByName } from '../extractor/mapping-loader.js';
 import { Listing } from '../models/listing.js';
 import { WhereChain } from '../firestore/base-model.js';
 import { logActivity } from './activity-logger.js';
+import { findPortalByHost } from './portal-registry.js';
+import { normalizePrice } from '../extractor/price-normalizer.js';
+import { findListingByUrl, getListing } from './listing-store.js';
 
 export interface RetrievalResult {
   success: boolean;
@@ -65,21 +68,38 @@ export async function retrieveListing(
   }
 
   try {
+    // Check URL deduplication — reuse existing listing if already extracted
+    const existingId = findListingByUrl(importUrl);
+    let existingListing: Listing | undefined;
+    if (existingId) {
+      existingListing = await getListing(existingId);
+    }
+
     // Find or create listing (Firestore or in-memory fallback)
     let listing: Listing;
-    try {
-      const chain = new WhereChain(Listing as any, { import_url: importUrl });
-      listing = await chain.firstOrCreate();
-    } catch (e: any) {
-      // Firestore unavailable — use in-memory listing
+    if (existingListing) {
+      listing = existingListing;
       logActivity({
-        level: 'warn',
+        level: 'info',
         category: 'extraction',
-        message: `Firestore unavailable (${e.message}), using in-memory listing`,
+        message: `Reusing existing listing (dedup match)`,
         sourceUrl: importUrl,
       });
-      listing = new Listing();
-      listing.assignAttributes({ import_url: importUrl });
+    } else {
+      try {
+        const chain = new WhereChain(Listing as any, { import_url: importUrl });
+        listing = await chain.firstOrCreate();
+      } catch (e: any) {
+        // Firestore unavailable — use in-memory listing
+        logActivity({
+          level: 'warn',
+          category: 'extraction',
+          message: `Firestore unavailable (${e.message}), using in-memory listing`,
+          sourceUrl: importUrl,
+        });
+        listing = new Listing();
+        listing.assignAttributes({ import_url: importUrl });
+      }
     }
 
     // Extract from HTML
@@ -98,6 +118,17 @@ export async function retrieveListing(
         listing.import_host_slug = importHost.slug;
         listing.last_retrieved_at = new Date();
         Listing.updateFromHash(listing, result.properties[0]);
+
+        // Price normalization using portal's default currency
+        const portal = findPortalByHost(validation.uri!.hostname);
+        const fallbackCurrency = portal?.currency;
+        const normalized = normalizePrice(
+          listing.price_string || '',
+          listing.price_float || 0,
+          fallbackCurrency,
+        );
+        listing.price_cents = normalized.priceCents;
+        listing.price_currency = normalized.currency;
 
         const fieldsFound = diagnostics?.populatedFields ?? Object.entries(result.properties[0]).filter(([, v]) => {
           if (v === null || v === undefined || v === '' || v === 0 || v === false) return false;

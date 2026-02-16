@@ -12,9 +12,11 @@ export interface ExtractionSummary {
   qualityGrade: QualityGrade;
   qualityLabel: string;
   extractionRate: number;
+  weightedExtractionRate?: number;
   populatedExtractableFields: number;
   extractableFields: number;
   meetsExpectation: boolean;
+  criticalFieldsMissing?: string[];
   title: string;
   priceString: string;
 }
@@ -66,9 +68,11 @@ export async function getRecentExtractions(limit = 100): Promise<ExtractionSumma
       qualityGrade: diag.qualityGrade,
       qualityLabel: diag.qualityLabel,
       extractionRate: diag.extractionRate,
+      weightedExtractionRate: diag.weightedExtractionRate,
       populatedExtractableFields: diag.populatedExtractableFields,
       extractableFields: diag.extractableFields,
       meetsExpectation: diag.meetsExpectation,
+      criticalFieldsMissing: diag.criticalFieldsMissing,
       title: (listing as any).title || '',
       priceString: (listing as any).price_string || '',
     });

@@ -1,4 +1,5 @@
 import { ImportHost } from '../models/import-host.js';
+import { PORTAL_REGISTRY, findPortalByHost } from './portal-registry.js';
 
 export interface ValidationResult {
   valid: boolean;
@@ -14,43 +15,28 @@ export const UNSUPPORTED = 'unsupported';
 
 /**
  * Local fallback mapping: hostname → scraper name + slug.
- * Used when Firestore is unavailable.
+ * Derived from the portal registry for backward compatibility.
  */
-export const LOCAL_HOST_MAP: Record<string, { scraper_name: string; slug: string }> = {
-  'www.idealista.com': { scraper_name: 'idealista', slug: 'idealista' },
-  'idealista.com': { scraper_name: 'idealista', slug: 'idealista' },
-  'www.rightmove.co.uk': { scraper_name: 'rightmove', slug: 'rightmove' },
-  'rightmove.co.uk': { scraper_name: 'rightmove', slug: 'rightmove' },
-  'www.zoopla.co.uk': { scraper_name: 'zoopla_v2', slug: 'zoopla_v2' },
-  'zoopla.co.uk': { scraper_name: 'zoopla_v2', slug: 'zoopla_v2' },
-  'www.realtor.com': { scraper_name: 'realtor', slug: 'realtor' },
-  'realtor.com': { scraper_name: 'realtor', slug: 'realtor' },
-  'www.fotocasa.es': { scraper_name: 'fotocasa', slug: 'fotocasa' },
-  'fotocasa.es': { scraper_name: 'fotocasa', slug: 'fotocasa' },
-  'www.pisos.com': { scraper_name: 'pisos', slug: 'pisos' },
-  'pisos.com': { scraper_name: 'pisos', slug: 'pisos' },
-  'www.realestateindia.com': { scraper_name: 'realestateindia', slug: 'realestateindia' },
-  'realestateindia.com': { scraper_name: 'realestateindia', slug: 'realestateindia' },
-  'www.forsalebyowner.com': { scraper_name: 'forsalebyowner', slug: 'forsalebyowner' },
-  'forsalebyowner.com': { scraper_name: 'forsalebyowner', slug: 'forsalebyowner' },
-  'jitty.com': { scraper_name: 'uk_jitty', slug: 'uk_jitty' },
-  'www.jitty.com': { scraper_name: 'uk_jitty', slug: 'uk_jitty' },
-  'www.onthemarket.com': { scraper_name: 'onthemarket', slug: 'onthemarket' },
-  'onthemarket.com': { scraper_name: 'onthemarket', slug: 'onthemarket' },
-  'www.daft.ie': { scraper_name: 'daft', slug: 'daft' },
-  'daft.ie': { scraper_name: 'daft', slug: 'daft' },
-};
+export const LOCAL_HOST_MAP: Record<string, { scraper_name: string; slug: string }> = (() => {
+  const map: Record<string, { scraper_name: string; slug: string }> = {};
+  for (const config of Object.values(PORTAL_REGISTRY)) {
+    for (const host of config.hosts) {
+      map[host] = { scraper_name: config.scraperName, slug: config.slug };
+    }
+  }
+  return map;
+})();
 
 /**
  * Build an in-memory ImportHost-like object from the local map.
  */
 function buildLocalImportHost(hostname: string): ImportHost | null {
-  const entry = LOCAL_HOST_MAP[hostname];
-  if (!entry) return null;
+  const portal = findPortalByHost(hostname);
+  if (!portal) return null;
   const host = new ImportHost();
   host.host = hostname;
-  host.scraper_name = entry.scraper_name;
-  host.slug = entry.slug;
+  host.scraper_name = portal.scraperName;
+  host.slug = portal.slug;
   return host;
 }
 

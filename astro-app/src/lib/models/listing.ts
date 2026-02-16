@@ -16,6 +16,8 @@ export class Listing extends BaseModel {
     price_string: { type: 'string' },
     price_float: { type: 'float', default: 0 },
     currency: { type: 'string' },
+    price_cents: { type: 'integer', default: 0 },
+    price_currency: { type: 'string' },
     title: { type: 'string' },
     description: { type: 'string' },
     locale_code: { type: 'string' },
@@ -76,6 +78,8 @@ export class Listing extends BaseModel {
   price_string = '';
   price_float = 0;
   currency = '';
+  price_cents = 0;
+  price_currency = '';
   title = '';
   description = '';
   locale_code = '';
@@ -134,6 +138,7 @@ export class Listing extends BaseModel {
   override asJson(): Record<string, unknown> {
     return super.asJson([
       'import_url', 'reference', 'price_string', 'price_float',
+      'price_cents', 'price_currency',
       'title', 'description', 'area_unit', 'plot_area', 'constructed_area',
       'year_construction', 'count_bedrooms', 'count_bathrooms',
       'count_toilets', 'count_garages', 'currency',
