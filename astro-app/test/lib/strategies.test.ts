@@ -217,5 +217,108 @@ describe('Strategies', () => {
       }, uri);
       expect(text).toBe('105,000');
     });
+
+    it('uses scriptJsonPath with __NEXT_DATA__ script tag', () => {
+      const html = `
+        <html><body>
+          <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"listingDetails":{"price":450000,"bedrooms":3}}}}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        scriptJsonVar: '__NEXT_DATA__',
+        scriptJsonPath: 'props.pageProps.listingDetails.bedrooms',
+      }, uri);
+      expect(text).toBe('3');
+    });
+
+    it('__NEXT_DATA__ works with deeply nested paths', () => {
+      const html = `
+        <html><body>
+          <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"listingDetails":{"location":{"coordinates":{"latitude":51.5,"longitude":-0.1}}}}}}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        scriptJsonVar: '__NEXT_DATA__',
+        scriptJsonPath: 'props.pageProps.listingDetails.location.coordinates.latitude',
+      }, uri);
+      expect(text).toBe('51.5');
+    });
+
+    it('uses jsonLdPath strategy', () => {
+      const html = `
+        <html><body>
+          <script type="application/ld+json">{"@type":"RealEstateListing","name":"Beautiful House","price":"500000"}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, { jsonLdPath: 'name' }, uri);
+      expect(text).toBe('Beautiful House');
+    });
+
+    it('jsonLdPath filters by @type', () => {
+      const html = `
+        <html><body>
+          <script type="application/ld+json">{"@type":"Organization","name":"Acme Corp"}</script>
+          <script type="application/ld+json">{"@type":"RealEstateListing","name":"Nice Flat","price":"300000"}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        jsonLdPath: 'name',
+        jsonLdType: 'RealEstateListing',
+      }, uri);
+      expect(text).toBe('Nice Flat');
+    });
+
+    it('jsonLdPath navigates nested objects', () => {
+      const html = `
+        <html><body>
+          <script type="application/ld+json">{"@type":"RealEstateListing","geo":{"latitude":40.7,"longitude":-74.0}}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        jsonLdPath: 'geo.latitude',
+        jsonLdType: 'RealEstateListing',
+      }, uri);
+      expect(text).toBe('40.7');
+    });
+
+    it('jsonLdPath returns empty string when not found', () => {
+      const html = `
+        <html><body>
+          <script type="application/ld+json">{"@type":"Product","name":"Widget"}</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        jsonLdPath: 'nonexistent',
+        jsonLdType: 'RealEstateListing',
+      }, uri);
+      expect(text).toBe('');
+    });
+
+    it('jsonLdPath handles array of JSON-LD objects', () => {
+      const html = `
+        <html><body>
+          <script type="application/ld+json">[{"@type":"BreadcrumbList","name":"Nav"},{"@type":"Apartment","numberOfRooms":4}]</script>
+        </body></html>
+      `;
+      const $ = cheerio.load(html);
+      const uri = new URL('https://example.com/property/1');
+      const text = retrieveTargetText($, html, {
+        jsonLdPath: 'numberOfRooms',
+        jsonLdType: 'Apartment',
+      }, uri);
+      expect(text).toBe('4');
+    });
   });
 });

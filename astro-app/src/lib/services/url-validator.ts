@@ -35,6 +35,10 @@ export const LOCAL_HOST_MAP: Record<string, { scraper_name: string; slug: string
   'forsalebyowner.com': { scraper_name: 'forsalebyowner', slug: 'forsalebyowner' },
   'jitty.com': { scraper_name: 'uk_jitty', slug: 'uk_jitty' },
   'www.jitty.com': { scraper_name: 'uk_jitty', slug: 'uk_jitty' },
+  'www.onthemarket.com': { scraper_name: 'onthemarket', slug: 'onthemarket' },
+  'onthemarket.com': { scraper_name: 'onthemarket', slug: 'onthemarket' },
+  'www.daft.ie': { scraper_name: 'daft', slug: 'daft' },
+  'daft.ie': { scraper_name: 'daft', slug: 'daft' },
 };
 
 /**

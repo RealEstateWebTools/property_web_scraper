@@ -89,6 +89,11 @@
     {
       "cssLocator": "meta[property='og:image']",
       "cssAttr": "content"
+    },
+    "tenure":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.tenure.tenureType"
     }
   },
   "images": [

@@ -74,6 +74,10 @@ const HOSTNAME_MAP: Record<string, string> = {
   'weebrix.com': 'weebrix',
   'jitty.com': 'uk_jitty',
   'www.jitty.com': 'uk_jitty',
+  'www.onthemarket.com': 'onthemarket',
+  'onthemarket.com': 'onthemarket',
+  'www.daft.ie': 'daft',
+  'daft.ie': 'daft',
 };
 
 const HELP_TEXT = `

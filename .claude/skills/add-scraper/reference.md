@@ -39,8 +39,41 @@ name appears in multiple sections, the last one wins:
 | Property | Type | Description |
 |----------|------|-------------|
 | `cssLocator` | string | CSS selector (Cheerio). Most common strategy. |
+| `scriptJsonVar` + `scriptJsonPath` | string | Extract from a named JSON variable in a script tag. See below. |
+| `flightDataPath` | string | Dot-path into parsed Next.js RSC flight data (`self.__next_f.push`). See below. |
+| `jsonLdPath` | string | Dot-path into JSON-LD `<script type="application/ld+json">` data. See below. |
 | `scriptRegEx` | string | Regex pattern run against concatenated `<script>` tag text |
 | `urlPathPart` | string | Extract URL path segment by index (1-based). `"3"` extracts 3rd segment. |
+
+### Script JSON extraction (`scriptJsonVar` + `scriptJsonPath`)
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `scriptJsonVar` | string | Variable name to find in script tags. Supports `window.VAR = {...}` and `<script id="VAR">` patterns. |
+| `scriptJsonPath` | string | Dot-notation path into the parsed JSON object (e.g. `"propertyData.bedrooms"`). |
+
+Handles two patterns automatically:
+- **Named variable assignment**: `window.PAGE_MODEL = {...}` — finds `window.VAR =` or `var VAR =` and extracts the JSON by counting braces
+- **Script tag by ID**: `<script id="__NEXT_DATA__" type="application/json">{...}</script>` — finds `<script id="VAR">` and parses innerHTML
+
+Results are cached per Cheerio instance so parsing only happens once even if 20+ fields use the same variable.
+
+### Flight data path (`flightDataPath`)
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `flightDataPath` | string | Dot-notation path to search for in parsed flight data (e.g. `"coordinates.latitude"`). |
+
+For Next.js sites using React Server Components (RSC) that stream data via `self.__next_f.push([1, "..."])` script tags. The parser extracts all chunks, unescapes them, parses JSON values, resolves `$N` back-references, then searches all parsed objects for the requested path.
+
+### JSON-LD path (`jsonLdPath`)
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `jsonLdPath` | string | Dot-notation path into a JSON-LD object (e.g. `"offers.price"`). |
+| `jsonLdType` | string | Optional `@type` filter (e.g. `"RealEstateListing"`, `"Apartment"`). Only search objects with this type. |
+
+Extracts data from `<script type="application/ld+json">` tags containing Schema.org structured data. Handles both single objects and arrays.
 
 ### CSS selector modifiers
 
@@ -187,7 +220,82 @@ Available evaluators: `include?`, `start_with?`, `end_with?`, `present?`, `to_i_
 }]
 ```
 
-## Example: extracting from script tags
+## Choosing the right strategy
+
+| Site pattern | Strategy | Example sites |
+|---|---|---|
+| Classic server-rendered HTML | `cssLocator` | Older Rightmove, Realtor.com, Pisos.com |
+| `window.VAR = {...}` in script | `scriptJsonVar` + `scriptJsonPath` | Rightmove (`PAGE_MODEL`), Idealista (`__INITIAL_STATE__`) |
+| Next.js with `<script id="__NEXT_DATA__">` | `scriptJsonVar: "__NEXT_DATA__"` + `scriptJsonPath` | OnTheMarket, Daft.ie |
+| Next.js RSC with `self.__next_f.push` | `flightDataPath` | Zoopla (coordinates) |
+| Schema.org `<script type="application/ld+json">` | `jsonLdPath` + `jsonLdType` | Zoopla (description), many sites |
+| Inline JS variables | `scriptRegEx` | Legacy scrapers |
+| Data in URL path | `urlPathPart` | Reference from URL slug |
+
+Multiple strategies can be used in the same mapping for different fields.
+
+## Example: extracting from `window.VAR = {...}`
+
+For sites like Rightmove that embed data in `window.PAGE_MODEL`:
+
+```json5
+{
+  "count_bedrooms": {
+    "scriptJsonVar": "PAGE_MODEL",
+    "scriptJsonPath": "propertyData.bedrooms"
+  },
+  "latitude": {
+    "scriptJsonVar": "PAGE_MODEL",
+    "scriptJsonPath": "propertyData.location.latitude"
+  }
+}
+```
+
+## Example: extracting from `__NEXT_DATA__`
+
+For Next.js sites like OnTheMarket:
+
+```json5
+{
+  "count_bedrooms": {
+    "scriptJsonVar": "__NEXT_DATA__",
+    "scriptJsonPath": "props.pageProps.property.bedrooms"
+  }
+}
+```
+
+## Example: extracting from flight data
+
+For Next.js RSC sites like Zoopla:
+
+```json5
+{
+  "latitude": {
+    "flightDataPath": "coordinates.latitude"
+  }
+}
+```
+
+The parser searches all parsed flight data objects for the first match.
+
+## Example: extracting from JSON-LD
+
+For sites with Schema.org structured data:
+
+```json5
+{
+  "description": {
+    "jsonLdPath": "description",
+    "jsonLdType": "RealEstateListing"
+  },
+  "price_float": {
+    "jsonLdPath": "offers.price",
+    "jsonLdType": "RealEstateListing"
+  }
+}
+```
+
+## Example: extracting from script tags (regex)
 
 When property data is embedded in JavaScript:
 
@@ -210,7 +318,8 @@ Use `scriptRegEx`:
 ```
 
 Note: the regex runs against ALL `<script>` tags concatenated together. The first
-capture group match is returned.
+capture group match is returned. Prefer `scriptJsonVar` + `scriptJsonPath` when
+the data is a proper JSON object.
 
 ## Example: extracting from URL
 

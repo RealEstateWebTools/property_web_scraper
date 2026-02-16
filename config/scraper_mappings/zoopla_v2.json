@@ -1,0 +1,88 @@
+[{
+  "name": "zoopla_v2",
+  "defaultValues": {
+    "country": { "value": "UK" },
+    "area_unit": { "value": "sqft" },
+    "currency": { "value": "GBP" },
+    "for_rent_short_term": { "value": "false" },
+    "locale_code": { "value": "en" }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "scriptJsonVar": "__ZAD_TARGETING__",
+      "scriptJsonPath": "num_beds"
+    },
+    "count_bathrooms": {
+      "scriptJsonVar": "__ZAD_TARGETING__",
+      "scriptJsonPath": "num_baths"
+    }
+  },
+  "floatFields": {
+    "price_float": {
+      "scriptJsonVar": "__ZAD_TARGETING__",
+      "scriptJsonPath": "price_actual"
+    },
+    "latitude": {
+      "flightDataPath": "coordinates.latitude"
+    },
+    "longitude": {
+      "flightDataPath": "coordinates.longitude"
+    }
+  },
+  "textFields": {
+    "reference": {
+      "scriptJsonVar": "__ZAD_TARGETING__",
+      "scriptJsonPath": "listing_id"
+    },
+    "title": {
+      "cssLocator": "title"
+    },
+    "description": {
+      "jsonLdPath": "description",
+      "jsonLdType": "RealEstateListing"
+    },
+    "price_string": {
+      "jsonLdPath": "name",
+      "jsonLdType": "RealEstateListing"
+    },
+    "postal_code": {
+      "flightDataPath": "postcode"
+    },
+    "address_string": {
+      "scriptJsonVar": "__ZAD_TARGETING__",
+      "scriptJsonPath": "display_address"
+    },
+    "property_type": {
+      "scriptJsonVar": "__ZAD_TARGETING__",
+      "scriptJsonPath": "property_type"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+  "images": [{
+    "cssLocator": "meta[property='og:image']",
+    "cssAttr": "content"
+  }],
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar": "__ZAD_TARGETING__",
+      "scriptJsonPath": "listing_status",
+      "evaluator": "include?",
+      "evaluatorParam": "for_sale"
+    },
+    "for_rent": {
+      "scriptJsonVar": "__ZAD_TARGETING__",
+      "scriptJsonPath": "listing_status",
+      "evaluator": "include?",
+      "evaluatorParam": "to_rent"
+    },
+    "for_rent_long_term": {
+      "scriptJsonVar": "__ZAD_TARGETING__",
+      "scriptJsonPath": "listing_status",
+      "evaluator": "include?",
+      "evaluatorParam": "to_rent"
+    }
+  }
+}]

@@ -1,0 +1,89 @@
+[{
+  "name": "daft",
+  "defaultValues": {
+    "country": { "value": "Ireland" },
+    "area_unit": { "value": "sqm" },
+    "currency": { "value": "EUR" },
+    "for_rent_short_term": { "value": "false" },
+    "locale_code": { "value": "en" }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.numBedrooms"
+    },
+    "count_bathrooms": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.numBathrooms"
+    },
+    "constructed_area": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.floorArea.value"
+    }
+  },
+  "floatFields": {
+    "price_float": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.numericPrice"
+    },
+    "latitude": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.point.coordinates.1"
+    },
+    "longitude": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.point.coordinates.0"
+    }
+  },
+  "textFields": {
+    "reference": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.id"
+    },
+    "title": {
+      "cssLocator": "title"
+    },
+    "description": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.description"
+    },
+    "price_string": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.price"
+    },
+    "postal_code": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.eircode"
+    },
+    "address_string": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.address"
+    },
+    "property_type": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.propertyType"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+  "images": [{
+    "cssLocator": "meta[property='og:image']",
+    "cssAttr": "content"
+  }],
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.category",
+      "evaluator": "include?",
+      "evaluatorParam": "Buy"
+    },
+    "for_rent": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.category",
+      "evaluator": "include?",
+      "evaluatorParam": "Rent"
+    }
+  }
+}]
