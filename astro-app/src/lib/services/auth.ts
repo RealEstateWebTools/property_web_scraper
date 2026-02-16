@@ -1,3 +1,5 @@
+import { errorResponse, ApiErrorCode } from './api-response.js';
+
 /**
  * API key authentication.
  * Port of Ruby ApplicationController#authenticate_api_key!
@@ -17,10 +19,7 @@ export function authenticateApiKey(request: Request): { authorized: boolean; err
   if (!providedKey || providedKey !== expectedKey) {
     return {
       authorized: false,
-      errorResponse: new Response(
-        JSON.stringify({ success: false, error_message: 'Unauthorized' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      ),
+      errorResponse: errorResponse(ApiErrorCode.UNAUTHORIZED, 'Unauthorized'),
     };
   }
 

@@ -5,13 +5,7 @@ import { extractFromHtml } from '@lib/extractor/html-extractor.js';
 import { findByName } from '@lib/extractor/mapping-loader.js';
 import { Listing } from '@lib/models/listing.js';
 import { WhereChain } from '@lib/firestore/base-model.js';
-
-function jsonResponse(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
-}
+import { errorResponse, successResponse, ApiErrorCode, mapValidatorError } from '@lib/services/api-response.js';
 
 /**
  * GET /public_api/v1/listings?url=...
@@ -26,13 +20,13 @@ export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url).searchParams.get('url');
   const validation = await validateUrl(url);
   if (!validation.valid) {
-    return jsonResponse({ success: false, error_message: validation.errorMessage });
+    return errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!);
   }
 
   const importHost = validation.importHost!;
   const scraperMapping = findByName(importHost.scraper_name);
   if (!scraperMapping) {
-    return jsonResponse({ success: false, error_message: 'No scraper mapping found' });
+    return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found');
   }
 
   // For GET, we don't have HTML, just return metadata
@@ -45,8 +39,7 @@ export const GET: APIRoute = async ({ request }) => {
     listing.assignAttributes({ import_url: url! });
   }
 
-  return jsonResponse({
-    success: true,
+  return successResponse({
     retry_duration: 0,
     urls_remaining: 0,
     listings: [listing.asJson()],
@@ -78,18 +71,18 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   if (!url) {
-    return jsonResponse({ success: false, error_message: 'Please provide a url' });
+    return errorResponse(ApiErrorCode.MISSING_URL, 'Please provide a url');
   }
 
   const validation = await validateUrl(url);
   if (!validation.valid) {
-    return jsonResponse({ success: false, error_message: validation.errorMessage });
+    return errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!);
   }
 
   const importHost = validation.importHost!;
   const scraperMapping = findByName(importHost.scraper_name);
   if (!scraperMapping) {
-    return jsonResponse({ success: false, error_message: 'No scraper mapping found' });
+    return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found');
   }
 
   let listing: Listing;
@@ -116,8 +109,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
   }
 
-  return jsonResponse({
-    success: true,
+  return successResponse({
     retry_duration: 0,
     urls_remaining: 0,
     listings: [listing.asJson()],
