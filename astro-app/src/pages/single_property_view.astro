@@ -1,0 +1,259 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { validateUrl } from '@lib/services/url-validator.js';
+import { extractFromHtml } from '@lib/extractor/html-extractor.js';
+import { findByName } from '@lib/extractor/mapping-loader.js';
+import { Listing } from '@lib/models/listing.js';
+import { WhereChain } from '@lib/firestore/base-model.js';
+
+const url = Astro.url.searchParams.get('url') || '';
+let listing: any = {};
+let errorMessage = '';
+let success = false;
+let markers: Array<{title: string; position: {lat: number; lng: number}}> = [];
+let mainImageUrl = 'https://placehold.co/500x250?text=No+Image';
+
+if (url) {
+  const validation = await validateUrl(url);
+  if (!validation.valid) {
+    errorMessage = validation.errorMessage || 'Invalid URL';
+  } else {
+    const importHost = validation.importHost!;
+    const scraperMapping = findByName(importHost.scraper_name);
+    if (scraperMapping) {
+      try {
+        const chain = new WhereChain(Listing as any, { import_url: url });
+        listing = await chain.firstOrCreate();
+
+        // Check for HTML in query params (for POST-redirect pattern)
+        const html = Astro.url.searchParams.get('html');
+        if (html) {
+          const result = extractFromHtml({ html, sourceUrl: url, scraperMapping });
+          if (result.success && result.properties.length > 0) {
+            listing.import_host_slug = importHost.slug;
+            listing.last_retrieved_at = new Date();
+            Listing.updateFromHash(listing, result.properties[0]);
+            await listing.save();
+          }
+        }
+
+        success = true;
+
+        if (listing.latitude && listing.longitude) {
+          markers.push({
+            title: listing.title || '',
+            position: { lat: listing.latitude, lng: listing.longitude },
+          });
+        }
+
+        if (listing.image_urls?.length > 0) {
+          mainImageUrl = listing.image_urls[0];
+        }
+      } catch (err: unknown) {
+        errorMessage = err instanceof Error ? err.message : String(err);
+      }
+    } else {
+      errorMessage = 'No scraper mapping found';
+    }
+  }
+} else {
+  errorMessage = 'Please provide a url';
+}
+
+const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || '';
+
+// Build details for property info list
+const details: [string, any][] = [];
+if (listing.reference) details.push(['Reference', listing.reference]);
+if (listing.price_string) details.push(['Price', listing.price_string]);
+if (listing.count_bedrooms > 0) details.push(['Bedrooms', listing.count_bedrooms]);
+if (listing.count_bathrooms > 0) details.push(['Bathrooms', listing.count_bathrooms]);
+if (listing.constructed_area > 0) details.push(['Area', `${listing.constructed_area} ${listing.area_unit || ''}`]);
+if (listing.address_string) details.push(['Address', listing.address_string]);
+---
+<BaseLayout title={success ? (listing.title || 'Property Details') : 'Error'}>
+
+{errorMessage ? (
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="pws-error-card text-center">
+          <div class="pws-error-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h5>Could not load property</h5>
+          <p>{errorMessage}</p>
+          <div class="pws-error-hint">
+            <i class="bi bi-arrow-left"></i>
+            <a href="/">Go back and try again</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+) : (
+  <div class="container pws-property-page">
+    <!-- Breadcrumb -->
+    <nav class="pws-breadcrumb">
+      <a href="/"><i class="bi bi-house me-1"></i>Home</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>Property Details</span>
+    </nav>
+
+    <div class="row">
+      <!-- Left column: images + description -->
+      <div class="col-lg-8">
+        {listing.image_urls?.length > 1 ? (
+          <div class="pws-gallery-card">
+            <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-indicators">
+                {listing.image_urls.map((_: string, i: number) => (
+                  <button type="button" data-bs-target="#propertyCarousel" data-bs-slide-to={i}
+                    class={i === 0 ? 'active' : ''} aria-label={`Slide ${i + 1}`}></button>
+                ))}
+              </div>
+              <div class="carousel-inner">
+                {listing.image_urls.map((imageUrl: string, i: number) => (
+                  <div class={`carousel-item${i === 0 ? ' active' : ''}`}>
+                    <img src={imageUrl} class="d-block w-100 pws-gallery-img" alt={`Property image ${i + 1}`} />
+                  </div>
+                ))}
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+            <div class="pws-gallery-count">
+              <i class="bi bi-images"></i> {listing.image_urls.length} photos
+            </div>
+          </div>
+        ) : (
+          <div class="pws-gallery-card">
+            <img src={mainImageUrl} class="w-100 pws-gallery-img" alt="Property image" />
+          </div>
+        )}
+
+        {listing.description && (
+          <div class="pws-section-card">
+            <h5><i class="bi bi-text-paragraph me-2"></i>Description</h5>
+            <div class="pws-description-text" set:html={listing.description}></div>
+          </div>
+        )}
+
+        {markers.length > 0 && googleMapsApiKey && (
+          <div class="pws-section-card">
+            <h5><i class="bi bi-geo-alt me-2"></i>Location</h5>
+            <div id="map" class="pws-map" data-markers={JSON.stringify(markers)} data-zoom="15" data-api-key={googleMapsApiKey}></div>
+          </div>
+        )}
+      </div>
+
+      <!-- Right column: key info sidebar -->
+      <div class="col-lg-4">
+        <div class="pws-info-sidebar">
+          <div class="pws-property-badges mb-3">
+            {listing.for_sale && <span class="badge bg-success"><i class="bi bi-house-door me-1"></i>For Sale</span>}
+            {listing.for_rent && <span class="badge bg-info text-dark"><i class="bi bi-key me-1"></i>For Rent</span>}
+          </div>
+
+          {listing.title && <h4 class="pws-property-title">{listing.title}</h4>}
+
+          {listing.address_string && (
+            <p class="text-muted mb-3">
+              <i class="bi bi-geo-alt me-1"></i>{listing.address_string}
+            </p>
+          )}
+
+          {listing.price_string && (
+            <div class="pws-price-block">
+              <span class="pws-price">{listing.price_string}</span>
+              {listing.currency && <span class="pws-currency">{listing.currency}</span>}
+            </div>
+          )}
+
+          <div class="pws-key-stats">
+            {listing.count_bedrooms > 0 && (
+              <div class="pws-key-stat">
+                <i class="bi bi-door-open"></i>
+                <span class="pws-key-stat-value">{listing.count_bedrooms}</span>
+                <span class="pws-key-stat-label">Bedrooms</span>
+              </div>
+            )}
+            {listing.count_bathrooms > 0 && (
+              <div class="pws-key-stat">
+                <i class="bi bi-droplet"></i>
+                <span class="pws-key-stat-value">{listing.count_bathrooms}</span>
+                <span class="pws-key-stat-label">Bathrooms</span>
+              </div>
+            )}
+            {listing.constructed_area > 0 && (
+              <div class="pws-key-stat">
+                <i class="bi bi-arrows-angle-expand"></i>
+                <span class="pws-key-stat-value">{listing.constructed_area}</span>
+                <span class="pws-key-stat-label">{listing.area_unit || 'm\u00B2'}</span>
+              </div>
+            )}
+          </div>
+
+          {details.length > 0 && (
+            <div class="pws-detail-list">
+              {details.map(([label, value]) => (
+                <div class="pws-detail-row">
+                  <span class="pws-detail-label">{label}</span>
+                  <span class="pws-detail-value">{value}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div class="pws-property-actions">
+            {listing.import_url && (
+              <a href={listing.import_url} target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                <i class="bi bi-box-arrow-up-right me-1"></i> View Original Listing
+              </a>
+            )}
+            {listing.import_url && (
+              <a href={`/retriever/as_json?url=${encodeURIComponent(listing.import_url)}`} class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                <i class="bi bi-braces me-1"></i> Get JSON
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', () => {
+  const mapEl = document.getElementById('map');
+  if (!mapEl) return;
+  const apiKey = mapEl.dataset.apiKey;
+  if (!apiKey) return;
+
+  const markers = JSON.parse(mapEl.dataset.markers || '[]');
+  const zoom = parseInt(mapEl.dataset.zoom || '15', 10);
+
+  const script = document.createElement('script');
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
+  script.async = true;
+  window.initMap = function() {
+    if (markers.length === 0) return;
+    const map = new google.maps.Map(mapEl, {
+      center: markers[0].position,
+      zoom: zoom,
+    });
+    markers.forEach(m => {
+      new google.maps.Marker({ position: m.position, map: map, title: m.title });
+    });
+  };
+  document.head.appendChild(script);
+});
+</script>
+
+</BaseLayout>

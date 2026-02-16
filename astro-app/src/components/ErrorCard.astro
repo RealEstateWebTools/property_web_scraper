@@ -1,0 +1,40 @@
+---
+interface Props {
+  errorMessage: string;
+}
+const { errorMessage } = Astro.props;
+const isUnsupported = errorMessage === 'Unsupported Url';
+const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com'];
+---
+<div class="pws-error-card">
+  <div class="pws-error-icon">
+    <i class="bi bi-exclamation-triangle"></i>
+  </div>
+
+  {isUnsupported ? (
+    <>
+      <h5>This website isn't supported yet</h5>
+      <p>We don't have a scraper mapping configured for that host.</p>
+      <div class="pws-error-hint">
+        <i class="bi bi-info-circle"></i>
+        <strong>Supported sites:</strong>
+        <div class="mt-2">
+          {supportedSites.map((site) => (
+            <span class="pws-site-badge">{site}</span>
+          ))}
+        </div>
+      </div>
+    </>
+  ) : (
+    <>
+      <h5>Something went wrong</h5>
+      <p>{errorMessage}</p>
+      <div class="pws-error-hint">
+        <i class="bi bi-lightbulb"></i>
+        <strong>Tips:</strong> Make sure the URL is a direct link to a single property page.
+        If the site uses JavaScript rendering, try switching to
+        <strong>Paste HTML</strong> or <strong>Upload File</strong> mode above.
+      </div>
+    </>
+  )}
+</div>
