@@ -28,11 +28,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     </ul>
   </div>
 
-  <!-- GET /api/v1/listings -->
+  <!-- GET /public_api/v1/listings -->
   <div class="bg-white rounded-xl shadow-md p-6 mb-5">
     <div class="flex items-center gap-2 mb-3">
       <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
-      <code class="text-sm font-semibold">/api/v1/listings?url=...</code>
+      <code class="text-sm font-semibold">/public_api/v1/listings?url=...</code>
     </div>
     <p class="text-sm text-gray-600 mb-3">
       Look up a property by URL. Returns existing data if previously extracted.
@@ -45,14 +45,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       </tbody>
     </table>
     <h5 class="text-sm font-semibold mb-2">Example</h5>
-    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl "http://localhost:4321/api/v1/listings?url=https://www.idealista.com/inmueble/12345678/"</code></pre>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl "http://localhost:4321/public_api/v1/listings?url=https://www.idealista.com/inmueble/12345678/"</code></pre>
   </div>
 
-  <!-- POST /api/v1/listings -->
+  <!-- POST /public_api/v1/listings -->
   <div class="bg-white rounded-xl shadow-md p-6 mb-5">
     <div class="flex items-center gap-2 mb-3">
       <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded">POST</span>
-      <code class="text-sm font-semibold">/api/v1/listings</code>
+      <code class="text-sm font-semibold">/public_api/v1/listings</code>
     </div>
     <p class="text-sm text-gray-600 mb-3">
       Extract property data from a URL with optional HTML body. Use this when the site requires JavaScript rendering.
@@ -66,22 +66,22 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       </tbody>
     </table>
     <h5 class="text-sm font-semibold mb-2">Example</h5>
-    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl -X POST http://localhost:4321/api/v1/listings \
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl -X POST http://localhost:4321/public_api/v1/listings \
   -H "Content-Type: application/json" \
   -d '&#123;"url": "https://www.idealista.com/inmueble/12345678/", "html": "&lt;html&gt;...&lt;/html&gt;"&#125;'</code></pre>
   </div>
 
-  <!-- GET /api/v1/listings/:id -->
+  <!-- GET /public_api/v1/listings/:id -->
   <div class="bg-white rounded-xl shadow-md p-6 mb-5">
     <div class="flex items-center gap-2 mb-3">
       <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
-      <code class="text-sm font-semibold">/api/v1/listings/:id</code>
+      <code class="text-sm font-semibold">/public_api/v1/listings/:id</code>
     </div>
     <p class="text-sm text-gray-600 mb-3">
       Retrieve a single listing by its ID.
     </p>
     <h5 class="text-sm font-semibold mb-2">Example</h5>
-    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl "http://localhost:4321/api/v1/listings/abc123"</code></pre>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl "http://localhost:4321/public_api/v1/listings/abc123"</code></pre>
   </div>
 
   <!-- Response format -->
