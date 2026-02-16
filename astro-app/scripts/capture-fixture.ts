@@ -72,6 +72,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'cerdfw.com': 'cerdfw',
   'www.weebrix.com': 'weebrix',
   'weebrix.com': 'weebrix',
+  'jitty.com': 'uk_jitty',
+  'www.jitty.com': 'uk_jitty',
 };
 
 const HELP_TEXT = `

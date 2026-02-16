@@ -1,0 +1,113 @@
+[{
+  "name": "uk_jitty",
+  "defaultValues": {
+    "country": {
+      "value": "UK"
+    },
+    "area_unit": {
+      "value": "sqft"
+    },
+    "currency": {
+      "value": "GBP"
+    },
+    "for_rent_short_term": {
+      "value": "false"
+    },
+    "locale_code": {
+      "value": "en"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      // Stats grid: label "Bedrooms" followed by value div; pick 1st stat value (index 0)
+      "cssLocator": ".grid.grid-cols-1.gap-2 .flex.items-center.gap-2 div:last-child",
+      "cssCountId": "0"
+    },
+    "count_bathrooms": {
+      "cssLocator": ".grid.grid-cols-1.gap-2 .flex.items-center.gap-2 div:last-child",
+      "cssCountId": "1"
+    }
+  },
+  "floatFields": {
+    "price_float": {
+      // Price is "£895,000" in div.flex.flex-row.gap-2.-mt-2.text-lg.font-medium > div:first-child
+      "cssLocator": "div.-mt-2.text-lg.font-medium > div:first-child",
+      "cssCountId": "0",
+      "stripFirstChar": "true",
+      "stripPunct": "true"
+    },
+    "latitude": {
+      "cssLocator": "[data-controller='map']",
+      "cssAttr": "data-map-lat-value"
+    },
+    "longitude": {
+      "cssLocator": "[data-controller='map']",
+      "cssAttr": "data-map-lon-value"
+    },
+    "constructed_area": {
+      // Area is "3,031 sqft" inside the click-switch-component target "a"
+      "cssLocator": "[data-click-switch-component-target='a'] > div",
+      "cssCountId": "0",
+      "splitTextCharacter": " ",
+      "splitTextArrayId": "0",
+      "stripPunct": "true"
+    }
+  },
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content"
+    },
+    "description": {
+      "cssLocator": "meta[name='description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": "div.-mt-2.text-lg.font-medium > div:first-child",
+      "cssCountId": "0"
+    },
+    "address_string": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content"
+    },
+    "reference": {
+      "urlPathPart": "2"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      // Type stat field (4th stat label group, index 3)
+      "cssLocator": ".grid.grid-cols-1.gap-2 .flex.items-center.gap-2 div:last-child",
+      "cssCountId": "3"
+    }
+  },
+  "booleanFields": {
+    "for_sale": {
+      "cssLocator": "meta[name='description']",
+      "cssAttr": "content",
+      "evaluator": "include?",
+      "evaluatorParam": "For Sale",
+      "caseInsensitive": true
+    },
+    "for_rent": {
+      "cssLocator": "meta[name='description']",
+      "cssAttr": "content",
+      "evaluator": "include?",
+      "evaluatorParam": "To Rent",
+      "caseInsensitive": true
+    },
+    "for_rent_long_term": {
+      "cssLocator": "meta[name='description']",
+      "cssAttr": "content",
+      "evaluator": "include?",
+      "evaluatorParam": "To Rent",
+      "caseInsensitive": true
+    }
+  },
+  "images": [{
+    "cssLocator": "img.object-cover.cursor-pointer",
+    "cssAttr": "src"
+  }]
+}]
