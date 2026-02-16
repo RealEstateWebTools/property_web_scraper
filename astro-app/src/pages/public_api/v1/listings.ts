@@ -14,8 +14,8 @@ function jsonResponse(data: unknown, status = 200): Response {
 }
 
 /**
- * GET /api/v1/listings?url=...
- * POST /api/v1/listings (with url + html body or html_file upload)
+ * GET /public_api/v1/listings?url=...
+ * POST /public_api/v1/listings (with url + html body or html_file upload)
  *
  * Port of Ruby Api::V1::ListingsController#retrieve.
  */
