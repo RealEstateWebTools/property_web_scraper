@@ -6,151 +6,156 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
 <BaseLayout title="Property Web Scraper">
 
 <!-- Hero -->
-<section class="pws-landing-hero">
-  <div class="container">
-    <div class="pws-hero-badge">
+<section class="bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] text-white py-16 text-center">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="inline-block bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
       <i class="bi bi-building"></i> Open-source property data extraction
     </div>
-    <h1>Extract Property Data from<br>Any Real Estate Website</h1>
-    <p class="lead">
+    <h1 class="text-4xl font-bold tracking-tight mb-3">Extract Property Data from<br>Any Real Estate Website</h1>
+    <p class="text-lg opacity-85 max-w-xl mx-auto mb-6">
       Provide a URL or pre-rendered HTML and get structured property data
       instantly &mdash; title, price, images, location, and more.
     </p>
-    <a href="#try-it" class="btn btn-outline-light btn-lg">
+    <a href="#try-it" class="inline-block border border-white/60 text-white rounded-lg px-6 py-3 hover:bg-white/10 transition no-underline">
       Try It Now <i class="bi bi-arrow-down-short"></i>
     </a>
   </div>
 </section>
 
 <!-- Try it section -->
-<section id="try-it" class="container">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="card pws-tryit-card">
-        <div class="card-body">
+<section id="try-it" class="max-w-6xl mx-auto px-4">
+  <div class="flex justify-center">
+    <div class="w-full max-w-2xl">
+      <div class="bg-white rounded-2xl shadow-lg -mt-10 relative z-10 p-8">
 
-          <h4 class="mb-3">Try it out</h4>
+        <h4 class="mb-3 font-semibold text-lg">Try it out</h4>
 
-          <!-- Mode tabs -->
-          <div class="pws-mode-tabs">
-            <button type="button" class="pws-mode-tab active" data-mode="url">
-              <i class="bi bi-link-45deg"></i> Enter URL
-            </button>
-            <button type="button" class="pws-mode-tab" data-mode="html">
-              <i class="bi bi-code-slash"></i> Paste HTML
-            </button>
-            <button type="button" class="pws-mode-tab" data-mode="file">
-              <i class="bi bi-file-earmark-arrow-up"></i> Upload File
-            </button>
-          </div>
-
-          <p class="pws-mode-hint" id="modeHint">
-            We'll fetch the page directly. Works best with static HTML sites.
-          </p>
-
-          <form id="scraperForm" method="post" action="/scrapers/submit" enctype="multipart/form-data">
-
-            <!-- URL (always visible) -->
-            <div class="mb-3">
-              <label for="import_url" class="form-label fw-semibold">Property URL</label>
-              <input type="text" name="import_url" id="import_url" class="form-control pws-url-input"
-                     placeholder="https://www.idealista.com/inmueble/12345678/" required />
-            </div>
-
-            <!-- HTML textarea (hidden by default) -->
-            <div class="mb-3 d-none" id="htmlGroup">
-              <label for="html_input" class="form-label fw-semibold">Page HTML</label>
-              <textarea name="html" id="html_input" class="form-control pws-html-textarea" rows="5"
-                        placeholder="Paste the full page source here..."></textarea>
-            </div>
-
-            <!-- File upload (hidden by default) -->
-            <div class="mb-3 d-none" id="fileGroup">
-              <label for="html_file_input" class="form-label fw-semibold">HTML File</label>
-              <input type="file" name="html_file" id="html_file_input" class="form-control pws-file-input" accept=".html,.htm" />
-            </div>
-
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary pws-submit-btn" id="submitBtn">Fetch &amp; Extract</button>
-            </div>
-
-          </form>
-
-          <!-- Supported sites -->
-          <div class="pws-supported-sites text-center">
-            <small class="text-muted d-block mb-2">Works with these sites and any site with a configured mapping:</small>
-            {supportedSites.map((site) => (
-              <span class="pws-site-badge">{site}</span>
-            ))}
-            <span class="pws-site-badge">+ more</span>
-          </div>
-
+        <!-- Mode tabs -->
+        <div class="flex gap-1 p-1 bg-gray-100 rounded-lg mb-5">
+          <button type="button" class="pws-mode-tab flex-1 text-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer transition bg-white text-blue-600 shadow-sm" data-mode="url">
+            <i class="bi bi-link-45deg"></i> Enter URL
+          </button>
+          <button type="button" class="pws-mode-tab flex-1 text-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer transition text-gray-500 hover:text-gray-700 hover:bg-white/60" data-mode="html">
+            <i class="bi bi-code-slash"></i> Paste HTML
+          </button>
+          <button type="button" class="pws-mode-tab flex-1 text-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer transition text-gray-500 hover:text-gray-700 hover:bg-white/60" data-mode="file">
+            <i class="bi bi-file-earmark-arrow-up"></i> Upload File
+          </button>
         </div>
+
+        <p class="text-xs text-gray-400 mb-4 min-h-[1.2em]" id="modeHint">
+          We'll fetch the page directly. Works best with static HTML sites.
+        </p>
+
+        <form id="scraperForm" method="post" action="/scrapers/submit" enctype="multipart/form-data">
+
+          <!-- URL (always visible) -->
+          <div class="mb-3">
+            <label for="import_url" class="block text-sm font-semibold mb-1">Property URL</label>
+            <input type="text" name="import_url" id="import_url"
+                   class="w-full px-4 py-2.5 border-[1.5px] border-gray-300 rounded-lg text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition"
+                   placeholder="https://www.idealista.com/inmueble/12345678/" required />
+          </div>
+
+          <!-- HTML textarea (hidden by default) -->
+          <div class="mb-3 hidden" id="htmlGroup">
+            <label for="html_input" class="block text-sm font-semibold mb-1">Page HTML</label>
+            <textarea name="html" id="html_input"
+                      class="w-full px-4 py-2.5 border-[1.5px] border-gray-300 rounded-lg text-sm font-mono min-h-[120px] resize-y focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition"
+                      rows="5" placeholder="Paste the full page source here..."></textarea>
+          </div>
+
+          <!-- File upload (hidden by default) -->
+          <div class="mb-3 hidden" id="fileGroup">
+            <label for="html_file_input" class="block text-sm font-semibold mb-1">HTML File</label>
+            <input type="file" name="html_file" id="html_file_input"
+                   class="w-full px-4 py-2.5 border-[1.5px] border-gray-300 rounded-lg text-sm file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100"
+                   accept=".html,.htm" />
+          </div>
+
+          <div>
+            <button type="submit" id="submitBtn"
+                    class="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-lg hover:bg-blue-700 transition active:scale-[0.98]">
+              Fetch &amp; Extract
+            </button>
+          </div>
+
+        </form>
+
+        <!-- Supported sites -->
+        <div class="mt-5 pt-4 border-t border-gray-100 text-center">
+          <small class="text-gray-400 block mb-2">Works with these sites and any site with a configured mapping:</small>
+          {supportedSites.map((site) => (
+            <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">{site}</span>
+          ))}
+          <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">+ more</span>
+        </div>
+
       </div>
     </div>
   </div>
 </section>
 
 <!-- Results appear here -->
-<section class="container mt-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
+<section class="max-w-6xl mx-auto px-4 mt-4">
+  <div class="flex justify-center">
+    <div class="w-full max-w-2xl">
       <div id="retrieve-results"></div>
     </div>
   </div>
 </section>
 
 <!-- How it works -->
-<section class="pws-how-it-works">
-  <div class="container">
-    <h3 class="text-center mb-4">How It Works</h3>
-    <div class="row align-items-start justify-content-center">
-      <div class="col-md-3">
-        <div class="pws-step-card">
-          <div class="pws-step-number">1</div>
-          <div class="pws-step-icon"><i class="bi bi-globe"></i></div>
-          <h5>Provide a Source</h5>
-          <p>Enter a property URL, paste rendered HTML, or upload a saved page.</p>
+<section class="py-12">
+  <div class="max-w-6xl mx-auto px-4">
+    <h3 class="text-center text-xl font-semibold mb-8">How It Works</h3>
+    <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr] gap-4 items-start max-w-4xl mx-auto">
+      <div class="text-center p-6">
+        <div class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold leading-6 text-center mx-auto mb-2">1</div>
+        <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 inline-flex items-center justify-center text-2xl mb-4">
+          <i class="bi bi-globe"></i>
         </div>
+        <h5 class="text-base font-semibold mb-2">Provide a Source</h5>
+        <p class="text-sm text-gray-500 m-0">Enter a property URL, paste rendered HTML, or upload a saved page.</p>
       </div>
-      <div class="col-md-1 d-none d-md-block">
-        <div class="pws-step-connector"><i class="bi bi-chevron-right"></i></div>
+      <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl pt-4">
+        <i class="bi bi-chevron-right"></i>
       </div>
-      <div class="col-md-3">
-        <div class="pws-step-card">
-          <div class="pws-step-number">2</div>
-          <div class="pws-step-icon"><i class="bi bi-cpu"></i></div>
-          <h5>We Extract Data</h5>
-          <p>Configurable mappings parse titles, prices, images, coordinates, and more.</p>
+      <div class="text-center p-6">
+        <div class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold leading-6 text-center mx-auto mb-2">2</div>
+        <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 inline-flex items-center justify-center text-2xl mb-4">
+          <i class="bi bi-cpu"></i>
         </div>
+        <h5 class="text-base font-semibold mb-2">We Extract Data</h5>
+        <p class="text-sm text-gray-500 m-0">Configurable mappings parse titles, prices, images, coordinates, and more.</p>
       </div>
-      <div class="col-md-1 d-none d-md-block">
-        <div class="pws-step-connector"><i class="bi bi-chevron-right"></i></div>
+      <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl pt-4">
+        <i class="bi bi-chevron-right"></i>
       </div>
-      <div class="col-md-3">
-        <div class="pws-step-card">
-          <div class="pws-step-number">3</div>
-          <div class="pws-step-icon"><i class="bi bi-braces"></i></div>
-          <h5>Use the Results</h5>
-          <p>Get structured JSON, view a rich property page, or integrate via API.</p>
+      <div class="text-center p-6">
+        <div class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold leading-6 text-center mx-auto mb-2">3</div>
+        <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 inline-flex items-center justify-center text-2xl mb-4">
+          <i class="bi bi-braces"></i>
         </div>
+        <h5 class="text-base font-semibold mb-2">Use the Results</h5>
+        <p class="text-sm text-gray-500 m-0">Get structured JSON, view a rich property page, or integrate via API.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Why pre-rendered HTML? -->
-<section class="container mb-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="pws-callout">
-        <div class="row align-items-center">
-          <div class="col-md-1 text-center d-none d-md-block">
-            <i class="bi bi-lightbulb" style="font-size: 2rem; color: #0d6efd;"></i>
+<section class="max-w-6xl mx-auto px-4 mb-12">
+  <div class="flex justify-center">
+    <div class="w-full max-w-2xl">
+      <div class="bg-gradient-to-br from-gray-50 to-gray-200 rounded-2xl p-8 my-8">
+        <div class="flex items-start gap-4">
+          <div class="hidden md:block text-3xl text-blue-600 shrink-0">
+            <i class="bi bi-lightbulb"></i>
           </div>
-          <div class="col-md-11">
-            <h4>Why "Paste HTML" or "Upload File"?</h4>
-            <p>
+          <div>
+            <h4 class="font-semibold text-lg mb-3">Why "Paste HTML" or "Upload File"?</h4>
+            <p class="text-sm text-gray-600 m-0">
               Modern real estate sites render content with JavaScript. A simple URL fetch
               only sees the empty shell. By pasting the fully-rendered page source from your
               browser (right-click &rarr; View Page Source, or save the page as HTML),
@@ -181,12 +186,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
+      tabs.forEach(t => {
+        t.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+        t.classList.add('text-gray-500');
+      });
+      tab.classList.remove('text-gray-500');
+      tab.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
       const mode = tab.dataset.mode;
       hint.textContent = hints[mode] || '';
-      htmlGroup.classList.toggle('d-none', mode !== 'html');
-      fileGroup.classList.toggle('d-none', mode !== 'file');
+      htmlGroup.classList.toggle('hidden', mode !== 'html');
+      fileGroup.classList.toggle('hidden', mode !== 'file');
     });
   });
 
@@ -203,8 +212,22 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const html = await response.text();
       resultsDiv.innerHTML = html;
+
+      // Wire up collapse toggle in injected HTML
+      const toggle = resultsDiv.querySelector('.pws-details-toggle');
+      const target = resultsDiv.querySelector('#all-fields');
+      if (toggle && target) {
+        toggle.addEventListener('click', () => {
+          target.classList.toggle('hidden');
+          const icon = toggle.querySelector('i');
+          if (icon) {
+            icon.classList.toggle('bi-chevron-down');
+            icon.classList.toggle('bi-chevron-up');
+          }
+        });
+      }
     } catch (err) {
-      resultsDiv.innerHTML = '<div class="pws-error-card"><div class="pws-error-icon"><i class="bi bi-exclamation-triangle"></i></div><h5>Network Error</h5><p>Could not connect to the server.</p></div>';
+      resultsDiv.innerHTML = '<div class="bg-amber-50 rounded-2xl p-6 text-center"><div class="text-3xl text-amber-600 mb-3"><i class="bi bi-exclamation-triangle"></i></div><h5 class="font-semibold text-amber-900">Network Error</h5><p class="text-amber-800 text-sm">Could not connect to the server.</p></div>';
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Fetch & Extract';

@@ -21,13 +21,15 @@ export abstract class BaseModel {
     return this._persisted;
   }
 
-  static collectionRef() {
+  static async collectionRef() {
     const prefix = getCollectionPrefix();
-    return getClient().collection(`${prefix}${this._collectionName}`);
+    const db = await getClient();
+    return db.collection(`${prefix}${this._collectionName}`);
   }
 
   static async find<T extends BaseModel>(this: ModelConstructor<T>, id: string): Promise<T> {
-    const doc = await this.collectionRef().doc(id).get();
+    const col = await this.collectionRef();
+    const doc = await col.doc(id).get();
     if (!doc.exists) throw new Error(`Document not found: ${id}`);
     return this.buildFromSnapshot(doc);
   }
@@ -36,7 +38,7 @@ export abstract class BaseModel {
     this: ModelConstructor<T>,
     conditions: Record<string, unknown>
   ): Promise<T | null> {
-    let query: FirebaseFirestore.Query = this.collectionRef();
+    let query: FirebaseFirestore.Query = await this.collectionRef();
     for (const [field, value] of Object.entries(conditions)) {
       query = query.where(field, '==', value);
     }
@@ -94,16 +96,17 @@ export abstract class BaseModel {
   async save(): Promise<this> {
     const ctor = this.constructor as typeof BaseModel;
     const data = this.firestoreAttributes();
+    const col = await ctor.collectionRef();
 
     if (this._persisted) {
-      await ctor.collectionRef().doc(this.id).set(data);
+      await col.doc(this.id).set(data);
     } else {
       if (ctor._documentIdField) {
         const docId = String((this as Record<string, unknown>)[ctor._documentIdField]);
         this.id = docId;
-        await ctor.collectionRef().doc(docId).set(data);
+        await col.doc(docId).set(data);
       } else {
-        const docRef = ctor.collectionRef().doc();
+        const docRef = col.doc();
         this.id = docRef.id;
         await docRef.set(data);
       }
@@ -115,7 +118,8 @@ export abstract class BaseModel {
   async destroy(): Promise<void> {
     if (!this._persisted) return;
     const ctor = this.constructor as typeof BaseModel;
-    await ctor.collectionRef().doc(this.id).delete();
+    const col = await ctor.collectionRef();
+    await col.doc(this.id).delete();
     this._persisted = false;
   }
 
@@ -166,7 +170,7 @@ type ModelConstructor<T extends BaseModel> = {
   _collectionName: string;
   _documentIdField: string | null;
   _attributeDefinitions: Record<string, AttributeDefinition>;
-  collectionRef(): FirebaseFirestore.CollectionReference;
+  collectionRef(): Promise<FirebaseFirestore.CollectionReference>;
   buildFromSnapshot(doc: FirebaseFirestore.DocumentSnapshot): T;
 };
 
@@ -181,7 +185,7 @@ export class WhereChain<T extends BaseModel> {
   ) {}
 
   async first(): Promise<T | null> {
-    let query: FirebaseFirestore.Query = this.klass.collectionRef();
+    let query: FirebaseFirestore.Query = await this.klass.collectionRef();
     for (const [field, value] of Object.entries(this.conditions)) {
       query = query.where(field, '==', value);
     }
@@ -200,7 +204,7 @@ export class WhereChain<T extends BaseModel> {
   }
 
   async get(): Promise<T[]> {
-    let query: FirebaseFirestore.Query = this.klass.collectionRef();
+    let query: FirebaseFirestore.Query = await this.klass.collectionRef();
     for (const [field, value] of Object.entries(this.conditions)) {
       query = query.where(field, '==', value);
     }

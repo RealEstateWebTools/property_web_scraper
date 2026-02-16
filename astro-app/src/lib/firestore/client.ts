@@ -1,14 +1,13 @@
-import { Firestore } from '@google-cloud/firestore';
-
-let client: Firestore | null = null;
+let client: any = null;
+let firestoreModule: any = null;
 
 /**
- * Singleton Firestore client.
+ * Singleton Firestore client (lazy-loaded).
  * Port of Ruby FirestoreClient module.
  */
-export function getClient(): Firestore {
+export async function getClient() {
   if (client) return client;
-  client = buildClient();
+  client = await buildClient();
   return client;
 }
 
@@ -20,10 +19,14 @@ export function resetClient(): void {
  * Allow injecting a mock/in-memory client for tests.
  */
 export function setClient(c: unknown): void {
-  client = c as Firestore;
+  client = c;
 }
 
-function buildClient(): Firestore {
+async function buildClient() {
+  if (!firestoreModule) {
+    firestoreModule = await import('@google-cloud/firestore');
+  }
+  const { Firestore } = firestoreModule;
   const projectId = process.env.FIRESTORE_PROJECT_ID || 'property-web-scraper-dev';
 
   if (process.env.FIRESTORE_EMULATOR_HOST) {

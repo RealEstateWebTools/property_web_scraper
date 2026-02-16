@@ -74,152 +74,146 @@ if (listing.address_string) details.push(['Address', listing.address_string]);
 <BaseLayout title={success ? (listing.title || 'Property Details') : 'Error'}>
 
 {errorMessage ? (
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-6">
-        <div class="pws-error-card text-center">
-          <div class="pws-error-icon">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <div class="flex justify-center">
+      <div class="w-full max-w-lg">
+        <div class="bg-amber-50 rounded-2xl p-6 text-center">
+          <div class="text-3xl text-amber-600 mb-3">
             <i class="bi bi-exclamation-triangle"></i>
           </div>
-          <h5>Could not load property</h5>
-          <p>{errorMessage}</p>
-          <div class="pws-error-hint">
-            <i class="bi bi-arrow-left"></i>
-            <a href="/">Go back and try again</a>
+          <h5 class="font-semibold text-amber-900 mb-2">Could not load property</h5>
+          <p class="text-amber-800 text-sm">{errorMessage}</p>
+          <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+            <i class="bi bi-arrow-left mr-1"></i>
+            <a href="/" class="text-blue-600 hover:underline">Go back and try again</a>
           </div>
         </div>
       </div>
     </div>
   </div>
 ) : (
-  <div class="container pws-property-page">
+  <div class="max-w-6xl mx-auto px-4 pt-4 pb-12">
     <!-- Breadcrumb -->
-    <nav class="pws-breadcrumb">
-      <a href="/"><i class="bi bi-house me-1"></i>Home</a>
-      <i class="bi bi-chevron-right"></i>
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-5">
+      <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
+      <i class="bi bi-chevron-right text-[0.65rem]"></i>
       <span>Property Details</span>
     </nav>
 
-    <div class="row">
+    <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
       <!-- Left column: images + description -->
-      <div class="col-lg-8">
+      <div>
         {listing.image_urls?.length > 1 ? (
-          <div class="pws-gallery-card">
-            <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
-              <div class="carousel-indicators">
-                {listing.image_urls.map((_: string, i: number) => (
-                  <button type="button" data-bs-target="#propertyCarousel" data-bs-slide-to={i}
-                    class={i === 0 ? 'active' : ''} aria-label={`Slide ${i + 1}`}></button>
-                ))}
+          <div class="rounded-xl overflow-hidden relative mb-5 shadow-md">
+            <div id="propertyCarousel" class="relative">
+              <div class="overflow-hidden">
+                <div id="carouselTrack" class="flex transition-transform duration-300 ease-in-out">
+                  {listing.image_urls.map((imageUrl: string, i: number) => (
+                    <div class="w-full flex-shrink-0">
+                      <img src={imageUrl} class="block w-full max-h-[450px] object-cover" alt={`Property image ${i + 1}`} />
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div class="carousel-inner">
-                {listing.image_urls.map((imageUrl: string, i: number) => (
-                  <div class={`carousel-item${i === 0 ? ' active' : ''}`}>
-                    <img src={imageUrl} class="d-block w-100 pws-gallery-img" alt={`Property image ${i + 1}`} />
-                  </div>
-                ))}
-              </div>
-              <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
+              <button id="carouselPrev" type="button" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition">
+                <i class="bi bi-chevron-left"></i>
               </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
+              <button id="carouselNext" type="button" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition">
+                <i class="bi bi-chevron-right"></i>
               </button>
             </div>
-            <div class="pws-gallery-count">
+            <div class="absolute bottom-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
               <i class="bi bi-images"></i> {listing.image_urls.length} photos
             </div>
           </div>
         ) : (
-          <div class="pws-gallery-card">
-            <img src={mainImageUrl} class="w-100 pws-gallery-img" alt="Property image" />
+          <div class="rounded-xl overflow-hidden relative mb-5 shadow-md">
+            <img src={mainImageUrl} class="w-full max-h-[450px] object-cover" alt="Property image" />
           </div>
         )}
 
         {listing.description && (
-          <div class="pws-section-card">
-            <h5><i class="bi bi-text-paragraph me-2"></i>Description</h5>
-            <div class="pws-description-text" set:html={listing.description}></div>
+          <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+            <h5 class="font-semibold text-base text-gray-800 mb-4"><i class="bi bi-text-paragraph mr-2"></i>Description</h5>
+            <div class="text-sm leading-relaxed text-gray-600" set:html={listing.description}></div>
           </div>
         )}
 
         {markers.length > 0 && googleMapsApiKey && (
-          <div class="pws-section-card">
-            <h5><i class="bi bi-geo-alt me-2"></i>Location</h5>
-            <div id="map" class="pws-map" data-markers={JSON.stringify(markers)} data-zoom="15" data-api-key={googleMapsApiKey}></div>
+          <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+            <h5 class="font-semibold text-base text-gray-800 mb-4"><i class="bi bi-geo-alt mr-2"></i>Location</h5>
+            <div id="map" class="min-h-[300px] w-full rounded-lg" data-markers={JSON.stringify(markers)} data-zoom="15" data-api-key={googleMapsApiKey}></div>
           </div>
         )}
       </div>
 
       <!-- Right column: key info sidebar -->
-      <div class="col-lg-4">
-        <div class="pws-info-sidebar">
-          <div class="pws-property-badges mb-3">
-            {listing.for_sale && <span class="badge bg-success"><i class="bi bi-house-door me-1"></i>For Sale</span>}
-            {listing.for_rent && <span class="badge bg-info text-dark"><i class="bi bi-key me-1"></i>For Rent</span>}
+      <div>
+        <div class="bg-white rounded-xl shadow-md p-6 sticky top-4">
+          <div class="flex flex-wrap gap-2 mb-3">
+            {listing.for_sale && <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full"><i class="bi bi-house-door mr-1"></i>For Sale</span>}
+            {listing.for_rent && <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full"><i class="bi bi-key mr-1"></i>For Rent</span>}
           </div>
 
-          {listing.title && <h4 class="pws-property-title">{listing.title}</h4>}
+          {listing.title && <h4 class="font-bold text-lg text-gray-900 mb-2 leading-snug">{listing.title}</h4>}
 
           {listing.address_string && (
-            <p class="text-muted mb-3">
-              <i class="bi bi-geo-alt me-1"></i>{listing.address_string}
+            <p class="text-gray-500 text-sm mb-3">
+              <i class="bi bi-geo-alt mr-1"></i>{listing.address_string}
             </p>
           )}
 
           {listing.price_string && (
-            <div class="pws-price-block">
-              <span class="pws-price">{listing.price_string}</span>
-              {listing.currency && <span class="pws-currency">{listing.currency}</span>}
+            <div class="bg-blue-50 rounded-lg px-4 py-3.5 mb-4">
+              <span class="text-2xl font-bold text-blue-600">{listing.price_string}</span>
+              {listing.currency && <span class="text-sm text-gray-500 ml-1.5">{listing.currency}</span>}
             </div>
           )}
 
-          <div class="pws-key-stats">
+          <div class="grid grid-cols-[repeat(auto-fit,minmax(90px,1fr))] gap-3 mb-4">
             {listing.count_bedrooms > 0 && (
-              <div class="pws-key-stat">
-                <i class="bi bi-door-open"></i>
-                <span class="pws-key-stat-value">{listing.count_bedrooms}</span>
-                <span class="pws-key-stat-label">Bedrooms</span>
+              <div class="text-center py-3 px-2 bg-gray-50 rounded-lg">
+                <i class="bi bi-door-open block text-xl text-blue-600 mb-1"></i>
+                <span class="block text-lg font-bold text-gray-900">{listing.count_bedrooms}</span>
+                <span class="block text-[0.7rem] text-gray-400 uppercase tracking-wide">Bedrooms</span>
               </div>
             )}
             {listing.count_bathrooms > 0 && (
-              <div class="pws-key-stat">
-                <i class="bi bi-droplet"></i>
-                <span class="pws-key-stat-value">{listing.count_bathrooms}</span>
-                <span class="pws-key-stat-label">Bathrooms</span>
+              <div class="text-center py-3 px-2 bg-gray-50 rounded-lg">
+                <i class="bi bi-droplet block text-xl text-blue-600 mb-1"></i>
+                <span class="block text-lg font-bold text-gray-900">{listing.count_bathrooms}</span>
+                <span class="block text-[0.7rem] text-gray-400 uppercase tracking-wide">Bathrooms</span>
               </div>
             )}
             {listing.constructed_area > 0 && (
-              <div class="pws-key-stat">
-                <i class="bi bi-arrows-angle-expand"></i>
-                <span class="pws-key-stat-value">{listing.constructed_area}</span>
-                <span class="pws-key-stat-label">{listing.area_unit || 'm\u00B2'}</span>
+              <div class="text-center py-3 px-2 bg-gray-50 rounded-lg">
+                <i class="bi bi-arrows-angle-expand block text-xl text-blue-600 mb-1"></i>
+                <span class="block text-lg font-bold text-gray-900">{listing.constructed_area}</span>
+                <span class="block text-[0.7rem] text-gray-400 uppercase tracking-wide">{listing.area_unit || 'm\u00B2'}</span>
               </div>
             )}
           </div>
 
           {details.length > 0 && (
-            <div class="pws-detail-list">
+            <div class="mb-4 border-t border-gray-200">
               {details.map(([label, value]) => (
-                <div class="pws-detail-row">
-                  <span class="pws-detail-label">{label}</span>
-                  <span class="pws-detail-value">{value}</span>
+                <div class="flex justify-between py-2 border-b border-gray-100 text-sm">
+                  <span class="text-gray-400 font-medium">{label}</span>
+                  <span class="text-gray-800 font-semibold text-right">{value}</span>
                 </div>
               ))}
             </div>
           )}
 
-          <div class="pws-property-actions">
+          <div class="mb-4">
             {listing.import_url && (
-              <a href={listing.import_url} target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2">
-                <i class="bi bi-box-arrow-up-right me-1"></i> View Original Listing
+              <a href={listing.import_url} target="_blank" class="block w-full text-center border border-blue-600 text-blue-600 rounded-lg py-2 text-sm hover:bg-blue-50 transition no-underline mb-2">
+                <i class="bi bi-box-arrow-up-right mr-1"></i> View Original Listing
               </a>
             )}
             {listing.import_url && (
-              <a href={`/retriever/as_json?url=${encodeURIComponent(listing.import_url)}`} class="btn btn-outline-secondary btn-sm w-100 mb-2">
-                <i class="bi bi-braces me-1"></i> Get JSON
+              <a href={`/retriever/as_json?url=${encodeURIComponent(listing.import_url)}`} class="block w-full text-center border border-gray-300 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50 transition no-underline mb-2">
+                <i class="bi bi-braces mr-1"></i> Get JSON
               </a>
             )}
           </div>
@@ -231,6 +225,32 @@ if (listing.address_string) details.push(['Address', listing.address_string]);
 
 <script is:inline>
 document.addEventListener('DOMContentLoaded', () => {
+  // Carousel
+  const track = document.getElementById('carouselTrack');
+  const prevBtn = document.getElementById('carouselPrev');
+  const nextBtn = document.getElementById('carouselNext');
+  if (track && prevBtn && nextBtn) {
+    const slides = track.children;
+    let current = 0;
+    const total = slides.length;
+
+    function goTo(i) {
+      current = ((i % total) + total) % total;
+      track.style.transform = `translateX(-${current * 100}%)`;
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+
+    // Auto-play
+    let timer = setInterval(() => goTo(current + 1), 5000);
+    track.parentElement.addEventListener('mouseenter', () => clearInterval(timer));
+    track.parentElement.addEventListener('mouseleave', () => {
+      timer = setInterval(() => goTo(current + 1), 5000);
+    });
+  }
+
+  // Map
   const mapEl = document.getElementById('map');
   if (!mapEl) return;
   const apiKey = mapEl.dataset.apiKey;

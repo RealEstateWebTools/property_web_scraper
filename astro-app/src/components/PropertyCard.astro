@@ -11,68 +11,68 @@ const attrs = [
   'count_bedrooms', 'count_bathrooms',
 ];
 ---
-<div class="pws-success-banner">
-  <i class="bi bi-check-circle-fill"></i>
+<div class="flex items-center gap-3 bg-green-100 text-green-900 px-5 py-3 rounded-xl mb-6 font-medium">
+  <i class="bi bi-check-circle-fill text-xl"></i>
   Property data extracted successfully
 </div>
 
-<div class="card pws-result-card">
+<div class="rounded-2xl shadow-md overflow-hidden mb-4">
   {imageUrls.length > 0 && imageUrls[0] && (
-    <img src={imageUrls[0]} alt="Property image" class="pws-result-image" />
+    <img src={imageUrls[0]} alt="Property image" class="w-full h-[200px] object-cover bg-gray-200" />
   )}
 
-  <div class="card-body">
-    {listing.title && <h5 class="pws-result-title">{listing.title}</h5>}
+  <div class="p-6">
+    {listing.title && <h5 class="text-lg font-semibold text-gray-900 mb-3">{listing.title}</h5>}
 
-    <div class="pws-stat-row">
+    <div class="flex flex-wrap gap-2 mb-4">
       {listing.price_string && (
-        <span class="pws-stat pws-stat-price">
+        <span class="inline-flex items-center gap-1.5 bg-blue-600 text-white font-semibold px-3 py-1.5 rounded-full text-sm">
           <i class="bi bi-tag-fill"></i> {listing.price_string} {listing.currency || ''}
         </span>
       )}
       {listing.count_bedrooms > 0 && (
-        <span class="pws-stat"><i class="bi bi-door-open"></i> {listing.count_bedrooms} beds</span>
+        <span class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full text-sm text-gray-700"><i class="bi bi-door-open text-blue-600"></i> {listing.count_bedrooms} beds</span>
       )}
       {listing.count_bathrooms > 0 && (
-        <span class="pws-stat"><i class="bi bi-droplet"></i> {listing.count_bathrooms} baths</span>
+        <span class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full text-sm text-gray-700"><i class="bi bi-droplet text-blue-600"></i> {listing.count_bathrooms} baths</span>
       )}
       {listing.constructed_area > 0 && (
-        <span class="pws-stat"><i class="bi bi-arrows-angle-expand"></i> {listing.constructed_area} {listing.area_unit}</span>
+        <span class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full text-sm text-gray-700"><i class="bi bi-arrows-angle-expand text-blue-600"></i> {listing.constructed_area} {listing.area_unit}</span>
       )}
-      {listing.for_sale && <span class="pws-stat"><i class="bi bi-house"></i> For Sale</span>}
-      {listing.for_rent && <span class="pws-stat"><i class="bi bi-key"></i> For Rent</span>}
+      {listing.for_sale && <span class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full text-sm text-gray-700"><i class="bi bi-house text-blue-600"></i> For Sale</span>}
+      {listing.for_rent && <span class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full text-sm text-gray-700"><i class="bi bi-key text-blue-600"></i> For Rent</span>}
     </div>
 
     {listing.address_string && (
-      <p class="text-muted mb-3">
-        <i class="bi bi-geo-alt me-1"></i> {listing.address_string}
+      <p class="text-gray-500 mb-3 text-sm">
+        <i class="bi bi-geo-alt mr-1"></i> {listing.address_string}
       </p>
     )}
 
-    <div class="d-flex flex-wrap gap-2 mb-3">
-      <a href={`/single_property_view?url=${encodeURIComponent(listing.import_url || '')}`} class="btn btn-primary btn-sm">
-        <i class="bi bi-eye me-1"></i> View Full Details
+    <div class="flex flex-wrap gap-2 mb-3">
+      <a href={`/single_property_view?url=${encodeURIComponent(listing.import_url || '')}`} class="bg-blue-600 text-white text-sm px-3 py-1.5 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+        <i class="bi bi-eye"></i> View Full Details
       </a>
-      <a href={`/retriever/as_json?url=${encodeURIComponent(listing.import_url || '')}`} class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-braces me-1"></i> Get JSON
+      <a href={`/retriever/as_json?url=${encodeURIComponent(listing.import_url || '')}`} class="border border-gray-300 text-gray-600 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+        <i class="bi bi-braces"></i> Get JSON
       </a>
     </div>
 
-    <button class="pws-details-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#all-fields" aria-expanded="false">
+    <button class="pws-details-toggle text-sm text-blue-600 cursor-pointer inline-flex items-center gap-1.5 border-0 bg-transparent p-0 mt-2 hover:underline" type="button">
       <i class="bi bi-chevron-down"></i> Show all extracted fields
     </button>
 
-    <div class="collapse mt-3" id="all-fields">
-      <table class="table table-sm table-striped mb-3">
+    <div class="hidden mt-3" id="all-fields">
+      <table class="w-full text-sm mb-3">
         <tbody>
           {attrs.map((attr) => {
             const val = listing[attr];
             if (val == null || val === '' || val === 0 || val === false) return null;
             const label = attr.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
             return (
-              <tr>
-                <td class="fw-semibold" style="width: 35%;">{label}</td>
-                <td>{String(val)}</td>
+              <tr class="even:bg-gray-50">
+                <td class="font-semibold py-1.5 px-2" style="width: 35%;">{label}</td>
+                <td class="py-1.5 px-2">{String(val)}</td>
               </tr>
             );
           })}
@@ -81,15 +81,15 @@ const attrs = [
 
       {imageUrls.length > 0 && (
         <>
-          <p class="fw-semibold mb-2">{imageUrls.length} image{imageUrls.length === 1 ? '' : 's'} found</p>
-          <div class="d-flex flex-wrap gap-2 mb-2">
+          <p class="font-semibold mb-2 text-sm">{imageUrls.length} image{imageUrls.length === 1 ? '' : 's'} found</p>
+          <div class="flex flex-wrap gap-2 mb-2">
             {imageUrls.slice(0, 6).map((imgUrl) => (
               <a href={imgUrl} target="_blank">
-                <img src={imgUrl} alt="Property" style="width: 80px; height: 60px; object-fit: cover; border-radius: 0.35rem; border: 1px solid #ddd;" />
+                <img src={imgUrl} alt="Property" class="w-20 h-15 object-cover rounded-md border border-gray-200" />
               </a>
             ))}
             {imageUrls.length > 6 && (
-              <span class="pws-site-badge align-self-center">+ {imageUrls.length - 6} more</span>
+              <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs self-center">+ {imageUrls.length - 6} more</span>
             )}
           </div>
         </>
