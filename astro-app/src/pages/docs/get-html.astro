@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const browsers = [
+  { name: 'Chrome', icon: 'bi-browser-chrome', href: '/docs/get-html/chrome', color: 'blue' },
+  { name: 'Firefox', icon: 'bi-browser-firefox', href: '/docs/get-html/firefox', color: 'orange' },
+  { name: 'Safari', icon: 'bi-browser-safari', href: '/docs/get-html/safari', color: 'cyan' },
+  { name: 'Edge', icon: 'bi-browser-edge', href: '/docs/get-html/edge', color: 'green' },
+];
+---
+<BaseLayout title="Getting the Full Page HTML - Property Web Scraper">
+
+<section class="max-w-4xl mx-auto px-4 py-12">
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm text-gray-400 mb-5">
+    <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <span>Docs</span>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <span>Getting the Full Page HTML</span>
+  </nav>
+
+  <h2 class="text-2xl font-bold mb-2">Getting the Full Page HTML</h2>
+  <p class="text-gray-500 text-sm mb-8">
+    Modern real estate sites load property data with JavaScript after the initial page loads.
+    A plain URL fetch only sees the empty shell. To extract all fields accurately, you need the
+    fully-rendered DOM &mdash; the HTML your browser has after JavaScript finishes running.
+  </p>
+
+  <!-- Browser quick-link cards -->
+  <h3 class="text-lg font-semibold mb-4">Choose Your Browser</h3>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+    {browsers.map((b) => (
+      <a href={b.href} class="bg-white rounded-xl shadow-md p-5 text-center no-underline hover:shadow-lg transition group">
+        <i class={`bi ${b.icon} text-3xl text-gray-700 group-hover:text-blue-600 transition mb-2 block`}></i>
+        <span class="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition">{b.name}</span>
+      </a>
+    ))}
+  </div>
+
+  <!-- Cross-browser: Save as Complete Web Page -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-download mr-2 text-blue-600"></i>Save as Complete Web Page (All Browsers)</h3>
+    <p class="text-sm text-gray-600 mb-3">
+      The simplest method that works across all browsers:
+    </p>
+    <ol class="text-sm text-gray-600 list-decimal ml-5 space-y-2">
+      <li>Navigate to the property listing page and <strong>wait for it to fully load</strong> (images, prices, map, etc.).</li>
+      <li>Press <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Ctrl+S</kbd> (Windows/Linux) or <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd+S</kbd> (Mac).</li>
+      <li>In the save dialog, choose <strong>"Webpage, HTML Only"</strong> (or "Web Page, HTML only" depending on your browser).</li>
+      <li>Save the file, then use the <a href="/extract/upload" class="text-blue-600 hover:underline">Upload File</a> form to extract data from it.</li>
+    </ol>
+  </div>
+
+  <!-- Cross-browser: Console method -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-terminal mr-2 text-blue-600"></i>Developer Console Method (All Browsers)</h3>
+    <p class="text-sm text-gray-600 mb-3">
+      If you're comfortable with developer tools, this gives you the full rendered HTML directly:
+    </p>
+    <ol class="text-sm text-gray-600 list-decimal ml-5 space-y-2">
+      <li>Open the property listing page and wait for it to fully load.</li>
+      <li>Open DevTools: press <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">F12</kbd> or <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Ctrl+Shift+I</kbd> (Windows/Linux) / <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd+Option+I</kbd> (Mac).</li>
+      <li>Go to the <strong>Console</strong> tab.</li>
+      <li>Type the following and press Enter:</li>
+    </ol>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto mt-3 mb-3"><code>copy(document.documentElement.outerHTML)</code></pre>
+    <p class="text-sm text-gray-600 mb-0">
+      The entire rendered HTML is now on your clipboard. Paste it into the <a href="/extract/html" class="text-blue-600 hover:underline">Paste HTML</a> form.
+    </p>
+  </div>
+
+  <!-- Warning about View Source -->
+  <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5 flex items-start gap-3">
+    <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg shrink-0 mt-0.5"></i>
+    <div class="text-sm text-amber-800">
+      <strong>"View Source" (Ctrl+U) is NOT the same thing.</strong>
+      It shows the original server HTML before JavaScript runs. On modern sites this is often an empty shell
+      with none of the property data. Always use one of the methods above to get the fully-rendered DOM.
+    </div>
+  </div>
+
+  <div class="text-center mt-8">
+    <a href="/extract/html" class="inline-block bg-blue-600 text-white rounded-lg px-6 py-3 hover:bg-blue-700 transition no-underline font-semibold">
+      <i class="bi bi-code-slash mr-1"></i> Go to Paste HTML
+    </a>
+  </div>
+</section>
+
+</BaseLayout>

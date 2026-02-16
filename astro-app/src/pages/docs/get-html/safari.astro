@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Get HTML in Safari - Property Web Scraper">
+
+<section class="max-w-4xl mx-auto px-4 py-12">
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm text-gray-400 mb-5">
+    <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <a href="/docs/get-html" class="text-gray-500 no-underline hover:text-blue-600 transition">Get HTML</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <span>Safari</span>
+  </nav>
+
+  <h2 class="text-2xl font-bold mb-2"><i class="bi bi-browser-safari mr-2"></i>Getting Rendered HTML in Safari</h2>
+  <p class="text-gray-500 text-sm mb-6">
+    Three ways to copy the fully-rendered HTML from Apple Safari.
+  </p>
+
+  <!-- Prerequisite -->
+  <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+    <i class="bi bi-info-circle-fill text-blue-500 text-lg shrink-0 mt-0.5"></i>
+    <div class="text-sm text-blue-800">
+      <strong>Prerequisite: Enable the Develop menu.</strong>
+      Go to <strong>Safari &gt; Settings &gt; Advanced</strong> (or <strong>Preferences &gt; Advanced</strong> on older versions)
+      and check <strong>"Show features for web developers"</strong> (or "Show Develop menu in menu bar").
+    </div>
+  </div>
+
+  <!-- Warning -->
+  <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+    <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg shrink-0 mt-0.5"></i>
+    <div class="text-sm text-amber-800">
+      <strong>"Show Page Source" (<kbd class="font-mono">Cmd+Option+U</kbd>) shows the server HTML, not the JS-rendered DOM.</strong>
+      Don't use it for extraction &mdash; on modern sites it will be missing property data.
+    </div>
+  </div>
+
+  <!-- Method 1: Web Inspector -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5 relative">
+    <span class="absolute -top-2.5 right-4 bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded-full">Recommended</span>
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-tools mr-2 text-blue-600"></i>Method 1: Web Inspector &mdash; Copy Outer HTML</h3>
+    <ol class="text-sm text-gray-600 list-decimal ml-5 space-y-2">
+      <li>Navigate to the property page and wait for it to fully load.</li>
+      <li>Open Web Inspector:
+        <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd+Option+I</kbd>
+        or go to <strong>Develop &gt; Show Web Inspector</strong>.
+      </li>
+      <li>Go to the <strong>Elements</strong> tab.</li>
+      <li>Click the <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">&lt;html&gt;</code> tag at the top of the DOM tree.</li>
+      <li>Right-click it and choose <strong>Copy &gt; Outer HTML</strong>.</li>
+      <li>Paste into the <a href="/extract/html" class="text-blue-600 hover:underline">Paste HTML</a> form.</li>
+    </ol>
+  </div>
+
+  <!-- Method 2: Console -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-terminal mr-2 text-blue-600"></i>Method 2: Console</h3>
+    <p class="text-sm text-gray-600 mb-2">
+      Safari's console doesn't have a built-in <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">copy()</code> function like Chrome/Firefox.
+      Use this workaround:
+    </p>
+    <ol class="text-sm text-gray-600 list-decimal ml-5 space-y-2">
+      <li>Open Web Inspector (<kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd+Option+I</kbd>) and go to the <strong>Console</strong> tab.</li>
+      <li>Type the following and press Enter:</li>
+    </ol>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto mt-3 mb-3"><code>document.documentElement.outerHTML</code></pre>
+    <p class="text-sm text-gray-600 mb-0">
+      The output will appear in the console. Right-click the result string and choose <strong>Copy String Contents</strong>,
+      or click the result to expand it, select all with <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd+A</kbd>, and copy.
+    </p>
+  </div>
+
+  <!-- Method 3: Save As -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-download mr-2 text-blue-600"></i>Method 3: Save As</h3>
+    <ol class="text-sm text-gray-600 list-decimal ml-5 space-y-2">
+      <li>Go to <strong>File &gt; Save As</strong> (or press <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd+S</kbd>).</li>
+      <li>In the Format dropdown, choose <strong>"Page Source"</strong>.</li>
+      <li>Save the file, then upload it via the <a href="/extract/upload" class="text-blue-600 hover:underline">Upload File</a> form.</li>
+    </ol>
+  </div>
+
+  <!-- iOS Safari note -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-phone mr-2 text-blue-600"></i>iOS Safari</h3>
+    <p class="text-sm text-gray-600 mb-0">
+      On iPhone or iPad, there is no direct way to copy the full page HTML. Options:
+    </p>
+    <ul class="text-sm text-gray-600 list-disc ml-5 space-y-1 mt-2">
+      <li>Use <strong>Safari's Web Inspector</strong> via a connected Mac (Develop menu &gt; your device).</li>
+      <li>Use the iOS <strong>Shortcuts</strong> app to create a shortcut that runs JavaScript on the page to extract <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">document.documentElement.outerHTML</code> and copies it to the clipboard.</li>
+      <li>Open the page on a desktop browser instead for easiest results.</li>
+    </ul>
+  </div>
+
+  <div class="flex flex-wrap gap-3 mt-8">
+    <a href="/docs/get-html" class="text-sm text-gray-500 hover:text-blue-600 no-underline transition">
+      <i class="bi bi-arrow-left mr-1"></i> Back to all browsers
+    </a>
+    <a href="/extract/html" class="inline-block bg-blue-600 text-white rounded-lg px-5 py-2.5 hover:bg-blue-700 transition no-underline text-sm font-semibold ml-auto">
+      <i class="bi bi-code-slash mr-1"></i> Go to Paste HTML
+    </a>
+  </div>
+</section>
+
+</BaseLayout>

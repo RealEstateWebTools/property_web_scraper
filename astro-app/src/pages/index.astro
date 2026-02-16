@@ -12,19 +12,22 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
       <i class="bi bi-building"></i> Open-source property data extraction
     </div>
     <h1 class="text-4xl font-bold tracking-tight mb-3">Extract Property Data from<br>Any Real Estate Website</h1>
-    <p class="text-lg opacity-85 max-w-xl mx-auto mb-6">
+    <p class="text-lg opacity-85 max-w-xl mx-auto mb-4">
       Provide a URL or pre-rendered HTML and get structured property data
       instantly &mdash; title, price, images, location, and more.
     </p>
+    <p class="text-sm opacity-70 max-w-lg mx-auto mb-6">
+      <i class="bi bi-stars mr-1"></i> For the most accurate results, paste the fully-rendered HTML from your browser.
+    </p>
     <div class="flex flex-wrap gap-3 justify-center">
-      <a href="/extract/url" class="inline-block bg-blue-600 text-white rounded-lg px-6 py-3 hover:bg-blue-700 transition no-underline font-semibold">
-        <i class="bi bi-link-45deg mr-1"></i> Extract by URL
-      </a>
-      <a href="/extract/html" class="inline-block border border-white/60 text-white rounded-lg px-6 py-3 hover:bg-white/10 transition no-underline">
+      <a href="/extract/html" class="inline-block bg-blue-600 text-white rounded-lg px-6 py-3 hover:bg-blue-700 transition no-underline font-semibold">
         <i class="bi bi-code-slash mr-1"></i> Paste HTML
       </a>
       <a href="/extract/upload" class="inline-block border border-white/60 text-white rounded-lg px-6 py-3 hover:bg-white/10 transition no-underline">
         <i class="bi bi-file-earmark-arrow-up mr-1"></i> Upload File
+      </a>
+      <a href="/extract/url" class="inline-block border border-white/60 text-white rounded-lg px-6 py-3 hover:bg-white/10 transition no-underline">
+        <i class="bi bi-link-45deg mr-1"></i> Extract by URL
       </a>
     </div>
   </div>
@@ -41,7 +44,7 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
           <i class="bi bi-globe"></i>
         </div>
         <h5 class="text-base font-semibold mb-2">Provide a Source</h5>
-        <p class="text-sm text-gray-500 m-0">Enter a property URL, paste rendered HTML, or upload a saved page.</p>
+        <p class="text-sm text-gray-500 m-0">Paste the fully-rendered HTML from your browser (recommended), upload a saved page, or enter a URL.</p>
       </div>
       <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl pt-4">
         <i class="bi bi-chevron-right"></i>
@@ -98,11 +101,16 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
           </div>
           <div>
             <h4 class="font-semibold text-lg mb-3">Why "Paste HTML" or "Upload File"?</h4>
-            <p class="text-sm text-gray-600 m-0">
+            <p class="text-sm text-gray-600 mb-3">
               Modern real estate sites render content with JavaScript. A simple URL fetch
               only sees the empty shell. By pasting the fully-rendered page source from your
-              browser (right-click &rarr; View Page Source, or save the page as HTML),
-              you give the extractor the complete HTML it needs to find every field.
+              browser, you give the extractor the complete DOM it needs to find every field
+              &mdash; prices, images, coordinates, and more.
+            </p>
+            <p class="text-sm text-gray-600 m-0">
+              Not sure how to get the rendered HTML? Check our
+              <a href="/docs/get-html" class="text-blue-600 hover:underline font-medium">step-by-step guide</a>
+              with instructions for Chrome, Firefox, Safari, and Edge.
             </p>
           </div>
         </div>
