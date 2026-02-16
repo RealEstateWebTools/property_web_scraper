@@ -53,3 +53,7 @@ export function clearCache(): void {
 export function allMappingNames(): string[] {
   return Object.keys(mappings);
 }
+
+export function getCacheStats(): { size: number; names: string[] } {
+  return { size: mappingCache.size, names: Array.from(mappingCache.keys()) };
+}

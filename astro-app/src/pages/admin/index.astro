@@ -1,0 +1,118 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import StatCard from '../../components/admin/StatCard.astro';
+import LogTable from '../../components/admin/LogTable.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+import { queryLogs, getLogStats } from '@lib/services/activity-logger.js';
+import { allMappingNames, findByName } from '@lib/extractor/mapping-loader.js';
+import { getStoreStats } from '@lib/services/listing-store.js';
+import { getRateLimiterStats } from '@lib/services/rate-limiter.js';
+import { getRuntimeConfig } from '@lib/services/runtime-config.js';
+import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+
+const logStats = getLogStats();
+const recentLogs = queryLogs({ limit: 10 });
+const mappingNames = allMappingNames();
+const storeStats = getStoreStats();
+const rateLimiterStats = getRateLimiterStats();
+const config = getRuntimeConfig();
+
+// Build scraper status
+const scraperHosts = new Map<string, string[]>();
+for (const [host, entry] of Object.entries(LOCAL_HOST_MAP)) {
+  if (!host.startsWith('www.')) continue; // skip non-www duplicates
+  const existing = scraperHosts.get(entry.scraper_name) || [];
+  existing.push(host);
+  scraperHosts.set(entry.scraper_name, existing);
+}
+
+const scrapers = mappingNames.map((name) => ({
+  name,
+  loaded: findByName(name) !== null,
+  hosts: scraperHosts.get(name) || [],
+}));
+---
+<AdminLayout title="Dashboard — Admin" activePage="dashboard">
+  <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+
+  <!-- Stat cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <StatCard
+      title="Scrapers Loaded"
+      value={mappingNames.length}
+      subtitle={`${scrapers.filter(s => s.hosts.length > 0).length} with host mapping`}
+      icon="bi-cpu"
+      color="text-green-600"
+    />
+    <StatCard
+      title="Listings"
+      value={storeStats.count}
+      subtitle="In-memory store"
+      icon="bi-house"
+      color="text-blue-600"
+    />
+    <StatCard
+      title="Rate Limiter"
+      value={`${rateLimiterStats.activeClients} clients`}
+      subtitle={`Max ${config.maxRequests} req/min`}
+      icon="bi-speedometer"
+      color="text-orange-600"
+    />
+    <StatCard
+      title="Log Buffer"
+      value={`${logStats.totalEntries}/${logStats.capacity}`}
+      subtitle={logStats.byLevel.error > 0 ? `${logStats.byLevel.error} errors` : 'No errors'}
+      icon="bi-journal-text"
+      color={logStats.byLevel.error > 0 ? 'text-red-600' : 'text-gray-600'}
+    />
+  </div>
+
+  <!-- Recent activity -->
+  <div class="bg-white rounded-lg shadow mb-8">
+    <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="font-semibold">Recent Activity</h2>
+      <a href="/admin/logs" class="text-sm text-blue-600 hover:underline no-underline">View all logs &rarr;</a>
+    </div>
+    <div class="p-2">
+      <LogTable entries={recentLogs.entries} compact={true} />
+    </div>
+  </div>
+
+  <!-- Scraper status -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-5 py-4 border-b border-gray-200">
+      <h2 class="font-semibold">Scraper Status</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-200">
+            <th class="py-2 px-5 font-medium">Scraper</th>
+            <th class="py-2 px-5 font-medium">Status</th>
+            <th class="py-2 px-5 font-medium">Hosts</th>
+          </tr>
+        </thead>
+        <tbody>
+          {scrapers.map((s) => (
+            <tr class="border-b border-gray-100">
+              <td class="py-2 px-5 font-mono text-sm">{s.name}</td>
+              <td class="py-2 px-5">
+                {s.loaded ? (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">loaded</span>
+                ) : (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">not loaded</span>
+                )}
+              </td>
+              <td class="py-2 px-5 text-gray-500">
+                {s.hosts.length > 0 ? s.hosts.join(', ') : <span class="text-gray-400 italic">no host mapping</span>}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</AdminLayout>

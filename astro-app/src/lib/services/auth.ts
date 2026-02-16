@@ -1,4 +1,5 @@
 import { errorResponse, ApiErrorCode } from './api-response.js';
+import { logActivity } from './activity-logger.js';
 
 /**
  * API key authentication.
@@ -17,6 +18,15 @@ export function authenticateApiKey(request: Request): { authorized: boolean; err
     '';
 
   if (!providedKey || providedKey !== expectedKey) {
+    logActivity({
+      level: 'warn',
+      category: 'auth',
+      message: `Auth failed: ${providedKey ? 'invalid key' : 'no key provided'}`,
+      path: new URL(request.url).pathname,
+      method: request.method,
+      statusCode: 401,
+      errorCode: ApiErrorCode.UNAUTHORIZED,
+    });
     return {
       authorized: false,
       errorResponse: errorResponse(ApiErrorCode.UNAUTHORIZED, 'Unauthorized'),

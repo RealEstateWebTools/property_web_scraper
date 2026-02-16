@@ -3,6 +3,7 @@ import { extractFromHtml } from '../extractor/html-extractor.js';
 import { findByName } from '../extractor/mapping-loader.js';
 import { Listing } from '../models/listing.js';
 import { WhereChain } from '../firestore/base-model.js';
+import { logActivity } from './activity-logger.js';
 
 export interface RetrievalResult {
   success: boolean;
@@ -19,26 +20,47 @@ export async function retrieveListing(
   importUrl: string,
   html?: string
 ): Promise<RetrievalResult> {
-  console.log(`[Retriever] Starting retrieval for URL: "${importUrl}", html: ${html ? `${html.length} chars` : 'none'}`);
+  logActivity({
+    level: 'info',
+    category: 'extraction',
+    message: `Starting retrieval for URL: "${importUrl}", html: ${html ? `${html.length} chars` : 'none'}`,
+    sourceUrl: importUrl,
+  });
 
   const validation = await validateUrl(importUrl);
   if (!validation.valid || !validation.importHost) {
     const errorMessage = validation.errorCode === UNSUPPORTED
       ? 'Unsupported Url'
       : 'Invalid Url';
-    console.log(`[Retriever] URL validation failed: ${errorMessage}`);
+    logActivity({
+      level: 'warn',
+      category: 'extraction',
+      message: `URL validation failed: ${errorMessage}`,
+      sourceUrl: importUrl,
+    });
     return { success: false, errorMessage };
   }
 
   const importHost = validation.importHost;
-  console.log(`[Retriever] Matched import host: slug="${importHost.slug}", scraper="${importHost.scraper_name}"`);
+  logActivity({
+    level: 'info',
+    category: 'extraction',
+    message: `Matched import host: slug="${importHost.slug}", scraper="${importHost.scraper_name}"`,
+    sourceUrl: importUrl,
+    scraperName: importHost.scraper_name,
+  });
 
   const scraperMapping = findByName(importHost.scraper_name);
   if (!scraperMapping) {
-    console.log(`[Retriever] No scraper mapping found for: ${importHost.scraper_name}`);
+    logActivity({
+      level: 'warn',
+      category: 'extraction',
+      message: `No scraper mapping found for: ${importHost.scraper_name}`,
+      sourceUrl: importUrl,
+      scraperName: importHost.scraper_name,
+    });
     return { success: false, errorMessage: `No mapping found for scraper: ${importHost.scraper_name}` };
   }
-  console.log(`[Retriever] Loaded scraper mapping: ${importHost.scraper_name}`);
 
   try {
     // Find or create listing (Firestore or in-memory fallback)
@@ -46,43 +68,74 @@ export async function retrieveListing(
     try {
       const chain = new WhereChain(Listing as any, { import_url: importUrl });
       listing = await chain.firstOrCreate();
-      console.log(`[Retriever] Firestore listing loaded/created`);
     } catch (e: any) {
       // Firestore unavailable — use in-memory listing
-      console.warn(`[Retriever] Firestore unavailable (${e.message}), using in-memory listing`);
+      logActivity({
+        level: 'warn',
+        category: 'extraction',
+        message: `Firestore unavailable (${e.message}), using in-memory listing`,
+        sourceUrl: importUrl,
+      });
       listing = new Listing();
       listing.assignAttributes({ import_url: importUrl });
     }
 
     // Extract from HTML
     if (html) {
-      console.log(`[Retriever] Extracting from HTML (${html.length} chars)...`);
       const result = extractFromHtml({
         html,
         sourceUrl: importUrl,
         scraperMapping,
       });
-      console.log(`[Retriever] Extraction result: success=${result.success}, properties=${result.properties.length}`);
 
       if (result.success && result.properties.length > 0) {
         listing.import_host_slug = importHost.slug;
         listing.last_retrieved_at = new Date();
         Listing.updateFromHash(listing, result.properties[0]);
-        console.log(`[Retriever] Listing updated: title="${listing.title || ''}", price="${listing.price_string || ''}"`);
+
+        const fieldsFound = Object.entries(result.properties[0]).filter(([, v]) => {
+          if (v === null || v === undefined || v === '' || v === 0 || v === false) return false;
+          if (Array.isArray(v) && v.length === 0) return false;
+          return true;
+        }).length;
+
+        logActivity({
+          level: fieldsFound > 0 ? 'info' : 'warn',
+          category: 'extraction',
+          message: `Extraction complete: ${fieldsFound} fields found`,
+          sourceUrl: importUrl,
+          scraperName: importHost.scraper_name,
+          fieldsFound,
+        });
+
         try {
           await listing.save();
-          console.log(`[Retriever] Listing saved to Firestore`);
         } catch (e: any) {
-          console.warn(`[Retriever] Firestore save failed (${e.message}), skipping persistence`);
+          logActivity({
+            level: 'warn',
+            category: 'extraction',
+            message: `Firestore save failed (${e.message}), skipping persistence`,
+            sourceUrl: importUrl,
+          });
         }
       }
     } else {
-      console.log(`[Retriever] No HTML provided — skipping extraction. URL-only mode returns existing listing data.`);
+      logActivity({
+        level: 'info',
+        category: 'extraction',
+        message: 'No HTML provided — URL-only mode',
+        sourceUrl: importUrl,
+      });
     }
 
     return { success: true, retrievedListing: listing };
   } catch (err: unknown) {
-    console.error(`[Retriever] Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
+    logActivity({
+      level: 'error',
+      category: 'extraction',
+      message: `Unexpected error: ${err instanceof Error ? err.message : String(err)}`,
+      sourceUrl: importUrl,
+    });
     return {
       success: false,
       errorMessage: err instanceof Error ? err.message : String(err),

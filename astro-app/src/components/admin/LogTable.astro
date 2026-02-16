@@ -1,0 +1,70 @@
+---
+import type { LogEntry } from '@lib/services/activity-logger.js';
+
+interface Props {
+  entries: LogEntry[];
+  compact?: boolean;
+}
+const { entries, compact = false } = Astro.props;
+
+function formatTime(ts: number): string {
+  const diff = Date.now() - ts;
+  if (diff < 60_000) return `${Math.floor(diff / 1000)}s ago`;
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  return new Date(ts).toLocaleDateString();
+}
+
+function levelBadge(level: string): string {
+  switch (level) {
+    case 'error': return 'bg-red-100 text-red-700';
+    case 'warn': return 'bg-yellow-100 text-yellow-700';
+    default: return 'bg-blue-100 text-blue-700';
+  }
+}
+---
+<div class="overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="text-left text-gray-500 border-b border-gray-200">
+        <th class="py-2 px-3 font-medium">Time</th>
+        <th class="py-2 px-3 font-medium">Level</th>
+        {!compact && <th class="py-2 px-3 font-medium">Category</th>}
+        {!compact && <th class="py-2 px-3 font-medium">Method</th>}
+        <th class="py-2 px-3 font-medium">Message</th>
+        {!compact && <th class="py-2 px-3 font-medium">Duration</th>}
+      </tr>
+    </thead>
+    <tbody>
+      {entries.map((entry) => (
+        <tr class="border-b border-gray-100 hover:bg-gray-50">
+          <td class="py-2 px-3 text-gray-500 whitespace-nowrap">{formatTime(entry.timestamp)}</td>
+          <td class="py-2 px-3">
+            <span class={`inline-block px-2 py-0.5 rounded text-xs font-medium ${levelBadge(entry.level)}`}>
+              {entry.level}
+            </span>
+          </td>
+          {!compact && <td class="py-2 px-3 text-gray-500">{entry.category}</td>}
+          {!compact && (
+            <td class="py-2 px-3 text-gray-500 whitespace-nowrap">
+              {entry.method && entry.path ? `${entry.method} ${entry.path}` : ''}
+            </td>
+          )}
+          <td class="py-2 px-3 max-w-md truncate">{entry.message}</td>
+          {!compact && (
+            <td class="py-2 px-3 text-gray-500 whitespace-nowrap">
+              {entry.durationMs !== undefined ? `${entry.durationMs}ms` : ''}
+            </td>
+          )}
+        </tr>
+      ))}
+      {entries.length === 0 && (
+        <tr>
+          <td colspan={compact ? 3 : 6} class="py-8 text-center text-gray-400">
+            No log entries
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,108 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import LogTable from '../../components/admin/LogTable.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+import { queryLogs, getLogStats, type LogLevel, type LogCategory } from '@lib/services/activity-logger.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+
+const url = new URL(Astro.request.url);
+const level = url.searchParams.get('level') as LogLevel | null;
+const category = url.searchParams.get('category') as LogCategory | null;
+const search = url.searchParams.get('search') || '';
+
+const result = queryLogs({
+  level: level || undefined,
+  category: category || undefined,
+  search: search || undefined,
+  limit: 100,
+});
+const stats = getLogStats();
+---
+<AdminLayout title="Logs — Admin" activePage="logs">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Activity Logs</h1>
+    <div class="flex items-center gap-2">
+      <span class="text-sm text-gray-500">{stats.totalEntries} / {stats.capacity} entries</span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-lg shadow mb-6 p-4">
+    <form method="GET" class="flex flex-wrap items-end gap-3" id="filterForm">
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Search</label>
+        <input
+          type="text"
+          name="search"
+          value={search}
+          placeholder="Search messages, paths, errors..."
+          class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          id="searchInput"
+        />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Level</label>
+        <select name="level" class="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" id="levelSelect">
+          <option value="">All</option>
+          <option value="info" selected={level === 'info'}>Info</option>
+          <option value="warn" selected={level === 'warn'}>Warning</option>
+          <option value="error" selected={level === 'error'}>Error</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Category</label>
+        <select name="category" class="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" id="categorySelect">
+          <option value="">All</option>
+          <option value="api_request" selected={category === 'api_request'}>API Request</option>
+          <option value="extraction" selected={category === 'extraction'}>Extraction</option>
+          <option value="auth" selected={category === 'auth'}>Auth</option>
+          <option value="rate_limit" selected={category === 'rate_limit'}>Rate Limit</option>
+          <option value="system" selected={category === 'system'}>System</option>
+        </select>
+      </div>
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition">
+        Filter
+      </button>
+      <a href="/admin/logs" class="px-4 py-2 bg-gray-200 text-gray-700 rounded text-sm font-medium hover:bg-gray-300 transition no-underline">
+        Clear
+      </a>
+    </form>
+  </div>
+
+  <!-- Level summary -->
+  <div class="flex gap-4 mb-4 text-sm">
+    <span class="text-blue-600 font-medium">{stats.byLevel.info} info</span>
+    <span class="text-yellow-600 font-medium">{stats.byLevel.warn} warn</span>
+    <span class="text-red-600 font-medium">{stats.byLevel.error} error</span>
+    <span class="text-gray-400">|</span>
+    <span class="text-gray-500">Showing {result.entries.length} of {result.total} filtered</span>
+  </div>
+
+  <!-- Log table -->
+  <div class="bg-white rounded-lg shadow">
+    <LogTable entries={result.entries} />
+  </div>
+
+  <!-- Auto-refresh toggle -->
+  <div class="mt-4 flex items-center gap-2">
+    <label class="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+      <input type="checkbox" id="autoRefresh" class="rounded" />
+      Auto-refresh (5s)
+    </label>
+  </div>
+
+  <script is:inline>
+    let refreshTimer = null;
+    const checkbox = document.getElementById('autoRefresh');
+    checkbox?.addEventListener('change', () => {
+      if (checkbox.checked) {
+        refreshTimer = setInterval(() => location.reload(), 5000);
+      } else {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+      }
+    });
+  </script>
+</AdminLayout>

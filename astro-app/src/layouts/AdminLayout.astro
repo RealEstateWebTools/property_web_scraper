@@ -1,0 +1,58 @@
+---
+import '../styles/global.css';
+interface Props {
+  title?: string;
+  activePage?: string;
+}
+const { title = 'Admin — Property Web Scraper', activePage = '' } = Astro.props;
+
+function navClass(page: string): string {
+  return page === activePage
+    ? 'flex items-center gap-2 px-3 py-2 rounded text-sm font-medium bg-gray-700 text-white no-underline'
+    : 'flex items-center gap-2 px-3 py-2 rounded text-sm text-gray-300 hover:bg-gray-700 hover:text-white no-underline transition';
+}
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="min-h-screen flex bg-gray-100 text-gray-800 font-sans">
+    <!-- Sidebar -->
+    <aside class="w-60 bg-gray-900 text-gray-100 flex flex-col min-h-screen shrink-0">
+      <div class="px-4 py-4 border-b border-gray-700">
+        <a href="/admin" class="font-bold text-lg text-white no-underline flex items-center gap-2">
+          <i class="bi bi-gear-fill"></i> Admin
+        </a>
+        <p class="text-xs text-gray-400 mt-1">PropertyWebScraper</p>
+      </div>
+      <nav class="flex-1 px-3 py-4 space-y-1">
+        <a href="/admin" class={navClass('dashboard')}>
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="/admin/logs" class={navClass('logs')}>
+          <i class="bi bi-journal-text"></i> Logs
+        </a>
+        <a href="/admin/config" class={navClass('config')}>
+          <i class="bi bi-sliders"></i> Config
+        </a>
+      </nav>
+      <div class="px-3 py-4 border-t border-gray-700 space-y-1">
+        <a href="/" class="flex items-center gap-2 px-3 py-2 rounded text-sm text-gray-300 hover:bg-gray-700 hover:text-white no-underline transition">
+          <i class="bi bi-arrow-left"></i> Back to Site
+        </a>
+        <a href="/admin/logout" class="flex items-center gap-2 px-3 py-2 rounded text-sm text-gray-300 hover:bg-gray-700 hover:text-white no-underline transition">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6 overflow-auto">
+      <slot />
+    </main>
+  </body>
+</html>

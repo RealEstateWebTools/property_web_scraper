@@ -1,4 +1,6 @@
 import { errorResponse, ApiErrorCode } from './api-response.js';
+import { getRuntimeConfig } from './runtime-config.js';
+import { logActivity } from './activity-logger.js';
 
 const DEFAULT_MAX_REQUESTS = 60;
 const WINDOW_MS = 60_000; // 1 minute
@@ -6,11 +8,9 @@ const WINDOW_MS = 60_000; // 1 minute
 const requestLog = new Map<string, number[]>();
 
 function getMaxRequests(): number {
-  try {
-    const env = (import.meta as any).env?.PWS_RATE_LIMIT;
-    if (env) return parseInt(env, 10) || DEFAULT_MAX_REQUESTS;
-  } catch { /* ignore */ }
-  return DEFAULT_MAX_REQUESTS;
+  // Runtime config takes priority
+  const config = getRuntimeConfig();
+  return config.maxRequests;
 }
 
 function getClientKey(request: Request): string {
@@ -33,6 +33,16 @@ export function checkRateLimit(request: Request): { allowed: boolean; retryAfter
   if (timestamps.length >= maxRequests) {
     const oldestInWindow = timestamps[0];
     const retryAfter = Math.ceil((oldestInWindow + WINDOW_MS - now) / 1000);
+
+    logActivity({
+      level: 'warn',
+      category: 'rate_limit',
+      message: `Rate limited: ${key}`,
+      clientKey: key,
+      path: new URL(request.url).pathname,
+      method: request.method,
+    });
+
     return {
       allowed: false,
       retryAfter,
@@ -52,4 +62,21 @@ export function checkRateLimit(request: Request): { allowed: boolean; retryAfter
 /** Reset all rate limit state. For testing only. */
 export function resetRateLimiter(): void {
   requestLog.clear();
+}
+
+export function getRateLimiterStats(): { activeClients: number; totalRequests: number } {
+  const now = Date.now();
+  const windowStart = now - WINDOW_MS;
+  let activeClients = 0;
+  let totalRequests = 0;
+
+  for (const [, timestamps] of requestLog) {
+    const active = timestamps.filter(t => t > windowStart);
+    if (active.length > 0) {
+      activeClients++;
+      totalRequests += active.length;
+    }
+  }
+
+  return { activeClients, totalRequests };
 }

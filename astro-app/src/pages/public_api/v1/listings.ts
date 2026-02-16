@@ -10,6 +10,7 @@ import {
   errorResponse, successResponse, corsPreflightResponse,
   ApiErrorCode, mapValidatorError,
 } from '@lib/services/api-response.js';
+import { logActivity } from '@lib/services/activity-logger.js';
 import type { ScraperMapping } from '@lib/extractor/mapping-loader.js';
 
 const MAX_HTML_SIZE = 10_000_000; // 10 MB
@@ -41,6 +42,9 @@ export const OPTIONS: APIRoute = () => corsPreflightResponse();
  * GET /public_api/v1/listings?url=...
  */
 export const GET: APIRoute = async ({ request }) => {
+  const startTime = Date.now();
+  const path = '/public_api/v1/listings';
+
   const auth = authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
@@ -50,12 +54,33 @@ export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url).searchParams.get('url');
   const validation = await validateUrl(url);
   if (!validation.valid) {
-    return errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!);
+    const resp = errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!);
+    logActivity({
+      level: 'warn',
+      category: 'api_request',
+      message: `GET listings: ${validation.errorMessage}`,
+      method: 'GET',
+      path,
+      statusCode: resp.status,
+      durationMs: Date.now() - startTime,
+      errorCode: mapValidatorError(validation.errorCode),
+    });
+    return resp;
   }
 
   const importHost = validation.importHost!;
   const scraperMapping = findByName(importHost.scraper_name);
   if (!scraperMapping) {
+    logActivity({
+      level: 'warn',
+      category: 'api_request',
+      message: 'GET listings: No scraper mapping found',
+      method: 'GET',
+      path,
+      statusCode: 500,
+      durationMs: Date.now() - startTime,
+      errorCode: ApiErrorCode.MISSING_SCRAPER,
+    });
     return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found');
   }
 
@@ -68,6 +93,16 @@ export const GET: APIRoute = async ({ request }) => {
     listing.assignAttributes({ import_url: url! });
   }
 
+  logActivity({
+    level: 'info',
+    category: 'api_request',
+    message: 'GET listings: OK',
+    method: 'GET',
+    path,
+    statusCode: 200,
+    durationMs: Date.now() - startTime,
+  });
+
   return successResponse({
     retry_duration: 0,
     urls_remaining: 0,
@@ -79,6 +114,9 @@ export const GET: APIRoute = async ({ request }) => {
  * POST /public_api/v1/listings
  */
 export const POST: APIRoute = async ({ request }) => {
+  const startTime = Date.now();
+  const path = '/public_api/v1/listings';
+
   const auth = authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
@@ -88,6 +126,16 @@ export const POST: APIRoute = async ({ request }) => {
   const contentType = request.headers.get('content-type') || '';
 
   if (!contentType.includes('multipart/form-data') && !contentType.includes('application/json')) {
+    logActivity({
+      level: 'warn',
+      category: 'api_request',
+      message: 'POST listings: unsupported content type',
+      method: 'POST',
+      path,
+      statusCode: 415,
+      durationMs: Date.now() - startTime,
+      errorCode: ApiErrorCode.UNSUPPORTED_CONTENT_TYPE,
+    });
     return errorResponse(ApiErrorCode.UNSUPPORTED_CONTENT_TYPE, 'Content-Type must be application/json or multipart/form-data');
   }
 
@@ -110,21 +158,62 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   if (html && html.length > MAX_HTML_SIZE) {
+    logActivity({
+      level: 'warn',
+      category: 'api_request',
+      message: 'POST listings: payload too large',
+      method: 'POST',
+      path,
+      statusCode: 413,
+      durationMs: Date.now() - startTime,
+      errorCode: ApiErrorCode.PAYLOAD_TOO_LARGE,
+    });
     return errorResponse(ApiErrorCode.PAYLOAD_TOO_LARGE, 'HTML payload exceeds 10MB limit');
   }
 
   if (!url) {
+    logActivity({
+      level: 'warn',
+      category: 'api_request',
+      message: 'POST listings: missing URL',
+      method: 'POST',
+      path,
+      statusCode: 400,
+      durationMs: Date.now() - startTime,
+      errorCode: ApiErrorCode.MISSING_URL,
+    });
     return errorResponse(ApiErrorCode.MISSING_URL, 'Please provide a url');
   }
 
   const validation = await validateUrl(url);
   if (!validation.valid) {
-    return errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!);
+    const resp = errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!);
+    logActivity({
+      level: 'warn',
+      category: 'api_request',
+      message: `POST listings: ${validation.errorMessage}`,
+      method: 'POST',
+      path,
+      statusCode: resp.status,
+      durationMs: Date.now() - startTime,
+      errorCode: mapValidatorError(validation.errorCode),
+    });
+    return resp;
   }
 
   const importHost = validation.importHost!;
   const scraperMapping = findByName(importHost.scraper_name);
   if (!scraperMapping) {
+    logActivity({
+      level: 'warn',
+      category: 'api_request',
+      message: 'POST listings: No scraper mapping found',
+      method: 'POST',
+      path,
+      statusCode: 500,
+      durationMs: Date.now() - startTime,
+      errorCode: ApiErrorCode.MISSING_SCRAPER,
+    });
     return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found');
   }
 
@@ -152,11 +241,24 @@ export const POST: APIRoute = async ({ request }) => {
       Listing.updateFromHash(listing, result.properties[0]);
       try { await listing.save(); } catch { /* Firestore unavailable */ }
 
+      const fieldsExtracted = countExtractedFields(result.properties[0]);
+      const fieldsAvailable = countAvailableFields(scraperMapping);
+
       extraction = {
-        fields_extracted: countExtractedFields(result.properties[0]),
-        fields_available: countAvailableFields(scraperMapping),
+        fields_extracted: fieldsExtracted,
+        fields_available: fieldsAvailable,
         scraper_used: importHost.scraper_name,
       };
+
+      logActivity({
+        level: 'info',
+        category: 'extraction',
+        message: `Extraction via API: ${fieldsExtracted}/${fieldsAvailable} fields`,
+        sourceUrl: url,
+        scraperName: importHost.scraper_name,
+        fieldsFound: fieldsExtracted,
+        fieldsAvailable,
+      });
     }
   }
 
@@ -169,6 +271,16 @@ export const POST: APIRoute = async ({ request }) => {
   if (extraction) {
     response.extraction = extraction;
   }
+
+  logActivity({
+    level: 'info',
+    category: 'api_request',
+    message: `POST listings: OK${extraction ? ` (extracted ${extraction.fields_extracted} fields)` : ''}`,
+    method: 'POST',
+    path,
+    statusCode: 200,
+    durationMs: Date.now() - startTime,
+  });
 
   return successResponse(response);
 };
