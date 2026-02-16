@@ -50,6 +50,21 @@ module PropertyWebScraper
       end
     end
 
+    describe 'with html: keyword' do
+      let(:html) do
+        path = File.join(PropertyWebScraper::Engine.root, 'spec', 'fixtures', 'vcr', 'scrapers', 'idealista_2018_01.yml')
+        cassette = YAML.safe_load(File.read(path), permitted_classes: [Symbol])
+        cassette['http_interactions'].first['response']['body']['string']
+      end
+
+      it 'retrieves listing from provided HTML without HTTP fetch' do
+        listing_retriever = PropertyWebScraper::ListingRetriever.new(valid_import_url, html: html)
+        result = listing_retriever.retrieve
+        expect(result.success).to eq(true)
+        expect(result.retrieved_listing.title).to eq('Piso en venta en goya, 54, Goya, Madrid')
+      end
+    end
+
     describe 'error path handling' do
       it 'captures OpenURI::HTTPError gracefully' do
         allow_any_instance_of(PropertyWebScraper::Scraper).to receive(:process_url)

@@ -5,6 +5,20 @@ module PropertyWebScraper
 
     private
 
+    # Extracts HTML input from params.
+    #
+    # Supports two sources: an uploaded file (+html_file+) or a string
+    # parameter (+html+). File upload takes precedence.
+    #
+    # @return [String, nil] the HTML string, or nil if not provided
+    def extract_html_input
+      if params[:html_file].present?
+        params[:html_file].read
+      elsif params[:html].present?
+        params[:html]
+      end
+    end
+
     # Authenticates API requests via the PROPERTY_SCRAPER_API_KEY env var.
     #
     # When the env var is unset, authentication is skipped (backwards

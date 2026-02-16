@@ -22,9 +22,10 @@ module PropertyWebScraper
 
       import_host = validation.import_host
       @success = true
+      html = extract_html_input
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
       begin
-        @listing = web_scraper.process_url import_url.strip, import_host
+        @listing = web_scraper.process_url import_url.strip, import_host, html: html
       rescue OpenURI::HTTPError => e
         @error_message = "Could not retrieve property: the website returned #{e.message}"
         return render '/property_web_scraper/single_property_view/error', layout: false

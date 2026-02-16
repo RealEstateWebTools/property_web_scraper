@@ -12,6 +12,7 @@ PropertyWebScraper::Engine.routes.draw do
   namespace :api do
     namespace :v1 do
       get '/listings' => 'listings#retrieve'
+      post '/listings' => 'listings#retrieve'
     end
   end
 end

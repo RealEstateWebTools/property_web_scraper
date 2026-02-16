@@ -23,8 +23,9 @@ module PropertyWebScraper
       end
       uri = validation.uri
       import_host = validation.import_host
+      html = extract_html_input
       web_scraper = PropertyWebScraper::Scraper.new(import_host.scraper_name)
-      listing = web_scraper.process_url uri.to_s, import_host
+      listing = web_scraper.process_url uri.to_s, import_host, html: html
 
       pwb_listing = PropertyWebScraper::PwbListing.find listing.id
 
