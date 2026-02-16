@@ -54,6 +54,55 @@ describe('HtmlExtractor', () => {
     });
   });
 
+  describe('extraction diagnostics', () => {
+    it('includes diagnostics in the result', () => {
+      const mapping = findByName('idealista');
+      const result = extractFromHtml({
+        html: '<html></html>',
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMapping: mapping!,
+      });
+
+      expect(result.diagnostics).toBeDefined();
+      expect(result.diagnostics!.scraperName).toBe('idealista');
+      expect(result.diagnostics!.fieldTraces).toBeInstanceOf(Array);
+      expect(result.diagnostics!.fieldTraces.length).toBe(result.diagnostics!.totalFields);
+      expect(result.diagnostics!.emptyFields).toBeInstanceOf(Array);
+    });
+
+    it('traces contain expected properties', () => {
+      const html = loadFixture('idealista_2018_01');
+      const result = extractFromHtml({
+        html,
+        sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        scraperMappingName: 'idealista',
+      });
+
+      const diag = result.diagnostics!;
+      expect(diag.populatedFields).toBeGreaterThan(0);
+      expect(diag.totalFields).toBeGreaterThan(diag.emptyFields.length);
+
+      const titleTrace = diag.fieldTraces.find(t => t.field === 'title');
+      expect(titleTrace).toBeDefined();
+      expect(titleTrace!.section).toBe('textFields');
+      expect(titleTrace!.strategy).toMatch(/cssLocator|scriptJsonPath|jsonLdPath/);
+      expect(titleTrace!.rawText).not.toBe('');
+    });
+
+    it('reports empty fields when HTML has no matching data', () => {
+      const mapping = findByName('idealista');
+      const result = extractFromHtml({
+        html: '<html><body></body></html>',
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMapping: mapping!,
+      });
+
+      const diag = result.diagnostics!;
+      expect(diag.emptyFields.length).toBeGreaterThan(0);
+      expect(diag.populatedFields).toBeLessThan(diag.totalFields);
+    });
+  });
+
   describe('idealista extraction from raw HTML', () => {
     it('extracts the same values as the Ruby specs', () => {
       const html = loadFixture('idealista_2018_01');

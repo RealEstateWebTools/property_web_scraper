@@ -6,10 +6,27 @@ import { extractImages } from './image-extractor.js';
 import { extractFeatures } from './feature-extractor.js';
 import { booleanEvaluators } from './field-processors.js';
 
+export interface FieldTrace {
+  field: string;
+  section: string;
+  strategy: string;
+  rawText: string;
+  value: unknown;
+}
+
+export interface ExtractionDiagnostics {
+  scraperName: string;
+  fieldTraces: FieldTrace[];
+  totalFields: number;
+  populatedFields: number;
+  emptyFields: string[];
+}
+
 export interface ExtractionResult {
   success: boolean;
   properties: Record<string, unknown>[];
   errorMessage?: string;
+  diagnostics?: ExtractionDiagnostics;
 }
 
 export interface ExtractParams {
@@ -37,6 +54,17 @@ function resolveMapping(
   throw new Error('No scraper mapping provided and auto-detection not implemented in PoC');
 }
 
+function describeStrategy(m: FieldMapping): string {
+  if (m.flightDataPath) return `flightDataPath:${m.flightDataPath}`;
+  if (m.jsonLdPath) return `jsonLdPath:${m.jsonLdPath}`;
+  if (m.scriptJsonPath && m.scriptJsonVar) return `scriptJsonPath:${m.scriptJsonVar}.${m.scriptJsonPath}`;
+  if (m.scriptRegEx) return `scriptRegEx:${m.scriptRegEx.slice(0, 40)}`;
+  if (m.urlPathPart) return `urlPathPart:${m.urlPathPart}`;
+  if (m.cssLocator) return `cssLocator:${m.cssLocator}`;
+  if (m.value) return `default:${m.value}`;
+  return 'none';
+}
+
 /**
  * Main entry point: extract structured property data from raw HTML.
  * Port of Ruby HtmlExtractor.call.
@@ -60,11 +88,19 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   const $ = cheerio.load(html);
   const uri = new URL(sourceUrl);
   const propertyHash: Record<string, unknown> = {};
+  const traces: FieldTrace[] = [];
 
   // Default values
   if (mapping.defaultValues) {
     for (const [key, fieldMapping] of Object.entries(mapping.defaultValues)) {
       propertyHash[key] = fieldMapping.value;
+      traces.push({
+        field: key,
+        section: 'defaultValues',
+        strategy: describeStrategy(fieldMapping),
+        rawText: fieldMapping.value || '',
+        value: propertyHash[key],
+      });
     }
   }
 
@@ -72,6 +108,14 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   if (mapping.images) {
     for (const imageMapping of mapping.images) {
       propertyHash['image_urls'] = extractImages($, html, imageMapping, uri);
+      const urls = propertyHash['image_urls'] as string[];
+      traces.push({
+        field: 'image_urls',
+        section: 'images',
+        strategy: describeStrategy(imageMapping),
+        rawText: urls.length > 0 ? `${urls.length} images` : '',
+        value: urls,
+      });
     }
   }
 
@@ -79,6 +123,14 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   if (mapping.features) {
     for (const featureMapping of mapping.features) {
       propertyHash['features'] = extractFeatures($, featureMapping, uri);
+      const feats = propertyHash['features'] as string[];
+      traces.push({
+        field: 'features',
+        section: 'features',
+        strategy: describeStrategy(featureMapping),
+        rawText: feats.length > 0 ? `${feats.length} features` : '',
+        value: feats,
+      });
     }
   }
 
@@ -87,6 +139,13 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
     for (const [key, fieldMapping] of Object.entries(mapping.intFields)) {
       const text = retrieveTargetText($, html, fieldMapping, uri);
       propertyHash[key] = parseInt(text.trim(), 10) || 0;
+      traces.push({
+        field: key,
+        section: 'intFields',
+        strategy: describeStrategy(fieldMapping),
+        rawText: text.slice(0, 120),
+        value: propertyHash[key],
+      });
     }
   }
 
@@ -101,6 +160,13 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
         text = text.trim().slice(1) || '';
       }
       propertyHash[key] = parseFloat(text.trim()) || 0;
+      traces.push({
+        field: key,
+        section: 'floatFields',
+        strategy: describeStrategy(fieldMapping),
+        rawText: text.slice(0, 120),
+        value: propertyHash[key],
+      });
     }
   }
 
@@ -109,6 +175,13 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
     for (const [key, fieldMapping] of Object.entries(mapping.textFields)) {
       const text = retrieveTargetText($, html, fieldMapping, uri);
       propertyHash[key] = text.trim();
+      traces.push({
+        field: key,
+        section: 'textFields',
+        strategy: describeStrategy(fieldMapping),
+        rawText: text.slice(0, 120),
+        value: propertyHash[key],
+      });
     }
   }
 
@@ -130,8 +203,36 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
       propertyHash[key] = evaluatorFn
         ? evaluatorFn(text.trim(), evaluatorParam)
         : false;
+      traces.push({
+        field: key,
+        section: 'booleanFields',
+        strategy: describeStrategy(fieldMapping),
+        rawText: text.slice(0, 120),
+        value: propertyHash[key],
+      });
     }
   }
 
-  return { success: true, properties: [propertyHash] };
+  const emptyFields = traces
+    .filter(t => t.rawText === '' || t.value === 0 || t.value === false || t.value === '')
+    .map(t => t.field);
+
+  const diagnostics: ExtractionDiagnostics = {
+    scraperName: mapping.name,
+    fieldTraces: traces,
+    totalFields: traces.length,
+    populatedFields: traces.length - emptyFields.length,
+    emptyFields,
+  };
+
+  console.log(`[Extractor] ${mapping.name}: ${diagnostics.populatedFields}/${diagnostics.totalFields} fields populated`);
+  if (emptyFields.length > 0) {
+    console.log(`[Extractor] Empty fields: ${emptyFields.join(', ')}`);
+  }
+  for (const t of traces) {
+    const status = t.rawText ? '\u2713' : '\u2717';
+    console.log(`[Extractor]   ${status} ${t.field} (${t.strategy}) \u2192 ${JSON.stringify(t.value)}`);
+  }
+
+  return { success: true, properties: [propertyHash], diagnostics };
 }
