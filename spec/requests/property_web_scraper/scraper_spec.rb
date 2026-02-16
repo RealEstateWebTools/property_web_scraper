@@ -188,6 +188,55 @@ module PropertyWebScraper
           expect(response.body).to include('turbo-frame')
         end
       end
+
+      it 'renders error card for unsupported URL' do
+        post '/scrapers/submit',
+             params: { import_url: 'https://www.google.com/search' },
+             headers: { 'Accept' => 'text/html' }
+        expect(response).to have_http_status(200)
+        expect(response.body).to include('pws-error-card')
+        expect(response.body).to include("isn't supported yet")
+        expect(response.body).to include('idealista.com')
+      end
+
+      it 'renders success card with property data' do
+        VCR.use_cassette('scrapers/idealista_2018_01') do
+          post '/scrapers/submit',
+               params: { import_url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/' },
+               headers: { 'Accept' => 'text/html' }
+          expect(response).to have_http_status(200)
+          expect(response.body).to include('pws-success-banner')
+          expect(response.body).to include('pws-result-card')
+        end
+      end
+
+      context 'with html parameter' do
+        let(:html) do
+          path = File.join(PropertyWebScraper::Engine.root, 'spec', 'fixtures', 'vcr', 'scrapers', 'idealista_2018_01.yml')
+          cassette = YAML.safe_load(File.read(path), permitted_classes: [Symbol])
+          cassette['http_interactions'].first['response']['body']['string']
+        end
+
+        it 'extracts from provided HTML without HTTP fetch' do
+          post '/scrapers/submit',
+               params: { import_url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/', html: html },
+               headers: { 'Accept' => 'text/html' }
+          expect(response).to have_http_status(200)
+          expect(response.body).to include('pws-success-banner')
+          expect(response.body).to include('pws-result-card')
+        end
+
+        it 'extracts from uploaded HTML file' do
+          file = Rack::Test::UploadedFile.new(
+            StringIO.new(html), 'text/html', false, original_filename: 'page.html'
+          )
+          post '/scrapers/submit',
+               params: { import_url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/', html_file: file },
+               headers: { 'Accept' => 'text/html' }
+          expect(response).to have_http_status(200)
+          expect(response.body).to include('pws-success-banner')
+        end
+      end
     end
   end
 end

@@ -43,6 +43,22 @@ module PropertyWebScraper
           expect(response).to have_http_status(200)
         end
       end
+
+      context 'with html parameter' do
+        let(:html) do
+          path = File.join(PropertyWebScraper::Engine.root, 'spec', 'fixtures', 'vcr', 'scrapers', 'idealista_2018_01.yml')
+          cassette = YAML.safe_load(File.read(path), permitted_classes: [Symbol])
+          cassette['http_interactions'].first['response']['body']['string']
+        end
+
+        it 'renders property view from provided HTML without HTTP fetch' do
+          get '/single_property_view', params: {
+            url: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+            html: html
+          }
+          expect(response).to have_http_status(200)
+        end
+      end
     end
   end
 end

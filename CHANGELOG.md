@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- `HtmlExtractor` service — pure-function HTML extraction with zero network I/O; accepts raw HTML + source URL and returns structured property data
+- HTML-first input across all endpoints — `html` (string) and `html_file` (upload) parameters on `/scrapers/submit`, `/retriever/as_json`, `/api/v1/listings`, and `/single_property_view`
+- `POST /api/v1/listings` route for submitting HTML via API
+- Redesigned landing page with dark gradient hero, tabbed input form (URL / Paste HTML / Upload File), inline AJAX results, and "How It Works" walkthrough
+- Stimulus `scraper-form` controller — handles tab switching and fetch-based form submission with loading spinner
+- Styled result cards for both success (property card with stat pills, expandable fields, image thumbnails) and error (unsupported-site list, tips for JS-rendered sites)
+- `DESIGN.md` documenting architecture, API reference, mapping schema, and migration guide
 - `UrlValidator` service — single entry point for URL validation across all controllers
 - `ScrapedContentSanitizer` service — strips HTML tags, blocks dangerous URI schemes (`javascript:`, `data:`), and normalises protocol-relative URLs before persistence
 - API key authentication via `authenticate_api_key!` in `ApplicationController`; supports `X-Api-Key` header and `api_key` query parameter
@@ -16,6 +23,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `.env.development` template with Firestore emulator defaults
 
 ### Changed
+- `Scraper` refactored to thin orchestration layer delegating extraction to `HtmlExtractor`; direct HTTP fetch now logs a deprecation warning
+- `ListingRetriever` accepts `html:` keyword parameter, passed through to `Scraper`
+- Landing page layout uses full-width hero; stash and error views wrap content in their own containers
 - `Listing.update_from_hash` now calls `ScrapedContentSanitizer.call` before persisting data
 - All controllers delegate URL parsing to `UrlValidator` instead of inline `URI.parse` calls
 
