@@ -13,6 +13,7 @@ export interface RetrievalResult {
 /**
  * High-level service for retrieving a property listing by URL.
  * Port of Ruby ListingRetriever.
+ * Falls back to in-memory Listing when Firestore is unavailable.
  */
 export async function retrieveListing(
   importUrl: string,
@@ -33,9 +34,16 @@ export async function retrieveListing(
   }
 
   try {
-    // Find or create listing
-    const chain = new WhereChain(Listing as any, { import_url: importUrl });
-    const listing = await chain.firstOrCreate();
+    // Find or create listing (Firestore or in-memory fallback)
+    let listing: Listing;
+    try {
+      const chain = new WhereChain(Listing as any, { import_url: importUrl });
+      listing = await chain.firstOrCreate();
+    } catch {
+      // Firestore unavailable — use in-memory listing
+      listing = new Listing();
+      listing.assignAttributes({ import_url: importUrl });
+    }
 
     // Extract from HTML
     if (html) {
@@ -49,7 +57,11 @@ export async function retrieveListing(
         listing.import_host_slug = importHost.slug;
         listing.last_retrieved_at = new Date();
         Listing.updateFromHash(listing, result.properties[0]);
-        await listing.save();
+        try {
+          await listing.save();
+        } catch {
+          // Firestore unavailable — skip persistence
+        }
       }
     }
 

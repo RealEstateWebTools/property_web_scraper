@@ -22,8 +22,14 @@ if (url) {
     const scraperMapping = findByName(importHost.scraper_name);
     if (scraperMapping) {
       try {
-        const chain = new WhereChain(Listing as any, { import_url: url });
-        listing = await chain.firstOrCreate();
+        // Try Firestore, fall back to in-memory listing
+        try {
+          const chain = new WhereChain(Listing as any, { import_url: url });
+          listing = await chain.firstOrCreate();
+        } catch {
+          listing = new Listing();
+          listing.assignAttributes({ import_url: url });
+        }
 
         // Check for HTML in query params (for POST-redirect pattern)
         const html = Astro.url.searchParams.get('html');
@@ -33,7 +39,7 @@ if (url) {
             listing.import_host_slug = importHost.slug;
             listing.last_retrieved_at = new Date();
             Listing.updateFromHash(listing, result.properties[0]);
-            await listing.save();
+            try { await listing.save(); } catch { /* Firestore unavailable */ }
           }
         }
 
