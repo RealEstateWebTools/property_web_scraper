@@ -253,6 +253,65 @@ verified against the actual HTML.
 
 ---
 
+## Capturing New Fixtures
+
+Use the `capture-fixture` CLI utility to fetch HTML, save it as a test fixture,
+preview extracted fields, and generate a manifest stub.
+
+### Quick start
+
+```bash
+cd astro-app
+npm install   # installs tsx if not present
+
+# Fetch from a URL (static sites)
+npm run capture-fixture -- https://www.realtor.com/realestateandhomes-detail/...
+
+# From a local file (JS-rendered pages — use browser "Save As")
+npm run capture-fixture -- --file page.html --url https://www.realtor.com/...
+
+# From stdin (automated pipelines)
+curl -s https://... | npm run capture-fixture -- --stdin --url https://...
+```
+
+### All options
+
+```
+capture-fixture [url]
+  --file <path>          Read HTML from file
+  --stdin                Read HTML from stdin
+  --url <url>            Source URL (required with --file/--stdin)
+  --name <scraper>       Override scraper detection
+  --fixture-name <name>  Override output filename (without .html)
+  --force                Overwrite existing fixture without warning
+  --no-extract           Skip extraction preview
+  --help                 Show usage
+```
+
+### Workflow
+
+1. **Capture**: Run the utility. It saves `test/fixtures/<name>.html` and prints
+   an extraction preview showing each field, its value, and which pipeline stage
+   produced it (default, int, float, text, boolean, images, features).
+
+2. **Review**: Check the preview output. If fields are wrong or missing, fix the
+   mapping JSON in `config/scraper_mappings/<name>.json`.
+
+3. **Add to manifest**: Copy the printed manifest stub into `test/fixtures/manifest.ts`.
+   Adjust expected values as needed.
+
+4. **Run tests**: `npx vitest run` to confirm the new fixture passes validation.
+
+### Tips
+
+- For JS-heavy sites, open the page in a browser, wait for it to render, then
+  use File > Save As > "Web Page, HTML Only". Pass the saved file with `--file`.
+- Use `--fixture-name` to save multiple fixtures for the same scraper (e.g.
+  `--fixture-name idealista_2025_01`).
+- Use `--no-extract` if you just want to save the HTML without running the pipeline.
+
+---
+
 ## Common Pitfalls Reference
 
 | Pitfall | Details |
