@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Get HTML in Firefox - Property Web Scraper">
+
+<section class="max-w-4xl mx-auto px-4 py-12">
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm text-gray-400 mb-5">
+    <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <a href="/docs/get-html" class="text-gray-500 no-underline hover:text-blue-600 transition">Get HTML</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <span>Firefox</span>
+  </nav>
+
+  <h2 class="text-2xl font-bold mb-2"><i class="bi bi-browser-firefox mr-2"></i>Getting Rendered HTML in Firefox</h2>
+  <p class="text-gray-500 text-sm mb-6">
+    Three reliable ways to copy the fully-rendered HTML from Mozilla Firefox.
+  </p>
+
+  <!-- Warning -->
+  <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+    <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg shrink-0 mt-0.5"></i>
+    <div class="text-sm text-amber-800">
+      <strong>"View Page Source" (<kbd class="font-mono">Ctrl+U</kbd> / <kbd class="font-mono">Cmd+U</kbd>) shows the server HTML, not the JS-rendered DOM.</strong>
+      Don't use it &mdash; on modern sites it will be an empty shell. Use one of the methods below instead.
+    </div>
+  </div>
+
+  <!-- Method 1: DevTools Inspector -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5 relative">
+    <span class="absolute -top-2.5 right-4 bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded-full">Recommended</span>
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-tools mr-2 text-blue-600"></i>Method 1: Inspector &mdash; Copy Outer HTML</h3>
+    <ol class="text-sm text-gray-600 list-decimal ml-5 space-y-2">
+      <li>Navigate to the property page and wait for it to fully load.</li>
+      <li>Open DevTools:
+        <span class="inline-flex gap-1.5 ml-1">
+          <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">F12</kbd>
+          or
+          <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Ctrl+Shift+I</kbd>
+          <span class="text-gray-400 text-xs">(Win/Linux)</span>
+          /
+          <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd+Option+I</kbd>
+          <span class="text-gray-400 text-xs">(Mac)</span>
+        </span>
+      </li>
+      <li>Go to the <strong>Inspector</strong> tab.</li>
+      <li>Click the <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">&lt;html&gt;</code> tag at the top of the DOM tree.</li>
+      <li>Right-click it and choose <strong>Copy &gt; Outer HTML</strong>.</li>
+      <li>Paste into the <a href="/extract/html" class="text-blue-600 hover:underline">Paste HTML</a> form.</li>
+    </ol>
+  </div>
+
+  <!-- Method 2: Console -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-terminal mr-2 text-blue-600"></i>Method 2: Console Command</h3>
+    <ol class="text-sm text-gray-600 list-decimal ml-5 space-y-2">
+      <li>Open DevTools (see shortcuts above) and go to the <strong>Console</strong> tab.</li>
+      <li>Type the following and press Enter:</li>
+    </ol>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto mt-3 mb-3"><code>copy(document.documentElement.outerHTML)</code></pre>
+    <p class="text-sm text-gray-600 mb-0">
+      The full rendered HTML is now on your clipboard. Paste it into the extract form.
+    </p>
+  </div>
+
+  <!-- Method 3: Save Page -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-download mr-2 text-blue-600"></i>Method 3: Save Page</h3>
+    <ol class="text-sm text-gray-600 list-decimal ml-5 space-y-2">
+      <li>Press
+        <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Ctrl+S</kbd>
+        <span class="text-gray-400 text-xs">(Win/Linux)</span>
+        /
+        <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd+S</kbd>
+        <span class="text-gray-400 text-xs">(Mac)</span>
+      </li>
+      <li>In the "Save as type" dropdown, choose <strong>"Web Page, HTML only"</strong>.</li>
+      <li>Save the file, then upload it via the <a href="/extract/upload" class="text-blue-600 hover:underline">Upload File</a> form.</li>
+    </ol>
+  </div>
+
+  <!-- Reader View warning -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-book mr-2 text-gray-400"></i>Reader View (Not Recommended)</h3>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+      <i class="bi bi-x-circle mr-1"></i> Firefox's Reader/Simplified View strips out most page elements.
+      It's great for reading articles but will <strong>remove</strong> property data like images, maps, and structured fields.
+      Don't use Reader View as a source for extraction.
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-3 mt-8">
+    <a href="/docs/get-html" class="text-sm text-gray-500 hover:text-blue-600 no-underline transition">
+      <i class="bi bi-arrow-left mr-1"></i> Back to all browsers
+    </a>
+    <a href="/extract/html" class="inline-block bg-blue-600 text-white rounded-lg px-5 py-2.5 hover:bg-blue-700 transition no-underline text-sm font-semibold ml-auto">
+      <i class="bi bi-code-slash mr-1"></i> Go to Paste HTML
+    </a>
+  </div>
+</section>
+
+</BaseLayout>
