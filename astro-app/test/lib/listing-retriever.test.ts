@@ -1,13 +1,23 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { retrieveListing } from '../../src/lib/services/listing-retriever.js';
+import {
+  clearListingStore,
+  storeListing,
+  generateId,
+  findListingByUrl,
+} from '../../src/lib/services/listing-store.js';
+import { Listing } from '../../src/lib/models/listing.js';
 
 function loadFixture(name: string): string {
   return readFileSync(resolve(__dirname, '..', 'fixtures', `${name}.html`), 'utf-8');
 }
 
 describe('retrieveListing', () => {
+  beforeEach(() => {
+    clearListingStore();
+  });
   it('returns error for invalid URL', async () => {
     const result = await retrieveListing('not-a-valid-url');
     expect(result.success).toBe(false);
@@ -99,5 +109,122 @@ describe('retrieveListing', () => {
     expect(result.success).toBe(true);
     expect(result.retrievedListing!.title).toBe('Piso en venta en goya, 54, Goya, Madrid');
     expect(result.diagnostics!.scraperName).toBe('idealista');
+  });
+
+  describe('price normalization', () => {
+    it('sets price_cents and price_currency for rightmove', async () => {
+      const html = loadFixture('rightmove');
+      const result = await retrieveListing(
+        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        html,
+      );
+
+      expect(result.success).toBe(true);
+      const listing = result.retrievedListing!;
+      expect(listing.price_cents).toBeGreaterThan(0);
+      expect(listing.price_currency).toBe('GBP');
+    });
+
+    it('uses EUR currency for idealista', async () => {
+      const html = loadFixture('idealista_2018_01');
+      const result = await retrieveListing(
+        'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        html,
+      );
+
+      expect(result.success).toBe(true);
+      const listing = result.retrievedListing!;
+      expect(listing.price_currency).toBe('EUR');
+      expect(listing.price_cents).toBeGreaterThan(0);
+    });
+
+    it('sets price_cents to 0 when no price in HTML', async () => {
+      const result = await retrieveListing(
+        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        '<html><body></body></html>',
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.retrievedListing!.price_cents).toBe(0);
+    });
+
+    it('includes price_cents in listing asJson output', async () => {
+      const html = loadFixture('rightmove');
+      const result = await retrieveListing(
+        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        html,
+      );
+
+      const json = result.retrievedListing!.asJson();
+      expect(json).toHaveProperty('price_cents');
+      expect(json).toHaveProperty('price_currency');
+      expect(json.price_cents).toBeGreaterThan(0);
+    });
+  });
+
+  describe('URL deduplication', () => {
+    it('reuses existing listing from store', async () => {
+      const url = 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html';
+      const listing = new Listing();
+      listing.assignAttributes({ import_url: url, title: 'Stored Listing' });
+
+      const id = generateId();
+      await storeListing(id, listing);
+
+      const result = await retrieveListing(url);
+      expect(result.success).toBe(true);
+      // The listing was found via dedup
+      expect(findListingByUrl(url)).toBe(id);
+    });
+
+    it('deduplicates URLs ignoring tracking params', async () => {
+      const url = 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html';
+      const listing = new Listing();
+      listing.assignAttributes({ import_url: url, title: 'Original' });
+
+      const id = generateId();
+      await storeListing(id, listing);
+
+      const foundId = findListingByUrl(url + '?utm_source=google&fbclid=abc');
+      expect(foundId).toBe(id);
+    });
+  });
+
+  describe('weighted diagnostics', () => {
+    it('includes weightedExtractionRate', async () => {
+      const html = loadFixture('rightmove');
+      const result = await retrieveListing(
+        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        html,
+      );
+
+      expect(result.diagnostics!.weightedExtractionRate).toBeDefined();
+      expect(result.diagnostics!.weightedExtractionRate).toBeGreaterThan(0);
+    });
+
+    it('includes criticalFieldsMissing', async () => {
+      const html = loadFixture('rightmove');
+      const result = await retrieveListing(
+        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        html,
+      );
+
+      expect(result.diagnostics!.criticalFieldsMissing).toBeDefined();
+      expect(Array.isArray(result.diagnostics!.criticalFieldsMissing)).toBe(true);
+    });
+
+    it('includes contentAnalysis', async () => {
+      const html = loadFixture('rightmove');
+      const result = await retrieveListing(
+        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        html,
+      );
+
+      const ca = result.diagnostics!.contentAnalysis!;
+      expect(ca).toBeDefined();
+      expect(ca.htmlLength).toBeGreaterThan(0);
+      expect(typeof ca.hasScriptTags).toBe('boolean');
+      expect(typeof ca.jsonLdCount).toBe('number');
+    });
   });
 });

@@ -12,6 +12,8 @@ import {
 } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
 import type { ScraperMapping } from '@lib/extractor/mapping-loader.js';
+import { findPortalByHost } from '@lib/services/portal-registry.js';
+import { normalizePrice } from '@lib/extractor/price-normalizer.js';
 
 const MAX_HTML_SIZE = 10_000_000; // 10 MB
 
@@ -239,6 +241,20 @@ export const POST: APIRoute = async ({ request }) => {
       listing.import_host_slug = importHost.slug;
       listing.last_retrieved_at = new Date();
       Listing.updateFromHash(listing, result.properties[0]);
+
+      // Price normalization using portal's default currency
+      try {
+        const parsedUrl = new URL(url);
+        const portal = findPortalByHost(parsedUrl.hostname);
+        const normalized = normalizePrice(
+          listing.price_string || '',
+          listing.price_float || 0,
+          portal?.currency,
+        );
+        listing.price_cents = normalized.priceCents;
+        listing.price_currency = normalized.currency;
+      } catch { /* URL parse failed, skip price normalization */ }
+
       try { await listing.save(); } catch { /* Firestore unavailable */ }
 
       const fieldsExtracted = countExtractedFields(result.properties[0]);
@@ -249,6 +265,7 @@ export const POST: APIRoute = async ({ request }) => {
         fields_available: fieldsAvailable,
         scraper_used: importHost.scraper_name,
         diagnostics: result.diagnostics,
+        ...(result.splitSchema ? { split_schema: result.splitSchema } : {}),
       };
 
       if (fieldsExtracted === 0) {

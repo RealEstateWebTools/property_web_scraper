@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
+import { splitPropertyHash } from '@lib/extractor/schema-splitter.js';
 
 export const GET: APIRoute = async ({ params, locals }) => {
   initKV((locals as any).runtime?.env?.RESULTS);
@@ -13,10 +14,13 @@ export const GET: APIRoute = async ({ params, locals }) => {
   }
 
   const diagnostics = params.id ? await getDiagnostics(params.id) : undefined;
+  const listingJson = listing.asJson();
+  const splitSchema = splitPropertyHash(listingJson);
 
   return new Response(JSON.stringify({
     success: true,
-    listing: listing.asJson(),
+    listing: listingJson,
+    split_schema: splitSchema,
     ...(diagnostics ? { diagnostics } : {}),
   }), {
     headers: { 'Content-Type': 'application/json' },

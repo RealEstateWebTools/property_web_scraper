@@ -62,15 +62,27 @@
     },
     "title":
     {
-      "cssLocator": "title"
+      "cssLocator": "title",
+      "fallbacks": [
+        { "cssLocator": "h1[itemprop='name']" },
+        { "cssLocator": "h1" }
+      ]
     },
     "description":
     {
-      "cssLocator": "p[itemprop='description']"
+      "cssLocator": "p[itemprop='description']",
+      "fallbacks": [
+        { "cssLocator": ".sect-description p" },
+        { "cssLocator": "[data-testid='truncated_text_container']" }
+      ]
     },
     "price_string":
     {
-      "cssLocator": "#propertyHeaderPrice > strong"
+      "cssLocator": "#propertyHeaderPrice > strong",
+      "fallbacks": [
+        { "cssLocator": "[itemprop='price']", "cssAttr": "content" },
+        { "cssLocator": ".property-header-price strong" }
+      ]
     },
     "postal_code":
     {
@@ -81,17 +93,27 @@
     "address_string":
     {
       "cssLocator": "meta[itemprop='streetAddress']",
-      "cssAttr": "content"
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='address-label']" },
+        { "cssLocator": ".property-header-bedroom-and-price address" }
+      ]
     },
     "street_address":
     {
       "cssLocator": "meta[itemprop='streetAddress']",
-      "cssAttr": "content"
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='address-label']" }
+      ]
     },
     "main_image_url":
     {
       "cssLocator": "meta[name='twitter:image:src']",
-      "cssAttr": "content"
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:image']", "cssAttr": "content" }
+      ]
     }
   },
   "images": [

@@ -20,11 +20,19 @@
   },
   "floatFields": {
     "constructed_area": {
-      "cssLocator": ".info-features.txt-big > span:nth-child(1) > span"
+      "cssLocator": ".info-features.txt-big > span:nth-child(1) > span",
+      "fallbacks": [
+        { "jsonLdPath": "floorSize.value", "jsonLdType": "Product" },
+        { "cssLocator": ".info-features span" }
+      ]
     },
     "price_float": {
       "cssLocator": ".ide-container-detail > section > div > div.info-data > span > span",
-      "stripPunct": "true"
+      "stripPunct": "true",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price", "jsonLdType": "Product", "stripPunct": "true" },
+        { "cssLocator": ".info-data-price span", "stripPunct": "true" }
+      ]
     },
     "latitude":
     {
@@ -52,13 +60,27 @@
       "splitTextArrayId": "1"
     },
     "title": {
-      "cssLocator": "title"
+      "cssLocator": "title",
+      "fallbacks": [
+        { "jsonLdPath": "name", "jsonLdType": "Product" },
+        { "cssLocator": ".main-info__title-main" },
+        { "cssLocator": "h1" }
+      ]
     },
     "description": {
-      "cssLocator": ".adCommentsLanguage"
+      "cssLocator": ".adCommentsLanguage",
+      "fallbacks": [
+        { "jsonLdPath": "description", "jsonLdType": "Product" },
+        { "cssLocator": ".comment p" },
+        { "cssLocator": ".adCommentsLanguage p" }
+      ]
     },
     "price_string": {
-      "cssLocator": ".ide-container-detail > section > div > div.info-data > span > span"
+      "cssLocator": ".ide-container-detail > section > div > div.info-data > span > span",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price", "jsonLdType": "Product" },
+        { "cssLocator": ".info-data-price span" }
+      ]
     }
   },
   "images": [
