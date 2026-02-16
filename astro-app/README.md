@@ -66,6 +66,7 @@ astro-app/
 | `npm test` | Run Vitest unit tests |
 | `npm run test:watch` | Run Vitest in watch mode |
 | `npm run test:e2e` | Run Playwright E2E tests |
+| `npm run capture-fixture -- <url>` | Capture HTML fixture for a scraper |
 
 ## API Endpoints
 
@@ -95,6 +96,23 @@ The local fallback host map includes:
 - forsalebyowner.com
 
 Additional sites can be configured via Firestore `import_hosts` collection and corresponding scraper mapping JSON files in `config/scraper_mappings/`.
+
+### Adding a New Scraper
+
+Use the fixture capture utility to streamline the process:
+
+```bash
+# 1. Capture HTML and preview extraction
+npm run capture-fixture -- https://www.example.com/listing/123
+
+# 2. For JS-rendered sites, save the page from your browser first
+npm run capture-fixture -- --file saved_page.html --url https://www.example.com/listing/123
+
+# 3. See all options
+npm run capture-fixture -- --help
+```
+
+The utility saves the HTML to `test/fixtures/`, runs the extraction pipeline, and prints a manifest stub ready to paste into `test/fixtures/manifest.ts`. See `docs/scraper-maintenance-guide.md` for the full workflow.
 
 ## Architecture Notes
 
