@@ -23,7 +23,10 @@ const { title = 'Property Web Scraper' } = Astro.props;
           <i class="bi bi-list text-xl"></i>
         </button>
         <div id="navMenu" class="hidden md:flex items-center gap-6">
-          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/#try-it">Extract</a>
+          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/extract/url">Extract</a>
+          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/listings">Listings</a>
+          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/sites">Sites</a>
+          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/docs/api">API</a>
           <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition flex items-center gap-1" href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank">
             <i class="bi bi-github"></i> GitHub
           </a>
@@ -31,7 +34,10 @@ const { title = 'Property Web Scraper' } = Astro.props;
       </div>
       <!-- Mobile menu -->
       <div id="mobileMenu" class="hidden md:hidden border-t border-gray-100 px-4 pb-3">
-        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/#try-it">Extract</a>
+        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/extract/url">Extract</a>
+        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/listings">Listings</a>
+        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/sites">Sites</a>
+        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/docs/api">API</a>
         <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline flex items-center gap-1" href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank">
           <i class="bi bi-github"></i> GitHub
         </a>

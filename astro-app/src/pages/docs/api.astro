@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="API Documentation - Property Web Scraper">
+
+<section class="max-w-4xl mx-auto px-4 py-12">
+  <nav class="flex items-center gap-2 text-sm text-gray-400 mb-5">
+    <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <span>API Documentation</span>
+  </nav>
+
+  <h2 class="text-2xl font-bold mb-2">API Documentation</h2>
+  <p class="text-gray-500 text-sm mb-8">
+    Integrate property data extraction into your tools using the JSON API.
+  </p>
+
+  <!-- Authentication -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-shield-lock mr-2 text-blue-600"></i>Authentication</h3>
+    <p class="text-sm text-gray-600 mb-3">
+      If a <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">PWS_API_KEY</code> is configured on the server,
+      all API requests must include it via one of:
+    </p>
+    <ul class="text-sm text-gray-600 list-disc ml-5 space-y-1">
+      <li>Header: <code class="bg-gray-100 px-1.5 py-0.5 rounded">X-Api-Key: your-key</code></li>
+      <li>Query parameter: <code class="bg-gray-100 px-1.5 py-0.5 rounded">?api_key=your-key</code></li>
+    </ul>
+  </div>
+
+  <!-- GET /api/v1/listings -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
+      <code class="text-sm font-semibold">/api/v1/listings?url=...</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      Look up a property by URL. Returns existing data if previously extracted.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Parameters</h5>
+    <table class="w-full text-sm mb-3">
+      <thead><tr class="border-b"><th class="text-left py-1.5 px-2 text-gray-500">Name</th><th class="text-left py-1.5 px-2 text-gray-500">Type</th><th class="text-left py-1.5 px-2 text-gray-500">Description</th></tr></thead>
+      <tbody>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>url</code></td><td class="py-1.5 px-2">string</td><td class="py-1.5 px-2">Property listing URL (required)</td></tr>
+      </tbody>
+    </table>
+    <h5 class="text-sm font-semibold mb-2">Example</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl "http://localhost:4321/api/v1/listings?url=https://www.idealista.com/inmueble/12345678/"</code></pre>
+  </div>
+
+  <!-- POST /api/v1/listings -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded">POST</span>
+      <code class="text-sm font-semibold">/api/v1/listings</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      Extract property data from a URL with optional HTML body. Use this when the site requires JavaScript rendering.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Body (JSON)</h5>
+    <table class="w-full text-sm mb-3">
+      <thead><tr class="border-b"><th class="text-left py-1.5 px-2 text-gray-500">Name</th><th class="text-left py-1.5 px-2 text-gray-500">Type</th><th class="text-left py-1.5 px-2 text-gray-500">Description</th></tr></thead>
+      <tbody>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>url</code></td><td class="py-1.5 px-2">string</td><td class="py-1.5 px-2">Property listing URL (required)</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>html</code></td><td class="py-1.5 px-2">string</td><td class="py-1.5 px-2">Pre-rendered HTML (optional)</td></tr>
+      </tbody>
+    </table>
+    <h5 class="text-sm font-semibold mb-2">Example</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl -X POST http://localhost:4321/api/v1/listings \
+  -H "Content-Type: application/json" \
+  -d '&#123;"url": "https://www.idealista.com/inmueble/12345678/", "html": "&lt;html&gt;...&lt;/html&gt;"&#125;'</code></pre>
+  </div>
+
+  <!-- GET /api/v1/listings/:id -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
+      <code class="text-sm font-semibold">/api/v1/listings/:id</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      Retrieve a single listing by its ID.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Example</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl "http://localhost:4321/api/v1/listings/abc123"</code></pre>
+  </div>
+
+  <!-- Response format -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-braces mr-2 text-blue-600"></i>Response Format</h3>
+    <p class="text-sm text-gray-600 mb-3">
+      All endpoints return JSON with a <code class="bg-gray-100 px-1.5 py-0.5 rounded">success</code> boolean.
+      On success, listing data includes:
+    </p>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600">
+      <span class="bg-gray-50 rounded px-2 py-1"><code>title</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>price_string</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>price_float</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>description</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>count_bedrooms</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>count_bathrooms</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>constructed_area</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>address_string</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>latitude</code> / <code>longitude</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>image_urls</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>features</code></span>
+      <span class="bg-gray-50 rounded px-2 py-1"><code>for_sale</code> / <code>for_rent</code></span>
+    </div>
+  </div>
+
+</section>
+
+</BaseLayout>

@@ -16,91 +16,16 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
       Provide a URL or pre-rendered HTML and get structured property data
       instantly &mdash; title, price, images, location, and more.
     </p>
-    <a href="#try-it" class="inline-block border border-white/60 text-white rounded-lg px-6 py-3 hover:bg-white/10 transition no-underline">
-      Try It Now <i class="bi bi-arrow-down-short"></i>
-    </a>
-  </div>
-</section>
-
-<!-- Try it section -->
-<section id="try-it" class="max-w-6xl mx-auto px-4">
-  <div class="flex justify-center">
-    <div class="w-full max-w-2xl">
-      <div class="bg-white rounded-2xl shadow-lg -mt-10 relative z-10 p-8">
-
-        <h4 class="mb-3 font-semibold text-lg">Try it out</h4>
-
-        <!-- Mode tabs -->
-        <div class="flex gap-1 p-1 bg-gray-100 rounded-lg mb-5">
-          <button type="button" class="pws-mode-tab flex-1 text-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer transition bg-white text-blue-600 shadow-sm" data-mode="url">
-            <i class="bi bi-link-45deg"></i> Enter URL
-          </button>
-          <button type="button" class="pws-mode-tab flex-1 text-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer transition text-gray-500 hover:text-gray-700 hover:bg-white/60" data-mode="html">
-            <i class="bi bi-code-slash"></i> Paste HTML
-          </button>
-          <button type="button" class="pws-mode-tab flex-1 text-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer transition text-gray-500 hover:text-gray-700 hover:bg-white/60" data-mode="file">
-            <i class="bi bi-file-earmark-arrow-up"></i> Upload File
-          </button>
-        </div>
-
-        <p class="text-xs text-gray-400 mb-4 min-h-[1.2em]" id="modeHint">
-          We'll fetch the page directly. Works best with static HTML sites.
-        </p>
-
-        <form id="scraperForm" method="post" action="/scrapers/submit" enctype="multipart/form-data">
-
-          <!-- URL (always visible) -->
-          <div class="mb-3">
-            <label for="import_url" class="block text-sm font-semibold mb-1">Property URL</label>
-            <input type="text" name="import_url" id="import_url"
-                   class="w-full px-4 py-2.5 border-[1.5px] border-gray-300 rounded-lg text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition"
-                   placeholder="https://www.idealista.com/inmueble/12345678/" required />
-          </div>
-
-          <!-- HTML textarea (hidden by default) -->
-          <div class="mb-3 hidden" id="htmlGroup">
-            <label for="html_input" class="block text-sm font-semibold mb-1">Page HTML</label>
-            <textarea name="html" id="html_input"
-                      class="w-full px-4 py-2.5 border-[1.5px] border-gray-300 rounded-lg text-sm font-mono min-h-[120px] resize-y focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition"
-                      rows="5" placeholder="Paste the full page source here..."></textarea>
-          </div>
-
-          <!-- File upload (hidden by default) -->
-          <div class="mb-3 hidden" id="fileGroup">
-            <label for="html_file_input" class="block text-sm font-semibold mb-1">HTML File</label>
-            <input type="file" name="html_file" id="html_file_input"
-                   class="w-full px-4 py-2.5 border-[1.5px] border-gray-300 rounded-lg text-sm file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100"
-                   accept=".html,.htm" />
-          </div>
-
-          <div>
-            <button type="submit" id="submitBtn"
-                    class="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-lg hover:bg-blue-700 transition active:scale-[0.98]">
-              Fetch &amp; Extract
-            </button>
-          </div>
-
-        </form>
-
-        <!-- Supported sites -->
-        <div class="mt-5 pt-4 border-t border-gray-100 text-center">
-          <small class="text-gray-400 block mb-2">Works with these sites and any site with a configured mapping:</small>
-          {supportedSites.map((site) => (
-            <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">{site}</span>
-          ))}
-          <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">+ more</span>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Results appear here -->
-<section class="max-w-6xl mx-auto px-4 mt-4">
-  <div class="flex justify-center">
-    <div class="w-full max-w-2xl">
-      <div id="retrieve-results"></div>
+    <div class="flex flex-wrap gap-3 justify-center">
+      <a href="/extract/url" class="inline-block bg-blue-600 text-white rounded-lg px-6 py-3 hover:bg-blue-700 transition no-underline font-semibold">
+        <i class="bi bi-link-45deg mr-1"></i> Extract by URL
+      </a>
+      <a href="/extract/html" class="inline-block border border-white/60 text-white rounded-lg px-6 py-3 hover:bg-white/10 transition no-underline">
+        <i class="bi bi-code-slash mr-1"></i> Paste HTML
+      </a>
+      <a href="/extract/upload" class="inline-block border border-white/60 text-white rounded-lg px-6 py-3 hover:bg-white/10 transition no-underline">
+        <i class="bi bi-file-earmark-arrow-up mr-1"></i> Upload File
+      </a>
     </div>
   </div>
 </section>
@@ -144,6 +69,24 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
   </div>
 </section>
 
+<!-- Supported sites -->
+<section class="max-w-6xl mx-auto px-4 mb-12">
+  <div class="flex justify-center">
+    <div class="w-full max-w-2xl">
+      <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+        <h4 class="font-semibold text-lg mb-4">Supported Sites</h4>
+        <div class="flex flex-wrap justify-center gap-2 mb-4">
+          {supportedSites.map((site) => (
+            <span class="inline-block bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full text-sm">{site}</span>
+          ))}
+          <span class="inline-block bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full text-sm">+ more</span>
+        </div>
+        <a href="/sites" class="text-blue-600 hover:underline text-sm"><i class="bi bi-arrow-right mr-1"></i>View all supported sites</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Why pre-rendered HTML? -->
 <section class="max-w-6xl mx-auto px-4 mb-12">
   <div class="flex justify-center">
@@ -167,73 +110,5 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
     </div>
   </div>
 </section>
-
-<script is:inline>
-document.addEventListener('DOMContentLoaded', () => {
-  const tabs = document.querySelectorAll('.pws-mode-tab');
-  const hint = document.getElementById('modeHint');
-  const htmlGroup = document.getElementById('htmlGroup');
-  const fileGroup = document.getElementById('fileGroup');
-  const form = document.getElementById('scraperForm');
-  const resultsDiv = document.getElementById('retrieve-results');
-  const submitBtn = document.getElementById('submitBtn');
-
-  const hints = {
-    url: "We'll fetch the page directly. Works best with static HTML sites.",
-    html: "Paste the fully-rendered HTML from your browser for JavaScript-heavy sites.",
-    file: "Upload a saved HTML file from your computer."
-  };
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => {
-        t.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
-        t.classList.add('text-gray-500');
-      });
-      tab.classList.remove('text-gray-500');
-      tab.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
-      const mode = tab.dataset.mode;
-      hint.textContent = hints[mode] || '';
-      htmlGroup.classList.toggle('hidden', mode !== 'html');
-      fileGroup.classList.toggle('hidden', mode !== 'file');
-    });
-  });
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Extracting...';
-
-    try {
-      const formData = new FormData(form);
-      const response = await fetch('/scrapers/submit', {
-        method: 'POST',
-        body: formData,
-      });
-      const html = await response.text();
-      resultsDiv.innerHTML = html;
-
-      // Wire up collapse toggle in injected HTML
-      const toggle = resultsDiv.querySelector('.pws-details-toggle');
-      const target = resultsDiv.querySelector('#all-fields');
-      if (toggle && target) {
-        toggle.addEventListener('click', () => {
-          target.classList.toggle('hidden');
-          const icon = toggle.querySelector('i');
-          if (icon) {
-            icon.classList.toggle('bi-chevron-down');
-            icon.classList.toggle('bi-chevron-up');
-          }
-        });
-      }
-    } catch (err) {
-      resultsDiv.innerHTML = '<div class="bg-amber-50 rounded-2xl p-6 text-center"><div class="text-3xl text-amber-600 mb-3"><i class="bi bi-exclamation-triangle"></i></div><h5 class="font-semibold text-amber-900">Network Error</h5><p class="text-amber-800 text-sm">Could not connect to the server.</p></div>';
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Fetch & Extract';
-    }
-  });
-});
-</script>
 
 </BaseLayout>

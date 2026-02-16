@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const sites = [
+  { name: 'Idealista', host: 'idealista.com', country: 'Spain', example: 'https://www.idealista.com/inmueble/12345678/' },
+  { name: 'Rightmove', host: 'rightmove.co.uk', country: 'UK', example: 'https://www.rightmove.co.uk/properties/123456789' },
+  { name: 'Zoopla', host: 'zoopla.co.uk', country: 'UK', example: 'https://www.zoopla.co.uk/for-sale/details/12345678/' },
+  { name: 'Realtor.com', host: 'realtor.com', country: 'USA', example: 'https://www.realtor.com/realestateandhomes-detail/123-Main-St' },
+  { name: 'Fotocasa', host: 'fotocasa.es', country: 'Spain', example: 'https://www.fotocasa.es/es/comprar/vivienda/12345678/d' },
+  { name: 'Pisos.com', host: 'pisos.com', country: 'Spain', example: 'https://www.pisos.com/comprar/piso-12345678/' },
+  { name: 'RealEstateIndia', host: 'realestateindia.com', country: 'India', example: 'https://www.realestateindia.com/property-detail/' },
+  { name: 'ForSaleByOwner', host: 'forsalebyowner.com', country: 'USA', example: 'https://www.forsalebyowner.com/listing/12345678' },
+];
+---
+<BaseLayout title="Supported Sites - Property Web Scraper">
+
+<section class="max-w-6xl mx-auto px-4 py-12">
+  <nav class="flex items-center gap-2 text-sm text-gray-400 mb-5">
+    <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <span>Supported Sites</span>
+  </nav>
+
+  <h2 class="text-2xl font-bold mb-2">Supported Sites</h2>
+  <p class="text-gray-500 text-sm mb-8">
+    PropertyWebScraper has pre-configured scraper mappings for these real estate portals.
+    Custom mappings can also be added for any site.
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {sites.map((site) => (
+      <div class="bg-white rounded-xl shadow-md p-5 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h5 class="font-semibold text-base">{site.name}</h5>
+          <span class="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{site.country}</span>
+        </div>
+        <p class="text-sm text-gray-400">{site.host}</p>
+        <div class="flex gap-2">
+          <a href={`/extract/url`} class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+            <i class="bi bi-link-45deg"></i> Extract
+          </a>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="bg-gradient-to-br from-gray-50 to-gray-200 rounded-2xl p-8 mt-8">
+    <div class="flex items-start gap-4">
+      <div class="hidden md:block text-3xl text-blue-600 shrink-0">
+        <i class="bi bi-plus-circle"></i>
+      </div>
+      <div>
+        <h4 class="font-semibold text-lg mb-3">Need a different site?</h4>
+        <p class="text-sm text-gray-600 m-0">
+          PropertyWebScraper uses JSON-based mapping configs that define CSS selectors
+          and XPath queries for each field. You can create custom mappings for any real
+          estate site.
+          <a href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank" class="text-blue-600 hover:underline">
+            See the docs on GitHub
+          </a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</BaseLayout>
