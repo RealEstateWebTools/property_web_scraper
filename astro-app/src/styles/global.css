@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
 @theme {
   --font-sans: 'Open Sans', ui-sans-serif, system-ui, sans-serif;

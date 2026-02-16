@@ -15,6 +15,7 @@
     "@google-cloud/firestore": "^7.0.0",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.0.0",
+    "bootstrap-icons": "^1.13.1",
     "cheerio": "^1.0.0",
     "jsdom": "^25.0.0",
     "json5": "^2.2.3",

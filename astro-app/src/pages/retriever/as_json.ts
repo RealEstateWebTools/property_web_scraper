@@ -51,8 +51,14 @@ async function handleRequest(request: Request): Promise<Response> {
     return jsonResponse({ success: false, error_message: 'No scraper mapping found' });
   }
 
-  const chain = new WhereChain(Listing as any, { import_url: url! });
-  const listing = await chain.firstOrCreate();
+  let listing: any;
+  try {
+    const chain = new WhereChain(Listing as any, { import_url: url! });
+    listing = await chain.firstOrCreate();
+  } catch {
+    listing = new Listing();
+    listing.assignAttributes({ import_url: url! });
+  }
 
   if (html) {
     const result = extractFromHtml({ html, sourceUrl: url!, scraperMapping });
@@ -60,7 +66,7 @@ async function handleRequest(request: Request): Promise<Response> {
       listing.import_host_slug = importHost.slug;
       listing.last_retrieved_at = new Date();
       Listing.updateFromHash(listing, result.properties[0]);
-      await listing.save();
+      try { await listing.save(); } catch { /* Firestore unavailable */ }
     }
   }
 
