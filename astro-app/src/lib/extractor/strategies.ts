@@ -71,7 +71,9 @@ const scriptJsonCache = new WeakMap<cheerio.CheerioAPI, Map<string, unknown>>();
 
 /**
  * Extract and parse a JSON object assigned to a named variable in a script tag.
- * Handles patterns like: `window.VAR = {...}` or `var VAR = {...}`
+ * Handles patterns like:
+ *   - `window.VAR = {...}` or `var VAR = {...}` (Rightmove PAGE_MODEL, Idealista __INITIAL_STATE__)
+ *   - `<script id="VAR" type="application/json">{...}</script>` (Next.js __NEXT_DATA__)
  */
 function getOrParseScriptJson($: cheerio.CheerioAPI, varName: string): unknown {
   let cacheMap = scriptJsonCache.get($);
@@ -84,45 +86,113 @@ function getOrParseScriptJson($: cheerio.CheerioAPI, varName: string): unknown {
   }
 
   let result: unknown = undefined;
-  const pattern = new RegExp(`(?:window\\.)?${varName}\\s*=\\s*`);
 
-  $('script').each((_i, el) => {
-    if (result !== undefined) return;
-    const text = $(el).html() || '';
-    const match = pattern.exec(text);
-    if (!match) return;
-
-    const jsonStart = match.index + match[0].length;
-    // Find the JSON by counting braces
-    let depth = 0;
-    let inString = false;
-    let escaped = false;
-    let end = jsonStart;
-
-    for (let i = jsonStart; i < text.length; i++) {
-      const ch = text[i];
-      if (escaped) { escaped = false; continue; }
-      if (ch === '\\') { escaped = true; continue; }
-      if (ch === '"') { inString = !inString; continue; }
-      if (inString) continue;
-      if (ch === '{' || ch === '[') depth++;
-      if (ch === '}' || ch === ']') {
-        depth--;
-        if (depth === 0) { end = i + 1; break; }
-      }
-    }
-
-    if (end > jsonStart) {
+  // Strategy 1: Look for <script id="VAR"> tag (e.g. __NEXT_DATA__)
+  const scriptById = $(`script#${varName}`);
+  if (scriptById.length > 0) {
+    const text = scriptById.html() || '';
+    if (text.trim()) {
       try {
-        result = JSON.parse(text.slice(jsonStart, end));
+        result = JSON.parse(text);
       } catch {
         // malformed JSON
       }
     }
-  });
+  }
+
+  // Strategy 2: Look for window.VAR = {...} assignment
+  if (result === undefined) {
+    const pattern = new RegExp(`(?:window\\.)?${varName}\\s*=\\s*`);
+
+    $('script').each((_i, el) => {
+      if (result !== undefined) return;
+      const text = $(el).html() || '';
+      const match = pattern.exec(text);
+      if (!match) return;
+
+      const jsonStart = match.index + match[0].length;
+      // Find the JSON by counting braces
+      let depth = 0;
+      let inString = false;
+      let escaped = false;
+      let end = jsonStart;
+
+      for (let i = jsonStart; i < text.length; i++) {
+        const ch = text[i];
+        if (escaped) { escaped = false; continue; }
+        if (ch === '\\') { escaped = true; continue; }
+        if (ch === '"') { inString = !inString; continue; }
+        if (inString) continue;
+        if (ch === '{' || ch === '[') depth++;
+        if (ch === '}' || ch === ']') {
+          depth--;
+          if (depth === 0) { end = i + 1; break; }
+        }
+      }
+
+      if (end > jsonStart) {
+        try {
+          result = JSON.parse(text.slice(jsonStart, end));
+        } catch {
+          // malformed JSON
+        }
+      }
+    });
+  }
 
   cacheMap.set(varName, result);
   return result;
+}
+
+/**
+ * Per-HTML cache for parsed JSON-LD data.
+ * Keyed by Cheerio instance.
+ */
+const jsonLdCache = new WeakMap<cheerio.CheerioAPI, unknown[]>();
+
+/**
+ * Extract and parse all JSON-LD script tags from the page.
+ * Returns an array of parsed JSON-LD objects.
+ */
+function getOrParseJsonLd($: cheerio.CheerioAPI): unknown[] {
+  let cached = jsonLdCache.get($);
+  if (cached) return cached;
+
+  const results: unknown[] = [];
+  $('script[type="application/ld+json"]').each((_i, el) => {
+    const text = $(el).html() || '';
+    if (!text.trim()) return;
+    try {
+      const parsed = JSON.parse(text);
+      // Handle both single objects and arrays of objects
+      if (Array.isArray(parsed)) {
+        results.push(...parsed);
+      } else {
+        results.push(parsed);
+      }
+    } catch {
+      // malformed JSON-LD
+    }
+  });
+
+  jsonLdCache.set($, results);
+  return results;
+}
+
+/**
+ * Search JSON-LD objects for a value at the given dot-path.
+ * Optionally filter by @type.
+ */
+function searchJsonLd(objects: unknown[], dotPath: string, typeFilter?: string): unknown {
+  for (const obj of objects) {
+    if (typeFilter && typeof obj === 'object' && obj !== null) {
+      const objType = (obj as Record<string, unknown>)['@type'];
+      if (objType !== typeFilter) continue;
+    }
+    const value = getByDotPath(obj, dotPath);
+    if (value !== undefined) return value;
+  }
+  return undefined;
 }
 
 /**
@@ -158,7 +228,14 @@ export function retrieveTargetText(
     if (value !== undefined) retrievedText = String(value);
   }
 
-  // Script JSON path strategy (e.g. window.PAGE_MODEL)
+  // JSON-LD strategy (Schema.org structured data)
+  if (mapping.jsonLdPath) {
+    const jsonLdObjects = getOrParseJsonLd($);
+    const value = searchJsonLd(jsonLdObjects, mapping.jsonLdPath, mapping.jsonLdType);
+    if (value !== undefined) retrievedText = String(value);
+  }
+
+  // Script JSON path strategy (e.g. window.PAGE_MODEL, __NEXT_DATA__)
   if (mapping.scriptJsonPath && mapping.scriptJsonVar) {
     const parsed = getOrParseScriptJson($, mapping.scriptJsonVar);
     const value = getByDotPath(parsed, mapping.scriptJsonPath);

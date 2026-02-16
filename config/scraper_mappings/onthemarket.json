@@ -1,0 +1,85 @@
+[{
+  "name": "onthemarket",
+  "defaultValues": {
+    "country": { "value": "UK" },
+    "area_unit": { "value": "sqft" },
+    "currency": { "value": "GBP" },
+    "for_rent_short_term": { "value": "false" },
+    "locale_code": { "value": "en" }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.bedrooms"
+    },
+    "count_bathrooms": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.bathrooms"
+    }
+  },
+  "floatFields": {
+    "price_float": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.price-value"
+    },
+    "latitude": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.location.lat"
+    },
+    "longitude": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.location.lng"
+    }
+  },
+  "textFields": {
+    "reference": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.property-id"
+    },
+    "title": {
+      "cssLocator": "title"
+    },
+    "description": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.description"
+    },
+    "price_string": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.price"
+    },
+    "postal_code": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.postcode"
+    },
+    "address_string": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.address"
+    },
+    "property_type": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.property-type"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+  "images": [{
+    "cssLocator": "meta[property='og:image']",
+    "cssAttr": "content"
+  }],
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.listing-status",
+      "evaluator": "include?",
+      "evaluatorParam": "sale"
+    },
+    "for_rent": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.property.listing-status",
+      "evaluator": "include?",
+      "evaluatorParam": "rent"
+    }
+  }
+}]

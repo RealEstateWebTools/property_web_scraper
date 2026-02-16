@@ -20,6 +20,10 @@ import inmo1Raw from '../../../scraper_mappings/inmo1.json?raw';
 import weebrixRaw from '../../../scraper_mappings/weebrix.json?raw';
 import ukJittyRaw from '../../../scraper_mappings/uk_jitty.json?raw';
 import rightmoveV2Raw from '../../../scraper_mappings/rightmove_v2.json?raw';
+import zooplaV2Raw from '../../../scraper_mappings/zoopla_v2.json?raw';
+import onthemarketRaw from '../../../scraper_mappings/onthemarket.json?raw';
+import daftRaw from '../../../scraper_mappings/daft.json?raw';
+import idealistaV2Raw from '../../../scraper_mappings/idealista_v2.json?raw';
 
 function parse(raw: string): ScraperMapping {
   const parsed = JSON5.parse(raw);
@@ -45,6 +49,10 @@ const mappings: Record<string, ScraperMapping> = {
   weebrix: parse(weebrixRaw),
   uk_jitty: parse(ukJittyRaw),
   rightmove_v2: parse(rightmoveV2Raw),
+  zoopla_v2: parse(zooplaV2Raw),
+  onthemarket: parse(onthemarketRaw),
+  daft: parse(daftRaw),
+  idealista_v2: parse(idealistaV2Raw),
 };
 
 export default mappings;

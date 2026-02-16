@@ -7,6 +7,8 @@ export interface FieldMapping {
   flightDataPath?: string;
   scriptJsonPath?: string;
   scriptJsonVar?: string;
+  jsonLdPath?: string;
+  jsonLdType?: string;
   urlPathPart?: string;
   cssAttr?: string;
   xmlAttr?: string;
