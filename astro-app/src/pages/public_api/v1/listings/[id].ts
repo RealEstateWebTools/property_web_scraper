@@ -1,9 +1,10 @@
 import type { APIRoute } from 'astro';
 import { authenticateApiKey } from '@lib/services/auth.js';
-import { initKV, getListing } from '@lib/services/listing-store.js';
+import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
 import { checkRateLimit } from '@lib/services/rate-limiter.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
+import { splitPropertyHash } from '@lib/extractor/schema-splitter.js';
 
 export const OPTIONS: APIRoute = () => corsPreflightResponse();
 
@@ -35,6 +36,10 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
     return errorResponse(ApiErrorCode.LISTING_NOT_FOUND, 'Listing not found');
   }
 
+  const diagnostics = params.id ? await getDiagnostics(params.id) : undefined;
+  const listingJson = listing.asJson();
+  const splitSchema = splitPropertyHash(listingJson);
+
   logActivity({
     level: 'info',
     category: 'api_request',
@@ -45,5 +50,9 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
     durationMs: Date.now() - startTime,
   });
 
-  return successResponse({ listing: listing.asJson() });
+  return successResponse({
+    listing: listingJson,
+    split_schema: splitSchema,
+    ...(diagnostics ? { diagnostics } : {}),
+  });
 };
