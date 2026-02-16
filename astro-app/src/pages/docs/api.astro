@@ -84,6 +84,34 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl "http://localhost:4321/public_api/v1/listings/abc123"</code></pre>
   </div>
 
+  <!-- Error Codes -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-exclamation-triangle mr-2 text-blue-600"></i>Error Codes</h3>
+    <p class="text-sm text-gray-600 mb-3">
+      When an error occurs, the response includes a structured error object:
+      <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">&#123; "success": false, "error": &#123; "code": "...", "message": "..." &#125; &#125;</code>
+    </p>
+    <table class="w-full text-sm mb-4">
+      <thead><tr class="border-b"><th class="text-left py-1.5 px-2 text-gray-500">Code</th><th class="text-left py-1.5 px-2 text-gray-500">HTTP Status</th><th class="text-left py-1.5 px-2 text-gray-500">Description</th></tr></thead>
+      <tbody>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>MISSING_URL</code></td><td class="py-1.5 px-2">400</td><td class="py-1.5 px-2">No URL was provided in the request</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>INVALID_URL</code></td><td class="py-1.5 px-2">400</td><td class="py-1.5 px-2">The URL is not a valid HTTP/HTTPS address</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>UNSUPPORTED_HOST</code></td><td class="py-1.5 px-2">400</td><td class="py-1.5 px-2">The website is not currently supported</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>MISSING_SCRAPER</code></td><td class="py-1.5 px-2">500</td><td class="py-1.5 px-2">Server-side scraper configuration is missing</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>UNAUTHORIZED</code></td><td class="py-1.5 px-2">401</td><td class="py-1.5 px-2">Missing or invalid API key</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>LISTING_NOT_FOUND</code></td><td class="py-1.5 px-2">404</td><td class="py-1.5 px-2">No listing exists with the given ID</td></tr>
+      </tbody>
+    </table>
+    <h5 class="text-sm font-semibold mb-2">Example Error Response</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>&#123;
+  "success": false,
+  "error": &#123;
+    "code": "MISSING_URL",
+    "message": "Please provide a url"
+  &#125;
+&#125;</code></pre>
+  </div>
+
   <!-- Response format -->
   <div class="bg-white rounded-xl shadow-md p-6 mb-5">
     <h3 class="text-lg font-semibold mb-3"><i class="bi bi-braces mr-2 text-blue-600"></i>Response Format</h3>
