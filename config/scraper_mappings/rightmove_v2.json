@@ -1,0 +1,121 @@
+[
+{
+  "name": "rightmove_v2",
+  "defaultValues":
+  {
+    "country":
+    {
+      "value": "UK"
+    },
+    "area_unit":
+    {
+      "value": "sqft"
+    },
+    "currency":
+    {
+      "value": "GBP"
+    },
+    "for_rent_short_term": {
+      "value": "false"
+    },
+    "locale_code": {
+      "value": "en"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.bedrooms"
+    },
+    "count_bathrooms": {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.bathrooms"
+    }
+  },
+  "floatFields":
+  {
+    "price_float":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "analyticsInfo.analyticsProperty.price"
+    },
+    "latitude":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.location.latitude"
+    },
+    "longitude":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.location.longitude"
+    }
+  },
+  "textFields":
+  {
+    "reference": {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.id"
+    },
+    "title":
+    {
+      "cssLocator": "title"
+    },
+    "description":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.text.description"
+    },
+    "price_string":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.prices.primaryPrice"
+    },
+    "postal_code":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "analyticsInfo.analyticsProperty.postcode"
+    },
+    "address_string":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.address.displayAddress"
+    },
+    "property_type":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.propertySubType"
+    },
+    "main_image_url":
+    {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+  "images": [
+    {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  ],
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "analyticsInfo.analyticsProperty.activityType",
+      "evaluator": "include?",
+      "evaluatorParam": "forSale"
+    },
+    "for_rent": {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "analyticsInfo.analyticsProperty.activityType",
+      "evaluator": "include?",
+      "evaluatorParam": "toLet"
+    },
+    "for_rent_long_term": {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "analyticsInfo.analyticsProperty.activityType",
+      "evaluator": "include?",
+      "evaluatorParam": "toLet"
+    }
+  }
+
+}]
