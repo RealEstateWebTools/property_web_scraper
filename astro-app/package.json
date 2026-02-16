@@ -27,6 +27,6 @@
     "@types/sanitize-html": "^2.13.0",
     "typescript": "^5.6.0",
     "vitest": "^2.0.0",
-    "wrangler": "^3.0.0"
+    "wrangler": "^4.0.0"
   }
 }
