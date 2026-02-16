@@ -1,0 +1,579 @@
+/*
+ * Property Web Scraper application styles
+ *= require_self
+ */
+
+/* ── Form inputs (legacy compat) ── */
+.login_url input, .password input, .url_input input, .username input {
+  width: 80%;
+  padding: 6px;
+  margin: 10px;
+  font-size: large;
+}
+
+/* ═══════════════════════════════════════
+   PROPERTY DETAIL PAGE
+   ═══════════════════════════════════════ */
+
+.pws-property-page {
+  padding-top: 1rem;
+  padding-bottom: 3rem;
+}
+
+/* ── Breadcrumb ── */
+.pws-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 1.25rem;
+}
+.pws-breadcrumb a {
+  color: #555;
+  text-decoration: none;
+}
+.pws-breadcrumb a:hover {
+  color: #0d6efd;
+}
+.pws-breadcrumb .bi-chevron-right {
+  font-size: 0.65rem;
+}
+
+/* ── Gallery card ── */
+.pws-gallery-card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.pws-gallery-img {
+  max-height: 450px;
+  object-fit: cover;
+}
+.pws-gallery-count {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 0.3rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+}
+
+/* ── Section card (description, map, etc.) ── */
+.pws-section-card {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.pws-section-card h5 {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+.pws-description-text {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #444;
+}
+
+/* ── Info sidebar ── */
+.pws-info-sidebar {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 1.5rem;
+  position: sticky;
+  top: 1rem;
+}
+.pws-property-title {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #222;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+.pws-property-badges .badge {
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+}
+
+/* ── Price block ── */
+.pws-price-block {
+  background: #f0f7ff;
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+.pws-price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0d6efd;
+}
+.pws-currency {
+  font-size: 0.85rem;
+  color: #666;
+  margin-left: 0.35rem;
+}
+
+/* ── Key stats grid ── */
+.pws-key-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.pws-key-stat {
+  text-align: center;
+  padding: 0.75rem 0.5rem;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+}
+.pws-key-stat i {
+  display: block;
+  font-size: 1.25rem;
+  color: #0d6efd;
+  margin-bottom: 0.25rem;
+}
+.pws-key-stat-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #222;
+}
+.pws-key-stat-label {
+  display: block;
+  font-size: 0.72rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ── Detail list (replaces old table) ── */
+.pws-detail-list {
+  margin-bottom: 1rem;
+  border-top: 1px solid #eee;
+}
+.pws-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.88rem;
+}
+.pws-detail-label {
+  color: #888;
+  font-weight: 500;
+}
+.pws-detail-value {
+  color: #333;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ── Property actions ── */
+.pws-property-actions {
+  margin-bottom: 1rem;
+}
+
+/* ── Share row ── */
+.pws-share-row {
+  display: flex;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eee;
+}
+.pws-share-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f0f2f5;
+  color: #555;
+  text-decoration: none;
+  margin-left: 0.35rem;
+  font-size: 0.9rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.pws-share-link:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* ── Listings table ── */
+.pws-listings-table {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.pws-listings-table thead th {
+  background: #f8f9fa;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #666;
+  border-bottom: 2px solid #eee;
+}
+.pws-listings-table td {
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+/* ── Map ── */
+.pws-map {
+  min-height: 300px;
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+/* ═══════════════════════════════════════
+   LANDING PAGE
+   ═══════════════════════════════════════ */
+
+/* ── Landing hero ── */
+.pws-landing-hero {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #fff;
+  padding: 4rem 0 3.5rem;
+  text-align: center;
+}
+.pws-landing-hero h1 {
+  font-weight: 700;
+  font-size: 2.4rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+.pws-landing-hero .lead {
+  font-size: 1.15rem;
+  opacity: 0.85;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+}
+.pws-landing-hero .pws-hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 2rem;
+  padding: 0.35rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Try-it card ── */
+.pws-tryit-card {
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  margin-top: -2.5rem;
+  position: relative;
+  z-index: 10;
+}
+.pws-tryit-card .card-body {
+  padding: 2rem 2rem 1.5rem;
+}
+
+/* ── Mode tabs (segmented control) ── */
+.pws-mode-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: #f0f2f5;
+  border-radius: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+.pws-mode-tabs .pws-mode-tab {
+  flex: 1;
+  text-align: center;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.pws-mode-tabs .pws-mode-tab:hover {
+  color: #333;
+  background: rgba(255,255,255,0.6);
+}
+.pws-mode-tabs .pws-mode-tab.active {
+  background: #fff;
+  color: #0d6efd;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.pws-mode-tabs .pws-mode-tab i {
+  margin-right: 0.35rem;
+}
+
+.pws-mode-hint {
+  font-size: 0.82rem;
+  color: #888;
+  margin-bottom: 1rem;
+  min-height: 1.2em;
+}
+
+/* ── URL input ── */
+.pws-url-input {
+  font-size: 1rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid #ddd;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.pws-url-input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13,110,253,0.12);
+}
+
+/* ── HTML textarea ── */
+.pws-html-textarea {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.85rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid #ddd;
+  min-height: 120px;
+  resize: vertical;
+}
+.pws-html-textarea:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13,110,253,0.12);
+}
+
+/* ── Submit button ── */
+.pws-submit-btn {
+  padding: 0.65rem 2rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+.pws-submit-btn:active {
+  transform: scale(0.98);
+}
+
+/* ── Supported sites ── */
+.pws-supported-sites {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+.pws-site-badge {
+  display: inline-block;
+  background: #f0f2f5;
+  color: #555;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.78rem;
+  margin: 0.2rem 0.15rem;
+}
+
+/* ── How it works ── */
+.pws-how-it-works {
+  padding: 3rem 0;
+}
+.pws-step-card {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+.pws-step-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e8f0fe;
+  color: #0d6efd;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+.pws-step-card h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.pws-step-card p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+.pws-step-number {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #0d6efd;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+.pws-step-connector {
+  display: none;
+}
+@media (min-width: 768px) {
+  .pws-step-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 1.5rem;
+    padding-top: 1rem;
+  }
+}
+
+/* ── HTML-first callout ── */
+.pws-callout {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+.pws-callout h4 {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+.pws-callout p {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 0;
+}
+
+/* ═══════════════════════════════════════
+   RESULTS
+   ═══════════════════════════════════════ */
+
+/* ── Success banner ── */
+.pws-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #d1e7dd;
+  color: #0a3622;
+  padding: 0.85rem 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+.pws-success-banner i {
+  font-size: 1.3rem;
+}
+
+/* ── Property result card ── */
+.pws-result-card {
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.pws-result-card .card-body {
+  padding: 1.5rem;
+}
+.pws-result-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #222;
+}
+.pws-result-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background: #e9ecef;
+}
+
+/* ── Stat pills ── */
+.pws-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.pws-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #f0f2f5;
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  color: #444;
+}
+.pws-stat i {
+  font-size: 0.9rem;
+  color: #0d6efd;
+}
+.pws-stat-price {
+  background: #0d6efd;
+  color: #fff;
+  font-weight: 600;
+}
+.pws-stat-price i {
+  color: #fff;
+}
+
+/* ── All-fields toggle ── */
+.pws-details-toggle {
+  font-size: 0.9rem;
+  color: #0d6efd;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: none;
+  padding: 0.35rem 0;
+  margin-top: 0.5rem;
+}
+.pws-details-toggle:hover {
+  text-decoration: underline;
+}
+
+/* ── Error result ── */
+.pws-error-card {
+  border: none;
+  border-radius: 1rem;
+  background: #fff3cd;
+  padding: 1.5rem;
+}
+.pws-error-icon {
+  font-size: 2rem;
+  color: #997404;
+  margin-bottom: 0.75rem;
+}
+.pws-error-card h5 {
+  font-weight: 600;
+  color: #664d03;
+  margin-bottom: 0.5rem;
+}
+.pws-error-card p {
+  color: #665;
+  font-size: 0.95rem;
+}
+.pws-error-hint {
+  background: rgba(255,255,255,0.6);
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.88rem;
+  color: #555;
+}
+.pws-error-hint i {
+  color: #0d6efd;
+  margin-right: 0.35rem;
+}

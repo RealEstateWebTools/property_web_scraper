@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+	<html class="no-js ">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta charset="iso-8859-1" />
+		<meta name="viewport" content="width=device-width">
+		<!--[if IE]><![endif]-->
+		<meta name="format-detection" content="telephone=no">
+		
+<script type="text/javascript">
+<!--
+window["_csrf_"] = "080a3533548468005aceae0f6410c03ab86c5d52343f91ea704059127837aa2d15ac1b702e79117edf49b1f7712416257a4c42f0400ee4ae8c860b320be37941b99b91145711a13423c7ef0fb1e860d0429c790f295f605b75bfe179362be8be8853ddba39f6fd6ee0f0e1cdf99539ee";
+//-->
+</script>
+<script type="text/javascript" src="/TSbd/08d59bf359ab200079a1a84858442d52a9f19b3279fca59d2a3f847508635dbe37f4ba885b3a9e74?type=2"></script>
+<script type="text/javascript">
+	window.RIGHTMOVE_JS_ERROR = "";
+	window.onerror = function (msg, url, num) {
+		window.RIGHTMOVE_JS_ERROR += "Message:" + msg + ', URL:' + url + ', Line:' + num + '\n';
+		return false;
+	};
+</script>
+<script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={xpid:"VwcEUVNaGwECU1BXBgA="};window.NREUM||(NREUM={}),__nr_require=function(t,n,e){function r(e){if(!n[e]){var o=n[e]={exports:{}};t[e][0].call(o.exports,function(n){var o=t[e][1][n];return r(o||n)},o,o.exports)}return n[e].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<e.length;o++)r(e[o]);return r}({1:[function(t,n,e){function r(t){try{s.console&&console.log(t)}catch(n){}}var o,i=t("ee"),a=t(15),s={};try{o=localStorage.getItem("__nr_flags").split(","),console&&"function"==typeof console.log&&(s.console=!0,o.indexOf("dev")!==-1&&(s.dev=!0),o.indexOf("nr_dev")!==-1&&(s.nrDev=!0))}catch(c){}s.nrDev&&i.on("internal-error",function(t){r(t.stack)}),s.dev&&i.on("fn-err",function(t,n,e){r(e.stack)}),s.dev&&(r("NR AGENT IN DEVELOPMENT MODE"),r("flags: "+a(s,function(t,n){return t}).join(", ")))},{}],2:[function(t,n,e){function r(t,n,e,r,o){try{d?d-=1:i("err",[o||new UncaughtException(t,n,e)])}catch(s){try{i("ierr",[s,c.now(),!0])}catch(u){}}return"function"==typeof f&&f.apply(this,a(arguments))}function UncaughtException(t,n,e){this.message=t||"Uncaught error with no additional information",this.sourceURL=n,this.line=e}function o(t){i("err",[t,c.now()])}var i=t("handle"),a=t(16),s=t("ee"),c=t("loader"),f=window.onerror,u=!1,d=0;c.features.err=!0,t(1),window.onerror=r;try{throw new Error}catch(l){"stack"in l&&(t(8),t(7),"addEventListener"in window&&t(5),c.xhrWrappable&&t(9),u=!0)}s.on("fn-start",function(t,n,e){u&&(d+=1)}),s.on("fn-err",function(t,n,e){u&&(this.thrown=!0,o(e))}),s.on("fn-end",function(){u&&!this.thrown&&d>0&&(d-=1)}),s.on("internal-error",function(t){i("ierr",[t,c.now(),!0])})},{}],3:[function(t,n,e){t("loader").features.ins=!0},{}],4:[function(t,n,e){function r(t){}if(window.performance&&window.performance.timing&&window.performance.getEntriesByType){var o=t("ee"),i=t("handle"),a=t(8),s=t(7),c="learResourceTimings",f="addEventListener",u="resourcetimingbufferfull",d="bstResource",l="resource",p="-start",h="-end",m="fn"+p,w="fn"+h,v="bstTimer",y="pushState",g=t("loader");g.features.stn=!0,t(6);var b=NREUM.o.EV;o.on(m,function(t,n){var e=t[0];e instanceof b&&(this.bstStart=g.now())}),o.on(w,function(t,n){var e=t[0];e instanceof b&&i("bst",[e,n,this.bstStart,g.now()])}),a.on(m,function(t,n,e){this.bstStart=g.now(),this.bstType=e}),a.on(w,function(t,n){i(v,[n,this.bstStart,g.now(),this.bstType])}),s.on(m,function(){this.bstStart=g.now()}),s.on(w,function(t,n){i(v,[n,this.bstStart,g.now(),"requestAnimationFrame"])}),o.on(y+p,function(t){this.time=g.now(),this.startPath=location.pathname+location.hash}),o.on(y+h,function(t){i("bstHist",[location.pathname+location.hash,this.startPath,this.time])}),f in window.performance&&(window.performance["c"+c]?window.performance[f](u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["c"+c]()},!1):window.performance[f]("webkit"+u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["webkitC"+c]()},!1)),document[f]("scroll",r,{passive:!0}),document[f]("keypress",r,!1),document[f]("click",r,!1)}},{}],5:[function(t,n,e){function r(t){for(var n=t;n&&!n.hasOwnProperty(u);)n=Object.getPrototypeOf(n);n&&o(n)}function o(t){s.inPlace(t,[u,d],"-",i)}function i(t,n){return t[1]}var a=t("ee").get("events"),s=t(18)(a,!0),c=t("gos"),f=XMLHttpRequest,u="addEventListener",d="removeEventListener";n.exports=a,"getPrototypeOf"in Object?(r(document),r(window),r(f.prototype)):f.prototype.hasOwnProperty(u)&&(o(window),o(f.prototype)),a.on(u+"-start",function(t,n){var e=t[1],r=c(e,"nr@wrapped",function(){function t(){if("function"==typeof e.handleEvent)return e.handleEvent.apply(e,arguments)}var n={object:t,"function":e}[typeof e];return n?s(n,"fn-",null,n.name||"anonymous"):e});this.wrapped=t[1]=r}),a.on(d+"-start",function(t){t[1]=this.wrapped||t[1]})},{}],6:[function(t,n,e){var r=t("ee").get("history"),o=t(18)(r);n.exports=r,o.inPlace(window.history,["pushState","replaceState"],"-")},{}],7:[function(t,n,e){var r=t("ee").get("raf"),o=t(18)(r),i="equestAnimationFrame";n.exports=r,o.inPlace(window,["r"+i,"mozR"+i,"webkitR"+i,"msR"+i],"raf-"),r.on("raf-start",function(t){t[0]=o(t[0],"fn-")})},{}],8:[function(t,n,e){function r(t,n,e){t[0]=a(t[0],"fn-",null,e)}function o(t,n,e){this.method=e,this.timerDuration=isNaN(t[1])?0:+t[1],t[0]=a(t[0],"fn-",this,e)}var i=t("ee").get("timer"),a=t(18)(i),s="setTimeout",c="setInterval",f="clearTimeout",u="-start",d="-";n.exports=i,a.inPlace(window,[s,"setImmediate"],s+d),a.inPlace(window,[c],c+d),a.inPlace(window,[f,"clearImmediate"],f+d),i.on(c+u,r),i.on(s+u,o)},{}],9:[function(t,n,e){function r(t,n){d.inPlace(n,["onreadystatechange"],"fn-",s)}function o(){var t=this,n=u.context(t);t.readyState>3&&!n.resolved&&(n.resolved=!0,u.emit("xhr-resolved",[],t)),d.inPlace(t,y,"fn-",s)}function i(t){g.push(t),h&&(x?x.then(a):w?w(a):(E=-E,O.data=E))}function a(){for(var t=0;t<g.length;t++)r([],g[t]);g.length&&(g=[])}function s(t,n){return n}function c(t,n){for(var e in t)n[e]=t[e];return n}t(5);var f=t("ee"),u=f.get("xhr"),d=t(18)(u),l=NREUM.o,p=l.XHR,h=l.MO,m=l.PR,w=l.SI,v="readystatechange",y=["onload","onerror","onabort","onloadstart","onloadend","onprogress","ontimeout"],g=[];n.exports=u;var b=window.XMLHttpRequest=function(t){var n=new p(t);try{u.emit("new-xhr",[n],n),n.addEventListener(v,o,!1)}catch(e){try{u.emit("internal-error",[e])}catch(r){}}return n};if(c(p,b),b.prototype=p.prototype,d.inPlace(b.prototype,["open","send"],"-xhr-",s),u.on("send-xhr-start",function(t,n){r(t,n),i(n)}),u.on("open-xhr-start",r),h){var x=m&&m.resolve();if(!w&&!m){var E=1,O=document.createTextNode(E);new h(a).observe(O,{characterData:!0})}}else f.on("fn-end",function(t){t[0]&&t[0].type===v||a()})},{}],10:[function(t,n,e){function r(t){var n=this.params,e=this.metrics;if(!this.ended){this.ended=!0;for(var r=0;r<d;r++)t.removeEventListener(u[r],this.listener,!1);if(!n.aborted){if(e.duration=a.now()-this.startTime,4===t.readyState){n.status=t.status;var i=o(t,this.lastSize);if(i&&(e.rxSize=i),this.sameOrigin){var c=t.getResponseHeader("X-NewRelic-App-Data");c&&(n.cat=c.split(", ").pop())}}else n.status=0;e.cbTime=this.cbTime,f.emit("xhr-done",[t],t),s("xhr",[n,e,this.startTime])}}}function o(t,n){var e=t.responseType;if("json"===e&&null!==n)return n;var r="arraybuffer"===e||"blob"===e||"json"===e?t.response:t.responseText;return h(r)}function i(t,n){var e=c(n),r=t.params;r.host=e.hostname+":"+e.port,r.pathname=e.pathname,t.sameOrigin=e.sameOrigin}var a=t("loader");if(a.xhrWrappable){var s=t("handle"),c=t(11),f=t("ee"),u=["load","error","abort","timeout"],d=u.length,l=t("id"),p=t(14),h=t(13),m=window.XMLHttpRequest;a.features.xhr=!0,t(9),f.on("new-xhr",function(t){var n=this;n.totalCbs=0,n.called=0,n.cbTime=0,n.end=r,n.ended=!1,n.xhrGuids={},n.lastSize=null,p&&(p>34||p<10)||window.opera||t.addEventListener("progress",function(t){n.lastSize=t.loaded},!1)}),f.on("open-xhr-start",function(t){this.params={method:t[0]},i(this,t[1]),this.metrics={}}),f.on("open-xhr-end",function(t,n){"loader_config"in NREUM&&"xpid"in NREUM.loader_config&&this.sameOrigin&&n.setRequestHeader("X-NewRelic-ID",NREUM.loader_config.xpid)}),f.on("send-xhr-start",function(t,n){var e=this.metrics,r=t[0],o=this;if(e&&r){var i=h(r);i&&(e.txSize=i)}this.startTime=a.now(),this.listener=function(t){try{"abort"===t.type&&(o.params.aborted=!0),("load"!==t.type||o.called===o.totalCbs&&(o.onloadCalled||"function"!=typeof n.onload))&&o.end(n)}catch(e){try{f.emit("internal-error",[e])}catch(r){}}};for(var s=0;s<d;s++)n.addEventListener(u[s],this.listener,!1)}),f.on("xhr-cb-time",function(t,n,e){this.cbTime+=t,n?this.onloadCalled=!0:this.called+=1,this.called!==this.totalCbs||!this.onloadCalled&&"function"==typeof e.onload||this.end(e)}),f.on("xhr-load-added",function(t,n){var e=""+l(t)+!!n;this.xhrGuids&&!this.xhrGuids[e]&&(this.xhrGuids[e]=!0,this.totalCbs+=1)}),f.on("xhr-load-removed",function(t,n){var e=""+l(t)+!!n;this.xhrGuids&&this.xhrGuids[e]&&(delete this.xhrGuids[e],this.totalCbs-=1)}),f.on("addEventListener-end",function(t,n){n instanceof m&&"load"===t[0]&&f.emit("xhr-load-added",[t[1],t[2]],n)}),f.on("removeEventListener-end",function(t,n){n instanceof m&&"load"===t[0]&&f.emit("xhr-load-removed",[t[1],t[2]],n)}),f.on("fn-start",function(t,n,e){n instanceof m&&("onload"===e&&(this.onload=!0),("load"===(t[0]&&t[0].type)||this.onload)&&(this.xhrCbStart=a.now()))}),f.on("fn-end",function(t,n){this.xhrCbStart&&f.emit("xhr-cb-time",[a.now()-this.xhrCbStart,this.onload,n],n)})}},{}],11:[function(t,n,e){n.exports=function(t){var n=document.createElement("a"),e=window.location,r={};n.href=t,r.port=n.port;var o=n.href.split("://");!r.port&&o[1]&&(r.port=o[1].split("/")[0].split("@").pop().split(":")[1]),r.port&&"0"!==r.port||(r.port="https"===o[0]?"443":"80"),r.hostname=n.hostname||e.hostname,r.pathname=n.pathname,r.protocol=o[0],"/"!==r.pathname.charAt(0)&&(r.pathname="/"+r.pathname);var i=!n.protocol||":"===n.protocol||n.protocol===e.protocol,a=n.hostname===document.domain&&n.port===e.port;return r.sameOrigin=i&&(!n.hostname||a),r}},{}],12:[function(t,n,e){function r(){}function o(t,n,e){return function(){return i(t,[f.now()].concat(s(arguments)),n?null:this,e),n?void 0:this}}var i=t("handle"),a=t(15),s=t(16),c=t("ee").get("tracer"),f=t("loader"),u=NREUM;"undefined"==typeof window.newrelic&&(newrelic=u);var d=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],l="api-",p=l+"ixn-";a(d,function(t,n){u[n]=o(l+n,!0,"api")}),u.addPageAction=o(l+"addPageAction",!0),u.setCurrentRouteName=o(l+"routeName",!0),n.exports=newrelic,u.interaction=function(){return(new r).get()};var h=r.prototype={createTracer:function(t,n){var e={},r=this,o="function"==typeof n;return i(p+"tracer",[f.now(),t,e],r),function(){if(c.emit((o?"":"no-")+"fn-start",[f.now(),r,o],e),o)try{return n.apply(this,arguments)}finally{c.emit("fn-end",[f.now()],e)}}}};a("setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(t,n){h[n]=o(p+n)}),newrelic.noticeError=function(t){"string"==typeof t&&(t=new Error(t)),i("err",[t,f.now()])}},{}],13:[function(t,n,e){n.exports=function(t){if("string"==typeof t&&t.length)return t.length;if("object"==typeof t){if("undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer&&t.byteLength)return t.byteLength;if("undefined"!=typeof Blob&&t instanceof Blob&&t.size)return t.size;if(!("undefined"!=typeof FormData&&t instanceof FormData))try{return JSON.stringify(t).length}catch(n){return}}}},{}],14:[function(t,n,e){var r=0,o=navigator.userAgent.match(/Firefox[\/\s](\d+\.\d+)/);o&&(r=+o[1]),n.exports=r},{}],15:[function(t,n,e){function r(t,n){var e=[],r="",i=0;for(r in t)o.call(t,r)&&(e[i]=n(r,t[r]),i+=1);return e}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],16:[function(t,n,e){function r(t,n,e){n||(n=0),"undefined"==typeof e&&(e=t?t.length:0);for(var r=-1,o=e-n||0,i=Array(o<0?0:o);++r<o;)i[r]=t[n+r];return i}n.exports=r},{}],17:[function(t,n,e){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],18:[function(t,n,e){function r(t){return!(t&&t instanceof Function&&t.apply&&!t[a])}var o=t("ee"),i=t(16),a="nr@original",s=Object.prototype.hasOwnProperty,c=!1;n.exports=function(t,n){function e(t,n,e,o){function nrWrapper(){var r,a,s,c;try{a=this,r=i(arguments),s="function"==typeof e?e(r,a):e||{}}catch(f){l([f,"",[r,a,o],s])}u(n+"start",[r,a,o],s);try{return c=t.apply(a,r)}catch(d){throw u(n+"err",[r,a,d],s),d}finally{u(n+"end",[r,a,c],s)}}return r(t)?t:(n||(n=""),nrWrapper[a]=t,d(t,nrWrapper),nrWrapper)}function f(t,n,o,i){o||(o="");var a,s,c,f="-"===o.charAt(0);for(c=0;c<n.length;c++)s=n[c],a=t[s],r(a)||(t[s]=e(a,f?s+o:o,i,s))}function u(e,r,o){if(!c||n){var i=c;c=!0;try{t.emit(e,r,o,n)}catch(a){l([a,e,r,o])}c=i}}function d(t,n){if(Object.defineProperty&&Object.keys)try{var e=Object.keys(t);return e.forEach(function(e){Object.defineProperty(n,e,{get:function(){return t[e]},set:function(n){return t[e]=n,n}})}),n}catch(r){l([r])}for(var o in t)s.call(t,o)&&(n[o]=t[o]);return n}function l(n){try{t.emit("internal-error",n)}catch(e){}}return t||(t=o),e.inPlace=f,e.flag=a,e}},{}],ee:[function(t,n,e){function r(){}function o(t){function n(t){return t&&t instanceof r?t:t?c(t,s,i):i()}function e(e,r,o,i){if(!l.aborted||i){t&&t(e,r,o);for(var a=n(o),s=h(e),c=s.length,f=0;f<c;f++)s[f].apply(a,r);var d=u[y[e]];return d&&d.push([g,e,r,a]),a}}function p(t,n){v[t]=h(t).concat(n)}function h(t){return v[t]||[]}function m(t){return d[t]=d[t]||o(e)}function w(t,n){f(t,function(t,e){n=n||"feature",y[e]=n,n in u||(u[n]=[])})}var v={},y={},g={on:p,emit:e,get:m,listeners:h,context:n,buffer:w,abort:a,aborted:!1};return g}function i(){return new r}function a(){(u.api||u.feature)&&(l.aborted=!0,u=l.backlog={})}var s="nr@context",c=t("gos"),f=t(15),u={},d={},l=n.exports=o();l.backlog=u},{}],gos:[function(t,n,e){function r(t,n,e){if(o.call(t,n))return t[n];var r=e();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(t,n,{value:r,writable:!0,enumerable:!1}),r}catch(i){}return t[n]=r,r}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(t,n,e){function r(t,n,e,r){o.buffer([t],r),o.emit(t,n,e)}var o=t("ee").get("handle");n.exports=r,r.ee=o},{}],id:[function(t,n,e){function r(t){var n=typeof t;return!t||"object"!==n&&"function"!==n?-1:t===window?0:a(t,i,function(){return o++})}var o=1,i="nr@id",a=t("gos");n.exports=r},{}],loader:[function(t,n,e){function r(){if(!x++){var t=b.info=NREUM.info,n=l.getElementsByTagName("script")[0];if(setTimeout(u.abort,3e4),!(t&&t.licenseKey&&t.applicationID&&n))return u.abort();f(y,function(n,e){t[n]||(t[n]=e)}),c("mark",["onload",a()+b.offset],null,"api");var e=l.createElement("script");e.src="https://"+t.agent,n.parentNode.insertBefore(e,n)}}function o(){"complete"===l.readyState&&i()}function i(){c("mark",["domContent",a()+b.offset],null,"api")}function a(){return E.exists&&performance.now?Math.round(performance.now()):(s=Math.max((new Date).getTime(),s))-b.offset}var s=(new Date).getTime(),c=t("handle"),f=t(15),u=t("ee"),d=window,l=d.document,p="addEventListener",h="attachEvent",m=d.XMLHttpRequest,w=m&&m.prototype;NREUM.o={ST:setTimeout,SI:d.setImmediate,CT:clearTimeout,XHR:m,REQ:d.Request,EV:d.Event,PR:d.Promise,MO:d.MutationObserver};var v=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1044.min.js"},g=m&&w&&w[p]&&!/CriOS/.test(navigator.userAgent),b=n.exports={offset:s,now:a,origin:v,features:{},xhrWrappable:g};t(12),l[p]?(l[p]("DOMContentLoaded",i,!1),d[p]("load",r,!1)):(l[h]("onreadystatechange",o),d[h]("onload",r)),c("mark",["firstbyte",s],null,"api");var x=0,E=t(17)},{}]},{},["loader",2,10,4,3]);</script><script type="text/javascript">
+			window._gaq = window._gaq || [];
+			window._rmpage = window._rmpage || [];
+            window._rmbot = true;
+			window._rmsegment = '';
+        </script>
+
+		<script type="text/javascript">
+	var RIGHTMOVE_REQUEST = {
+		jsTime : (new Date()).getTime(),
+		trcid : "ee15c56c-0788-4e86-b74a-f20ec70bbb61",
+		reqTime : "t=1512036056632745",
+		svr : "1704",
+		uri : "/property-to-rent/property-51775029.html",
+		category : "other",
+		mobile: "false"
+	};
+</script><link rel="stylesheet" type="text/css" href="/ps/css17319/concat/css_fullsite/standard.css" media="all" />
+		<script type="text/javascript" src="/ps/js17319/concat/js_fullsite/standard.js"></script>
+
+		<script type="text/javascript">
+	RIGHTMOVE.UTIL.loadTime.init(RIGHTMOVE_REQUEST);
+	RIGHTMOVE.UTIL.encodedUrl = "/;jsessionid=A06E8669A45359AE5EFF82F9470E41D4";
+    RIGHTMOVE.UTIL.secureFlowPatterns = [".*/payment/.*","/rightmoveplus/property/preview/.*","/admin/property/preview/.*",".*/login.html.*",".*/register.html.*",".*/user/changePassword.html.*",".*/resetPassword.html.*",".*/forgottenPassword.html.*",".*/forgottenPasswordForm.html.*",".*/jobpicker.html.*",".*/unclaimedlead/.*\\.html.*",".*/removals/survey/.*\\.html.*"];
+	RIGHTMOVE.UTIL.secureEncodedUrl = "https://www.rightmove.co.uk/";
+</script><script type="text/javascript">
+        var _gaq = _gaq || [];
+        (function() {
+            var src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            RIGHTMOVE.loadJSAsync(src);
+        })();
+    </script>
+<title>4 bedroom detached house to rent in School Road, Birmingham, B14, B14</title>
+<meta name="description" content="4 bedroom detached house to rent in School Road, Birmingham, B14 - Rightmove."/>
+<link rel="canonical" href="/property-to-rent/property-51775029.html"/>
+<!-- APPLE ICONS -->
+<link rel="apple-touch-icon" sizes="72x72" href="/ps/images/favicons/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/ps/images/favicons/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/ps/images/favicons/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/ps/images/favicons/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/ps/images/favicons/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/ps/images/favicons/apple-touch-icon-180x180.png">
+<meta name="apple-mobile-web-app-title" content="Rightmove">
+<meta name="application-name" content="Rightmove">
+<meta name="theme-color" content="#262637">
+<!-- ANDROID AND CHROME ICONS -->
+<link rel="manifest" href="/ps/images/favicons/manifest.json">
+<!-- MICROSOFT ICONS -->
+<meta name="msapplication-TileColor" content="#262637">
+<meta name="msapplication-TileImage" content="/ps/images/favicons/mstile-144x144.png">
+<meta name="msapplication-config" content="/ps/images/favicons/browserconfig.xml">
+<!--[if IE]>
+<meta name="slice" scheme="IE" content="off"/>
+<![endif]-->
+
+<script type="text/javascript">
+		(function() {
+			var domain = 'rightmove.co.uk';
+			RIGHTMOVE.UTIL.analytics.initialise(domain, 'UA-3350334-1', 'UA-3350334-30');
+			
+		RIGHTMOVE.UTIL.analytics.setCustomVariable(
+		    5,
+		    'response_resi_results',
+		    'F',
+			2
+		);
+	
+		RIGHTMOVE.UTIL.analytics.setCustomVariable(
+		    8,
+		    'mvt',
+		    'SchoolsLandingPageMVT:SEARCH_BAR_AT_TOP',
+			2
+		);
+	
+    RIGHTMOVE.UTIL.analytics.trackPageViewWithDefault('renting/propertydetails');
+
+			RIGHTMOVE.UTIL.analytics.trackPageLoadTime();
+		}());
+    </script>
+	<script type="text/javascript">
+		var googletag = googletag || {};
+		googletag.cmd = googletag.cmd || [];
+	</script>
+	<script type='text/javascript'>
+			RIGHTMOVE.loadJSAsync("http://www.googletagservices.com/tag/js/gpt.js");
+		</script>
+	<meta property="og:url" content="http://www.rightmove.co.uk/property-to-rent/property-51775029.html"/>
+	<meta property="og:title" content="Check out this property for rent on Rightmove!"/>
+	<meta property="og:type" content="website"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_01_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_02_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_03_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_04_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_05_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_06_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_07_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_08_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_09_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_10_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_11_0000_max_135x100.jpg"/>
+	<meta property="og:image" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_12_0000_max_135x100.jpg"/>
+	<meta property="og:locale" content="en_GB"/>
+	<meta property="og:site_name" content="Rightmove.co.uk"/>
+	<meta property="og:description" content="4 bedroom detached house to rent in School Road, Birmingham, B14 Fixed Price &pound;995 pcm. Marketed by Glenwood Property Services, Birmingham"/>
+	<meta property="fb:admins" content="rightmove.plc"/>
+    <meta property="fb:app_id" content="485764298115191" />
+    <meta property="twitter:account_id" content="2911111" />
+<meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:image:src" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_656x437.jpg">
+        <meta name="twitter:site" content="@rightmove">
+    <meta name="twitter:url" content="http://www.rightmove.co.uk/property-to-rent/property-51775029.html">
+    <meta name="twitter:title" content="Check out this property for rent on Rightmove!">
+    <meta name="twitter:description" content="4 bedroom detached house to rent in School Road, Birmingham, B14 Fixed Price &pound;995 pcm. Marketed by Glenwood Property Services, Birmingham">
+<meta name="apple-itunes-app" content="app-id=323822803, affiliate-data=at=11lqxx&ct=smartbanner, app-argument=rightmove://PROPERTY_DETAILS?propertyId=51775029"/>
+	</head>
+
+<!--[if lt IE 7]> <body id="" class="t-right-col property-details-lettings print-agent-branded-header coloured odin-top-nav ie-6 lt-ie9 lt-ie8 lt-ie7"><![endif]-->
+<!--[if IE 7]> <body id="" class="t-right-col property-details-lettings print-agent-branded-header coloured odin-top-nav ie-7 lt-ie9 lt-ie8"><![endif]-->
+<!--[if IE 8]> <body id="" class="t-right-col property-details-lettings print-agent-branded-header coloured odin-top-nav ie-8 lt-ie9"><![endif]-->
+<!--[if lt IEMobile 8]> <body id="" class="t-right-col property-details-lettings print-agent-branded-header coloured odin-top-nav lt-ieMobile-8"><![endif]-->
+<!--[if gt IE 8]><!--> <body id="" class="t-right-col property-details-lettings print-agent-branded-header coloured odin-top-nav"><!--<![endif]-->
+<script>
+				
+		(function(w,p,u,s) {
+			var dataLayer = RIGHTMOVE.ANALYTICS.DataLayer;
+
+			dataLayer.pushKV('page', {"uri":"/property-to-rent/property-51775029.html","referrer":null,"serverTimestamp":1512036056712,"svr":"1704","channel":"lettings","isEmbedded":false,"ismSitePage":false});
+			dataLayer.pushKV('page', { screenHeight : w.innerHeight, screenWidth : w.innerWidth , userTimestamp : new Date().getTime() });
+
+			dataLayer.pushKV('user', {"pcid":"171130EX1290UIAR3AW4GU2E7EZWB37A","secUserId":null,"emailHash":"","ckse":null,"cksp":null,"userType":"none","userSegment":null});
+			dataLayer.pushKV('user', { ckse : w.navigator.cookieEnabled });
+
+			dataLayer.pushKV('session', {"mvtOnSession":false,"javaSessionId":"ddec1d87-7065-4b4f-8529-48981d208fae","deviceType":"desktop","referringURL":null,"mvtInfo":[{"shouldLog":true,"label":"SchoolsLandingPageMVT","state":"SEARCH_BAR_AT_TOP"}],"utm_medium":null,"utm_source":null,"utm_campaign":null,"utm_content":null,"utm_term":null});
+		}(window));
+	</script>
+		<script>
+				
+		(function(){
+			RIGHTMOVE.ANALYTICS.GoogleTagManager.initialize(window,document,'script','dataLayer','GTM-T4524Q','g2ndo_352oWlGwJG7HHfyw','env-7');
+		})();
+	</script>
+		<noscript>
+		<iframe src="//www.googletagmanager.com/ns.html?id=GTM-T4524Q&gtm_auth=g2ndo_352oWlGwJG7HHfyw&gtm_preview=env-7&gtm_cookies_win=x"
+				height="0" width="0" style="display:none;visibility:hidden"></iframe>
+	</noscript>
+<div id="fb-root"></div>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		
+					RIGHTMOVE.COOKIE.cookieAdder.addCookie(
+							'false',
+							{"TPC":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"*","path":"/","secure":false,"value":"","version":0},"iPhoneAd":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"iPhoneAd","path":"/","secure":false,"value":"","version":0},"ki":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"*","path":"/","secure":false,"value":"","version":0},"sso2":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"sso2","path":"/","secure":false,"value":"","version":0},"rmsessionid":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"rmsessionid","path":"/","secure":false,"value":"","version":0},"loginnotes":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"loginnotes","path":"/","secure":false,"value":"","version":0},"cmS":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"cmS","path":"/","secure":false,"value":"","version":0},"jsts":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"jsts","path":"/rmplus","secure":false,"value":"","version":0},"splash_screen":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"splash_screen","path":"/","secure":false,"value":"","version":0},"rmmv":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"*","path":"/","secure":false,"value":"","version":0},"cookieLevel":{"comment":"","domain":".investorsrightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"cookieLevel","path":"/","secure":false,"value":"","version":0},"propertyHuntGameState":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"propertyHuntGameState","path":"/","secure":false,"value":"","version":0},"__utmx_k_":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"*","path":"/overseas-property/","secure":false,"value":"","version":0},"__utm":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"*","path":"/","secure":false,"value":"","version":0},"cmL":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"cmL","path":"/","secure":false,"value":"","version":0},"switchable.":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"*","path":"/","secure":false,"value":"","version":0},"rmtcj":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"rmtcj","path":"/","secure":false,"value":"","version":0},"beta_optin":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"beta_optin","path":"/","secure":false,"value":"","version":0},"rmrcm":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"rmrcm","path":"/","secure":false,"value":"","version":0},"sb-installed":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"sb-installed","path":"/","secure":false,"value":"","version":0},"propertyDetailsResultsCarousel":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"propertyDetailsResultsCarousel","path":"/","secure":false,"value":"","version":0},"UID":{"comment":"","domain":".scorecardresearch.com","httpOnly":false,"maxAge":-1,"name":"UID","path":"/","secure":false,"value":"","version":0},"topPCRSearch":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"topPCRSearch","path":"/","secure":false,"value":"","version":0},"studentGridOrListView":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"studentGridOrListView","path":"/","secure":false,"value":"","version":0},"iphoneAppMentioned":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"iphoneAppMentioned","path":"/","secure":false,"value":"","version":0},"ghostrec-usability":{"comment":"","domain":".labsrightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"ghostrec-usability","path":"/","secure":false,"value":"","version":0},"wcilCriteria":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"wcilCriteria","path":"/","secure":false,"value":"","version":0},"osLsId":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"osLsId","path":"/","secure":false,"value":"","version":0},"ghost-sessionId":{"comment":"","domain":".labsrightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"ghost-sessionId","path":"/","secure":false,"value":"","version":0},"seenMapFeedbackBar":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"seenMapFeedbackBar","path":"/","secure":false,"value":"","version":0},"MobileCurrentLocationSortOrder":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"MobileCurrentLocationSortOrder","path":"/","secure":false,"value":"","version":0},"TS":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"*","path":"/","secure":false,"value":"","version":0},"MobileRegionSortOrder":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"MobileRegionSortOrder","path":"/","secure":false,"value":"","version":0},"iPadAd":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"iPadAd","path":"/","secure":false,"value":"","version":0},"X-RM-Feature-Overrides":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"X-RM-Feature-Overrides","path":"/","secure":false,"value":"","version":0},"MobilePointSortOrder":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"MobilePointSortOrder","path":"/","secure":false,"value":"","version":0},"sva":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"sva","path":"/","secure":false,"value":"","version":0},"sb-closed":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"sb-closed","path":"/","secure":false,"value":"","version":0},"androidAppMentioned":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"androidAppMentioned","path":"/","secure":false,"value":"","version":0},"JSESSIONID":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"JSESSIONID","path":"/","secure":false,"value":"","version":0},"siteType":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"siteType","path":"/","secure":false,"value":"","version":0},"UIDR":{"comment":"","domain":".scorecardresearch.com","httpOnly":false,"maxAge":-1,"name":"UIDR","path":"/","secure":false,"value":"","version":0},"permuserid":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"permuserid","path":"/","secure":false,"value":"","version":0},"cdUserType":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"cdUserType","path":"/","secure":false,"value":"","version":0},"MobileSoldSortOrder":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"MobileSoldSortOrder","path":"/house-prices/","secure":false,"value":"","version":0},"svp":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"svp","path":"/","secure":false,"value":"","version":0},"svr":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"svr","path":"/","secure":false,"value":"","version":0},"hsid":{"comment":"","domain":".investorsrightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"hsid","path":"/","secure":false,"value":"","version":0},"sso2v":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"sso2v","path":"/","secure":false,"value":"","version":0},"PDC":{"comment":"","domain":"","httpOnly":false,"maxAge":-1,"name":"*","path":"","secure":false,"value":"","version":0},"ghost-taskId":{"comment":"","domain":".labsrightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"ghost-taskId","path":"/","secure":false,"value":"","version":0},"cks_policy":{"comment":"","domain":".rightmove.co.uk","httpOnly":false,"maxAge":-1,"name":"cks_policy","path":"/","secure":false,"value":"","version":0}},
+							'rmtcj',
+							'rmtcj=8714; path=/');
+			
+	});
+</script><div class="cookiemodalbar-rebrand">
+		<div id="cookiemodalbarplaceholder"></div>
+	</div>
+
+	<div class="cookiemodalbar-rebrand">
+        <div id="cookiemodalbar">
+	<div id="cookiemodalbar-description">
+		<p>
+			<span id="cookiemodalbar-description-title">We use cookies</span>
+			to optimise your experience on our website.
+			If you continue we'll assume that you are happy to receive our cookies.
+			However, if you would like to, you can
+			<a id="cookiemodalbar-changelink" href="http://www.rightmove.co.uk/this-site/cookies.html">change your cookie settings</a>
+			at any time.
+		</p>
+		<a id="cookiemodalbar-button" href="/property-to-rent/property-51775029.html">
+			<div id="cookiemodalbar-button-icon"></div>
+			<span id="cookiemodalbar-button-text">Continue</span>
+		</a>
+	</div>
+</div></div>
+
+<header class="globalHeader  header-rebranding"
+		id="globalHeader">
+	<div class="globalNav-wrapper">
+		<a href="/">
+	<img id="rm-site-logo"
+				 src="/ps/images17319/fullsite/logos/rm-site--logo.svg"
+				 class="globalHeader-logo globalHeader-logo--rebranded" alt="Rightmove property search for flats and houses for sale and for rent">
+		</a><nav class="globalNav">
+			<ul class="globalNav-content">
+				<li class="globalNav-item">
+					<a class="globalNav-link" href="/property-for-sale.html" data-analytics-label="buy">
+						Buy
+					</a>
+					<div class="globalNav-subNav">
+						<ul class="globalNav-subNav-col">
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/property-for-sale.html"
+								   data-analytics-label="buy-property-for-sale">Property for sale</a>
+							</li>
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/new-homes-for-sale.html"
+								   data-analytics-label="buy-new-homes-for-sale">New homes for sale</a>
+							</li>
+						</ul>
+						<ul class="globalNav-subNav-col">
+								<li class="globalNav-subNav-item">
+									<a class="globalNav-subNav-link" href="/property-valuation.html"
+									   data-analytics-label="buy-property-valuation">Property valuation</a>
+								</li>
+								<li class="globalNav-subNav-item">
+									<a class="globalNav-subNav-link" href="/property-investment.html"
+									   data-analytics-label="buy-investors">Investors</a>
+								</li>
+								<li class="globalNav-subNav-item">
+									<a class="globalNav-subNav-link" href="http://www.rightmove.co.uk/mortgages/"
+									   data-analytics-label="buy-mortgages">Mortgages</a>
+								</li>
+							</ul>
+						</div>
+				</li>
+
+				<li class="globalNav-item">
+					<a class="globalNav-link" href="/property-to-rent.html" data-analytics-label="rent">
+						Rent
+					</a>
+					<div class="globalNav-subNav">
+						<ul class="globalNav-subNav-col">
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/property-to-rent"
+								   data-analytics-label="rent-property-to-rent">Property to rent</a>
+							</li>
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/student-accommodation.html"
+								   data-analytics-label="rent-student-property-to-rent">Student property to rent</a>
+							</li>
+						</ul>
+					</div>
+				</li>
+
+				<li class="globalNav-item globalNav-item-findAgents">
+					<a class="globalNav-link" href="/estate-agents.html" data-analytics-label="find-agent">
+						Find&nbsp;Agent
+					</a>
+					<div class="globalNav-subNav">
+						<ul class="globalNav-subNav-col">
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/estate-agents.html"
+								   data-analytics-label="find-agent-find-estate-agents">Find estate agents</a>
+							</li>
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/property-valuation.html"
+								   data-analytics-label="find-agent-property-valuation">Property valuation</a>
+							</li>
+						</ul>
+					</div>
+				</li>
+
+				<li class="globalNav-item">
+					<a class="globalNav-link" href="/house-prices.html" data-analytics-label="house-prices">
+						House&nbsp;Prices
+					</a>
+					<div class="globalNav-subNav">
+						<ul class="globalNav-subNav-col">
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/house-prices.html"
+								   data-analytics-label="house-prices-sold-house-prices">Sold house prices</a>
+							</li>
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/property-valuation.html"
+								   data-analytics-label="house-prices-property-valuation">Property valuation</a>
+							</li>
+						</ul>
+						<ul class="globalNav-subNav-col">
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/house-prices-in-my-area.html"
+								   data-analytics-label="house-prices-market-trends">Market trends</a>
+							</li>
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/house-value.html"
+								   data-analytics-label="house-prices-price-comparison-report">Price comparison
+									report</a>
+							</li>
+						</ul>
+					</div>
+				</li>
+
+				<li class="globalNav-item globalNav-item-commercial">
+					<a class="globalNav-link" href="/commercial-property-to-let.html" data-analytics-label="commercial">
+						Commercial
+					</a>
+					<div class="globalNav-subNav">
+						<ul class="globalNav-subNav-col">
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/commercial-property-to-let.html"
+								   data-analytics-label="commercial-commercial-property-to-let">Commercial property to
+									let</a>
+							</li>
+							<li class="globalNav-subNav-item">
+								<a class="globalNav-subNav-link" href="/commercial-property-for-sale.html"
+								   data-analytics-label="commercial-commercial-property-for-sale">Commercial property
+									for sale</a>
+							</li>
+						</ul>
+					</div>
+				</li>
+
+				<li class="globalNav-item globalNav-item-overseas">
+					<a class="globalNav-link" href="/overseas-property.html" data-analytics-label="overseas">
+						Overseas
+					</a>
+					<div class="globalNav-subNav">
+								<ul class="reverseBorder globalNav-subNav-col">
+									<li class="globalNav-subNav-item">
+										<a class="globalNav-subNav-link" href="/overseas-property.html"
+										   data-analytics-label="overseas-overseas-properties-for-sale">Overseas
+											properties for sale</a>
+									</li>
+									<li class="globalNav-subNav-item">
+										<a class="globalNav-subNav-link" href="/overseas-property/hot-properties.html"
+										   data-analytics-label="overseas-hot-properties">Hot properties</a>
+									</li>
+									<li class="globalNav-subNav-item">
+										<a class="globalNav-subNav-link" href="/overseas-property/in-Spain.html"
+										   data-analytics-label="overseas-spain">Spain</a>
+									</li>
+								</ul>
+								<ul class="reverseBorder globalNav-subNav-col">
+									<li class="globalNav-subNav-item">
+										<a class="globalNav-subNav-link" href="/overseas-property/in-France.html"
+										   data-analytics-label="overseas-france">France</a>
+									</li>
+									<li class="globalNav-subNav-item">
+										<a class="globalNav-subNav-link"
+										   href="/overseas-property/help-and-advice/research.html"
+										   data-analytics-label="overseas-help-and-advice">Help and advice</a>
+									</li>
+									<li class="globalNav-subNav-item">
+										<a class="globalNav-subNav-link" href="/overseas-property/advertise.html"
+										   data-analytics-label="overseas-sell-overseas-property">Sell overseas
+											property</a>
+									</li>
+								</ul>
+							</div>
+						</li>
+
+				<li class="globalNav-item globalNav-item-signin">
+					<a id="sign-in" class="globalNav-link globalNav-link--loggedOut"
+					   href="/login.html?from=%2Fproperty-to-rent%2Fproperty-51775029.html&amp;hideFromParameterOnRegisterURI=true"
+					   rel="nofollow">
+						<span class="globalNav-signin">Sign In</span>
+						<img src="/ps/images/header/signedout.png" class="icon-signedOut">
+						<img src="/ps/images/header/signedin.png" class="icon-signedIn">
+					</a>
+					<a id="my-rightmove" class="globalNav-link globalNav-link--loggedIn"
+					   href="/user/saved-searches/redirect.html" rel="nofollow">
+						<span class="globalNav-signin">My Rightmove</span>
+						<img src="/ps/images/header/signedout.png" class="icon-signedOut">
+						<img src="/ps/images/header/signedin.png" class="icon-signedIn">
+					</a>
+				</li>
+
+			</ul>
+		</nav>
+
+		<div class="globalHeader-burger">
+
+		</div>
+		<div class="globalHeader-signin">
+			<img src="/ps/images/header/signedout.png" class="icon-signedOut">
+			<img src="/ps/images/header/signedin.png" class="icon-signedIn">
+		</div>
+
+	</div>
+	<div class="globalNav-background"></div>
+	<div class="globalHeader-background"></div>
+</header>
+
+<div class="site-wrapper" id="sitewrapper">
+	<!--[if IE 6]>
+<div class="clearfix dontPrint" id="ie6msg" style="background-color:#FF6666;height:24px;padding-top:0.5em;text-align:center;">
+    Rightmove.co.uk no longer supports Internet Explorer 6. &nbsp; Please update to the latest <a href="http://www.microsoft.com/windows/internet-explorer/" target="_blank"><b>Internet Explorer</b></a>, <a href="http://www.mozilla.com/firefox/" target="_blank"><b>Firefox</b></a> or <a href="http://www.google.co.uk/chrome/" target="_blank"><b>Chrome</b></a>.
+</div>
+<![endif]-->
+
+<!--[if IE 7]>
+<div class="clearfix dontPrint" id="ie7msg" style="background-color:#FF6666;height:24px;padding-top:0.5em;text-align:center;">
+	Rightmove.co.uk no longer supports Internet Explorer 7. &nbsp; Please update to the latest <a href="http://www.microsoft.com/windows/internet-explorer/" target="_blank"><b>Internet Explorer</b></a>, <a href="http://www.mozilla.com/firefox/" target="_blank"><b>Firefox</b></a> or <a href="http://www.google.co.uk/chrome/" target="_blank"><b>Chrome</b></a>.
+</div>
+<script type="text/javascript">if(document.documentMode){document.getElementById('ie7msg').style.display='none';document.getElementById('ie7msg').style.visibility='hidden';}</script>
+<![endif]--><div class="clearfix main" role="main">
+		<!-- For more information see: https://developers.google.com/analytics/devguides/collection/gajs/gaTrackingCustomVariables -->
+
+<script type="text/javascript">
+	_gaq.push(['_setCustomVar', 9, 'Video Type', 'No Video', 3]);
+</script>
+<div class="page-header"></div>
+<div  class="row print-only two-col bdr-b">
+    <div class="cell ">
+	<div class="module ">
+	<img class="left agent-details-agent-logo" src="http://media.rightmove.co.uk/147k/146672/branch_rmchoice_logo_146672_0000_t.jpeg" alt="Glenwood Property Services, Birmingham">
+        <div class="overflow-hidden">
+            <strong>Glenwood Property Services, Birmingham</strong>
+            <address>412 Ladypool Road,
+Moseley,
+Birmingham,
+B12 8JZ</address>
+            <p><strong><a href="tel:0121 396 0802" class="branch-telephone-number">
+	<strong>0121 396 0802</strong>
+</a></strong> local call rate</p>
+        </div>
+    </div></div><div class="cell align-right">
+	<div class="module ">
+	<img src="/ps/images17319/fullsite/logos/site_logo_strapless.gif" alt="Rightmove.co.uk">
+        <p>www.rightmove.co.uk/property/51775029</p>
+    </div></div></div><div id="primaryContent" class="primary-content property-details" itemscope itemtype="http://schema.org/Residence">
+	<div  class="row one-col property-header">
+    <div class="cell ">
+	<div class="module ">
+	<div class="right print-only print-property-header-qr-code">
+			<img src="http://media.rightmove.co.uk/qr/www.rightmove.co.uk/s2p_51775029_s/QR_146672_REF_87-School-Rd.png" alt="QR code"/>
+		</div>
+
+		<div class="property-header-bedroom-and-price ">
+			<div class="left">
+				<h1 class="fs-22" itemprop="name">4 bedroom detached house to rent</h1>
+				<address class="pad-0 fs-16 grid-25" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+					<meta itemprop="streetAddress" content="School Road, Birmingham, B14" />
+					<meta itemprop="addressCountry" content="GB" />
+						School Road, Birmingham, B14</address>
+			</div>
+			<p id="propertyHeaderPrice" class="property-header-price ">
+				<small class="property-header-qualifier">Let Agreed</small>
+				<strong>
+					&pound;995 pcm<br/>
+					</strong>
+
+				<a id="link-fees" href="#fees-apply-disclaimer" class="link-fees">fees apply</a>
+				</p>
+		</div>
+	</div></div></div><div  class="row one-col">
+    <div class="cell ">
+	<div class="module ">
+	<div class="gallery no-js-hidden">
+    <div class="gallery-main">
+        <a class="gallery-nav gallery-nav-prev js-gallery-prev" href="#">
+            <span class="visuallyhidden">Prev</span>
+        </a>
+        <a class="gallery-nav gallery-nav-next js-gallery-next" href="#">
+            <span class="visuallyhidden">Next</span>
+        </a>
+        <div class="gallery-main-img-wrap">
+			<span class="gallery-main-img" href="#">
+				<img class="js-gallery-main" src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_656x437.jpg"
+					 alt="Front of Property" itemprop="image"/>
+				<span  class="propertystatus propertystatusBR letagreed">
+		<strong>Let Agreed</strong>
+	</span>
+</span>
+		</div>
+        <div class="gallery-main-controls">
+			<p class="gallery-main-nav">
+				<a class="gallery-main-prev js-gallery-prev" href="#">
+					<span class="visuallyhidden">Prev</span>
+				</a>
+				<span class="gallery-main-status"><span class="js-gallery-index">1</span> of 13</span>
+				<a class="gallery-main-next js-gallery-next" href="#">
+					<span class="visuallyhidden">Next</span>
+				</a>
+			</p>
+
+			<p class="gallery-main-slideshow left">
+					<a class="icon-before icon-slideshow js-gallery-slideshow mar-lr" href="#">Start slideshow</a>
+				</p>
+			<div class="gallery-main-actions">
+				<p class="gallery-main-caption right pad-lr js-gallery-caption">Front of Property</p>
+				<p class="gallery-main-enlarge right">
+						<a id="link-enlarge" class="icon-before icon-enlarge-white js-gallery-enlarge js-fullscreen-fixed" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=0">Enlarge</a></p>
+				</div>
+        </div>
+    </div>
+    <div class="gallery-thumbs">
+        <a class="gallery-nav gallery-nav-prev js-thumbnail-prev" href="#">
+            <span>Prev</span>
+        </a>
+        <div class="gallery-thumbs-carousel">
+            <ul class="gallery-thumbs-list js-thumbnail-main" style="width: 1716px;">
+                <li class="js-gallery-thumbnail selected" itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_656x437.jpg" />
+                        <a id="thumbnail-0" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_135x100.jpg" alt="Front of Property"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_01_0000_max_656x437.jpg" />
+                        <a id="thumbnail-1" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_01_0000_max_135x100.jpg" alt="Hallway"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_02_0000_max_656x437.jpg" />
+                        <a id="thumbnail-2" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_02_0000_max_135x100.jpg" alt="Reception 1"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_03_0000_max_656x437.jpg" />
+                        <a id="thumbnail-3" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_03_0000_max_135x100.jpg" alt="Reception 2"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_04_0000_max_656x437.jpg" />
+                        <a id="thumbnail-4" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_04_0000_max_135x100.jpg" alt="Kitchen"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_05_0000_max_656x437.jpg" />
+                        <a id="thumbnail-5" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_05_0000_max_135x100.jpg" alt="Conservatory"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_06_0000_max_656x437.jpg" />
+                        <a id="thumbnail-6" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_06_0000_max_135x100.jpg" alt="Bathroom"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_07_0000_max_656x437.jpg" />
+                        <a id="thumbnail-7" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_07_0000_max_135x100.jpg" alt="Bedroom 1"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_08_0000_max_656x437.jpg" />
+                        <a id="thumbnail-8" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_08_0000_max_135x100.jpg" alt="Bedroom 2"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_09_0000_max_656x437.jpg" />
+                        <a id="thumbnail-9" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_09_0000_max_135x100.jpg" alt="Bedroom 3"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_10_0000_max_656x437.jpg" />
+                        <a id="thumbnail-10" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_10_0000_max_135x100.jpg" alt="Bedroom 4"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_11_0000_max_656x437.jpg" />
+                        <a id="thumbnail-11" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_11_0000_max_135x100.jpg" alt="Gated Driveway"/></a></li>
+                <li class="js-gallery-thumbnail " itemprop="photo" itemscope itemtype="http://schema.org/ImageObject">
+                        <meta itemprop="contentUrl" content="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_12_0000_max_656x437.jpg" />
+                        <a id="thumbnail-12" rel="nofollow" href="#"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_12_0000_max_135x100.jpg" alt="Garden"/></a></li>
+                </ul>
+        </div>
+        <a class="gallery-nav gallery-nav-next js-thumbnail-next" href="#">
+            <span>Next</span>
+        </a>
+    </div>
+</div>
+
+<noscript>
+    <div class="gallery gallery-grid">
+    <ul>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=0"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_656x437.jpg" alt="Front of Property"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=1"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_01_0000_max_656x437.jpg" alt="Hallway"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=2"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_02_0000_max_656x437.jpg" alt="Reception 1"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=3"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_03_0000_max_656x437.jpg" alt="Reception 2"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=4"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_04_0000_max_656x437.jpg" alt="Kitchen"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=5"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_05_0000_max_656x437.jpg" alt="Conservatory"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=6"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_06_0000_max_656x437.jpg" alt="Bathroom"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=7"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_07_0000_max_656x437.jpg" alt="Bedroom 1"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=8"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_08_0000_max_656x437.jpg" alt="Bedroom 2"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=9"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_09_0000_max_656x437.jpg" alt="Bedroom 3"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=10"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_10_0000_max_656x437.jpg" alt="Bedroom 4"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=11"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_11_0000_max_656x437.jpg" alt="Gated Driveway"></a></li>
+        <li>
+                <a target="_blank" rel="nofollow" href="/property-to-rent/fullscreen/image-gallery.html?propertyId=51775029&photoIndex=12"><img src="http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_12_0000_max_656x437.jpg" alt="Garden"></a></li>
+        </ul>
+</div></noscript><div id="requestdetails" class="request-property-details cta-request-details clearfix hl-1 pad-16 align-center print-hidden">
+    <a id="property-detail-button-middle" class="right btn btn-primary" title="Request Details" rel="nofollow" href="/property-to-rent/contactBranch.html?propertyId=51775029&backToPropertyURL=/property-to-rent/property-51775029.html&fromButtonId=property-detail-button-middle">Request Details</a><h3 class="left">Do you like this property?</h3>
+        <p class="right" >
+    
+            Call:
+        <a href="tel:0121 396 0802" class="fs-19">
+        <strong>0121 396 0802</strong>
+    </a>
+</p></div></div></div></div><div  class="row one-col">
+    <div class="cell ">
+	<div class="module ">
+	<div id="detailsTabs" class="tabbed-content ">
+    <ul class="clearfix tabbed-content-nav print-hidden ">
+    <li class="tabbed-content-nav-item active" id="">
+    <a href="#description">
+					Description
+				</a>
+</li><li class="tabbed-content-nav-item " id="locationTab">
+    <a href="#location">Map & Street View</a>
+</li><li class="tabbed-content-nav-item " id="schoolsTab">
+    <a href="#schools">SchoolChecker</a>
+</li></ul><div class="clearfix tabs">
+				<div id="description" class="tabbed-content-tab clearfix active">
+	<h2 class="tabbed-content-tab-heading">Property Description</h2>
+	<div class="tabbed-content-tab-content description">
+    <div class="left overflow-hidden agent-content">
+    <div id="lettingInformation" class="sect">
+
+        <h3>Letting information:</h3>
+        <table class="table-reset width-100">
+            <colgroup>
+                <col class="col-1 width-50">
+                <col class="col-2 width-50">
+            </colgroup>
+            <tbody>
+            <tr>
+                <td>Furnishing:</td>
+                <td id="furnishedType">Unfurnished</td>
+            </tr>
+            <tr>
+                <td>Deposit:</td>
+                <td>&pound;995</td>
+            </tr>
+            <tr>
+                <td>Letting type:</td>
+                <td>Long term</td>
+            </tr>
+            <tr>
+                <td>Added on Rightmove: </td>
+                <td>22 November 2017 (7 days ago)</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+<div class="sect key-features">
+    <h3>Key features</h3>
+        <ul class="list-two-col list-style-square">
+            <li>GATED DRIVEWAY</li>
+            <li>DETACHED PROPERTY</li>
+            <li>FOUR BEDROOMS</li>
+            <li>TWO RECEPTION ROOMS</li>
+            <li>PERECT FAMILY HOME</li>
+            <li>FRESHLY PAINTED THROUGHOUT</li>
+            </ul>
+    </div><div class="sect ">
+    <h3>Full description</h3>
+	<div class="sect ">
+    <p><strong>Tenure:</strong> <span id="tenureType">Freehold</span></p>
+		</div><p itemprop="description">
+        Glenwood Property Services proudly present this stunningly spacious four bedroom detached property located in Yardley Wood. Located conveniently between Solihull and Kings Heath this property is ideal for a professional working family.<br /><br />The property itself has been painted freshly throughout and is available to move into from 27/11/2017. <br /><br />On the first floor you will find an entrance hallway which leads to two spacious reception rooms both of which benefit from brand new laminate flooring. To the rear of the property you will find a large fully fitted kitchen which includes all major white good including and integrated dishwasher. To rear of the kitchen you will find a small conservatory which leads to the rear garden. There is a w/c on the ground floor which is located under the staircase.<br /><br />On the first floor you will find three good sized double bedrooms and one single bedroom. The modern family bathroom is also located on the first floor.<br /><br />The property also benefits from central heating, double glazing a gated driveway and a large double garage. <br /><br />**CALL THE OFFICE NOW TO ARRANGE YOUR VIEWING**  </p>
+    <div class="sect ">
+    <br/>
+        </div></div></div>
+<div class="right desc-widgets">
+        <div class="bdr-2 box-1">
+        <div class="pos-rel">
+    <a class="block js-tab-trigger js-ga-minimap" href="#location">
+                <img src="//media.rightmove.co.uk/map/_generate?latitude=52.413249&longitude=-1.868374&zoomLevel=14&width=190&height=222&signature=y_uvUlsrJe3AnUhDNm6LqIeyD3k=" width="190px" height="222px" alt="Get map and local information"/>
+            </a>
+        <img src="/ps/images17319/maps/icons/rmpin.png"
+         alt="Location on map"
+         class="icon-house-pin-centered">
+</div></div>
+    <p class="bdr-2 box-1 pad-8 print-hidden">
+        <a class="icon-before icon-enlarge-blue js-tab-trigger js-ga-minimap-text" href="#location">Enlarge this map</a>
+    </p>
+<div class="clearfix nearest-stations">
+        <div class="bdr-2 box-1 pad-8">
+            <h4>Nearest stations</h4>
+            <ul class="stations-list">
+                <li>
+                        <i class="icon icon-national-train-station"></i>
+                        <span>Yardley Wood</span>
+                        <small>(0.9 mi)</small>
+                    </li>
+                <li>
+                        <i class="icon icon-national-train-station"></i>
+                        <span>Shirley</span>
+                        <small>(1.2 mi)</small>
+                    </li>
+                <li>
+                        <i class="icon icon-national-train-station"></i>
+                        <span>Whitlock's End</span>
+                        <small>(1.6 mi)</small>
+                    </li>
+                </ul>
+			<small class="disclaimer">Distances are straight line measurements from centre of postcode</small>
+        </div>
+        </div>
+<div class="clearfix school-checker">
+    <div class="bdr-2 box-1 pad-8">
+        <h4>Nearest schools</h4>
+        <a class="js-description-school-checker icon-after icon-arrow-right" href="#schools">Use the school checker</a>
+    </div>
+</div>
+
+<p class="bdr-2 box-1 pad-8 print-hidden">
+	<span class="broadband-cmt">
+				<span class="check-broadband-speed">Show fastest broadband speed at this postcode</span>
+				<span class="top-broadband-speed">
+					<span class="title"><b>Top broadband speed within this postcode</b></span>
+					<span class="loader-wrapper">
+						<span class="loader"></span>
+						<span class="loader-text">Finding the fastest speed...</span>
+					</span>
+					<span class="results-wrapper">
+						<span class="top-provider">
+							Up to
+							<b></b>
+							<span></span>
+						</span>
+						<span class="compare-providers">
+							<a class="see-all-offers" target="_blank" href="#">Compare broadband deals</a><img src="/ps/images17319/propertydetails/compare-providers.png"
+								 srcset="/ps/images17319/propertydetails/compare-providers@2x.png 2x,
+							 /ps/images17319/propertydetails/compare-providers@3x 3x">
+						</span>
+					</span>
+					<img src="/ps/images17319/propertydetails/powered-by-ctm.png"
+						 srcset="/ps/images17319/propertydetails/powered-by-ctm@2x.png 2x,
+						 /ps/images17319/propertydetails/powered-by-ctm@3x 3x">
+				</span>
+			</span>
+		</p>
+
+</div>
+<div class="sect clearfix clear-both hl-2 pad-16">
+    <div class="agent-details">
+		<p><strong>To view this property or request more details, contact:</strong></p>
+		<p class="left agent-details-agent-logo">
+			<a href="/estate-agents/agent/Glenwood-Property-Services/Birmingham-146672.html"><img src="http://media.rightmove.co.uk/147k/146672/branch_rmchoice_logo_146672_0000_t.jpeg" alt="Glenwood Property Services, Birmingham logo"/></a></p>
+        <div class="agent-details-display">
+
+            <p class="pad-0">
+                <a title="Contact Glenwood Property Services, Birmingham" rel="nofollow" href="/property-to-rent/contactBranch.html?propertyId=51775029&backToPropertyURL=%2Fproperty-to-rent%2Fproperty-51775029.html&fromButtonId=contactagent-footer"><strong>Glenwood Property Services, Birmingham</strong></a></p>
+            <address class="pad-0">412 Ladypool Road,
+Moseley,
+Birmingham,
+B12 8JZ</address>
+            <p>
+					<a href="tel:0121 396 0802" class="branch-telephone-number">
+	<strong>0121 396 0802</strong>
+</a><a id="link-local-rate" href="#local-rate-message">
+						<small>Local call rate</small>
+                    </a>
+                </p>
+                <div class="hide">
+                    <div id="local-rate-message">
+    <h4>How much will it cost me to call the number displayed on the site?</h4>
+    <p>Standard geographic charges from landlines and mobiles apply and calls may be included in your telecom provider's call package.</p>
+</div></div>
+
+            </div>
+    </div>
+</div></div></div><div id="location" class="tabbed-content-tab clearfix ">
+	<h2 class="tabbed-content-tab-heading">Map & Street View</h2>
+	<div class="tabbed-content-tab-content ">
+    <div class="sect print-avoid-break-inside">
+    <p class="locationTabControls clearfix">
+		<span class="buttonGroup" data-bind="visible: showStreetViewOption() == true">
+			<button type="button" id="mapToggle" class="buttonGroup-button" data-bind="css: {'buttonGroup-button--active': showStreetView() == false}, click: function(){showStreetView(false)}">MAP VIEW</button>
+			<button type="button" id="streetViewToggle" class="buttonGroup-button" data-bind="css: {'buttonGroup-button--active': showStreetView() == true}, click: function(){showStreetView(true)}">STREET VIEW</button>
+		</span>
+		<a class="right icon-before icon-enlarge-blue no-js-hidden js-fullscreen-percentage" href="/property-to-rent/fullscreen/view-map.html?propertyId=51775029" data-bind="visible: showStreetView() == false, attr: { href: '/property-to-rent/fullscreen/view-map.html?propertyId=51775029&mapTypeId=' + mapTypeId() }">View in fullscreen</a><a class="right icon-before icon-enlarge-blue no-js-hidden js-fullscreen-percentage" href="/property-to-rent/fullscreen/view-streetview.html?propertyId=51775029" data-bind="visible: showStreetView() == true">View in fullscreen</a></p>
+
+	<div class="locationTabMap">
+		<div style="height: 480px;"
+			 data-bind="component: {
+				name: 'map',
+				params: {
+					mapLocation: mapLocation,
+					streetViewPointOfView: streetViewPointOfView,
+					streetViewPanorama: streetViewPanorama,
+					streetViewUnavailable: streetViewUnavailable,
+					markerIcon: '/ps/images/fullsite/icons/rmpin-noshadow.png',
+					showStreetView: showStreetView,
+					nearbyTubeLine: nearbyTubeLine,
+					distanceFromPanoramaOrigin: distanceFromPanoramaOrigin,
+					streetViewUnavailable: streetViewUnavailable,
+					resetStreetView: resetStreetView,
+					mapTypeId: mapTypeId
+				}
+			 }">
+		</div>
+
+		<div class="locationTabMap-schoolCheckerBtn">
+				<a class="icon-after icon-arrow-right" data-bind="click: gotoSchoolsTab" href="#schools">School Checker</a>
+			</div>
+		<div data-bind="visible: showStreetView() == true">
+			<div class="locationTabMap-error" data-bind="css: {'locationTabMap-error--active' : streetViewUnavailable()}">
+				<div class="locationTabMap-errorContent">
+					<h3 class="locationTabMap-errorTitle">Street View is unavailable in this location</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+	<small data-bind="visible: showStreetView() == false">
+		Note:
+		<span data-bind="visible: mapLocation().exact == false">The pin shows the centre of the property's postcode, and does not pinpoint the exact address</span>
+		<span data-bind="visible: mapLocation().exact == true">The pin shows the exact address of the property</span>
+	</small>
+	<small data-bind="visible: showStreetView() == true">
+		<span data-bind="visible: streetViewUnavailable() == true">
+			Street View is unavailable in this location
+		</span>
+		<span data-bind="visible: distanceFromPanoramaOrigin() <= 30 && streetViewUnavailable() == false">
+			<span data-bind="visible: streetViewPanorama() == true">You're in the centre of the property's postcode.</span>
+			Start exploring the local area from here.
+		</span>
+		<span data-bind="visible: distanceFromPanoramaOrigin() > 30 && streetViewUnavailable() == false">
+			<a href="#" data-bind="click: resetStreetView">Take me back to the start</a>
+		</span>
+	</small>
+</div><div class="sect ">
+    <div class="clearfix nearest-stations">
+        <div class="">
+            <h4>Nearest stations</h4>
+            <ul class="stations-list">
+                <li>
+                        <i class="icon icon-national-train-station"></i>
+                        <span>Yardley Wood</span>
+                        <small>(0.9 mi)</small>
+                    </li>
+                <li>
+                        <i class="icon icon-national-train-station"></i>
+                        <span>Shirley</span>
+                        <small>(1.2 mi)</small>
+                    </li>
+                <li>
+                        <i class="icon icon-national-train-station"></i>
+                        <span>Whitlock's End</span>
+                        <small>(1.6 mi)</small>
+                    </li>
+                </ul>
+			<small class="disclaimer">Distances are straight line measurements from centre of postcode</small>
+        </div>
+        </div>
+</div><div class="sect ">
+    <div class="sect clearfix clear-both hl-2 pad-16">
+    <div class="agent-details">
+		<p><strong>To view this property or request more details, contact:</strong></p>
+		<p class="left agent-details-agent-logo">
+			<a href="/estate-agents/agent/Glenwood-Property-Services/Birmingham-146672.html"><img src="http://media.rightmove.co.uk/147k/146672/branch_rmchoice_logo_146672_0000_t.jpeg" alt="Glenwood Property Services, Birmingham logo"/></a></p>
+        <div class="agent-details-display">
+
+            <p class="pad-0">
+                <a title="Contact Glenwood Property Services, Birmingham" rel="nofollow" href="/property-to-rent/contactBranch.html?propertyId=51775029&backToPropertyURL=%2Fproperty-to-rent%2Fproperty-51775029.html&fromButtonId=contactagent-footer"><strong>Glenwood Property Services, Birmingham</strong></a></p>
+            <address class="pad-0">412 Ladypool Road,
+Moseley,
+Birmingham,
+B12 8JZ</address>
+            <p>
+					<a href="tel:0121 396 0802" class="branch-telephone-number">
+	<strong>0121 396 0802</strong>
+</a><a id="link-local-rate" href="#local-rate-message">
+						<small>Local call rate</small>
+                    </a>
+                </p>
+                <div class="hide">
+                    <div id="local-rate-message">
+    <h4>How much will it cost me to call the number displayed on the site?</h4>
+    <p>Standard geographic charges from landlines and mobiles apply and calls may be included in your telecom provider's call package.</p>
+</div></div>
+
+            </div>
+    </div>
+</div></div></div></div><div id="schools" class="tabbed-content-tab clearfix print-hidden no-js-hidden">
+	<h2 class="tabbed-content-tab-heading">Schools</h2>
+	<div class="tabbed-content-tab-content ">
+    <div id="schools-192">
+
+	<div class="schoolsLevelToggle">
+		<a class="schoolsLevelToggle-button js-primary-age-group-btn" data-bind="click: updateEducationLevel('primary'), css: { 'schoolsLevelToggle-button--selected' : isEducationLevelSelected('primary') }">Primary</a><!--
+		--><a class="schoolsLevelToggle-button js-secondary-age-group-btn" data-bind="click: updateEducationLevel('secondary'), css: { 'schoolsLevelToggle-button--selected' : isEducationLevelSelected('secondary') }">Secondary</a>
+	</div>
+
+	<div id="schools-map" class="schoolMap">
+		<div id="schools-map-canvas" class="school-list-map map-canvas height-100 width-100"></div>
+		<div id="greyoutmap" class="schoolsMapCover schoolsMapCover--disabled" data-bind="css: { 'schoolsMapCover--disabled': shouldShowTable }">
+			<div id='mainmessage' class='schoolMapMessage'>
+				<h3 class='schoolMapMessage-title' data-bind="text: noDataMessage">
+					There are no nearby secondary schools found.
+				</h3>
+			</div>
+		</div>
+		<div class="schoolPreloader">
+			<div class="schoolPreloader-spinner"></div>
+			<span class="schoolPreloader-label">Loading</span>
+		</div>
+		<div class="schoolMap-admission" data-bind="css: {'schoolMap-admission--active': selectedSchool().schoolMapAdmissionMessage}">
+			<span class="schoolMap-admissionLabel" data-bind="text: selectedSchool().schoolMapAdmissionMessage"></span>
+		</div>
+		<div class="schoolMap-recenterBtn" data-bind="click: recenterMapToProperty">
+			<i class="schoolMap-recenterBtnIcon icon-schools-map-house"></i>
+		</div>
+	</div>
+
+	<div data-bind="visible: shouldShowTable, with: selectedSchool">
+
+		<div class="schoolInformationPanel">
+			<p class="schoolInformationPanel-marker">
+				<i class="icon-schools-large-map-icon"></i>
+				<span data-bind="text: rowNum"></span>
+			</p>
+			<div class="schoolInformationPanel-header">
+				<span class="schoolInformationPanel-headerTitle" data-bind="text: name "></span>
+			</div>
+			<div class="schoolInformationPanel-meta clearfix">
+				<span class="schoolInformationPanel-metaDistance" data-bind="text: schoolDistance"></span>
+				<span class="schoolInformationPanel-metaType" data-bind="text: schoolType"></span>
+			</div>
+		</div>
+		<div class="schoolInformationDetails">
+			<div class="schoolInformationDetails-overview clearfix">
+				<div class="schoolInformationDetails-overviewGroup schoolInformationDetails-overviewGroup--active">
+					<div class="schoolInformationDetails-overviewIcon schoolInformationDetails-overviewIcon--ofsted icon-schools-ofsted-grade">
+						<span class="schoolInformationDetails-overviewIconLabel" data-bind="text: ratingValue"></span>
+					</div>
+					<div>
+						<span class="schoolInformationDetails-overviewHeading" data-bind="text: ratingBody"></span>
+						<span class="schoolInformationDetails-overviewHeading">REPORT:</span>
+					</div>
+					<!-- ko if: $parent.selectedSchool().isOfstedRated || !$parent.selectedSchool().inspectionReportUrl -->
+					   <span class="schoolInformationDetails-overviewHeadingValue" data-bind="text: ratingLabel"></span>
+				    <!-- /ko -->
+					<!-- ko if: !$parent.selectedSchool().isOfstedRated && $parent.selectedSchool().inspectionReportUrl -->
+					   <span class="schoolInformationDetails-overviewHeadingValue">
+						   <a data-bind="attr: { href: inspectionReportUrl }" target="_blank">See details</a>
+					   </span>
+					<!-- /ko -->
+				</div>
+				<div class="schoolInformationDetails-overviewGroup schoolInformationDetails-overviewGroup--subscription" data-bind="css : {'schoolInformationDetails-overviewGroup--active' : hasSubscription}">
+					<i class="schoolInformationDetails-overviewIcon" data-bind="css: subscriptionIcon"></i>
+					<span class="schoolInformationDetails-overviewLabel" data-bind="text: subscriptionLabel"></span>
+					<span class="schoolInformationDetails-overviewAlertButton" data-bind="click: $parent.showSubscriptionAlert">?</span>
+				</div>
+				<div class="schoolInformationDetails-overviewGroup schoolInformationDetails-overviewGroup--admission" data-bind="css : {'schoolInformationDetails-overviewGroup--active' : hasAdmissionArea}">
+					<i class="schoolInformationDetails-overviewIcon" data-bind="css: admissionIcon"></i>
+					<span class="schoolInformationDetails-overviewLabel" data-bind="text: admissionLabel"></span>
+					<span class="schoolInformationDetails-overviewAlertButton" data-bind="click: $parent.showAdmissionAreaAlert">?</span>
+				</div>
+			</div>
+			<div class="schoolInformationDetails-spec clearfix">
+				<div class="schoolInformationDetails-specArrow"></div>
+				<div class="schoolInformationDetails-specGroup schoolInformationDetails-specGroup--left">
+					<div class="schoolInformationDetails-specItem schoolInformationDetails-specItem--brdBtm">
+						<span class="schoolInformationDetails-specItemTitle">AGE:</span>
+						<span class="schoolInformationDetails-specItemValue" data-bind="text: ageRange"></span>
+					</div>
+					<div class="schoolInformationDetails-specItem">
+						<span class="schoolInformationDetails-specItemTitle">PUPILS:</span>
+						<span class="schoolInformationDetails-specItemValue" data-bind="text: pupilCount"></span>
+					</div>
+				</div>
+				<div class="schoolInformationDetails-specGroup">
+					<div class="schoolInformationDetails-specItem schoolInformationDetails-specItem--brdBtm">
+						<span class="schoolInformationDetails-specItemTitle">GENDER:</span>
+						<span class="schoolInformationDetails-specItemValue" data-bind="text: gender"></span>
+					</div>
+					<div class="schoolInformationDetails-specItem">
+						<span class="schoolInformationDetails-specItemTitle">RELIGION:</span>
+						<span class="schoolInformationDetails-specItemValue" data-bind="text: religion"></span>
+					</div>
+				</div>
+			</div>
+			<div class="schoolInformationDetails-seeMore">
+				<span class="schoolInformationDetails-seeMoreBody">See more, including the inspection report, on</span>
+				<a class="schoolInformationDetails-seeMoreLink" href="http://www.192.com" data-bind="attr: {href: schoolGuideUrl, title: dataProviderUrlTitle}, click: $parent.trackDetailProviderLink" target="_blank">
+					<div class="schoolInformationDetails-seeMoreLogoWrapper">
+						<i class="icon-findaschool-logo"></i>
+						<i class="seeMoreArrow"></i>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="schoolsTableHeading" data-bind="visible: shouldShowTable">
+		<h3 class="schoolsTableHeading-title">Nearby Schools:</h3>
+	</div>
+
+	<table class="schoolsTable" data-bind="visible: shouldShowTable, css: {'schoolsTable--hideRating': isScotland}">
+		<colgroup>
+			<col class="schoolsTable-colIndex"/>
+			<col class="schoolsTable-colName"/>
+			<col class="schoolsTable-colRating"/>
+			<col class="schoolsTable-colCatchment"/>
+		</colgroup>
+		<tbody data-bind="foreach: schoolsList">
+			<tr class="schoolsTable-row" data-bind="click: $parent.schoolsListItemClicked.bind($data, $index()), css: {'schoolsTable-row--selected' : $parent.selectedSchool().rowNum == $index() + 1, 'schoolsTable-row--odd' : ($index() % 2 == 0) }, visible:  $parent.isRowVisible($index())">
+	            <td class="schoolsTable-cell schoolsTable-cellIndex">
+					<span class="schoolsTable-index" data-bind="text: $index() + 1"></span>
+	            </td>
+	            <td class="schoolsTable-cell schoolsTable-cellName">
+					<div class="schoolsTable-name" data-bind="text: name, attr: { title: name }"></div>
+					<span class="schoolsTable-distance" data-bind="text: schoolDistance"></span>
+					<span class="schoolsTable-schoolType" data-bind="text: schoolType"></span>
+				</td>
+	            <td class="schoolsTable-cell schoolsTable-cellRating">
+	                <span class="schoolsTable-rating" data-bind="text: ratingBodyWithColon"></span>
+	                <span class="schoolsTable-rating" data-bind="text: ratingLabel"></span>
+	            </td>
+				<td class="schoolsTable-cell schoolsTable-cellCatchment">
+					<span class="schoolsTable-overview" data-bind="text: subscriptionLabel"></span>
+					<span class="schoolsTable-overview" data-bind="text: admissionLabel"></span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div class="schoolsTableLoadMore" data-bind="visible: isShowMoreVisible()">
+		<a href="#" class="schoolsTableLoadMore-button" data-bind="click: showMoreSchools">Show more <i class="schoolsTableLoadMore-buttonArrow"></i></a>
+	</div>
+
+	<div class="schoolsDataProvider">
+		<span class="schoolsDataProvider-title">data provided by</span>
+		<a class="schoolsDataProvider-logoWrapper" href="http://www.192.com/schools/" target="_blank" title="192.com/schools" data-bind="click: trackGenericProviderLink">
+			<i class="icon-192-logo"></i>
+		</a>
+	</div>
+
+	<div class="disclaimer">
+	<p>
+        Due to the frequency with which Inspection bodies, such as Ofsted, provide us with updates, there could be a delay of up to 8 weeks between a rating being updated and it being displayed on Rightmove. This data is provided for informational purposes only and Rightmove plc does not accept any liability for decisions based on this data. The data is sourced from <a href="http://www.192.com/" target="_blank" title="http://www.192.com/">192.com</a>. 192.com Ltd. does not accept responsibility for any inference or conclusion derived from the data by third parties.
+    </p>
+</div>
+<schools-alert params="{
+		title: 'What does oversubscribed mean?',
+		body: 'This means the school was not able to give a place to everyone who applied on time. In other words, at least one pupil was refused a place. This refusal will have been determined by prioritising applicants using the schools admission criteria.',
+		isVisible: showOverSubscriptionAlert
+	}"></schools-alert>
+
+	<schools-alert params="{
+		title: 'What does not oversubscribed mean?',
+		body: 'This means that everyone who applied on time was given a place at the school.',
+		isVisible: showUnderSubscriptionAlert
+	}"></schools-alert>
+
+	<schools-alert params="{
+		title: 'What does the admission area mean?',
+		body: 'These are the approximate areas that you would have needed to live in to have been successful in your application to the school in that year. (The areas shown do not include places given to children with special needs, or who have siblings already attending the school). These areas are calculated using data obtained from local authorities and individual schools. These areas can, and do, change significantly from year to year with shifts in local demographics and the popularity of a school. Therefore, living inside the Successful Applicant Area does not guarantee that you will get a place at the school in future years.',
+		isVisible: showWithinSAA
+	}"></schools-alert>
+
+	<schools-alert params="{
+		title: 'What does the admission area mean?',
+		body: 'Councils in Scotland generally allocate school places according to whether you live within a specific geographical area. The area for this specific school is displayed on the map. In almost all cases, schools are able to offer places to all applicants from within that set area. Most addresses in Scotland will fall within the admission area of two schools: a denominational and a non-denominational school.',
+		isVisible: showWithinSAAForScotland
+	}"></schools-alert>
+</div>
+</div></div></div>
+		</div></div></div></div><div  class="row one-col">
+    <div class="cell ">
+	<div class="module ">
+	<noscript>
+    <hr />
+    <a href="#" class="disclaimer">Back to top</a>
+    <div id="fees-apply-disclaimer" class="disclaimer-container">
+	<h3 id="pricingInformation">Pricing Information</h3>
+		<p>
+			This property is marketed by Glenwood Property Services, Birmingham at &pound;995 per month. Rightmove has calculated the price per week for comparison purposes only.</p>
+		<p>
+			The method we use for calculating the weekly price is: (monthly price x 12) / 52, rounded to the nearest pound.</p>
+		<br>
+	<h3 id="feesInformation">Letting fees information</h3>
+		<div id="feesInformationWrapper">
+			<p>
+						The asking rent does not include letting fees. Depending on your circumstances and the property you
+						select, the letting agent may also apply the following upfront fees:
+					</p>
+
+					<ul class="custom1-bullet">
+						<li>general administration fees</li>
+						<li>reference fees (including credit checks, bank, guarantor, previous landlord, etc)</li>
+						<li>application fees</li>
+						<li>fees for drawing up tenancy agreements</li>
+						<li>inventory fees, including check-in and check-out fees</li>
+						<li>guarantor arrangement/application fees</li>
+						<li>additional occupant fees</li>
+						<li>pets disclaimer fees/additional pet deposit</li>
+					</ul>
+
+					<br>
+
+					<p>Fees may be charged on a per person, or per property, basis and will vary from agent to agent, so
+						confirm before viewing.</p>
+				</div>
+	</div></noscript><div id="disclaimer" class="sect disclaimer">
+    <div id="soldPricesDisclaimer" class="fs-11 mar-b-8"></div>
+    <div id="agentDisclaimer" class="fs-11 mar-b-8">
+        <span>
+            <p>
+                        <span>
+                            <strong>Disclaimer</strong>
+    <span>-</span></span>
+                        <span>
+                            Administration fees may apply when renting a property in England, Wales or Northern Ireland. For more details, please contact the agent.
+                        </span>
+                    </p>
+                    <p>Property reference 87_School_Rd.
+    The information displayed about this property comprises a property advertisement.
+    Rightmove.co.uk makes no warranty as to the accuracy or completeness of the advertisement or any linked or
+    associated information, and Rightmove has no control over the content.  This property advertisement does not constitute property particulars.
+    The information is provided and maintained by
+    <strong>Glenwood Property Services, Birmingham</strong>.</p>
+                    <p>Please refer to our <a title="Renting Guides" href="/resources/property-guides/renting-guide.html">Renting Guides</a> for further information on how to safely rent a property.</p>
+                <p>
+                    <span>* This is the maximum possible speed. Broadband speed may be lower at peak times and can be affected by a range of technical and environmental factors. The speed you receive where you live may be lower than that listed above. Fibre/cable services at your postcode are subject to availability. You can confirm availability on the provider's website. The information is provided and maintained by <b>comparethemarket.com</b></span>
+                </p>
+            </span>
+    </div>
+    <div>
+        </div>
+    <div>
+        <span>
+            <div id="open-streetmap-disclaimer">
+	<p class="fs-11">
+		Map data ©<a href="http://www.openstreetmap.org/copyright" rel="nofollow" target="_blank" title="Open Street Map">OpenStreetMap</a> contributors.
+	</p>
+</div></span>
+    </div>
+</div></div></div></div></div><div id="secondaryContent" class="secondary-content ">
+	<div  class="row one-col print-hidden">
+    <div class="cell ">
+	<div class="module ">
+	<ul class="back-prev-next clearfix list-reset hl-1 pad-lr">
+	<li class="similar left">
+        <a id="showSimilarPropertiesLink" class="icon-after icon-arrow-right" title="See more properties like this one" rel="nofollow" href="/property-to-rent/find.html?locationIdentifier=POSTCODE%5E1297703&minPrice=800&maxPrice=1100&minBedrooms=4&radius=0.5">See more properties like this one</a></li>
+</ul>
+
+</div></div></div><div  class="row one-col print-hidden">
+    <div class="cell ">
+	<div class="module ">
+	<div class="hl-1 pad-16">
+				<div id="secondaryAgentDetails" class="agent-details clearfix bdr-b">
+	<h3>This property is marketed by:</h3>
+<a class="agent-details-agent-logo" title="Glenwood Property Services, Birmingham contact details and property" href="/estate-agents/agent/Glenwood-Property-Services/Birmingham-146672.html"><img src="http://media.rightmove.co.uk/147k/146672/branch_logo_146672_0001.jpeg" alt="Glenwood Property Services, Birmingham logo" class="secondary" /></a><div class="agent-details-display">
+  <div class="overflow-hidden">
+    <p class="pad-0">
+      <a id="aboutBranchLink" href="/estate-agents/agent/Glenwood-Property-Services/Birmingham-146672.html"><strong>Glenwood Property Services, Birmingham</strong></a></p>
+    <address class="pad-0">412 Ladypool Road,
+Moseley,
+Birmingham,
+B12 8JZ</address>
+  </div>
+  <p class="pad-0 overflow-hidden">
+
+    <a rel="nofollow" href="/property-to-rent/find/Glenwood-Property-Services/Birmingham.html?locationIdentifier=BRANCH%5E146672&propertyStatus=all&includeLetAgreed=true&_includeLetAgreed=on">View properties from this agent</a></p>
+</div></div><div id="requestdetails" class="request-property-details align-center bdr-b">
+    <a id="property-detail-button-rhs" class=" btn btn-primary" title="Request Details" rel="nofollow" href="/property-to-rent/contactBranch.html?propertyId=51775029&backToPropertyURL=/property-to-rent/property-51775029.html&fromButtonId=property-detail-button-rhs">Request Details</a><p class="" >
+    
+            or call:
+        <a href="tel:0121 396 0802" class="fs-19">
+        <strong>0121 396 0802</strong>
+    </a>
+</p></div><ul class="property-actions bold clearBoth">
+						<li class="property-actions-save bdr-b">
+	<a class="icon-before icon-star unsaved lightboxCreateAccount button secondary registersource-save-property" title="Save School Road, Birmingham, B14 to shortlist" href="/addtoshortlist.html?property_id=51775029&from=%2Fproperty-to-rent%2Fproperty-51775029.html">Save property</a></li><li class="bdr-b">
+	<a href="#" class="icon-before icon-notes js-property-note-add">Add notes</a>
+	<div id="js-property-note-wrapper">
+		<hr>
+		<p>Please <a id="noteslogin" class="register-source-add-notes" rel="nofollow" href="https://www.rightmove.co.uk/login.html?from=%2Fproperty-to-rent%2Fproperty-51775029.html%3Fsource%3DaddPropertyNote">sign in</a> or <a id="notesRegister" class="register-source-add-notes js-property-note-register" rel="nofollow" href="https://www.rightmove.co.uk/register.html?from=%2Fproperty-to-rent%2Fproperty-51775029.html%3Fsource%3DaddPropertyNote">create an account</a> to add notes</p>
+		</div>
+</li>
+
+<li class="bdr-b">
+	<a id="print" class="js-print-link icon-before icon-print" title="Print page" target="_blank" onclick=";return !RIGHTMOVE.UTIL.openAttributeWindowWithName(this.href, '', 'width=710,height=450,left=100,top=95,directories=no,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,titlebar=no,status=yes')" rel="nofollow" href="/property-details/print.html?propertyId=51775029">Print</a></li><li class="pad-b-8">
+	<a id="sendToFriend" class="icon-before icon-send" title="Email property details to a friend" rel="nofollow" href="/sendPropertyToFriend/sendPropertyToFriend.html?from=%2Fproperty-to-rent%2Fproperty-51775029.html&propertyIds=51775029">Send to Friend</a></li>
+
+</ul>
+				</div>
+		</div></div></div><div  class="row one-col print-hidden">
+    <div class="cell ">
+	<div class="module bdr-b">
+	<div class="pad-l">
+    <h3>Share this property</h3>
+    <a id="facebook" class="fb-share" title="Share this with Facebook" target="_blank" onclick=";return !RIGHTMOVE.UTIL.openAttributeWindowWithName(this.href, '', 'width=600,height=450,left=100,top=95,directories=no,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,titlebar=no,status=yes')" href="http://facebook.com/share.php?u=http%3A%2F%2Fwww.rightmove.co.uk%2Fproperty-to-rent%2Fproperty-51775029.html%3Futm_source%3Dfacebook%26utm_medium%3Dsharing%26utm_campaign%3Drenting"><i class="icon icon-facebook-share">Share on Facebook</i></a><a id="twitter" class="twitter-share" title="Share this with Twitter" target="_blank" onclick=";return !RIGHTMOVE.UTIL.openAttributeWindowWithName(this.href, '', 'width=600,height=450,left=100,top=95,directories=no,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,titlebar=no,status=yes')" href="http://twitter.com/share?text=Check out this 4 bedroom detached house to rent on Rightmove &url=http%3A%2F%2Fwww.rightmove.co.uk%2Fproperty-to-rent%2Fproperty-51775029.html%3Futm_source%3Dtwitter%26utm_medium%3Dsharing%26utm_campaign%3Drenting"><i class="icon icon-twitter-share">Share on Twitter</i></a><a id="pinterest" href="#"><i class="icon icon-pinterest-share">Share on Pinterest</i>
+    </a>
+
+</div>
+<hr>
+
+
+</div></div></div><div  class="row one-col print-hidden">
+    <div class="cell ">
+	<div class="module bdr-b">
+	<div id="bannerrhs" class="mpu-slot">
+			<div class="mpu-medium-rectangle inline-block">
+				<div id="propertyDetailsMPU"></div>
+			</div>
+		</div>
+		<hr>
+		</div></div></div><div  class="row row one-col print-hidden">
+    <div class="cell ">
+	<div class="module bdr-b">
+	<div id="securityCentre" class="pad-l content touchsearch-searchcontrol touchsearch-searchcontrol-hascontent touchsearch-search-secondarycontent clearfix">
+    <h3 class="touchsearch-searchcontrol-heading">Helping you stay secure online</h3>
+    <p class="touchsearch-searchcontrol-content">Finding a new place to live needn&#39;t be stressful, especially when you&#39;re well informed.</p>
+    <a id="security-advice-link" class="icon-after icon-arrow-right touchsearch-link touchsearch-searchcontrol-content" href="/this-site/safety-and-security.html">Visit our security centre to find out more</a></div>
+</div></div></div><div  class="row one-col print-hidden">
+    <div class="cell ">
+	<div class="module bdr-b">
+	<div class="pad-l" id="upgradelisting">
+				<h3>Are you letting this property?</h3>
+				<p>
+					Find out how to make it stand out from the crowd and increase your chances of letting.
+				</p>
+                <a id="link-premiumListingPromotion" class="icon-after icon-arrow-right" target="_blank" rel="nofollow" href="/upgrade-my-listing-51775029.html">Learn more about upgrading this property</a></div>
+			<hr>
+		</div></div></div><div  class="row one-col print-hidden">
+    <div class="cell ">
+	<div class="module bdr-b">
+	<div id="propertydetailsbreadcrumbs" class="pad-lr">
+    <h3>Surrounding Areas</h3>
+    <ul class="list-bdr-b">
+        <li>
+                <a class="icon-before icon-arrow-right" href="/property/Birmingham.html">Birmingham</a></li>
+        <li>
+                <a class="icon-before icon-arrow-right" href="/property/West-Midlands-County.html">West Midlands (County)</a></li>
+        <li>
+                <a class="icon-before icon-arrow-right" href="/property/West-Midlands.html">West Midlands</a></li>
+        </ul>
+</div>
+</div></div></div><div  class="row one-col print-hidden">
+    <div class="cell ">
+	<div class="module bdr-b">
+	<div class="pad-l " id="report-error">
+    <h3>Spotted an error?</h3>
+    <p>In order for us to help our agents maintain accurate and up-to-date information please inform the agent
+            if you have noticed an error with this property. If you are the vendor, please contact your agent directly.</p>
+    <a id="get-in-touch" class="icon-after icon-arrow-right" target="_blank" onclick=";return !RIGHTMOVE.UTIL.openAttributeWindowWithName(this.href, '', 'width=650,height=450,left=100,top=95,directories=no,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,titlebar=no,status=yes')" href="/property/reportPropertyErrorForm.html?propertyId=51775029">Get in touch</a></div><hr>
+			</div></div></div></div><script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+<script>
+				
+		(function(k,v){
+			RIGHTMOVE.ANALYTICS.DataLayer.pushKV(k,v);
+		}('property',{"location":{"postcode":"B14 4JP","country":"GB","latitude":52.413249369181294,"longitude":-1.8683744229091472},"propertyId":51775029,"viewType":"Current","imageCount":13,"floorplanCount":0,"videoProvider":"No Video","propertyInfo":{"propertyType":"Houses","propertySubType":"Detached","price":995.0,"beds":4,"added":"20171122","soldSTC":false,"retirement":null,"preOwned":"Resale","ownership":"Non-shared ownership","auctionOnly":false,"letAgreed":true,"lettingType":"Long term","furnishedType":"Unfurnished","minSizeFt":null,"maxSizeFt":null,"minSizeAc":null,"maxSizeAc":null,"businessForSale":false,"priceQualifier":"Fixed Price","currency":"GBP","selectedPrice":null,"selectedCurrency":null}}));
+	</script>
+		<script>
+				
+		(function(k,v){
+			RIGHTMOVE.ANALYTICS.DataLayer.pushKV(k,v);
+		}('branch',{"branchId":146672,"companyName":"A.U.H Property Management Ltd","brandName":"Glenwood Property Services","branchName":"Birmingham","companyType":"ILA","agentType":"ea_lettings","displayAddress":"412 Ladypool Road, Moseley, Birmingham, B12 8JZ","branchPostcode":null,"pageType":"Standard"}));
+	</script>
+		<script>
+				
+		(function(k,v){
+			RIGHTMOVE.ANALYTICS.DataLayer.pushKV(k,v);
+		}('page.customUri','www.rightmove.co.uk/property-to-rent/property/'));
+	</script>
+		</div>
+	<div id="sitefooter" class="site-footer print-hidden" role="contentinfo">
+		<div class="fixed-width-content">
+		<div  class="row ">
+    <div class="cell ">
+	<div class="module bdr-b">
+	<ul class="clearfix footer-links footer-links-cols">
+					<li class="footer-links-group">
+						<h4>Rightmove</h4>
+						<ul>
+							<li><a href="/rightmoveplc/rightmove-contacts.html">Contact us</a></li>
+							<li><a href="http://plc.rightmove.co.uk/careers/">Careers</a></li>
+                            <li><a title="Mobile platforms" href="/mobile-platforms.html">Mobile platforms</a></li>
+							<li><a href="/this-site/help.html">Help</a></li>
+                        </ul>
+					</li>
+					<li class="footer-links-group">
+						<h4>Resources</h4>
+						<ul>
+							<li><a title="Where can I live?" target="_blank" href="https://where.rightmove.co.uk">Where can I live?</a></li>
+							<li><a title="Schools" href="/schools.html">Schools</a></li>
+                            <li><a title="Removals" href="/removals.html">Removals</a></li>
+							<li>
+									<a	id="footer-mortgages"
+										  href="http://www.rightmove.co.uk/mortgages/"
+										  title="Mortgages"
+											>Mortgages</a>
+								</li>
+							<li>
+								<a	id="footer-mortgage-calculator"
+									  href="http://www.rightmove.co.uk/mortgages/calculators/#mortgage-repayment"
+									  title="Mortgage calculator">Mortgage calculator</a>
+							</li>
+							<li><a title="Renter advice" href="http://www.rightmove.co.uk/renter-advice/">Renter advice</a></li>
+							<li><a title="Landlord advice" href="http://www.rightmove.co.uk/landlord-advice/">Landlord advice</a></li>
+						</ul>
+					</li>
+					<li class="footer-links-group">
+						<h4>Quick links</h4>
+						<ul>
+                            <li><a title="Property guides" href="/resources/property-guides.html">Property guides</a></li>
+							<li><a title="House price index" href="http://www.rightmove.co.uk/news/house-price-index">House price index</a></li>
+                            <li><a title="Cheap flats to rent" href="/cheap-flats-to-rent.html">Cheap flats to rent</a></li>
+                            <li><a title="Property investment" href="/property-investment.html">Property investment</a></li>
+                            <li><a title="Cheap houses for sale" href="/cheap-houses-for-sale.html">Cheap houses for sale</a></li>
+                            <li><a id="footer-blog" href="http://www.rightmove.co.uk/news/" title="Property blog">Property blog</a></li>
+						</ul>
+					</li>
+					<li class="footer-links-group">
+						<h4>Rightmove PLC</h4>
+						<ul>
+							<li><a href="http://plc.rightmove.co.uk/about-us/">About</a></li>
+							<li><a href="http://plc.rightmove.co.uk/media/">Press centre</a></li>
+							<li><a href="http://plc.rightmove.co.uk/investors/">Investor relations</a></li>
+						</ul>
+					</li>
+					<li class="footer-links-group">
+						<h4>Professional</h4>
+						<ul>
+							<li>
+								<a id="rmplusfooterlink" title="Rightmoveplus" href="http://www.rightmove.co.uk/rmplus/login/login.action">Rightmove Plus</a></li>
+                            <li><a href="/for-agents.html">Agents and Developers</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div></div></div><div  class="row ">
+    <div class="cell ">
+	<div class="module ">
+	<h4 class="left fs-12 footer-locations-title">Major cities and towns in the UK: </h4>
+<div class="js-sliding-menu footer-locations-list">
+	<a href="#" class="icon-after icon-arrow-down txt-dark-crisp js-slide-trigger no-js-hidden">Select (A-Z)</a>
+    <div id="majorPlacesContainer" class="js-slide-target">
+        <ul class="footer-links footer-links-cols bdr-b">
+            <li class="footer-links-group">
+                <h4 class="block">United Kingdom:</h4>
+                <ul>
+                    <li><a title="Property for sale or to rent in the UK (A-Be)" href="/uk-property-search-a-be.html">A-Be</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Bl-Bu)" href="/uk-property-search-bl-bu.html">Bl-Bu</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Ca-Ce)" href="/uk-property-search-ca-ce.html">Ca-Ce</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Ch-Con)" href="/uk-property-search-ch-con.html">Ch-Con</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Cor-Cu)" href="/uk-property-search-cor-cu.html">Cor-Cu</a></li>
+                    <li><a title="Property for sale or to rent in the UK (D)" href="/uk-property-search-d.html">D</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Ea)" href="/uk-property-search-ea.html">Ea</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Ed-F)" href="/uk-property-search-ed-f.html">Ed-F</a></li>
+                    <li><a title="Property for sale or to rent in the UK (G)" href="/uk-property-search-g.html">G</a></li>
+                    <li><a title="Property for sale or to rent in the UK (H)" href="/uk-property-search-h.html">H</a></li>
+                    <li><a title="Property for sale or to rent in the UK (I-K)" href="/uk-property-search-i-k.html">I-K</a></li>
+                    <li><a title="Property for sale or to rent in the UK (L)" href="/uk-property-search-l.html">L</a></li>
+                    <li><a title="Property for sale or to rent in the UK (M-Ne)" href="/uk-property-search-m-ne.html">M-Ne</a></li>
+                    <li><a title="Property for sale or to rent in the UK (No)" href="/uk-property-search-no.html">No</a></li>
+                    <li><a title="Property for sale or to rent in the UK (O-R)" href="/uk-property-search-o-r.html">O-R</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Sc-So)" href="/uk-property-search-sc-so.html">Sc-So</a></li>
+                    <li><a title="Property for sale or to rent in the UK (St-Sw)" href="/uk-property-search-st-sw.html">St-Sw</a></li>
+                    <li><a title="Property for sale or to rent in the UK (T-V)" href="/uk-property-search-t-v.html">T-V</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Wa-We)" href="/uk-property-search-wa-we.html">Wa-We</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Wi-Wr)" href="/uk-property-search-wi-wr.html">Wi-Wr</a></li>
+                    <li><a title="Property for sale or to rent in the UK (Y)" href="/uk-property-search-y.html">Y</a></li>
+                    <li class="lastLink"><a title="Rightmove - Find property in major towns &amp; cities in the UK" href="/major-cities.html">Major cities in the UK</a></li>
+                </ul>
+            </li>
+            <li class="footer-links-group">
+                    <h4>London:</h4>
+                    <ul>
+                        <li><a title="Browse London property" href="/property/London.html">London Property</a></li>
+                        <li><a title="London property for sale" href="/property-for-sale/London.html">London Property for Sale</a></li>
+                        <li><a title="Property to rent" href="/property-to-rent/London.html">London Property to Rent</a></li>
+                        <li><a title="Property for sale or to rent in London (Ba)" href="/london-property-search-ba.html">Ba</a></li>
+                        <li><a title="Property for sale or to rent in London (Be-Br)" href="/london-property-search-be-br.html">Be-Br</a></li>
+                        <li><a title="Property for sale or to rent in London (C)" href="/london-property-search-c.html">C</a></li>
+                        <li><a title="Property for sale or to rent in London (E-G)" href="/london-property-search-e-g.html">E-G</a></li>
+                        <li><a title="Property for sale or to rent in London (Ha)" href="/london-property-search-ha.html">Ha</a></li>
+                        <li><a title="Property for sale or to rent in London (Hi-Ho)" href="/london-property-search-hi-ho.html">Hi-Ho</a></li>
+                        <li><a title="Property for sale or to rent in London (I-K)" href="/london-property-search-i-k.html">I-K</a></li>
+                        <li><a title="Property for sale or to rent in London (L-M)" href="/london-property-search-l-m.html">L-M</a></li>
+                        <li><a title="Property for sale or to rent in London (N-R)" href="/london-property-search-n-r.html">N-R</a></li>
+                        <li><a title="Property for sale or to rent in London (S-T)" href="/london-property-search-s-t.html">S-T</a></li>
+                        <li><a title="Property for sale or to rent in London (W)" href="/london-property-search-w.html">W</a></li>
+                        <li><a title="London popular regions" href="/london-popular-regions.html">Popular regions in London</a></li>
+                    </ul>
+                </li>
+            </ul>
+    </div>
+</div>
+
+<ul class="clearfix footer-links footer-links-inline">
+					<li class="footer-links-group">
+						<h4>This site:</h4>
+						<ul>
+							<li><a href="/site-map.html">Site map</a></li>
+							<li><a href="/this-site/cookies.html">Cookies we use</a></li>
+							<li><a href="/this-site/safety-and-security.html">Safety and security</a></li>
+							<li><a href="/this-site/terms-of-use-and-privacy-policy.html">Terms of use &amp; privacy policy</a></li>
+						</ul>
+					</li>
+				</ul>
+
+				</div></div></div></div>
+
+	</div>
+</div>
+
+<noscript>
+	<div style="display:inline;">
+		<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/1013535676/?value=0&guid=ON&script=0"/>
+	</div>
+</noscript><noscript>
+	<iframe src="http://4638770.fls.doubleclick.net/activityi;src=4638770;type=count0;cat=right003;ord=1;num=1?" width="1" height="1" frameborder="0" style="display:none"></iframe>
+</noscript><noscript>
+    <img height="1" width="1" style="display:none;" alt="" src="https://analytics.twitter.com/i/adsct?txn_id=l4g89&p_id=Twitter" />
+    <img height="1" width="1" style="display:none;" alt="" src="//t.co/i/adsct?txn_id=l4g89&p_id=Twitter" />
+</noscript><script type="text/javascript">
+    jQuery(document).ready(function() {
+        RIGHTMOVE.UTIL.clientPersister.init();
+    });
+</script><script type="text/javascript">
+	RIGHTMOVE.USER.accountLightbox.attach({element : ".lightboxSignIn", channel : "renting", loginForm : "#lightboxLogin", registerForm : "#lightboxRegistration", showRegisterOnLoad : false});
+	RIGHTMOVE.USER.accountLightbox.attach({element : ".lightboxCreateAccount", channel : "renting", loginForm : "#lightboxLogin", registerForm : "#lightboxRegistration", showRegisterOnLoad : true });
+</script>
+
+
+<script type="text/javascript" src="/ps/js17319/concat/js_fullsite/propertyDetails.js"></script>
+<script type="text/javascript">
+	(function($) { 
+	RIGHTMOVE.UTIL.analytics.trackEventOnClick('#link-enlarge', "renting-property-details","features","photos-fullscreen", "")
+})(jQuery);
+(function($) { 
+    var thumbnailCarousel = RIGHTMOVE.PROPERTYDETAILS.thumbnailCarousel;
+    thumbnailCarousel.init({
+        totalImages : 13,
+        maxThumbnailsToDisplay : 5,
+        nextThumbnailPageSelector : '.js-thumbnail-next',
+        prevThumbnailPageSelector : '.js-thumbnail-prev',
+        imageElementWidth : 132,
+        divToMove: '.js-thumbnail-main',
+        thumbnailImageContainer : '.js-gallery-thumbnail img',
+        failureThumbnailImageSrc: '/ps/images/fullsite/common/no_download_thumbnail.gif'
+    });
+
+    var imageGallery = RIGHTMOVE.PROPERTYDETAILS.imageGallery;
+    imageGallery.init({
+        images : [{"index":0,"caption":"Front of Property","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_656x437.jpg"},{"index":1,"caption":"Hallway","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_01_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_01_0000_max_656x437.jpg"},{"index":2,"caption":"Reception 1","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_02_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_02_0000_max_656x437.jpg"},{"index":3,"caption":"Reception 2","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_03_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_03_0000_max_656x437.jpg"},{"index":4,"caption":"Kitchen","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_04_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_04_0000_max_656x437.jpg"},{"index":5,"caption":"Conservatory","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_05_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_05_0000_max_656x437.jpg"},{"index":6,"caption":"Bathroom","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_06_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_06_0000_max_656x437.jpg"},{"index":7,"caption":"Bedroom 1","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_07_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_07_0000_max_656x437.jpg"},{"index":8,"caption":"Bedroom 2","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_08_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_08_0000_max_656x437.jpg"},{"index":9,"caption":"Bedroom 3","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_09_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_09_0000_max_656x437.jpg"},{"index":10,"caption":"Bedroom 4","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_10_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_10_0000_max_656x437.jpg"},{"index":11,"caption":"Gated Driveway","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_11_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_11_0000_max_656x437.jpg"},{"index":12,"caption":"Garden","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_12_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_12_0000_max_656x437.jpg"}],
+        mainImageContainer : '.js-gallery-main',
+        nextImageSelector : '.js-gallery-next',
+        prevImageSelector : '.js-gallery-prev',
+        currentSelectedImageIndex : 0,
+        slideshowToggle : '.js-gallery-slideshow',
+        selectedThumbnailClass : 'selected',
+        thumbnailCarousel : thumbnailCarousel,
+        slideshowIntervalMillis : 2000,
+        imageThumbnailSelector: '.js-gallery-thumbnail',
+        captionContainer: '.js-gallery-caption',
+        imageIndex: '.js-gallery-index',
+        fullscreenLink: '.js-gallery-enlarge',
+        loadingMainImageSrc: '/ps/images/fullsite/common/loading.gif',
+        failureMainImageSrc: '/ps/images/fullsite/common/no_download.gif'
+    });
+})(jQuery);
+(function($) { 
+	$(".js-ga-hipepc").click(function(){
+		RIGHTMOVE.UTIL.analytics.trackEvent("renting-property-details","features","hipepc");
+	});
+})(jQuery);
+(function($) { $(function() {
+	$('.js-ga-minimap').click(function(event){
+		event.preventDefault();
+		RIGHTMOVE.UTIL.analytics.trackEvent("renting-property-details", "features", "minimap");
+	});
+	$('.js-ga-minimap-text').click(function(event){
+		event.preventDefault();
+		RIGHTMOVE.UTIL.analytics.trackEvent("renting-property-details", "features", "minimap-text");
+	});
+})})(jQuery);
+(function($) { $(function() {
+    $('.js-description-school-checker').click(function(event){
+        event.preventDefault();
+
+        RIGHTMOVE.UTIL.analytics.trackEvent("renting-property-details", "features", "school-checker-full-description");
+
+        $('html, body').animate({
+            scrollTop: $("#detailsTabs").offset().top - 120
+        }, 0);
+
+        $('#schoolsTab').click();
+    });
+})})(jQuery);
+(function($) { $(function() {
+	RIGHTMOVE.UTIL.analytics.trackEventOnClick('.rm-broadband-check', 'compare-the-market-broadband', 'check-broadband-speed', 'rm-broadband-check');
+	RIGHTMOVE.UTIL.analytics.trackEventOnClick('.check-broadband-speed', 'compare-the-market-broadband', 'check-broadband-speed', 'ctm-broadband-check');
+	RIGHTMOVE.UTIL.analytics.trackEventOnClick('.see-all-offers', 'compare-the-market-broadband', 'check-providers', 'clicked-through-to-compare-the-market');
+})})(jQuery);
+(function($) { $(function() {
+                $("#link-local-rate").fancybox();
+             })})(jQuery);
+(function($) { $(function() {
+                $("#link-local-rate").fancybox();
+             })})(jQuery);
+(function($) { $(function() {
+	RIGHTMOVE.UTIL.analytics.setCurrentGAChannel("renting");
+
+    var marketInfoController;
+	var schoolsMapController;
+	var nearBySchools;
+
+    
+
+	var gaTrackingChannel = "renting" + '-property-details';
+
+	
+
+		var schoolMapOptions = {"zoom":14,"latitudeLongitude":{"lat":52.413249369181294,"lon":-1.8683744229091472},"exactLocation":false}
+		schoolMapOptions.gaTrackingChannel = gaTrackingChannel;
+
+		var AGE_GROUP_TYPE = {
+			PRIMARY: {
+				id: 'primary',
+				name: 'Primary'
+			},
+			SECONDARY: {
+				id: 'secondary',
+				name: 'Secondary'
+			}
+		};
+
+        var nearBySchoolsOptions = {
+			propertyId: 51775029,
+			propertyPostcode: "B14 4JP",
+			gaTrackingChannel : gaTrackingChannel,
+			schoolsMapController: new RIGHTMOVE.SCHOOLS_192.SchoolsMap(schoolMapOptions),
+			attachKnockoutToDomElement: document.getElementById("schools"),
+			schoolsService: new RIGHTMOVE.SCHOOLS_192.SchoolsService(),
+			ageGroupType: AGE_GROUP_TYPE,
+			ageGroupChoices: [AGE_GROUP_TYPE.PRIMARY, AGE_GROUP_TYPE.SECONDARY],
+			googleMapMarkerWithLabelUrl: "/ps/js17319/concat/js_fullsite/googleMapMarkerWithLabel.js",
+			mapMarkerEmptyImgUrl: "/ps/images17319/fullsite/icons/schools/google-map-empty-marker.png",
+            propertyLatLng: schoolMapOptions.latitudeLongitude
+		};
+		nearBySchools = new RIGHTMOVE.SCHOOLS_192.NearBySchools(nearBySchoolsOptions);
+	
+
+	var mapOptions = {"attachToElement":".js-map-canvas","latitude":52.413249369181294,"longitude":-1.8683744229091472,"zoom":15,"showPin":true,"tileUri":"/ajax/maps/school-summaries.html","schoolDetailsUri":"/ajax/maps/school-details.html?channel=renting-property-details","showSchools":true,"schoolListContainerSelector":".js-schools-list","schoolMapReducedWidth":"71.8%","mapTypeId":"roadmap","showTubeLinesOption":false};
+	mapOptions.gaTrackingChannel = gaTrackingChannel;
+
+    var options = {
+        propertyDetailsMapJsUrl : "/ps/js17319/concat/js_main_v1/propertyDetailsMap.js",
+		propertyDetailsMapV2JsUrl : "/ps/js17319/concat/js_main_v1/propertyDetailsMapV2.js",
+        mapOptions : mapOptions,
+        streetViewOptions : {"attachToElement":".js-streetview","streetViewPointOfView":null,"latitude":52.413249369181294,"longitude":-1.8683744229091472,"showOnInit":true,"motionTracking":false},
+        marketInfoController : marketInfoController,
+        channel : gaTrackingChannel,
+        tabsContainer : "similarNearbyTabs",
+		nearBySchools: nearBySchools,
+		knockoutJsUrl: "/ps/js17319/concat/js_main_v1/knockout-3.3.0.js",
+		locationTabContentsModel: {"mapLocation":{"latitude":52.413249369181294,"longitude":-1.8683744229091472,"zoom":15,"exact":false},"nearbyTubeLine":false,"showStreetViewOption":true,"defaultStreetView":false},
+		broadbandCtmUrl: "https://partnerships-broadband.sergei.io/v1/broadband/rightmove/B144JP?apikey=4d30b4e5380f6f38570f7432356ce00b06661cc444975fa6d7adc0c9f2efe6ed"
+    };
+
+    var propertyDetailsTabs = new RIGHTMOVE.PROPERTYDETAILS.PropertyDetailsTabs(options);
+
+	RIGHTMOVE.FULLSITE.UI.fullscreenOverlay.init({
+		selector: ".js-fullscreen-percentage"
+	},{
+		type : "iframe",
+		iframe: {
+			scrolling: "no",
+			preload: true
+		},
+		autoSize: false,
+		width: "95%",
+		height: "95%",
+		padding: "0"
+	});
+	RIGHTMOVE.FULLSITE.UI.fullscreenOverlay.init({
+		selector: ".js-fullscreen-fixed",
+		dark: true
+	},{
+		type : "iframe",
+		iframe: {
+			scrolling : "no",
+			preload   : true
+		},
+		autoSize: false,
+		width: "950",
+		height: "600"
+	});
+})})(jQuery);
+(function($) { 
+        new RIGHTMOVE.UTIL.PageHistory().trackPage("property-details-alias", false);
+        new RIGHTMOVE.UI.BackLink().showBackLinks();
+})(jQuery);
+(function($) { 
+	RIGHTMOVE.UTIL.analytics.trackEventOnClick('#showSimilarPropertiesLink', "renting-property-details","features","see-similar-properties", "")
+})(jQuery);
+(function($) { $(function() {
+				RIGHTMOVE.UTIL.analytics.trackEventOnClick('.property-actions-save', 'renting-property-details', 'Saving', 'Save-property');
+			})})(jQuery);
+(function($) { $(function() {
+		RIGHTMOVE.PROPERTYDETAILS.notes.attach('renting');
+	})})(jQuery);
+(function($) { $(function() {
+	if (true) {
+		$("#js-property-note-wrapper").hide();
+	}
+	$(".js-property-note-add").click(function (event) {
+		$("#js-property-note-wrapper").slideToggle();
+		event.preventDefault();
+	});
+})})(jQuery);
+(function($) { 
+	RIGHTMOVE.USER.accountLightbox.persistRegisterAction(".js-property-note-register", "add-notes");
+})(jQuery);
+(function($) { 
+	RIGHTMOVE.UTIL.analytics.trackEventOnClick('#sendToFriend', "renting-property-details","send-to-a-friend","send-to-a-friend-form", "true")
+})(jQuery);
+(function($) { 
+    //map the object to a default img
+    $("#pinterest").click(function(){
+
+        RIGHTMOVE.UTIL.analytics.trackEvent("renting-property-details","sharing","pinterest-open");
+
+        var imgArray = $.map([{"index":0,"caption":"Front of Property","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000_max_656x437.jpg","isVideo":false},{"index":1,"caption":"Hallway","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_01_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_01_0000_max_656x437.jpg","isVideo":false},{"index":2,"caption":"Reception 1","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_02_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_02_0000_max_656x437.jpg","isVideo":false},{"index":3,"caption":"Reception 2","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_03_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_03_0000_max_656x437.jpg","isVideo":false},{"index":4,"caption":"Kitchen","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_04_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_04_0000_max_656x437.jpg","isVideo":false},{"index":5,"caption":"Conservatory","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_05_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_05_0000_max_656x437.jpg","isVideo":false},{"index":6,"caption":"Bathroom","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_06_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_06_0000_max_656x437.jpg","isVideo":false},{"index":7,"caption":"Bedroom 1","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_07_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_07_0000_max_656x437.jpg","isVideo":false},{"index":8,"caption":"Bedroom 2","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_08_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_08_0000_max_656x437.jpg","isVideo":false},{"index":9,"caption":"Bedroom 3","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_09_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_09_0000_max_656x437.jpg","isVideo":false},{"index":10,"caption":"Bedroom 4","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_10_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_10_0000_max_656x437.jpg","isVideo":false},{"index":11,"caption":"Gated Driveway","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_11_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_11_0000_max_656x437.jpg","isVideo":false},{"index":12,"caption":"Garden","thumbnailUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_12_0000_max_135x100.jpg","masterUrl":"http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_12_0000_max_656x437.jpg","isVideo":false}], function(object){
+            var options = {
+                src: object.masterUrl,
+                alt: object.caption
+            }
+            return options;
+        });
+
+        RIGHTMOVE.UTIL.pinterest.addPinMarklet({
+            images : imgArray,
+            onPin : function(){
+                RIGHTMOVE.UTIL.analytics.trackEvent("renting-property-details","sharing","pinterest-shared");
+            }
+        });
+        return false;
+    });
+})(jQuery);
+(function($) { 
+	RIGHTMOVE.UTIL.analytics.trackEventOnClick('#security-advice-link', "renting-property-details","features","security-advice-rhs", "")
+})(jQuery);
+(function($) { 
+	RIGHTMOVE.UTIL.analytics.trackEventOnClick('#link-premiumListingPromotion', "renting-property-details","features","upgrade-listing", "")
+})(jQuery);
+(function($) { 
+        new RIGHTMOVE.UTIL.PageHistory().trackPage("property-details", false);
+        new RIGHTMOVE.UI.BackLink().showBackLinks();
+})(jQuery);
+(function($) { $(function() {
+		RIGHTMOVE.COOKIE.cookieSettingsModalBar.init();
+	})})(jQuery);
+(function($) { 
+    RIGHTMOVE.FULLSITE.UI.footerLocationLinks();
+})(jQuery);
+(function($) { $(function() {
+		RIGHTMOVE.UTIL.analytics.trackEventOnClick("#rmplusfooterlink", "homepage", "rightmoveplus", "footerlink");
+	})})(jQuery);
+</script>
+<script type="text/javascript">
+		window.onload = function() {
+			(function($) 
+{ setTimeout(
+function() {
+
+	RIGHTMOVE.PROPERTYDETAILS.imageGallery.setupInitialImagePreload();
+
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+
+    var fancyboxOptions = {};
+
+    
+        fancyboxOptions = {
+			maxWidth : "700px",
+			maxHeight : "80%",
+            scrolling : "auto",
+            content  : "<div id=\"fees-apply-disclaimer\" class=\"disclaimer-container\">\r\n\t<h3 id=\"pricingInformation\">Pricing Information<\/h3>\r\n\t\t<p>\r\n\t\t\tThis property is marketed by Glenwood Property Services, Birmingham at &pound;995 per month. Rightmove has calculated the price per week for comparison purposes only.<\/p>\r\n\t\t<p>\r\n\t\t\tThe method we use for calculating the weekly price is: (monthly price x 12) / 52, rounded to the nearest pound.<\/p>\r\n\t\t<br>\r\n\t<h3 id=\"feesInformation\">Letting fees information<\/h3>\r\n\t\t<div id=\"feesInformationWrapper\">\r\n\t\t\t<p>\r\n\t\t\t\t\t\tThe asking rent does not include letting fees. Depending on your circumstances and the property you\r\n\t\t\t\t\t\tselect, the letting agent may also apply the following upfront fees:\r\n\t\t\t\t\t<\/p>\r\n\r\n\t\t\t\t\t<ul class=\"custom1-bullet\">\r\n\t\t\t\t\t\t<li>general administration fees<\/li>\r\n\t\t\t\t\t\t<li>reference fees (including credit checks, bank, guarantor, previous landlord, etc)<\/li>\r\n\t\t\t\t\t\t<li>application fees<\/li>\r\n\t\t\t\t\t\t<li>fees for drawing up tenancy agreements<\/li>\r\n\t\t\t\t\t\t<li>inventory fees, including check-in and check-out fees<\/li>\r\n\t\t\t\t\t\t<li>guarantor arrangement/application fees<\/li>\r\n\t\t\t\t\t\t<li>additional occupant fees<\/li>\r\n\t\t\t\t\t\t<li>pets disclaimer fees/additional pet deposit<\/li>\r\n\t\t\t\t\t<\/ul>\r\n\r\n\t\t\t\t\t<br>\r\n\r\n\t\t\t\t\t<p>Fees may be charged on a per person, or per property, basis and will vary from agent to agent, so\r\n\t\t\t\t\t\tconfirm before viewing.<\/p>\r\n\t\t\t\t<\/div>\r\n\t<\/div>",
+            type : "html"
+        };
+    
+    RIGHTMOVE.FULLSITE.UI.fullscreenOverlay.init(
+    {
+        selector : "#propertyHeaderPrice, #link-fees",
+        dark : false
+    }, fancyboxOptions, false
+    );
+
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+
+		$('#propertyHeaderPrice, #link-fees').css( 'cursor', 'pointer' );
+	
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+
+	RIGHTMOVE.TENANCYFEES.tracking.applyToSelector("#link-fees");
+
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+
+	$('#facebook').click(function(event){
+		event.preventDefault();
+		RIGHTMOVE.UTIL.analytics.trackEvent("renting-property-details","sharing","facebook");
+        RIGHTMOVE.SOCIALMEDIA.LogSocialMedia("51775029", "true", "146672","facebook");
+	});
+
+	$('#twitter').click(function(event){
+		event.preventDefault();
+		RIGHTMOVE.UTIL.analytics.trackEvent("renting-property-details","sharing","twitter");
+        RIGHTMOVE.SOCIALMEDIA.LogSocialMedia("51775029", "true", "146672","twitter");
+	});
+
+    $('#pinterest').click(function(event){
+        event.preventDefault();
+        RIGHTMOVE.SOCIALMEDIA.LogSocialMedia("51775029", "true", "146672","pinterest");
+    });
+
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+
+		var refreshCountLimit = 1;
+		var refreshInterval = 45000;
+		initializeAdSlot = function() {
+			RIGHTMOVE.ADS.dfp.initializeAdSlotWithNetworkName(
+			5029762,
+			'Rightmove_Public_Site/Property-Details/firstMPU',
+			'propertyDetailsMPU',
+			300,
+			250,
+			refreshCountLimit,
+			refreshInterval
+			);
+		};
+		
+
+	var userMetadataService = RIGHTMOVE.CONSUMERDATA.UserMetadataService;
+	userMetadataService.initialise('http://ums.rightmove.co.uk/users/',
+									1000);
+	userMetadataService.getUserTypeAndSetDFPTargeting({"CT":["property-to-rent"],"B":["Band6"],"UTo_A":["B"],"UTo_D":["B14"],"UTo_UKZ":["England"],"UTo_TVR":["ITV-Central-Midlands"],"UTo_C":["GB"],"PT":["house"],"PST":["detached"],"TT":["Rent"],"BD":["4"],"SO":["false"],"R":["false"],"IM":["not_in_market"],"PV":["false"],"MH":["false"],"PTS":["false"],"PTR":["false"],"BIM":["not_in_market"],"IIM":["not_in_market"],"S":["N"]}, initializeAdSlot);
+
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+
+	(function(d, s, id){
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id))
+			return; js = d.createElement(s);
+		js.id = id;
+		js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId=485764298115191";
+		fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+var userMetadataService = RIGHTMOVE.CONSUMERDATA.UserMetadataService;
+    userMetadataService.initialise('http://ums.rightmove.co.uk/users/',
+                                    1000);
+    userMetadataService.requestUserTypeAndWriteToSessionStorage();
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+
+
+RIGHTMOVE.loadJSAsync("//www.googleadservices.com/pagead/conversion_async.js", function() {
+	var conversionData = {"google_conversion_id":1013535676,"google_remarketing_only":true,"google_custom_params":{"listing_id":51775029,"listing_pagetype":"property","listing_totalvalue":995.0}};
+	window.google_trackConversion(conversionData);
+});
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+var axel = Math.random() + "";
+var a = axel * 10000000000000;
+
+var doubleClickUniqueIframe = document.createElement('iframe');
+
+doubleClickUniqueIframe.src = 'http://4638770.fls.doubleclick.net/activityi;src=4638770;type=count0;cat=right003;ord=1;num=' + a + '?';
+doubleClickUniqueIframe.width = 1;
+doubleClickUniqueIframe.height = 1;
+doubleClickUniqueIframe.frameBorder = 0;
+doubleClickUniqueIframe.style.border = 0;
+doubleClickUniqueIframe.style.display = 'none';
+
+document.body.appendChild(doubleClickUniqueIframe);
+},100)
+})(jQuery);;
+			(function($) 
+{ setTimeout(
+function() {
+RIGHTMOVE.loadJSAsync('//platform.twitter.com/oct.js', function() {
+    twttr.conversion.trackPid('l4g89');
+});
+},100)
+})(jQuery);;
+			
+			}
+	</script>
+<!-- Begin comScore Tag -->
+	<script type="text/javascript">
+		RIGHTMOVE.ANALYTICS.comscoreBeacon.lightBeacon();
+	</script>
+
+	<noscript>
+	<img src="http://b.scorecardresearch.com/p?c1=2&c2=6035627&c3=&c4=&c5=&c6=&c15=&cj=1"/>
+</noscript><!-- End comScore Tag -->
+
+
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"applicationID":"2271511,2710116","applicationTime":85,"atts":"SRIRElxDRBQBAwZCVkBvB18ITBQJCAkGQhEIEhFeDVYJEQpHHk0=","beacon":"bam.nr-data.net","queueTime":0,"licenseKey":"8ec04da100","transactionName":"ZVUGZBRZCBUFBhdZXFwfNlUXTQMVECQXREFbUhFEAxckCRBIJUVfXmMNRAMXKgMQEQpeVEFgFl8WXRQSHSEGRFJbXBdzCVYSFAsJD1VB","agent":"","errorBeacon":"bam.nr-data.net"}</script><script>
+				
+		(function(w) {
+			RIGHTMOVE.ANALYTICS.DataLayer.trackPageView();
+		}(window));
+	</script>
+		<script type="text/javascript">
+	$( document ).ready(function() {
+        var queue = new RIGHTMOVE.UTIL.GoogleAnalyticsQueue();
+        queue.sendEventsFromTrackingQueue();
+	});
+</script><script>
+	document.cookie = 'shortPropertyFormPreviouslyCompleted=; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+</script>
+
+</body>
+</html>

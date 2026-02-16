@@ -1,0 +1,137 @@
+import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import { extractFromHtml } from '../../src/lib/extractor/html-extractor.js';
+import { findByName } from '../../src/lib/extractor/mapping-loader.js';
+
+function loadFixture(name: string): string {
+  return readFileSync(resolve(__dirname, '..', 'fixtures', `${name}.html`), 'utf-8');
+}
+
+describe('HtmlExtractor', () => {
+  describe('.extractFromHtml basic behavior', () => {
+    it('returns error for unknown mapping name', () => {
+      const result = extractFromHtml({
+        html: '<html></html>',
+        sourceUrl: 'https://example.com',
+        scraperMappingName: 'nonexistent',
+      });
+      expect(result.success).toBe(false);
+      expect(result.errorMessage).toMatch(/Unknown scraper mapping/);
+    });
+
+    it('accepts a pre-loaded scraper mapping', () => {
+      const mapping = findByName('idealista');
+      const result = extractFromHtml({
+        html: '<html></html>',
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMapping: mapping!,
+      });
+      expect(result.success).toBe(true);
+      expect(result.properties).toBeInstanceOf(Array);
+    });
+
+    it('handles empty HTML gracefully', () => {
+      const mapping = findByName('idealista');
+      const result = extractFromHtml({
+        html: '',
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMapping: mapping!,
+      });
+      expect(result.success).toBe(true);
+      expect(result.properties[0]).toBeDefined();
+    });
+
+    it('handles malformed HTML gracefully', () => {
+      const mapping = findByName('idealista');
+      const result = extractFromHtml({
+        html: '<div><p>unclosed',
+        sourceUrl: 'https://www.idealista.com/inmueble/123/',
+        scraperMapping: mapping!,
+      });
+      expect(result.success).toBe(true);
+      expect(result.properties[0]).toBeDefined();
+    });
+  });
+
+  describe('idealista extraction from raw HTML', () => {
+    it('extracts the same values as the Ruby specs', () => {
+      const html = loadFixture('idealista_2018_01');
+      const sourceUrl = 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/';
+
+      const result = extractFromHtml({
+        html,
+        sourceUrl,
+        scraperMappingName: 'idealista',
+      });
+
+      expect(result.success).toBe(true);
+      const props = result.properties[0];
+
+      expect(props['title']).toBe('Piso en venta en goya, 54, Goya, Madrid');
+      expect(props['price_string']).toBe('990.000');
+      expect(props['price_float']).toBe(990000.0);
+      expect(props['currency']).toBe('EUR');
+      expect(props['constructed_area']).toBe(172);
+      expect(props['reference']).toBe('38604738');
+      expect(props['for_sale']).toBe(true);
+      expect(props['latitude']).toBe(40.4246556);
+      expect(props['longitude']).toBe(-3.678188);
+      expect(props['image_urls']).toBeInstanceOf(Array);
+      expect(props['image_urls'][18]).toBe(
+        'https://img3.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/48/37/34/254187544.jpg'
+      );
+    });
+  });
+
+  describe('rightmove extraction from raw HTML', () => {
+    it('extracts the same values as the Ruby specs', () => {
+      const html = loadFixture('rightmove');
+      const sourceUrl = 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html';
+
+      const result = extractFromHtml({
+        html,
+        sourceUrl,
+        scraperMappingName: 'rightmove',
+      });
+
+      expect(result.success).toBe(true);
+      const props = result.properties[0];
+
+      expect(props['for_rent']).toBe(true);
+      expect(props['longitude']).toBe(-1.8683744229091472);
+      expect(props['latitude']).toBe(52.413249369181294);
+      expect(props['postal_code']).toBe('B14 4JP');
+      expect(props['reference']).toBe('51775029');
+      expect(props['image_urls'][0]).toBe(
+        'http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg'
+      );
+      expect(props['title']).toBe(
+        '4 bedroom detached house to rent in School Road, Birmingham, B14, B14'
+      );
+      expect(props['address_string']).toBe('School Road, Birmingham, B14');
+      expect(props['currency']).toBe('GBP');
+      expect(props['price_string']).toBe('\u00A3995 pcm');
+      expect(props['price_float']).toBe(995.0);
+    });
+  });
+
+  describe('realtor extraction from raw HTML', () => {
+    it('extracts property data from raw HTML', () => {
+      const html = loadFixture('realtor');
+      const sourceUrl =
+        'http://www.realtor.com/realestateandhomes-detail/5804-Cedar-Glen-Ln_Bakersfield_CA_93313_M12147-18296';
+
+      const result = extractFromHtml({
+        html,
+        sourceUrl,
+        scraperMappingName: 'realtor',
+      });
+
+      expect(result.success).toBe(true);
+      const props = result.properties[0];
+      expect(props).toBeDefined();
+      expect(props).toHaveProperty('title');
+    });
+  });
+});

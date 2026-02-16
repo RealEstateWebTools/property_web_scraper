@@ -1,0 +1,216 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com'];
+---
+<BaseLayout title="Property Web Scraper">
+
+<!-- Hero -->
+<section class="pws-landing-hero">
+  <div class="container">
+    <div class="pws-hero-badge">
+      <i class="bi bi-building"></i> Open-source property data extraction
+    </div>
+    <h1>Extract Property Data from<br>Any Real Estate Website</h1>
+    <p class="lead">
+      Provide a URL or pre-rendered HTML and get structured property data
+      instantly &mdash; title, price, images, location, and more.
+    </p>
+    <a href="#try-it" class="btn btn-outline-light btn-lg">
+      Try It Now <i class="bi bi-arrow-down-short"></i>
+    </a>
+  </div>
+</section>
+
+<!-- Try it section -->
+<section id="try-it" class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card pws-tryit-card">
+        <div class="card-body">
+
+          <h4 class="mb-3">Try it out</h4>
+
+          <!-- Mode tabs -->
+          <div class="pws-mode-tabs">
+            <button type="button" class="pws-mode-tab active" data-mode="url">
+              <i class="bi bi-link-45deg"></i> Enter URL
+            </button>
+            <button type="button" class="pws-mode-tab" data-mode="html">
+              <i class="bi bi-code-slash"></i> Paste HTML
+            </button>
+            <button type="button" class="pws-mode-tab" data-mode="file">
+              <i class="bi bi-file-earmark-arrow-up"></i> Upload File
+            </button>
+          </div>
+
+          <p class="pws-mode-hint" id="modeHint">
+            We'll fetch the page directly. Works best with static HTML sites.
+          </p>
+
+          <form id="scraperForm" method="post" action="/scrapers/submit" enctype="multipart/form-data">
+
+            <!-- URL (always visible) -->
+            <div class="mb-3">
+              <label for="import_url" class="form-label fw-semibold">Property URL</label>
+              <input type="text" name="import_url" id="import_url" class="form-control pws-url-input"
+                     placeholder="https://www.idealista.com/inmueble/12345678/" required />
+            </div>
+
+            <!-- HTML textarea (hidden by default) -->
+            <div class="mb-3 d-none" id="htmlGroup">
+              <label for="html_input" class="form-label fw-semibold">Page HTML</label>
+              <textarea name="html" id="html_input" class="form-control pws-html-textarea" rows="5"
+                        placeholder="Paste the full page source here..."></textarea>
+            </div>
+
+            <!-- File upload (hidden by default) -->
+            <div class="mb-3 d-none" id="fileGroup">
+              <label for="html_file_input" class="form-label fw-semibold">HTML File</label>
+              <input type="file" name="html_file" id="html_file_input" class="form-control pws-file-input" accept=".html,.htm" />
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary pws-submit-btn" id="submitBtn">Fetch &amp; Extract</button>
+            </div>
+
+          </form>
+
+          <!-- Supported sites -->
+          <div class="pws-supported-sites text-center">
+            <small class="text-muted d-block mb-2">Works with these sites and any site with a configured mapping:</small>
+            {supportedSites.map((site) => (
+              <span class="pws-site-badge">{site}</span>
+            ))}
+            <span class="pws-site-badge">+ more</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Results appear here -->
+<section class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div id="retrieve-results"></div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="pws-how-it-works">
+  <div class="container">
+    <h3 class="text-center mb-4">How It Works</h3>
+    <div class="row align-items-start justify-content-center">
+      <div class="col-md-3">
+        <div class="pws-step-card">
+          <div class="pws-step-number">1</div>
+          <div class="pws-step-icon"><i class="bi bi-globe"></i></div>
+          <h5>Provide a Source</h5>
+          <p>Enter a property URL, paste rendered HTML, or upload a saved page.</p>
+        </div>
+      </div>
+      <div class="col-md-1 d-none d-md-block">
+        <div class="pws-step-connector"><i class="bi bi-chevron-right"></i></div>
+      </div>
+      <div class="col-md-3">
+        <div class="pws-step-card">
+          <div class="pws-step-number">2</div>
+          <div class="pws-step-icon"><i class="bi bi-cpu"></i></div>
+          <h5>We Extract Data</h5>
+          <p>Configurable mappings parse titles, prices, images, coordinates, and more.</p>
+        </div>
+      </div>
+      <div class="col-md-1 d-none d-md-block">
+        <div class="pws-step-connector"><i class="bi bi-chevron-right"></i></div>
+      </div>
+      <div class="col-md-3">
+        <div class="pws-step-card">
+          <div class="pws-step-number">3</div>
+          <div class="pws-step-icon"><i class="bi bi-braces"></i></div>
+          <h5>Use the Results</h5>
+          <p>Get structured JSON, view a rich property page, or integrate via API.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why pre-rendered HTML? -->
+<section class="container mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="pws-callout">
+        <div class="row align-items-center">
+          <div class="col-md-1 text-center d-none d-md-block">
+            <i class="bi bi-lightbulb" style="font-size: 2rem; color: #0d6efd;"></i>
+          </div>
+          <div class="col-md-11">
+            <h4>Why "Paste HTML" or "Upload File"?</h4>
+            <p>
+              Modern real estate sites render content with JavaScript. A simple URL fetch
+              only sees the empty shell. By pasting the fully-rendered page source from your
+              browser (right-click &rarr; View Page Source, or save the page as HTML),
+              you give the extractor the complete HTML it needs to find every field.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', () => {
+  const tabs = document.querySelectorAll('.pws-mode-tab');
+  const hint = document.getElementById('modeHint');
+  const htmlGroup = document.getElementById('htmlGroup');
+  const fileGroup = document.getElementById('fileGroup');
+  const form = document.getElementById('scraperForm');
+  const resultsDiv = document.getElementById('retrieve-results');
+  const submitBtn = document.getElementById('submitBtn');
+
+  const hints = {
+    url: "We'll fetch the page directly. Works best with static HTML sites.",
+    html: "Paste the fully-rendered HTML from your browser for JavaScript-heavy sites.",
+    file: "Upload a saved HTML file from your computer."
+  };
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const mode = tab.dataset.mode;
+      hint.textContent = hints[mode] || '';
+      htmlGroup.classList.toggle('d-none', mode !== 'html');
+      fileGroup.classList.toggle('d-none', mode !== 'file');
+    });
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Extracting...';
+
+    try {
+      const formData = new FormData(form);
+      const response = await fetch('/scrapers/submit', {
+        method: 'POST',
+        body: formData,
+      });
+      const html = await response.text();
+      resultsDiv.innerHTML = html;
+    } catch (err) {
+      resultsDiv.innerHTML = '<div class="pws-error-card"><div class="pws-error-icon"><i class="bi bi-exclamation-triangle"></i></div><h5>Network Error</h5><p>Could not connect to the server.</p></div>';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Fetch & Extract';
+    }
+  });
+});
+</script>
+
+</BaseLayout>
