@@ -5,7 +5,14 @@ import { retrieveTargetText } from './strategies.js';
 import { extractImages } from './image-extractor.js';
 import { extractFeatures } from './feature-extractor.js';
 import { booleanEvaluators } from './field-processors.js';
-import { assessQuality, type QualityGrade, type QualityAssessment } from './quality-scorer.js';
+import {
+  assessQualityWeighted,
+  getFieldImportance,
+  type QualityGrade,
+  type QualityAssessment,
+  type FieldResult,
+} from './quality-scorer.js';
+import { splitPropertyHash, type SplitSchema } from './schema-splitter.js';
 
 export interface FieldTrace {
   field: string;
@@ -13,6 +20,16 @@ export interface FieldTrace {
   strategy: string;
   rawText: string;
   value: unknown;
+  fallbackUsed?: number;
+}
+
+export interface ContentAnalysis {
+  htmlLength: number;
+  hasScriptTags: boolean;
+  jsonLdCount: number;
+  scriptJsonVarsFound: string[];
+  appearsBlocked: boolean;
+  appearsJsOnly: boolean;
 }
 
 export interface ExtractionDiagnostics {
@@ -28,6 +45,9 @@ export interface ExtractionDiagnostics {
   qualityLabel: string;
   expectedExtractionRate?: number;
   meetsExpectation: boolean;
+  weightedExtractionRate?: number;
+  criticalFieldsMissing?: string[];
+  contentAnalysis?: ContentAnalysis;
 }
 
 export interface ExtractionResult {
@@ -35,6 +55,7 @@ export interface ExtractionResult {
   properties: Record<string, unknown>[];
   errorMessage?: string;
   diagnostics?: ExtractionDiagnostics;
+  splitSchema?: SplitSchema;
 }
 
 export interface ExtractParams {
@@ -73,6 +94,46 @@ function describeStrategy(m: FieldMapping): string {
   return 'none';
 }
 
+const KNOWN_SCRIPT_VARS = ['PAGE_MODEL', '__NEXT_DATA__', '__INITIAL_STATE__', 'dataLayer'];
+
+/**
+ * Analyze content for provenance tracking.
+ */
+function analyzeContent($: cheerio.CheerioAPI, html: string): ContentAnalysis {
+  const scriptTags = $('script');
+  const hasScriptTags = scriptTags.length > 0;
+  const jsonLdCount = $('script[type="application/ld+json"]').length;
+
+  const scriptJsonVarsFound: string[] = [];
+  const scriptText = scriptTags.text();
+  for (const varName of KNOWN_SCRIPT_VARS) {
+    const pattern = new RegExp(`(?:window\\.)?${varName}\\s*=`);
+    if (pattern.test(scriptText) || $(`script#${varName}`).length > 0) {
+      scriptJsonVarsFound.push(varName);
+    }
+  }
+
+  const bodyText = $('body').text().trim();
+  const bodyLength = bodyText.length;
+  const divCount = $('div').length;
+
+  // Bot block detection: short body + captcha/verification keywords
+  const blockKeywords = /captcha|verify|access denied|cloudflare|just a moment/i;
+  const appearsBlocked = bodyLength < 500 && blockKeywords.test(bodyText);
+
+  // JS-only shell detection: short body text + many scripts + few divs
+  const appearsJsOnly = bodyLength < 200 && scriptTags.length > 5 && divCount < 10;
+
+  return {
+    htmlLength: html.length,
+    hasScriptTags,
+    jsonLdCount,
+    scriptJsonVarsFound,
+    appearsBlocked,
+    appearsJsOnly,
+  };
+}
+
 /**
  * Main entry point: extract structured property data from raw HTML.
  * Port of Ruby HtmlExtractor.call.
@@ -97,6 +158,9 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   const uri = new URL(sourceUrl);
   const propertyHash: Record<string, unknown> = {};
   const traces: FieldTrace[] = [];
+
+  // Content analysis (provenance tracking)
+  const contentAnalysis = analyzeContent($, html);
 
   // Default values
   if (mapping.defaultValues) {
@@ -145,14 +209,15 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   // Int fields
   if (mapping.intFields) {
     for (const [key, fieldMapping] of Object.entries(mapping.intFields)) {
-      const text = retrieveTargetText($, html, fieldMapping, uri);
-      propertyHash[key] = parseInt(text.trim(), 10) || 0;
+      const result = retrieveTargetText($, html, fieldMapping, uri);
+      propertyHash[key] = parseInt(result.text.trim(), 10) || 0;
       traces.push({
         field: key,
         section: 'intFields',
-        strategy: describeStrategy(fieldMapping),
-        rawText: text.slice(0, 120),
+        strategy: result.strategyDescription,
+        rawText: result.text.slice(0, 120),
         value: propertyHash[key],
+        fallbackUsed: result.strategyIndex > 0 ? result.strategyIndex : undefined,
       });
     }
   }
@@ -160,7 +225,8 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   // Float fields
   if (mapping.floatFields) {
     for (const [key, fieldMapping] of Object.entries(mapping.floatFields)) {
-      let text = retrieveTargetText($, html, fieldMapping, uri);
+      const result = retrieveTargetText($, html, fieldMapping, uri);
+      let text = result.text;
       if (fieldMapping.stripPunct) {
         text = text.replace(/\./g, '').replace(/,/g, '');
       }
@@ -171,9 +237,10 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
       traces.push({
         field: key,
         section: 'floatFields',
-        strategy: describeStrategy(fieldMapping),
+        strategy: result.strategyDescription,
         rawText: text.slice(0, 120),
         value: propertyHash[key],
+        fallbackUsed: result.strategyIndex > 0 ? result.strategyIndex : undefined,
       });
     }
   }
@@ -181,14 +248,15 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   // Text fields
   if (mapping.textFields) {
     for (const [key, fieldMapping] of Object.entries(mapping.textFields)) {
-      const text = retrieveTargetText($, html, fieldMapping, uri);
-      propertyHash[key] = text.trim();
+      const result = retrieveTargetText($, html, fieldMapping, uri);
+      propertyHash[key] = result.text.trim();
       traces.push({
         field: key,
         section: 'textFields',
-        strategy: describeStrategy(fieldMapping),
-        rawText: text.slice(0, 120),
+        strategy: result.strategyDescription,
+        rawText: result.text.slice(0, 120),
         value: propertyHash[key],
+        fallbackUsed: result.strategyIndex > 0 ? result.strategyIndex : undefined,
       });
     }
   }
@@ -196,7 +264,8 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   // Boolean fields
   if (mapping.booleanFields) {
     for (const [key, fieldMapping] of Object.entries(mapping.booleanFields)) {
-      let text = retrieveTargetText($, html, fieldMapping, uri);
+      const result = retrieveTargetText($, html, fieldMapping, uri);
+      let text = result.text;
       let evaluatorParam = fieldMapping.evaluatorParam || '';
 
       if (fieldMapping.caseInsensitive) {
@@ -214,9 +283,10 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
       traces.push({
         field: key,
         section: 'booleanFields',
-        strategy: describeStrategy(fieldMapping),
+        strategy: result.strategyDescription,
         rawText: text.slice(0, 120),
         value: propertyHash[key],
+        fallbackUsed: result.strategyIndex > 0 ? result.strategyIndex : undefined,
       });
     }
   }
@@ -233,7 +303,18 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   const extractableFields = extractableTraces.length;
   const populatedExtractableFields = populatedExtractable.length;
   const extractionRate = extractableFields > 0 ? populatedExtractableFields / extractableFields : 0;
-  const quality: QualityAssessment = assessQuality(extractionRate, mapping.expectedExtractionRate);
+
+  // Build FieldResult array for weighted scoring
+  const fieldResults: FieldResult[] = extractableTraces.map(t => ({
+    field: t.field,
+    populated: t.rawText !== '' && t.value !== 0 && t.value !== false && t.value !== '',
+    importance: getFieldImportance(t.field),
+  }));
+
+  const quality: QualityAssessment = assessQualityWeighted(fieldResults, mapping.expectedExtractionRate);
+
+  // Split schema
+  const split = splitPropertyHash(propertyHash);
 
   const diagnostics: ExtractionDiagnostics = {
     scraperName: mapping.name,
@@ -248,16 +329,23 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
     qualityLabel: quality.label,
     expectedExtractionRate: mapping.expectedExtractionRate,
     meetsExpectation: quality.meetsExpectation,
+    weightedExtractionRate: quality.weightedRate,
+    criticalFieldsMissing: quality.criticalFieldsMissing,
+    contentAnalysis,
   };
 
-  console.log(`[Extractor] ${mapping.name}: Grade ${quality.grade} (${quality.label}) — ${populatedExtractableFields}/${extractableFields} extractable fields (${Math.round(extractionRate * 100)}%)`);
+  console.log(`[Extractor] ${mapping.name}: Grade ${quality.grade} (${quality.label}) — ${populatedExtractableFields}/${extractableFields} extractable fields (${Math.round(extractionRate * 100)}%), weighted ${Math.round((quality.weightedRate || 0) * 100)}%`);
+  if (quality.criticalFieldsMissing && quality.criticalFieldsMissing.length > 0) {
+    console.log(`[Extractor] Critical fields missing: ${quality.criticalFieldsMissing.join(', ')}`);
+  }
   if (emptyFields.length > 0) {
     console.log(`[Extractor] Empty fields: ${emptyFields.join(', ')}`);
   }
   for (const t of traces) {
     const status = t.rawText ? '\u2713' : '\u2717';
-    console.log(`[Extractor]   ${status} ${t.field} (${t.strategy}) \u2192 ${JSON.stringify(t.value)}`);
+    const fb = t.fallbackUsed != null ? ` [fallback ${t.fallbackUsed}]` : '';
+    console.log(`[Extractor]   ${status} ${t.field} (${t.strategy}${fb}) \u2192 ${JSON.stringify(t.value)}`);
   }
 
-  return { success: true, properties: [propertyHash], diagnostics };
+  return { success: true, properties: [propertyHash], diagnostics, splitSchema: split };
 }

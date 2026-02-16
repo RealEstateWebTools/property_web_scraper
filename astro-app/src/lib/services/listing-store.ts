@@ -1,5 +1,6 @@
 import { Listing } from '../models/listing.js';
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
+import { deduplicationKey } from './url-canonicalizer.js';
 
 /**
  * KV-backed store for extracted listings, with in-memory fallback.
@@ -11,6 +12,7 @@ import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 let kv: any = null;
 const store = new Map<string, Listing>();
 const diagnosticsStore = new Map<string, ExtractionDiagnostics>();
+const urlIndex = new Map<string, string>();
 let counter = 0;
 
 /** Call once per request with the RESULTS KV binding from Astro.locals.runtime.env */
@@ -25,9 +27,18 @@ export function generateId(): string {
 
 export async function storeListing(id: string, listing: Listing): Promise<void> {
   store.set(id, listing);
+  // Index by canonical URL for deduplication
+  const importUrl = (listing as any).import_url;
+  if (importUrl) {
+    urlIndex.set(deduplicationKey(importUrl), id);
+  }
   if (kv) {
     await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 3600 });
   }
+}
+
+export function findListingByUrl(url: string): string | undefined {
+  return urlIndex.get(deduplicationKey(url));
 }
 
 /**
@@ -99,4 +110,5 @@ export function getStoreStats(): { count: number } {
 export function clearListingStore(): void {
   store.clear();
   diagnosticsStore.clear();
+  urlIndex.clear();
 }

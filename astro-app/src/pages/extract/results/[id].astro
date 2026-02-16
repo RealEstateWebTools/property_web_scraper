@@ -33,6 +33,11 @@ const hasFields = diagnostics
 const grade = diagnostics?.qualityGrade || 'F';
 const colors = gradeColors[grade] || gradeColors.F;
 const ratePercent = diagnostics ? Math.round(diagnostics.extractionRate * 100) : 0;
+const weightedPercent = diagnostics?.weightedExtractionRate != null
+  ? Math.round(diagnostics.weightedExtractionRate * 100)
+  : null;
+const criticalMissing = diagnostics?.criticalFieldsMissing || [];
+const contentAnalysis = diagnostics?.contentAnalysis;
 
 const attrs = [
   'reference', 'title', 'description', 'price_string', 'price_float',
@@ -64,8 +69,14 @@ const attrs = [
             <div>
               <div class={`flex items-center gap-3 ${colors.bg} ${colors.text} px-5 py-3 rounded-xl mb-2 font-medium`}>
                 <i class={`bi ${colors.icon} text-xl`}></i>
-                Grade {grade}: {diagnostics.qualityLabel} — {diagnostics.populatedExtractableFields}/{diagnostics.extractableFields} fields ({ratePercent}%)
+                Grade {grade}: {diagnostics.qualityLabel} — {diagnostics.populatedExtractableFields}/{diagnostics.extractableFields} fields ({ratePercent}%{weightedPercent != null ? `, weighted ${weightedPercent}%` : ''})
               </div>
+              {criticalMissing.length > 0 && (
+                <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2 rounded-lg mb-2 text-sm">
+                  <i class="bi bi-exclamation-octagon"></i>
+                  Critical fields missing: {criticalMissing.join(', ')}
+                </div>
+              )}
               {!diagnostics.meetsExpectation && diagnostics.expectedExtractionRate != null && (
                 <div class="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-lg mb-4 text-sm">
                   <i class="bi bi-exclamation-triangle"></i>
@@ -176,9 +187,26 @@ const attrs = [
                     <div class="text-xs text-gray-500 mb-2">
                       Scraper: <span class="font-mono font-medium">{diagnostics.scraperName}</span> &middot;
                       Grade {diagnostics.qualityGrade} &middot;
-                      {diagnostics.populatedExtractableFields}/{diagnostics.extractableFields} extractable fields ({Math.round(diagnostics.extractionRate * 100)}%)
+                      {diagnostics.populatedExtractableFields}/{diagnostics.extractableFields} extractable fields ({Math.round(diagnostics.extractionRate * 100)}%{weightedPercent != null ? `, weighted ${weightedPercent}%` : ''})
                       &middot; {diagnostics.populatedFields}/{diagnostics.totalFields} total populated
                     </div>
+
+                    {contentAnalysis && (
+                      <div class="bg-gray-50 border border-gray-200 text-xs px-3 py-2 rounded mb-3">
+                        <strong>Content Analysis:</strong>
+                        HTML {Math.round(contentAnalysis.htmlLength / 1024)}KB
+                        &middot; {contentAnalysis.jsonLdCount} JSON-LD
+                        {contentAnalysis.scriptJsonVarsFound.length > 0 && (
+                          <span> &middot; Script vars: {contentAnalysis.scriptJsonVarsFound.join(', ')}</span>
+                        )}
+                        {contentAnalysis.appearsBlocked && (
+                          <span class="text-red-600 font-medium"> &middot; Appears blocked</span>
+                        )}
+                        {contentAnalysis.appearsJsOnly && (
+                          <span class="text-amber-600 font-medium"> &middot; JS-only shell</span>
+                        )}
+                      </div>
+                    )}
 
                     {diagnostics.emptyFields.length > 0 && (
                       <div class="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-2 rounded mb-3">

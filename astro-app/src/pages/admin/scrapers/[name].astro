@@ -5,6 +5,7 @@ import QualityBadge from '../../../components/admin/QualityBadge.astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
 import { findByName } from '@lib/extractor/mapping-loader.js';
 import { getScraperStats, getRecentExtractions } from '@lib/services/extraction-stats.js';
+import { findPortalByName } from '@lib/services/portal-registry.js';
 
 const auth = authenticateAdmin(Astro.request);
 if (!auth.authorized) return Astro.redirect('/admin/login');
@@ -14,6 +15,7 @@ if (!name) return Astro.redirect('/admin/scrapers');
 
 const stats = await getScraperStats(name);
 const mapping = findByName(name);
+const portal = findPortalByName(name);
 
 // Get recent extractions for this scraper
 const allExtractions = await getRecentExtractions(200);
@@ -67,6 +69,29 @@ const mappingJson = mapping ? JSON.stringify(mapping, null, 2) : null;
       <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">not loaded</span>
     )}
   </div>
+
+  <!-- Portal Metadata -->
+  {portal && (
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+        <i class="bi bi-globe2"></i> {portal.country}
+      </span>
+      <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+        <i class="bi bi-currency-exchange"></i> {portal.currency}
+      </span>
+      <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700">
+        <i class="bi bi-file-code"></i> {portal.contentSource}
+      </span>
+      <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+        <i class="bi bi-translate"></i> {portal.localeCode}
+      </span>
+      {portal.requiresJsRendering && (
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700">
+          <i class="bi bi-exclamation-triangle"></i> Requires JS
+        </span>
+      )}
+    </div>
+  )}
 
   <!-- Stat cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

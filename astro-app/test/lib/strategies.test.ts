@@ -78,7 +78,7 @@ describe('Strategies', () => {
       const $ = cheerio.load(html);
       const uri = new URL('https://example.com/property/1');
       const text = retrieveTargetText($, html, { cssLocator: 'span.price' }, uri);
-      expect(text).toBe('$500,000');
+      expect(text.text).toBe('$500,000');
     });
 
     it('uses regex strategy on script content', () => {
@@ -90,7 +90,7 @@ describe('Strategies', () => {
         splitTextCharacter: '"',
         splitTextArrayId: '1',
       }, uri);
-      expect(text).toBe('40.42');
+      expect(text.text).toBe('40.42');
     });
 
     it('uses URL path strategy', () => {
@@ -103,7 +103,7 @@ describe('Strategies', () => {
         splitTextArrayId: '1',
         stripString: '.html',
       }, uri);
-      expect(text).toBe('123');
+      expect(text.text).toBe('123');
     });
 
     it('uses flightDataPath strategy for simple key', () => {
@@ -115,7 +115,7 @@ describe('Strategies', () => {
       const $ = cheerio.load(html);
       const uri = new URL('https://example.com/property/1');
       const text = retrieveTargetText($, html, { flightDataPath: 'price' }, uri);
-      expect(text).toBe('500000');
+      expect(text.text).toBe('500000');
     });
 
     it('uses flightDataPath strategy for nested path', () => {
@@ -127,7 +127,7 @@ describe('Strategies', () => {
       const $ = cheerio.load(html);
       const uri = new URL('https://example.com/property/1');
       const text = retrieveTargetText($, html, { flightDataPath: 'location.latitude' }, uri);
-      expect(text).toBe('51.5074');
+      expect(text.text).toBe('51.5074');
     });
 
     it('flightDataPath returns empty string when path not found', () => {
@@ -139,7 +139,7 @@ describe('Strategies', () => {
       const $ = cheerio.load(html);
       const uri = new URL('https://example.com/property/1');
       const text = retrieveTargetText($, html, { flightDataPath: 'nonexistent' }, uri);
-      expect(text).toBe('');
+      expect(text.text).toBe('');
     });
 
     it('flightDataPath applies post-processing', () => {
@@ -154,7 +154,7 @@ describe('Strategies', () => {
         flightDataPath: 'ref',
         stripString: '.html',
       }, uri);
-      expect(text).toBe('ABC-12345');
+      expect(text.text).toBe('ABC-12345');
     });
 
     it('uses scriptJsonPath strategy for window.VAR = {...}', () => {
@@ -169,7 +169,7 @@ describe('Strategies', () => {
         scriptJsonVar: 'PAGE_MODEL',
         scriptJsonPath: 'propertyData.bedrooms',
       }, uri);
-      expect(text).toBe('3');
+      expect(text.text).toBe('3');
     });
 
     it('uses scriptJsonPath for deeply nested values', () => {
@@ -184,7 +184,7 @@ describe('Strategies', () => {
         scriptJsonVar: 'DATA',
         scriptJsonPath: 'location.coords.lat',
       }, uri);
-      expect(text).toBe('51.5');
+      expect(text.text).toBe('51.5');
     });
 
     it('scriptJsonPath returns empty string when path not found', () => {
@@ -199,7 +199,7 @@ describe('Strategies', () => {
         scriptJsonVar: 'MODEL',
         scriptJsonPath: 'nonexistent.path',
       }, uri);
-      expect(text).toBe('');
+      expect(text.text).toBe('');
     });
 
     it('scriptJsonPath applies post-processing', () => {
@@ -215,7 +215,7 @@ describe('Strategies', () => {
         scriptJsonPath: 'price',
         stripString: '£',
       }, uri);
-      expect(text).toBe('105,000');
+      expect(text.text).toBe('105,000');
     });
 
     it('uses scriptJsonPath with __NEXT_DATA__ script tag', () => {
@@ -230,7 +230,7 @@ describe('Strategies', () => {
         scriptJsonVar: '__NEXT_DATA__',
         scriptJsonPath: 'props.pageProps.listingDetails.bedrooms',
       }, uri);
-      expect(text).toBe('3');
+      expect(text.text).toBe('3');
     });
 
     it('__NEXT_DATA__ works with deeply nested paths', () => {
@@ -245,7 +245,7 @@ describe('Strategies', () => {
         scriptJsonVar: '__NEXT_DATA__',
         scriptJsonPath: 'props.pageProps.listingDetails.location.coordinates.latitude',
       }, uri);
-      expect(text).toBe('51.5');
+      expect(text.text).toBe('51.5');
     });
 
     it('uses jsonLdPath strategy', () => {
@@ -257,7 +257,7 @@ describe('Strategies', () => {
       const $ = cheerio.load(html);
       const uri = new URL('https://example.com/property/1');
       const text = retrieveTargetText($, html, { jsonLdPath: 'name' }, uri);
-      expect(text).toBe('Beautiful House');
+      expect(text.text).toBe('Beautiful House');
     });
 
     it('jsonLdPath filters by @type', () => {
@@ -273,7 +273,7 @@ describe('Strategies', () => {
         jsonLdPath: 'name',
         jsonLdType: 'RealEstateListing',
       }, uri);
-      expect(text).toBe('Nice Flat');
+      expect(text.text).toBe('Nice Flat');
     });
 
     it('jsonLdPath navigates nested objects', () => {
@@ -288,7 +288,7 @@ describe('Strategies', () => {
         jsonLdPath: 'geo.latitude',
         jsonLdType: 'RealEstateListing',
       }, uri);
-      expect(text).toBe('40.7');
+      expect(text.text).toBe('40.7');
     });
 
     it('jsonLdPath returns empty string when not found', () => {
@@ -303,7 +303,7 @@ describe('Strategies', () => {
         jsonLdPath: 'nonexistent',
         jsonLdType: 'RealEstateListing',
       }, uri);
-      expect(text).toBe('');
+      expect(text.text).toBe('');
     });
 
     it('jsonLdPath handles array of JSON-LD objects', () => {
@@ -318,7 +318,7 @@ describe('Strategies', () => {
         jsonLdPath: 'numberOfRooms',
         jsonLdType: 'Apartment',
       }, uri);
-      expect(text).toBe('4');
+      expect(text.text).toBe('4');
     });
   });
 });

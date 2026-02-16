@@ -2,6 +2,12 @@ import * as cheerio from 'cheerio';
 import type { FieldMapping } from './mapping-loader.js';
 import { parseFlightData, searchFlightData } from './flight-data-parser.js';
 
+export interface RetrievalResult {
+  text: string;
+  strategyIndex: number;
+  strategyDescription: string;
+}
+
 /**
  * Extract text using a CSS selector (Cheerio).
  * Port of Ruby get_text_from_css.
@@ -210,10 +216,10 @@ function getByDotPath(obj: unknown, dotPath: string): unknown {
 }
 
 /**
- * Main text retrieval combining all strategies.
+ * Single-mapping text retrieval combining all strategies.
  * Port of Ruby retrieve_target_text.
  */
-export function retrieveTargetText(
+function retrieveTargetTextSingle(
   $: cheerio.CheerioAPI,
   html: string,
   mapping: FieldMapping,
@@ -270,6 +276,45 @@ export function retrieveTargetText(
   retrievedText = cleanUpString(retrievedText, mapping);
 
   return retrievedText;
+}
+
+function describeMapping(m: FieldMapping): string {
+  if (m.flightDataPath) return `flightDataPath:${m.flightDataPath}`;
+  if (m.jsonLdPath) return `jsonLdPath:${m.jsonLdPath}`;
+  if (m.scriptJsonPath && m.scriptJsonVar) return `scriptJsonPath:${m.scriptJsonVar}.${m.scriptJsonPath}`;
+  if (m.scriptRegEx) return `scriptRegEx:${m.scriptRegEx.slice(0, 40)}`;
+  if (m.urlPathPart) return `urlPathPart:${m.urlPathPart}`;
+  if (m.cssLocator) return `cssLocator:${m.cssLocator}`;
+  if (m.value) return `default:${m.value}`;
+  return 'none';
+}
+
+/**
+ * Main text retrieval with fallback chain support.
+ * Tries the primary mapping first; if empty and fallbacks exist, iterates them.
+ */
+export function retrieveTargetText(
+  $: cheerio.CheerioAPI,
+  html: string,
+  mapping: FieldMapping,
+  uri: URL,
+): RetrievalResult {
+  const primaryText = retrieveTargetTextSingle($, html, mapping, uri);
+  if (primaryText.trim()) {
+    return { text: primaryText, strategyIndex: 0, strategyDescription: describeMapping(mapping) };
+  }
+
+  if (mapping.fallbacks) {
+    for (let i = 0; i < mapping.fallbacks.length; i++) {
+      const fb = mapping.fallbacks[i];
+      const fbText = retrieveTargetTextSingle($, html, fb, uri);
+      if (fbText.trim()) {
+        return { text: fbText, strategyIndex: i + 1, strategyDescription: describeMapping(fb) };
+      }
+    }
+  }
+
+  return { text: primaryText, strategyIndex: 0, strategyDescription: describeMapping(mapping) };
 }
 
 /**

@@ -23,6 +23,7 @@ export interface FieldMapping {
   evaluator?: string;
   evaluatorParam?: string;
   caseInsensitive?: boolean;
+  fallbacks?: FieldMapping[];
 }
 
 export interface ScraperMapping {
