@@ -3,3 +3,4 @@ dist/
 .astro/
 .env
 config/firebase-credentials.json
+test-results/
