@@ -221,10 +221,16 @@ Each field mapping can use one or more of these strategies:
 
 | Key              | Description                                         |
 |------------------|-----------------------------------------------------|
-| `cssLocator`     | CSS selector for Nokogiri `doc.css()`               |
-| `xpath`          | XPath expression for Nokogiri `doc.xpath()`         |
+| `cssLocator`     | CSS selector (Nokogiri/Cheerio)                     |
+| `xpath`          | XPath expression (deprecated — use CSS)             |
 | `scriptRegEx`    | Regex applied to all `<script>` tag text            |
 | `urlPathPart`    | Extract from URL path segments (1-indexed)          |
+| `flightDataPath` | Dot-path into Next.js RSC flight data               |
+| `scriptJsonPath` | Dot-path into a parsed script JSON variable         |
+| `scriptJsonVar`  | Variable name for scriptJsonPath (e.g. PAGE_MODEL)  |
+| `jsonLdPath`     | Dot-path into JSON-LD structured data               |
+| `jsonLdType`     | Filter JSON-LD by `@type` before path lookup        |
+| `fallbacks`      | Array of alternative FieldMapping objects tried in order if the primary strategy returns empty |
 
 ### Post-processing options
 
@@ -333,6 +339,66 @@ Or use `Scraper` with the `html:` keyword for the full extract-and-persist flow:
 scraper = PropertyWebScraper::Scraper.new('idealista')
 listing = scraper.process_url(url, import_host, html: html_string)
 ```
+
+## Astro App Pipeline Enhancements
+
+The Astro app (`astro-app/`) extends the core extraction pipeline with several
+services for production-grade data quality:
+
+### Portal Registry (`portal-registry.ts`)
+
+Centralized configuration for all supported property portals. Each entry
+defines the portal's country, default currency, locale, area unit, content
+source type (html/script-json/json-ld/flight-data), and whether JS rendering
+is required. The URL validator derives its host map from this registry.
+
+### Weighted Quality Scoring (`quality-scorer.ts`)
+
+Fields are classified by importance:
+- **Critical** (weight 3): title, price_string, price_float
+- **Important** (weight 2): lat/lng, address, bedrooms, bathrooms, description, images, reference
+- **Optional** (weight 1): all other fields
+
+`assessQualityWeighted()` computes a weighted extraction rate and caps the
+quality grade at C if any critical field is missing.
+
+### Fallback Strategy Chains (`strategies.ts`)
+
+Field mappings can define a `fallbacks` array of alternative mappings. When the
+primary strategy returns empty text, fallbacks are tried in order. The
+`RetrievalResult` records which strategy (primary or fallback N) produced the
+value.
+
+### URL Canonicalization (`url-canonicalizer.ts`)
+
+Normalizes URLs by lowercasing hosts, upgrading to HTTPS, removing tracking
+parameters (utm_*, fbclid, gclid, ref, source, channel), and stripping
+fragments. `deduplicationKey()` extracts hostname + pathname for duplicate
+detection in the listing store.
+
+### Price Normalization (`price-normalizer.ts`)
+
+Locale-aware price parsing supporting EU format (1.250.000,50) and US format
+(1,250,000.50). Detects currency from symbols ($, £, €, ₹) with portal
+fallback. Outputs `NormalizedPrice` with integer cents and ISO 4217 currency
+code.
+
+### Content Provenance Tracking (`html-extractor.ts`)
+
+`analyzeContent()` inspects the HTML to detect:
+- Known script variables (PAGE_MODEL, __NEXT_DATA__, __INITIAL_STATE__, dataLayer)
+- JSON-LD block count
+- Bot-blocked pages (short body + captcha/verify keywords)
+- JS-only shell pages (short body text + many scripts + few divs)
+
+Results are included in `ExtractionDiagnostics.contentAnalysis`.
+
+### Schema Splitting (`schema-splitter.ts`)
+
+Separates the extraction property hash into three categories:
+- **Asset data**: physical property attributes (title, address, rooms, coordinates, images)
+- **Listing data**: commercial attributes (price, currency, sale/rent flags, furnished)
+- **Unmapped**: fields not in either set
 
 ## Known Limitations
 

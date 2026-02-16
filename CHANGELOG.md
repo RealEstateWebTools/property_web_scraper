@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- Portal configuration registry (`portal-registry.ts`) — centralized config for all 11 supported portals with country, currency, locale, content source, and JS rendering requirements
+- Weighted quality scoring — fields classified as critical/important/optional with 3/2/1 weights; grade capped at C when critical fields (title, price) are missing
+- Fallback strategy chains — `FieldMapping.fallbacks` array allows multiple extraction strategies per field, tried in order until one succeeds
+- URL canonicalization and deduplication (`url-canonicalizer.ts`) — strips tracking params (utm_*, fbclid, gclid), normalizes protocol/host; listing store indexes by canonical URL to prevent duplicates
+- Price normalization (`price-normalizer.ts`) — locale-aware parsing (EU `1.250.000,50` vs US `1,250,000.50`), currency detection from symbols, output as integer cents + ISO 4217 code
+- `price_cents` and `price_currency` fields on Listing model
+- Content provenance tracking — `analyzeContent()` detects HTML size, JSON-LD blocks, known script variables (PAGE_MODEL, __NEXT_DATA__), bot-blocked pages, and JS-only shells
+- Schema splitting (`schema-splitter.ts`) — separates extraction output into asset data (physical property) and listing data (commercial/pricing) for downstream integration
+- Admin UI: portal metadata badges on scraper detail page, weighted rate display, critical fields warnings, content analysis card, fallback indicators in field traces
 - `HtmlExtractor` service — pure-function HTML extraction with zero network I/O; accepts raw HTML + source URL and returns structured property data
 - HTML-first input across all endpoints — `html` (string) and `html_file` (upload) parameters on `/scrapers/submit`, `/retriever/as_json`, `/api/v1/listings`, and `/single_property_view`
 - `POST /api/v1/listings` route for submitting HTML via API

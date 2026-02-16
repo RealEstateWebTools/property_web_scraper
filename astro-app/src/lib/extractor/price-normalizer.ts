@@ -38,15 +38,26 @@ export function parsePriceToCents(priceString: string): number {
 
   let normalized: string;
 
-  if (lastComma > lastPeriod) {
-    // EU format: 1.250.000,50 — comma is decimal separator
+  if (lastComma > lastPeriod && lastPeriod >= 0) {
+    // Both separators present, comma after period: EU format 1.250.000,50
     normalized = cleaned.replace(/\./g, '').replace(',', '.');
+  } else if (lastComma > lastPeriod && lastPeriod < 0) {
+    // Only comma(s), no period. Check digits after last comma:
+    // 3 digits → thousands separator (250,000); otherwise → decimal (250,50)
+    const digitsAfterComma = cleaned.length - lastComma - 1;
+    if (digitsAfterComma === 3) {
+      // Thousands separator: 250,000 or 1,250,000
+      normalized = cleaned.replace(/,/g, '');
+    } else {
+      // EU decimal: 250,50
+      normalized = cleaned.replace(',', '.');
+    }
   } else if (lastPeriod > lastComma) {
     // US format: 1,250,000.50 — period is decimal separator
     normalized = cleaned.replace(/,/g, '');
   } else {
-    // No mixed separators — just strip commas
-    normalized = cleaned.replace(/,/g, '');
+    // No separators — use as-is
+    normalized = cleaned;
   }
 
   // Remove any remaining non-numeric chars except period
