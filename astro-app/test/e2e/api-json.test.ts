@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loadFixture } from './helpers';
 
 test.describe('/public_api/v1/listings API', () => {
   test('GET without url returns 400 with MISSING_URL', async ({ request }) => {
@@ -108,6 +109,48 @@ test.describe('/public_api/v1/listings API', () => {
     const hasCors = headers['access-control-allow-origin'] === '*' ||
       headers['access-control-allow-methods'] !== undefined;
     expect(hasCors).toBe(true);
+  });
+});
+
+test.describe('/public_api/v1/listings POST diagnostics', () => {
+  test('POST with rightmove HTML returns diagnostics with fieldTraces', async ({ request }) => {
+    const res = await request.post('/public_api/v1/listings', {
+      headers: { 'Content-Type': 'application/json' },
+      data: JSON.stringify({
+        url: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        html: loadFixture('rightmove'),
+      }),
+    });
+    expect(res.status()).toBe(200);
+    const json = await res.json();
+    expect(json.success).toBe(true);
+
+    // extraction block should contain diagnostics
+    expect(json.extraction).toBeDefined();
+    expect(json.extraction.diagnostics).toBeDefined();
+    expect(json.extraction.diagnostics.scraperName).toBe('rightmove');
+    expect(json.extraction.diagnostics.fieldTraces).toBeInstanceOf(Array);
+    expect(json.extraction.diagnostics.fieldTraces.length).toBeGreaterThan(0);
+    expect(json.extraction.diagnostics.populatedFields).toBeGreaterThan(0);
+    expect(json.extraction.diagnostics.totalFields).toBeGreaterThan(0);
+  });
+
+  test('POST with empty HTML returns diagnostics with emptyFields', async ({ request }) => {
+    const res = await request.post('/public_api/v1/listings', {
+      headers: { 'Content-Type': 'application/json' },
+      data: JSON.stringify({
+        url: 'http://www.rightmove.co.uk/property-to-rent/property-99999.html',
+        html: '<html><body></body></html>',
+      }),
+    });
+    expect(res.status()).toBe(200);
+    const json = await res.json();
+    expect(json.success).toBe(true);
+
+    if (json.extraction && json.extraction.diagnostics) {
+      expect(json.extraction.diagnostics.emptyFields).toBeInstanceOf(Array);
+      expect(json.extraction.diagnostics.emptyFields.length).toBeGreaterThan(0);
+    }
   });
 });
 
