@@ -237,7 +237,7 @@ module PropertyWebScraper
     def get_text_from_css(css_elements, mapping)
       css_retrieved_text = css_elements.text
       if mapping['cssAttr'] && css_elements.attr(mapping['cssAttr'])
-        css_retrieved_text = css_elements.attr(mapping['cssAttr']).text
+        css_retrieved_text = css_elements.attr(mapping['cssAttr']).to_s
       elsif mapping['xmlAttr'] && css_elements.attr(mapping['xmlAttr'])
         css_retrieved_text = css_elements.attr(mapping['xmlAttr'])
       end
