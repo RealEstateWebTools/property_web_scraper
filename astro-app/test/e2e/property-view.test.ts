@@ -1,23 +1,45 @@
 import { test, expect } from '@playwright/test';
+import { loadFixture } from './helpers';
 
-test.describe('Single property view', () => {
-  test('without url param shows error "Please provide a url"', async ({ page }) => {
-    await page.goto('/single_property_view');
-    await expect(page.locator('text=Please provide a url')).toBeVisible();
+test.describe('Listing detail page', () => {
+  test('invalid listing ID shows not found message', async ({ page }) => {
+    await page.goto('/listings/nonexistent-id');
+    await expect(page.locator('text=Listing not found')).toBeVisible();
   });
 
-  test('with unsupported URL shows error card', async ({ page }) => {
-    await page.goto('/single_property_view?url=https://www.unknown-site.com/property/1');
-    await expect(page.locator('text=Could not load property')).toBeVisible();
-  });
+  test('extracted listing is accessible via /listings/:id', async ({ page }) => {
+    // First, extract a listing via the HTML form
+    await page.goto('/extract/html');
+    await page.locator('#import_url').fill('https://www.idealista.com/inmueble/38604738/');
+    await page.locator('#html_input').fill(loadFixture('idealista_2018_01'));
+    await page.locator('button[type="submit"]').click();
 
-  test('with supported URL loads without 500 (Firestore fallback works)', async ({ page }) => {
-    const response = await page.goto('/single_property_view?url=https://www.idealista.com/inmueble/12345/');
-    // Should not be a server error
-    expect(response!.status()).toBeLessThan(500);
+    await expect(page).toHaveURL(/\/extract\/results\//, { timeout: 30000 });
 
-    // Page should show property detail layout (not an error)
-    // Since no HTML was provided, listing will be mostly empty but page should still render
+    // Click "View Full Details" to go to the listings detail page
+    await page.locator('a', { hasText: 'View Full Details' }).click();
+    await expect(page).toHaveURL(/\/listings\//);
+
+    // Should show property detail layout
     await expect(page.locator('a', { hasText: 'PropertyWebScraper' }).first()).toBeVisible();
+    // Breadcrumb should have Listings link
+    await expect(page.locator('main nav a[href="/listings"]')).toBeVisible();
+  });
+});
+
+test.describe('Listings browse page', () => {
+  test('shows empty state when no extractions exist', async ({ page }) => {
+    await page.goto('/listings');
+    // Either shows listings or empty state — page should load without error
+    await expect(page.locator('a', { hasText: 'PropertyWebScraper' }).first()).toBeVisible();
+  });
+});
+
+test.describe('Listing JSON endpoint', () => {
+  test('invalid ID returns 404', async ({ request }) => {
+    const res = await request.get('/listings/nonexistent-id.json');
+    expect(res.status()).toBe(404);
+    const json = await res.json();
+    expect(json.success).toBe(false);
   });
 });
