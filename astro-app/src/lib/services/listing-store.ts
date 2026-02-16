@@ -1,4 +1,4 @@
-import type { Listing } from '../models/listing.js';
+import { Listing } from '../models/listing.js';
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 
 /**
@@ -30,14 +30,34 @@ export async function storeListing(id: string, listing: Listing): Promise<void> 
   }
 }
 
+/**
+ * Rehydrate a plain object (from KV JSON deserialization) into a Listing instance
+ * so that prototype methods like asJson() are available.
+ */
+function rehydrateListing(data: Record<string, unknown>): Listing {
+  const listing = new Listing();
+  listing.assignAttributes(data);
+  return listing;
+}
+
 export async function getListing(id: string): Promise<Listing | undefined> {
   const cached = store.get(id);
-  if (cached) return cached;
+  if (cached) {
+    // Ensure it's a real Listing instance (could be a plain object if
+    // module was re-evaluated by HMR or stored from a previous import)
+    if (typeof cached.asJson !== 'function') {
+      const listing = rehydrateListing(cached as unknown as Record<string, unknown>);
+      store.set(id, listing);
+      return listing;
+    }
+    return cached;
+  }
   if (kv) {
-    const data = await kv.get(`listing:${id}`, 'json') as Listing | null;
+    const data = await kv.get(`listing:${id}`, 'json') as Record<string, unknown> | null;
     if (data) {
-      store.set(id, data);
-      return data;
+      const listing = rehydrateListing(data);
+      store.set(id, listing);
+      return listing;
     }
   }
   return undefined;

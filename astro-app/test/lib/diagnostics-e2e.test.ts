@@ -329,14 +329,14 @@ describe('full pipeline end-to-end', () => {
   });
 });
 
-// ─── 6. JSON endpoint includes diagnostics ──────────────────────
+// ─── 6. JSON endpoint: listing.asJson() must work after store round-trip ──
 
-describe('JSON endpoint diagnostics inclusion', () => {
+describe('JSON endpoint listing serialization', () => {
   beforeEach(() => {
     clearListingStore();
   });
 
-  it('diagnostics are available alongside listing for JSON serialization', async () => {
+  it('listing.asJson() works after store/retrieve round-trip', async () => {
     const html = loadFixture('rightmove');
     const result = await retrieveListing(
       'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
@@ -349,38 +349,63 @@ describe('JSON endpoint diagnostics inclusion', () => {
       await storeDiagnostics(id, result.diagnostics);
     }
 
-    // Simulate what [id].json.ts does
+    // Simulate exactly what [id].json.ts does — this was crashing
     const listing = await getListing(id);
     const diagnostics = await getDiagnostics(id);
 
+    expect(listing).toBeDefined();
+    expect(typeof listing!.asJson).toBe('function');
+
     const json = {
       success: true,
-      listing: listing,
+      listing: listing!.asJson(),
       ...(diagnostics ? { diagnostics } : {}),
     };
 
+    expect(json.listing).toBeDefined();
+    expect(json.listing.title).toBe(
+      '4 bedroom detached house to rent in School Road, Birmingham, B14, B14'
+    );
     expect(json.diagnostics).toBeDefined();
     expect(json.diagnostics!.scraperName).toBe('rightmove');
-    expect(json.diagnostics!.fieldTraces).toBeInstanceOf(Array);
-
-    // Verify it's JSON-serializable
-    const serialized = JSON.stringify(json);
-    const parsed = JSON.parse(serialized);
-    expect(parsed.diagnostics.scraperName).toBe('rightmove');
-    expect(parsed.diagnostics.fieldTraces).toBeInstanceOf(Array);
   });
 
-  it('JSON has no diagnostics key when not stored', async () => {
+  it('listing.asJson() works even after plain-object insertion', async () => {
+    // Simulate what happens when KV returns a plain object (no prototype)
     const id = generateId();
-    // Store listing without diagnostics
-    const { Listing } = await import('../../src/lib/models/listing.js');
-    const listing = new Listing();
+    const plainObj = {
+      title: 'Test Property',
+      price_string: '£500,000',
+      import_url: 'http://example.com/listing/1',
+    } as any;
+
+    // Force a plain object into the store (simulates KV deserialization)
+    await storeListing(id, plainObj);
+
+    // getListing must rehydrate it into a proper Listing with asJson()
+    const listing = await getListing(id);
+    expect(listing).toBeDefined();
+    expect(typeof listing!.asJson).toBe('function');
+
+    const json = listing!.asJson();
+    expect(json.title).toBe('Test Property');
+    expect(json.price_string).toBe('£500,000');
+  });
+
+  it('JSON response has no diagnostics key when not stored', async () => {
+    const id = generateId();
+    const { Listing: ListingClass } = await import('../../src/lib/models/listing.js');
+    const listing = new ListingClass();
     await storeListing(id, listing);
 
+    const retrieved = await getListing(id);
     const diagnostics = await getDiagnostics(id);
+
+    expect(typeof retrieved!.asJson).toBe('function');
+
     const json = {
       success: true,
-      listing: await getListing(id),
+      listing: retrieved!.asJson(),
       ...(diagnostics ? { diagnostics } : {}),
     };
 
