@@ -1,41 +1,18 @@
-<h3><%= I18n.t("property.details", default: "Property Details") %></h3>
-<table class="table table-bordered table-striped">
-  <tbody>
-    <% if @listing.reference.present? %>
-      <tr>
-        <td><strong>Reference:</strong></td>
-        <td><%= @listing.reference %></td>
-      </tr>
+<% details = [] %>
+<% details << ["Reference", @listing.reference] if @listing.reference.present? %>
+<% details << ["Price", @listing.price_string] if @listing.price_string.present? %>
+<% details << ["Bedrooms", @listing.count_bedrooms] if @listing.count_bedrooms.present? && @listing.count_bedrooms.to_i > 0 %>
+<% details << ["Bathrooms", @listing.count_bathrooms] if @listing.count_bathrooms.present? && @listing.count_bathrooms.to_i > 0 %>
+<% details << ["Area", "#{@listing.constructed_area} #{@listing.area_unit}"] if @listing.constructed_area.present? && @listing.constructed_area.to_i > 0 %>
+<% details << ["Address", @listing.address_string] if @listing.address_string.present? %>
+
+<% if details.any? %>
+  <div class="pws-detail-list">
+    <% details.each do |label, value| %>
+      <div class="pws-detail-row">
+        <span class="pws-detail-label"><%= label %></span>
+        <span class="pws-detail-value"><%= value %></span>
+      </div>
     <% end %>
-    <% if @listing.price_string.present? %>
-      <tr>
-        <td><strong>Price:</strong></td>
-        <td><%= @listing.price_string %></td>
-      </tr>
-    <% end %>
-    <% if @listing.count_bedrooms.present? && @listing.count_bedrooms.to_i > 0 %>
-      <tr>
-        <td><strong>Bedrooms:</strong></td>
-        <td><%= @listing.count_bedrooms %></td>
-      </tr>
-    <% end %>
-    <% if @listing.count_bathrooms.present? && @listing.count_bathrooms.to_i > 0 %>
-      <tr>
-        <td><strong>Bathrooms:</strong></td>
-        <td><%= @listing.count_bathrooms %></td>
-      </tr>
-    <% end %>
-    <% if @listing.constructed_area.present? && @listing.constructed_area.to_i > 0 %>
-      <tr>
-        <td><strong>Area:</strong></td>
-        <td><%= @listing.constructed_area %> <%= @listing.area_unit %></td>
-      </tr>
-    <% end %>
-    <% if @listing.address_string.present? %>
-      <tr>
-        <td><strong>Address:</strong></td>
-        <td><%= @listing.address_string %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+  </div>
+<% end %>

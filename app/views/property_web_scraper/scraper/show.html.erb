@@ -1,62 +1,80 @@
-<div class="container">
-<div class="row">
-  <div class="col-sm-12">
-    <% if @import_host %>
-      <%= form_tag("/scrapers/#{@import_host.id}/retrieve", method: "get") do %>
-        <br>
-        <br>
-        <br>
-        <div>
-          <p>
-            Please enter the url for a property from <%= link_to "#{@import_host.host_url}", "#{@import_host.host_url}", target: "_blank" %>
-          </p>
-          <%# label_tag(:import_url, "Webpage URL:") %>
-          <span class="url_input">
-            <%= text_field_tag(:import_url) %>
-          </span>
-          <%= submit_tag("Retrieve property info") %>
+<div class="container pws-property-page">
+  <nav class="pws-breadcrumb">
+    <a href="/"><i class="bi bi-house me-1"></i>Home</a>
+    <i class="bi bi-chevron-right"></i>
+    <span>Scraper</span>
+  </nav>
+
+  <% if @import_host %>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card pws-tryit-card" style="margin-top: 0;">
+          <div class="card-body">
+            <h4 class="mb-3">
+              <i class="bi bi-search me-2"></i>Extract from <%= @import_host.host %>
+            </h4>
+            <p class="text-muted mb-3">
+              Enter the URL of a property page from
+              <%= link_to @import_host.host_url, @import_host.host_url, target: "_blank" %>.
+            </p>
+            <%= form_tag("/scrapers/#{@import_host.id}/retrieve", method: "get") do %>
+              <div class="mb-3">
+                <label for="import_url" class="form-label fw-semibold">Property URL</label>
+                <%= text_field_tag(:import_url, nil,
+                      id: "import_url",
+                      class: "form-control pws-url-input",
+                      placeholder: "#{@import_host.host_url}/property/12345/") %>
+              </div>
+              <div class="d-grid">
+                <%= submit_tag("Retrieve property info", class: "btn btn-primary pws-submit-btn") %>
+              </div>
+            <% end %>
+          </div>
         </div>
-      <% end %>
-      <br>
-    <% else %>
-      <div>
-        Sorry, scraper could not be found
+      </div>
     </div>
+
+    <% if @import_host_listings.length > 0 %>
+      <div class="row justify-content-center mt-4">
+        <div class="col-lg-8">
+          <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i>Previously imported listings</h5>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover pws-listings-table">
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Price</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @import_host_listings.each do |listing| %>
+                  <tr>
+                    <td><%= listing.reference %></td>
+                    <td><%= listing.price_string %></td>
+                    <td>
+                      <%= link_to listing.import_url, listing.import_url, target: "_blank", class: "text-truncate d-inline-block", style: "max-width: 300px;" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     <% end %>
-  </div>
-</div>
-<% if @import_host_listings.length > 0 %>
-  <div class="row">
-    <div class="col-sm-8">
-      <br>
-      <br>
-      <br>
-      <h3>Previously imported listings </h3>
-      <br>
-      <br>
-      <br>
+
+  <% else %>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="pws-error-card">
+          <div class="pws-error-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h5>Scraper not found</h5>
+          <p>The requested scraper configuration could not be found.</p>
+        </div>
+      </div>
     </div>
-  </div>
-  <table class="table">
-    <thead>
-      <tr>
-        <th></th>
-        <th>Reference</th>
-        <th>Price</th>
-        <th>Url</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @import_host_listings.each do |listing| %>
-        <tr>
-          <th scope="row"></th>
-          <td><%= listing.reference %></td>
-          <td><%= listing.price_string %></td>
-          <td><%= link_to listing.import_url, listing.import_url, target: "_blank" %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
+  <% end %>
 </div>
