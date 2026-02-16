@@ -1,57 +1,173 @@
-<div class="row">
-  <div class="col-12">
-    <h3 class="my-4">
-      Easily retrieve details of properties for sale or rent in a standard format
-    </h3>
-    <p>Allows you to monitor price changes, export data, analyze trends etc.</p>
+<!-- ── Hero ── -->
+<section class="pws-landing-hero">
+  <div class="container">
+    <div class="pws-hero-badge">
+      <i class="bi bi-building"></i> Open-source property data extraction
+    </div>
+    <h1>Extract Property Data from<br>Any Real Estate Website</h1>
+    <p class="lead">
+      Provide a URL or pre-rendered HTML and get structured property data
+      instantly &mdash; title, price, images, location, and more.
+    </p>
+    <a href="#try-it" class="btn btn-outline-light btn-lg">
+      Try It Now <i class="bi bi-arrow-down-short"></i>
+    </a>
+  </div>
+</section>
 
-    <%= form_tag(scrapers_submit_path, method: "post", data: { turbo_frame: "retrieve-results" }) do %>
-      <div class="mb-3">
-        <p>Please enter the url for a property for sale or for rent:</p>
-        <div class="input-group">
-          <span class="url_input">
-            <%= text_field_tag(:import_url, nil, class: "form-control", placeholder: "https://www.idealista.com/inmueble/...") %>
-          </span>
-          <%= submit_tag("Retrieve property info", class: "btn btn-primary") %>
+<!-- ── Try it section ── -->
+<section id="try-it" class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card pws-tryit-card">
+        <div class="card-body" data-controller="scraper-form">
+
+          <h4 class="mb-3">Try it out</h4>
+
+          <!-- Mode tabs -->
+          <div class="pws-mode-tabs">
+            <button type="button" class="pws-mode-tab active" data-scraper-form-target="tab" data-mode="url" data-action="click->scraper-form#switchMode">
+              <i class="bi bi-link-45deg"></i> Enter URL
+            </button>
+            <button type="button" class="pws-mode-tab" data-scraper-form-target="tab" data-mode="html" data-action="click->scraper-form#switchMode">
+              <i class="bi bi-code-slash"></i> Paste HTML
+            </button>
+            <button type="button" class="pws-mode-tab" data-scraper-form-target="tab" data-mode="file" data-action="click->scraper-form#switchMode">
+              <i class="bi bi-file-earmark-arrow-up"></i> Upload File
+            </button>
+          </div>
+
+          <p class="pws-mode-hint" data-scraper-form-target="modeHint">
+            We'll fetch the page directly. Works best with static HTML sites.
+          </p>
+
+          <%= form_tag(scrapers_submit_path, method: "post", multipart: true) do %>
+
+            <!-- URL (always visible) -->
+            <div class="mb-3">
+              <label for="import_url" class="form-label fw-semibold">Property URL</label>
+              <%= text_field_tag(:import_url, nil,
+                    id: "import_url",
+                    class: "form-control pws-url-input",
+                    placeholder: "https://www.idealista.com/inmueble/12345678/",
+                    required: true,
+                    data: { scraper_form_target: "urlInput" }) %>
+            </div>
+
+            <!-- HTML textarea (hidden by default) -->
+            <div class="mb-3 d-none" data-scraper-form-target="htmlGroup">
+              <label for="html_input" class="form-label fw-semibold">Page HTML</label>
+              <textarea name="html" id="html_input" class="form-control pws-html-textarea" rows="5"
+                        placeholder="Paste the full page source here..."></textarea>
+            </div>
+
+            <!-- File upload (hidden by default) -->
+            <div class="mb-3 d-none" data-scraper-form-target="fileGroup">
+              <label for="html_file_input" class="form-label fw-semibold">HTML File</label>
+              <input type="file" name="html_file" id="html_file_input" class="form-control pws-file-input" accept=".html,.htm">
+            </div>
+
+            <div class="d-grid">
+              <%= submit_tag("Fetch & Extract",
+                    class: "btn btn-primary pws-submit-btn",
+                    data: { scraper_form_target: "submitBtn" }) %>
+            </div>
+
+          <% end %>
+
+          <!-- Supported sites -->
+          <div class="pws-supported-sites text-center">
+            <small class="text-muted d-block mb-2">Works with these sites and any site with a configured mapping:</small>
+            <% %w[idealista.com rightmove.co.uk zoopla.co.uk realtor.com fotocasa.es pisos.com realestateindia.com].each do |site| %>
+              <span class="pws-site-badge"><%= site %></span>
+            <% end %>
+            <span class="pws-site-badge">+ more</span>
+          </div>
+
         </div>
-      </div>
-    <% end %>
-
-    <turbo-frame id="retrieve-results"></turbo-frame>
-
-    <div class="card border-info mb-3 text-center mt-4">
-      <div class="card-body">
-        <blockquote class="blockquote">
-          <p>Help us improve this product by giving us some feedback:</p>
-        </blockquote>
-        <form action="https://formspree.io/pws@propertywebbuilder.com" method="POST">
-          <div class="mb-3 row">
-            <label for="example-url-input" class="col-sm-2 col-form-label">Url you would like to scrape</label>
-            <div class="col-sm-10">
-              <input class="form-control" type="url" value="" id="example-url-input" name="scrape_url">
-            </div>
-          </div>
-          <div class="mb-3 row">
-            <label for="example-bool-input" class="col-sm-2 col-form-label">Would you pay for this service?</label>
-            <div class="col-sm-10">
-              <input class="form-control" type="text" value="" id="example-bool-input" name="would_pay">
-            </div>
-          </div>
-          <div class="mb-3 row">
-            <label for="example-email-input" class="col-sm-2 col-form-label">Email</label>
-            <div class="col-sm-10">
-              <input class="form-control" type="email" value="" id="example-email-input" name="email">
-            </div>
-          </div>
-          <div class="mb-3 row">
-            <label for="example-text-input" class="col-sm-2 col-form-label">Any other comments:</label>
-            <div class="col-sm-10">
-              <input class="form-control" type="text" value="" id="example-text-input" name="comments">
-            </div>
-          </div>
-          <input type="submit" value="Send" class="btn btn-outline-secondary">
-        </form>
       </div>
     </div>
   </div>
-</div>
+</section>
+
+<!-- ── Results appear here ── -->
+<section class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div id="retrieve-results"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ── -->
+<section class="pws-how-it-works">
+  <div class="container">
+    <h3 class="text-center mb-4">How It Works</h3>
+    <div class="row align-items-start justify-content-center">
+      <div class="col-md-3">
+        <div class="pws-step-card">
+          <div class="pws-step-number">1</div>
+          <div class="pws-step-icon">
+            <i class="bi bi-globe"></i>
+          </div>
+          <h5>Provide a Source</h5>
+          <p>Enter a property URL, paste rendered HTML, or upload a saved page.</p>
+        </div>
+      </div>
+      <div class="col-md-1 d-none d-md-block">
+        <div class="pws-step-connector">
+          <i class="bi bi-chevron-right"></i>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="pws-step-card">
+          <div class="pws-step-number">2</div>
+          <div class="pws-step-icon">
+            <i class="bi bi-cpu"></i>
+          </div>
+          <h5>We Extract Data</h5>
+          <p>Configurable mappings parse titles, prices, images, coordinates, and more.</p>
+        </div>
+      </div>
+      <div class="col-md-1 d-none d-md-block">
+        <div class="pws-step-connector">
+          <i class="bi bi-chevron-right"></i>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="pws-step-card">
+          <div class="pws-step-number">3</div>
+          <div class="pws-step-icon">
+            <i class="bi bi-braces"></i>
+          </div>
+          <h5>Use the Results</h5>
+          <p>Get structured JSON, view a rich property page, or integrate via API.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Why pre-rendered HTML? ── -->
+<section class="container mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="pws-callout">
+        <div class="row align-items-center">
+          <div class="col-md-1 text-center d-none d-md-block">
+            <i class="bi bi-lightbulb" style="font-size: 2rem; color: #0d6efd;"></i>
+          </div>
+          <div class="col-md-11">
+            <h4>Why "Paste HTML" or "Upload File"?</h4>
+            <p>
+              Modern real estate sites render content with JavaScript. A simple URL fetch
+              only sees the empty shell. By pasting the fully-rendered page source from your
+              browser (right-click &rarr; View Page Source, or save the page as HTML),
+              you give the extractor the complete HTML it needs to find every field.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

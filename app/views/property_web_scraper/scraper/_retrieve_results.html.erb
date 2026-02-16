@@ -1,31 +1,101 @@
-<p>Property info retrieved:</p>
-<div class="mb-3">
-  <%= link_to "Single Page view", single_property_view_path(url: @listing.import_url), class: "btn btn-success me-2" %>
-  <%= link_to "JSON view", retriever_as_json_path(url: @listing.import_url), class: "btn btn-success" %>
+<!-- Success banner -->
+<div class="pws-success-banner">
+  <i class="bi bi-check-circle-fill"></i>
+  Property data extracted successfully
 </div>
-<table class="table table-striped">
-  <tbody>
-    <% @listing_attributes.each do |listing_attribute| %>
-      <tr>
-        <th><%= listing_attribute %></th>
-        <td><%= @listing[listing_attribute] %></td>
-      </tr>
-    <% end %>
-    <tr>
-      <th>Url</th>
-      <td><%= link_to @listing.import_url, @listing.import_url, target: "_blank" %></td>
-    </tr>
-  </tbody>
-</table>
-<div class="mb-3">
-  <strong>Images</strong>
-  <% @image_urls.each do |listing_image_url| %>
-    <div>
-      <%= link_to listing_image_url, listing_image_url, target: "_blank" %>
-    </div>
+
+<!-- Property card -->
+<div class="card pws-result-card">
+  <% if @image_urls.present? && @image_urls.first.present? %>
+    <img src="<%= @image_urls.first %>" alt="Property image" class="pws-result-image">
   <% end %>
-</div>
-<div>
-  <%= link_to "Single Page view", single_property_view_path(url: @listing.import_url), class: "btn btn-success me-2" %>
-  <%= link_to "JSON view", retriever_as_json_path(url: @listing.import_url), class: "btn btn-success" %>
+
+  <div class="card-body">
+    <% if @listing.title.present? %>
+      <h5 class="pws-result-title"><%= @listing.title %></h5>
+    <% end %>
+
+    <!-- Key stats -->
+    <div class="pws-stat-row">
+      <% if @listing.price_string.present? %>
+        <span class="pws-stat pws-stat-price">
+          <i class="bi bi-tag-fill"></i> <%= @listing.price_string %> <%= @listing.currency %>
+        </span>
+      <% end %>
+      <% if @listing.count_bedrooms.present? && @listing.count_bedrooms.to_i > 0 %>
+        <span class="pws-stat">
+          <i class="bi bi-door-open"></i> <%= @listing.count_bedrooms %> beds
+        </span>
+      <% end %>
+      <% if @listing.count_bathrooms.present? && @listing.count_bathrooms.to_i > 0 %>
+        <span class="pws-stat">
+          <i class="bi bi-droplet"></i> <%= @listing.count_bathrooms %> baths
+        </span>
+      <% end %>
+      <% if @listing.constructed_area.present? && @listing.constructed_area.to_i > 0 %>
+        <span class="pws-stat">
+          <i class="bi bi-arrows-angle-expand"></i> <%= @listing.constructed_area %> <%= @listing.area_unit %>
+        </span>
+      <% end %>
+      <% if @listing.for_sale %>
+        <span class="pws-stat"><i class="bi bi-house"></i> For Sale</span>
+      <% end %>
+      <% if @listing.for_rent %>
+        <span class="pws-stat"><i class="bi bi-key"></i> For Rent</span>
+      <% end %>
+    </div>
+
+    <% if @listing.address_string.present? %>
+      <p class="text-muted mb-3">
+        <i class="bi bi-geo-alt me-1"></i> <%= @listing.address_string %>
+      </p>
+    <% end %>
+
+    <!-- Action buttons -->
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <%= link_to single_property_view_path(url: @listing.import_url), class: "btn btn-primary btn-sm" do %>
+        <i class="bi bi-eye me-1"></i> View Full Details
+      <% end %>
+      <%= link_to retriever_as_json_path(url: @listing.import_url), class: "btn btn-outline-secondary btn-sm" do %>
+        <i class="bi bi-braces me-1"></i> Get JSON
+      <% end %>
+      <%= link_to @listing.import_url, target: "_blank", class: "btn btn-outline-secondary btn-sm" do %>
+        <i class="bi bi-box-arrow-up-right me-1"></i> Original Page
+      <% end %>
+    </div>
+
+    <!-- Expandable all-fields section -->
+    <button class="pws-details-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#all-fields" aria-expanded="false">
+      <i class="bi bi-chevron-down"></i> Show all extracted fields
+    </button>
+
+    <div class="collapse mt-3" id="all-fields">
+      <table class="table table-sm table-striped mb-3">
+        <tbody>
+          <% @listing_attributes.each do |attr| %>
+            <% val = @listing[attr] %>
+            <% next if val.blank? %>
+            <tr>
+              <td class="fw-semibold" style="width: 35%;"><%= attr.humanize %></td>
+              <td><%= val %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <% if @image_urls.present? && @image_urls.length > 0 %>
+        <p class="fw-semibold mb-2"><%= @image_urls.length %> image<%= @image_urls.length == 1 ? '' : 's' %> found</p>
+        <div class="d-flex flex-wrap gap-2 mb-2">
+          <% @image_urls.first(6).each do |img_url| %>
+            <a href="<%= img_url %>" target="_blank">
+              <img src="<%= img_url %>" alt="Property" style="width: 80px; height: 60px; object-fit: cover; border-radius: 0.35rem; border: 1px solid #ddd;">
+            </a>
+          <% end %>
+          <% if @image_urls.length > 6 %>
+            <span class="pws-site-badge align-self-center">+ <%= @image_urls.length - 6 %> more</span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>

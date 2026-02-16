@@ -1,6 +1,17 @@
-<div>
-  Sorry, there has been an error.
-</div>
-<div>
-  <%= @error_message %>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="pws-error-card text-center">
+        <div class="pws-error-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h5>Could not load property</h5>
+        <p><%= @error_message %></p>
+        <div class="pws-error-hint">
+          <i class="bi bi-arrow-left"></i>
+          <a href="/">Go back and try again</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
