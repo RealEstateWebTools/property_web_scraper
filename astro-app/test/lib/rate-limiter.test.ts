@@ -1,4 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+vi.mock('../../src/lib/services/runtime-config.js', () => ({
+  getRuntimeConfig: () => ({ maxRequests: 60 }),
+}));
+
+vi.mock('../../src/lib/services/activity-logger.js', () => ({
+  logActivity: vi.fn(),
+}));
+
 import { checkRateLimit, resetRateLimiter } from '../../src/lib/services/rate-limiter.js';
 
 function makeRequest(overrides: { apiKey?: string; ip?: string; url?: string } = {}): Request {

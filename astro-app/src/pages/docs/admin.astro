@@ -1,0 +1,194 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Admin API Documentation - Property Web Scraper">
+
+<section class="max-w-4xl mx-auto px-4 py-12">
+  <nav class="flex items-center gap-2 text-sm text-gray-400 mb-5">
+    <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <a href="/docs/api" class="text-gray-500 no-underline hover:text-blue-600 transition">API Documentation</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <span>Admin API</span>
+  </nav>
+
+  <h2 class="text-2xl font-bold mb-2">Admin API Documentation</h2>
+  <p class="text-gray-500 text-sm mb-8">
+    Manage, monitor, and configure your Property Web Scraper instance via the admin endpoints.
+  </p>
+
+  <!-- Setup -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-gear mr-2 text-blue-600"></i>Setup</h3>
+    <p class="text-sm text-gray-600 mb-3">
+      Admin access is disabled by default. To enable it, set the
+      <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">PWS_ADMIN_KEY</code> environment variable to a secret string.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Login Flow</h5>
+    <ol class="text-sm text-gray-600 list-decimal ml-5 space-y-1">
+      <li>Navigate to <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">/admin/login</code> and enter your admin key.</li>
+      <li>On success, a <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">pws_admin_key</code> HttpOnly cookie is set (valid 24 hours, scoped to <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">/admin</code>).</li>
+      <li>All subsequent admin page and API requests are authenticated via this cookie.</li>
+      <li>Log out at <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">/admin/logout</code> to clear the cookie.</li>
+    </ol>
+  </div>
+
+  <!-- Authentication -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-shield-lock mr-2 text-blue-600"></i>Authentication</h3>
+    <p class="text-sm text-gray-600 mb-3">
+      All admin API endpoints require authentication. Provide the admin key via one of:
+    </p>
+    <ul class="text-sm text-gray-600 list-disc ml-5 space-y-1">
+      <li>Header: <code class="bg-gray-100 px-1.5 py-0.5 rounded">X-Admin-Key: your-key</code></li>
+      <li>Query parameter: <code class="bg-gray-100 px-1.5 py-0.5 rounded">?admin_key=your-key</code></li>
+      <li>Cookie: <code class="bg-gray-100 px-1.5 py-0.5 rounded">pws_admin_key=your-key</code> (set automatically after login)</li>
+    </ul>
+    <p class="text-sm text-gray-600 mt-3">
+      Unauthenticated requests receive a <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">401</code> response.
+    </p>
+  </div>
+
+  <!-- GET /admin/api/logs -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
+      <code class="text-sm font-semibold">/admin/api/logs</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      Query the in-memory activity log. Returns matching entries newest-first plus aggregate stats.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Query Parameters</h5>
+    <table class="w-full text-sm mb-3">
+      <thead><tr class="border-b"><th class="text-left py-1.5 px-2 text-gray-500">Name</th><th class="text-left py-1.5 px-2 text-gray-500">Type</th><th class="text-left py-1.5 px-2 text-gray-500">Description</th></tr></thead>
+      <tbody>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>level</code></td><td class="py-1.5 px-2">string</td><td class="py-1.5 px-2"><code>info</code>, <code>warn</code>, or <code>error</code></td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>category</code></td><td class="py-1.5 px-2">string</td><td class="py-1.5 px-2"><code>api_request</code>, <code>extraction</code>, <code>auth</code>, <code>rate_limit</code>, or <code>system</code></td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>search</code></td><td class="py-1.5 px-2">string</td><td class="py-1.5 px-2">Case-insensitive full-text search across message, path, method, errorCode, scraperName, sourceUrl</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>limit</code></td><td class="py-1.5 px-2">number</td><td class="py-1.5 px-2">Max entries to return (default 50)</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>offset</code></td><td class="py-1.5 px-2">number</td><td class="py-1.5 px-2">Skip entries for pagination (default 0)</td></tr>
+      </tbody>
+    </table>
+    <h5 class="text-sm font-semibold mb-2">Example Response</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>&#123;
+  "entries": [
+    &#123;
+      "id": "42",
+      "timestamp": 1700000000000,
+      "level": "info",
+      "category": "api_request",
+      "message": "GET /public_api/v1/listings",
+      "method": "GET",
+      "path": "/public_api/v1/listings"
+    &#125;
+  ],
+  "total": 1,
+  "stats": &#123;
+    "totalEntries": 128,
+    "capacity": 1000,
+    "byLevel": &#123; "info": 100, "warn": 20, "error": 8 &#125;,
+    "byCategory": &#123; "api_request": 90, "extraction": 25, "auth": 5, "rate_limit": 3, "system": 5 &#125;
+  &#125;
+&#125;</code></pre>
+  </div>
+
+  <!-- GET /admin/api/stats -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
+      <code class="text-sm font-semibold">/admin/api/stats</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      Returns a full dashboard snapshot: server health, listing store, rate limiter, log stats, and scraper status.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Example Response</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>&#123;
+  "health": &#123; "status": "ok", "scrapersLoaded": 16, "storage": "in_memory" &#125;,
+  "listings": &#123; "count": 42 &#125;,
+  "rateLimiter": &#123; "activeClients": 3, "totalRequests": 87, "maxRequests": 60 &#125;,
+  "logs": &#123; "totalEntries": 128, "capacity": 1000, "byLevel": &#123;...&#125;, "byCategory": &#123;...&#125; &#125;,
+  "scrapers": [
+    &#123; "name": "idealista", "loaded": true, "hosts": ["www.idealista.com"] &#125;
+  ]
+&#125;</code></pre>
+  </div>
+
+  <!-- GET/POST /admin/api/config -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
+      <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded">POST</span>
+      <code class="text-sm font-semibold">/admin/api/config</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      <strong>GET</strong> returns the current runtime configuration. <strong>POST</strong> updates it.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">GET Response</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto mb-3"><code>&#123; "config": &#123; "maxRequests": 60 &#125; &#125;</code></pre>
+    <h5 class="text-sm font-semibold mb-2">POST Body (JSON)</h5>
+    <table class="w-full text-sm mb-3">
+      <thead><tr class="border-b"><th class="text-left py-1.5 px-2 text-gray-500">Name</th><th class="text-left py-1.5 px-2 text-gray-500">Type</th><th class="text-left py-1.5 px-2 text-gray-500">Description</th></tr></thead>
+      <tbody>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>maxRequests</code></td><td class="py-1.5 px-2">number</td><td class="py-1.5 px-2">Rate limit per client per minute (1–1000)</td></tr>
+      </tbody>
+    </table>
+    <h5 class="text-sm font-semibold mb-2">Example</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl -X POST http://localhost:4321/admin/api/config \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Key: your-key" \
+  -d '&#123;"maxRequests": 120&#125;'
+
+# Response:
+&#123; "success": true, "config": &#123; "maxRequests": 120 &#125; &#125;</code></pre>
+  </div>
+
+  <!-- POST /admin/api/actions -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded">POST</span>
+      <code class="text-sm font-semibold">/admin/api/actions</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      Execute a maintenance action. Send a JSON body with an <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">action</code> field.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Valid Actions</h5>
+    <table class="w-full text-sm mb-3">
+      <thead><tr class="border-b"><th class="text-left py-1.5 px-2 text-gray-500">Action</th><th class="text-left py-1.5 px-2 text-gray-500">Description</th></tr></thead>
+      <tbody>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>clear_logs</code></td><td class="py-1.5 px-2">Clear all activity log entries</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>clear_mapping_cache</code></td><td class="py-1.5 px-2">Clear the scraper mapping cache</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>clear_listing_store</code></td><td class="py-1.5 px-2">Clear all stored listings</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>reset_rate_limiter</code></td><td class="py-1.5 px-2">Reset all rate limit counters</td></tr>
+      </tbody>
+    </table>
+    <h5 class="text-sm font-semibold mb-2">Example</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl -X POST http://localhost:4321/admin/api/actions \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Key: your-key" \
+  -d '&#123;"action": "clear_logs"&#125;'
+
+# Response:
+&#123; "success": true, "message": "Activity logs cleared" &#125;</code></pre>
+  </div>
+
+  <!-- Admin UI Pages -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-window-desktop mr-2 text-blue-600"></i>Admin UI Pages</h3>
+    <p class="text-sm text-gray-600 mb-3">
+      The admin dashboard also includes browser-based UI pages:
+    </p>
+    <table class="w-full text-sm">
+      <thead><tr class="border-b"><th class="text-left py-1.5 px-2 text-gray-500">Path</th><th class="text-left py-1.5 px-2 text-gray-500">Description</th></tr></thead>
+      <tbody>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>/admin</code></td><td class="py-1.5 px-2">Dashboard overview with stats and quick actions</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>/admin/logs</code></td><td class="py-1.5 px-2">Activity log viewer with filtering and search</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>/admin/config</code></td><td class="py-1.5 px-2">Runtime configuration editor</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>/admin/login</code></td><td class="py-1.5 px-2">Login page</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>/admin/logout</code></td><td class="py-1.5 px-2">Logout (clears session cookie)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+</BaseLayout>
