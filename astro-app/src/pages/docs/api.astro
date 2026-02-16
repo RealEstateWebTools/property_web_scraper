@@ -28,6 +28,20 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     </ul>
   </div>
 
+  <!-- CORS -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <h3 class="text-lg font-semibold mb-3"><i class="bi bi-globe mr-2 text-blue-600"></i>CORS</h3>
+    <p class="text-sm text-gray-600 mb-3">
+      All API responses include CORS headers for browser-based consumers:
+    </p>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Access-Control-Allow-Headers: Content-Type, X-Api-Key</code></pre>
+    <p class="text-sm text-gray-600 mt-3">
+      All endpoints also support <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">OPTIONS</code> preflight requests, returning <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">204 No Content</code> with the CORS headers above.
+    </p>
+  </div>
+
   <!-- GET /public_api/v1/listings -->
   <div class="bg-white rounded-xl shadow-md p-6 mb-5">
     <div class="flex items-center gap-2 mb-3">
@@ -62,9 +76,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <thead><tr class="border-b"><th class="text-left py-1.5 px-2 text-gray-500">Name</th><th class="text-left py-1.5 px-2 text-gray-500">Type</th><th class="text-left py-1.5 px-2 text-gray-500">Description</th></tr></thead>
       <tbody>
         <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>url</code></td><td class="py-1.5 px-2">string</td><td class="py-1.5 px-2">Property listing URL (required)</td></tr>
-        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>html</code></td><td class="py-1.5 px-2">string</td><td class="py-1.5 px-2">Pre-rendered HTML (optional)</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>html</code></td><td class="py-1.5 px-2">string</td><td class="py-1.5 px-2">Pre-rendered HTML (optional, max 10MB)</td></tr>
       </tbody>
     </table>
+    <p class="text-sm text-gray-600 mb-3">
+      When HTML is provided and extraction succeeds, the response includes an <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">extraction</code> metadata object with <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">fields_extracted</code>, <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">fields_available</code>, and <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">scraper_used</code>.
+    </p>
     <h5 class="text-sm font-semibold mb-2">Example</h5>
     <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl -X POST http://localhost:4321/public_api/v1/listings \
   -H "Content-Type: application/json" \
@@ -84,6 +101,43 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>curl "http://localhost:4321/public_api/v1/listings/abc123"</code></pre>
   </div>
 
+  <!-- GET /public_api/v1/supported_sites -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
+      <code class="text-sm font-semibold">/public_api/v1/supported_sites</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      Returns the list of supported property websites and their scraper names. Requires authentication.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Example Response</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>&#123;
+  "success": true,
+  "sites": [
+    &#123; "host": "www.idealista.com", "scraper": "idealista" &#125;,
+    &#123; "host": "www.rightmove.co.uk", "scraper": "rightmove" &#125;
+  ]
+&#125;</code></pre>
+  </div>
+
+  <!-- GET /public_api/v1/health -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
+      <code class="text-sm font-semibold">/public_api/v1/health</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      Health check endpoint. No authentication required. Returns server status and loaded scraper count.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Example Response</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>&#123;
+  "success": true,
+  "status": "ok",
+  "scrapers_loaded": 16,
+  "storage": "in_memory"
+&#125;</code></pre>
+  </div>
+
   <!-- Error Codes -->
   <div class="bg-white rounded-xl shadow-md p-6 mb-5">
     <h3 class="text-lg font-semibold mb-3"><i class="bi bi-exclamation-triangle mr-2 text-blue-600"></i>Error Codes</h3>
@@ -100,6 +154,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>MISSING_SCRAPER</code></td><td class="py-1.5 px-2">500</td><td class="py-1.5 px-2">Server-side scraper configuration is missing</td></tr>
         <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>UNAUTHORIZED</code></td><td class="py-1.5 px-2">401</td><td class="py-1.5 px-2">Missing or invalid API key</td></tr>
         <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>LISTING_NOT_FOUND</code></td><td class="py-1.5 px-2">404</td><td class="py-1.5 px-2">No listing exists with the given ID</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>RATE_LIMITED</code></td><td class="py-1.5 px-2">429</td><td class="py-1.5 px-2">Too many requests — includes <code>Retry-After</code> header</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>PAYLOAD_TOO_LARGE</code></td><td class="py-1.5 px-2">413</td><td class="py-1.5 px-2">HTML body exceeds 10MB size limit</td></tr>
+        <tr class="border-b border-gray-100"><td class="py-1.5 px-2"><code>UNSUPPORTED_CONTENT_TYPE</code></td><td class="py-1.5 px-2">415</td><td class="py-1.5 px-2">POST Content-Type must be application/json or multipart/form-data</td></tr>
       </tbody>
     </table>
     <h5 class="text-sm font-semibold mb-2">Example Error Response</h5>

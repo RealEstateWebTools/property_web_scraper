@@ -99,44 +99,42 @@ Future codes (not yet implemented):
 
 All endpoints now return correct HTTP status codes (400, 401, 404, 500) instead of 200 for errors.
 
-### 3. New Endpoint: `GET /public_api/v1/supported_sites`
+### 3. New Endpoint: `GET /public_api/v1/supported_sites` ✅ DONE
 
-Returns list of supported hosts and scraper info. Data already exists in
-`LOCAL_HOST_MAP` (url-validator.ts) and the scraper mapping files.
+Returns list of supported hosts and scraper info. Deduplicates www/non-www hosts.
 
 ```json
 {
   "success": true,
   "sites": [
-    { "host": "www.idealista.com", "scraper": "idealista", "country": "Spain" },
-    { "host": "www.rightmove.co.uk", "scraper": "rightmove", "country": "UK" }
+    { "host": "www.idealista.com", "scraper": "idealista" },
+    { "host": "www.rightmove.co.uk", "scraper": "rightmove" }
   ]
 }
 ```
 
-### 4. New Endpoint: `GET /public_api/v1/health`
+### 4. New Endpoint: `GET /public_api/v1/health` ✅ DONE
 
-Health check for monitoring.
+Health check for monitoring. No auth required.
 
 ```json
 {
   "success": true,
   "status": "ok",
-  "firestore": "connected",
   "scrapers_loaded": 16,
-  "version": "1.0.0"
+  "storage": "in_memory"
 }
 ```
 
-### 5. Input Validation
+### 5. Input Validation ✅ DONE
 
-- Max HTML body size: 10MB (return 413 if exceeded)
+- Max HTML body size: 10MB (returns 413 `PAYLOAD_TOO_LARGE` if exceeded)
 - URL format validation before host lookup
-- Content-Type enforcement on POST (reject unsupported types)
+- Content-Type enforcement on POST (returns 415 `UNSUPPORTED_CONTENT_TYPE` for unsupported types)
 
-### 6. Richer Extraction Response
+### 6. Richer Extraction Response ✅ DONE
 
-POST response includes extraction metadata:
+POST response includes extraction metadata when HTML is provided and extraction succeeds:
 
 ```json
 {
@@ -144,20 +142,19 @@ POST response includes extraction metadata:
   "extraction": {
     "fields_extracted": 12,
     "fields_available": 25,
-    "scraper_used": "idealista",
-    "persisted": true
+    "scraper_used": "idealista"
   },
-  "listing": { }
+  "listings": [...]
 }
 ```
 
-### 7. CORS Headers
+### 7. CORS Headers ✅ DONE
 
-Add `Access-Control-*` headers for browser extension / SPA consumers.
+All API responses include `Access-Control-Allow-Origin: *`, `Access-Control-Allow-Methods`, and `Access-Control-Allow-Headers`. All route files export OPTIONS handlers returning 204.
 
-### 8. Rate Limiting (Lightweight)
+### 8. Rate Limiting (Lightweight) ✅ DONE
 
-In-memory sliding window per API key or IP. Return `429` with `Retry-After` header.
+In-memory sliding window per API key or IP. 60 requests/minute default (configurable via `PWS_RATE_LIMIT`). Returns `429` with `Retry-After` header and `RATE_LIMITED` error code.
 
 ### 9. Expanded API Docs Page
 
@@ -203,10 +200,10 @@ Tests to add:
 ## Suggested Implementation Order
 
 1. ~~Structured errors + proper HTTP status codes (foundation for everything else)~~ ✅ DONE
-2. New endpoints: `supported_sites` and `health`
-3. Input validation (size limits, Content-Type)
-4. ~~Expanded test suite covering all the above~~ ✅ DONE (unit + E2E tests for error codes)
-5. ~~Updated docs page with error reference and supported sites~~ ✅ DONE (error codes section added)
-6. CORS headers
-7. Richer extraction response metadata
-8. Rate limiting
+2. ~~New endpoints: `supported_sites` and `health`~~ ✅ DONE
+3. ~~Input validation (size limits, Content-Type)~~ ✅ DONE
+4. ~~Expanded test suite covering all the above~~ ✅ DONE (unit + E2E tests for error codes, rate limiter, new endpoints)
+5. ~~Updated docs page with error reference and supported sites~~ ✅ DONE (error codes, CORS, new endpoints documented)
+6. ~~CORS headers~~ ✅ DONE
+7. ~~Richer extraction response metadata~~ ✅ DONE
+8. ~~Rate limiting~~ ✅ DONE
