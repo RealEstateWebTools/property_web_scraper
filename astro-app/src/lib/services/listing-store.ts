@@ -45,3 +45,11 @@ export async function getAllListings(): Promise<Array<{ id: string; listing: Lis
   // In-memory listings only; KV list is not practical for browsing
   return Array.from(store.entries()).map(([id, listing]) => ({ id, listing }));
 }
+
+export function getStoreStats(): { count: number } {
+  return { count: store.size };
+}
+
+export function clearListingStore(): void {
+  store.clear();
+}

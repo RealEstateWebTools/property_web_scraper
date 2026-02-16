@@ -1,0 +1,213 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+import { getRuntimeConfig, updateRuntimeConfig, resetRuntimeConfig } from '@lib/services/runtime-config.js';
+import { getRateLimiterStats, resetRateLimiter } from '@lib/services/rate-limiter.js';
+import { clearLogs, getLogStats } from '@lib/services/activity-logger.js';
+import { clearCache, allMappingNames } from '@lib/extractor/mapping-loader.js';
+import { getCacheStats } from '@lib/extractor/mapping-loader.js';
+import { getStoreStats, clearListingStore } from '@lib/services/listing-store.js';
+import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+
+let successMessage = '';
+let errorMessage = '';
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const action = formData.get('action') as string;
+
+  try {
+    switch (action) {
+      case 'update_rate_limit': {
+        const maxRequests = parseInt(formData.get('maxRequests') as string, 10);
+        updateRuntimeConfig({ maxRequests });
+        successMessage = `Rate limit updated to ${maxRequests} requests/min`;
+        break;
+      }
+      case 'reset_config': {
+        resetRuntimeConfig();
+        successMessage = 'Runtime config reset to defaults';
+        break;
+      }
+      case 'clear_logs': {
+        clearLogs();
+        successMessage = 'Activity logs cleared';
+        break;
+      }
+      case 'clear_mapping_cache': {
+        clearCache();
+        successMessage = 'Scraper mapping cache cleared';
+        break;
+      }
+      case 'clear_listing_store': {
+        clearListingStore();
+        successMessage = 'Listing store cleared';
+        break;
+      }
+      case 'reset_rate_limiter': {
+        resetRateLimiter();
+        successMessage = 'Rate limiter reset';
+        break;
+      }
+      default:
+        errorMessage = `Unknown action: ${action}`;
+    }
+  } catch (err: unknown) {
+    errorMessage = err instanceof Error ? err.message : String(err);
+  }
+}
+
+const config = getRuntimeConfig();
+const rateLimiterStats = getRateLimiterStats();
+const logStats = getLogStats();
+const cacheStats = getCacheStats();
+const storeStats = getStoreStats();
+
+// Count unique supported sites
+const uniqueSites = new Set(Object.values(LOCAL_HOST_MAP).map(e => e.scraper_name));
+---
+<AdminLayout title="Config — Admin" activePage="config">
+  <h1 class="text-2xl font-bold mb-6">Runtime Configuration</h1>
+
+  {successMessage && (
+    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4 text-sm">
+      {successMessage}
+    </div>
+  )}
+  {errorMessage && (
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+      {errorMessage}
+    </div>
+  )}
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Rate Limiter Config -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold flex items-center gap-2">
+          <i class="bi bi-speedometer"></i> Rate Limiter
+        </h2>
+      </div>
+      <div class="p-5 space-y-4">
+        <form method="POST" class="flex items-end gap-3">
+          <input type="hidden" name="action" value="update_rate_limit" />
+          <div class="flex-1">
+            <label class="block text-xs font-medium text-gray-500 mb-1">Max Requests / Minute</label>
+            <input
+              type="number"
+              name="maxRequests"
+              value={config.maxRequests}
+              min="1"
+              max="1000"
+              class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition">
+            Update
+          </button>
+        </form>
+        <form method="POST">
+          <input type="hidden" name="action" value="reset_config" />
+          <button type="submit" class="text-sm text-gray-500 hover:text-blue-600 transition">
+            Reset to default
+          </button>
+        </form>
+        <div class="text-sm text-gray-500 pt-2 border-t border-gray-100">
+          Active clients: <strong>{rateLimiterStats.activeClients}</strong> &middot;
+          Total requests tracked: <strong>{rateLimiterStats.totalRequests}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cache Management -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold flex items-center gap-2">
+          <i class="bi bi-trash3"></i> Cache Management
+        </h2>
+      </div>
+      <div class="p-5 space-y-3">
+        <div class="flex items-center justify-between py-2">
+          <div>
+            <p class="text-sm font-medium">Scraper Mappings</p>
+            <p class="text-xs text-gray-500">{cacheStats.size} cached</p>
+          </div>
+          <form method="POST">
+            <input type="hidden" name="action" value="clear_mapping_cache" />
+            <button type="submit" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs font-medium hover:bg-gray-300 transition">
+              Clear
+            </button>
+          </form>
+        </div>
+        <div class="flex items-center justify-between py-2 border-t border-gray-100">
+          <div>
+            <p class="text-sm font-medium">Listing Store</p>
+            <p class="text-xs text-gray-500">{storeStats.count} listings</p>
+          </div>
+          <form method="POST">
+            <input type="hidden" name="action" value="clear_listing_store" />
+            <button type="submit" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs font-medium hover:bg-gray-300 transition">
+              Clear
+            </button>
+          </form>
+        </div>
+        <div class="flex items-center justify-between py-2 border-t border-gray-100">
+          <div>
+            <p class="text-sm font-medium">Rate Limiter</p>
+            <p class="text-xs text-gray-500">{rateLimiterStats.activeClients} active clients</p>
+          </div>
+          <form method="POST">
+            <input type="hidden" name="action" value="reset_rate_limiter" />
+            <button type="submit" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs font-medium hover:bg-gray-300 transition">
+              Reset
+            </button>
+          </form>
+        </div>
+        <div class="flex items-center justify-between py-2 border-t border-gray-100">
+          <div>
+            <p class="text-sm font-medium">Activity Logs</p>
+            <p class="text-xs text-gray-500">{logStats.totalEntries} entries</p>
+          </div>
+          <form method="POST">
+            <input type="hidden" name="action" value="clear_logs" />
+            <button type="submit" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs font-medium hover:bg-gray-300 transition">
+              Clear
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Info -->
+    <div class="bg-white rounded-lg shadow lg:col-span-2">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold flex items-center gap-2">
+          <i class="bi bi-info-circle"></i> System Info
+        </h2>
+      </div>
+      <div class="p-5">
+        <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+          <div>
+            <dt class="text-gray-500">Supported Sites</dt>
+            <dd class="font-medium">{uniqueSites.size}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Scrapers Available</dt>
+            <dd class="font-medium">{allMappingNames().length}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Scrapers Cached</dt>
+            <dd class="font-medium">{cacheStats.size}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Storage</dt>
+            <dd class="font-medium">In-memory + KV</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

@@ -3,10 +3,13 @@ import { authenticateApiKey } from '@lib/services/auth.js';
 import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
 import { checkRateLimit } from '@lib/services/rate-limiter.js';
 import { successResponse, corsPreflightResponse } from '@lib/services/api-response.js';
+import { logActivity } from '@lib/services/activity-logger.js';
 
 export const OPTIONS: APIRoute = () => corsPreflightResponse();
 
 export const GET: APIRoute = async ({ request }) => {
+  const startTime = Date.now();
+
   const auth = authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
@@ -23,5 +26,16 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   const sites = Array.from(seen.values());
+
+  logActivity({
+    level: 'info',
+    category: 'api_request',
+    message: `GET supported_sites: ${sites.length} sites`,
+    method: 'GET',
+    path: '/public_api/v1/supported_sites',
+    statusCode: 200,
+    durationMs: Date.now() - startTime,
+  });
+
   return successResponse({ sites });
 };
