@@ -1,23 +1,31 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import QualityBadge from '../../components/admin/QualityBadge.astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
 import { allMappingNames, findByName } from '@lib/extractor/mapping-loader.js';
 import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
+import { getAllScraperStats } from '@lib/services/extraction-stats.js';
 
 const auth = authenticateAdmin(Astro.request);
 if (!auth.authorized) return Astro.redirect('/admin/login');
 
+const scraperStats = await getAllScraperStats();
+
+// Sort: scrapers with extractions first (worst rate on top), then unused
+const scrapers = [...scraperStats].sort((a, b) => {
+  if (a.extractionCount > 0 && b.extractionCount === 0) return -1;
+  if (a.extractionCount === 0 && b.extractionCount > 0) return 1;
+  if (a.extractionCount > 0 && b.extractionCount > 0) return a.avgExtractionRate - b.avgExtractionRate;
+  return a.name.localeCompare(b.name);
+});
+
+const activeCount = scrapers.filter(s => s.extractionCount > 0).length;
+const totalRate = scrapers.reduce((sum, s) => sum + (s.extractionCount > 0 ? s.avgExtractionRate : 0), 0);
+const avgRate = activeCount > 0 ? Math.round((totalRate / activeCount) * 100) : 0;
+
+// Build fields data for test panel
 const mappingNames = allMappingNames();
-
-const scraperHosts = new Map<string, string[]>();
-for (const [host, entry] of Object.entries(LOCAL_HOST_MAP)) {
-  if (!host.startsWith('www.')) continue;
-  const existing = scraperHosts.get(entry.scraper_name) || [];
-  existing.push(host);
-  scraperHosts.set(entry.scraper_name, existing);
-}
-
-const scrapers = mappingNames.map((name) => {
+const scrapersForTest = mappingNames.map((name) => {
   const mapping = findByName(name);
   const textFields = Object.keys(mapping?.textFields ?? {});
   const intFields = Object.keys(mapping?.intFields ?? {});
@@ -25,24 +33,14 @@ const scrapers = mappingNames.map((name) => {
   const booleanFields = Object.keys(mapping?.booleanFields ?? {});
   const allFields = [...textFields, ...intFields, ...floatFields, ...booleanFields];
   const defaultValues = Object.keys(mapping?.defaultValues ?? {});
-
-  return {
-    name,
-    loaded: mapping !== null,
-    hosts: scraperHosts.get(name) || [],
-    fieldCount: allFields.length,
-    fields: allFields,
-    defaultValues,
-    hasImages: (mapping?.images ?? []).length > 0,
-    hasFeatures: (mapping?.features ?? []).length > 0,
-  };
+  return { name, fields: allFields, defaultValues };
 });
 ---
 <AdminLayout title="Scrapers — Admin" activePage="scrapers">
   <h1 class="text-2xl font-bold mb-6">Scraper Management</h1>
 
   <!-- Summary cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     <div class="bg-white rounded-lg shadow p-5">
       <p class="text-sm text-gray-500">Total Scrapers</p>
       <p class="text-2xl font-bold">{scrapers.length}</p>
@@ -52,8 +50,14 @@ const scrapers = mappingNames.map((name) => {
       <p class="text-2xl font-bold">{scrapers.filter(s => s.hosts.length > 0).length}</p>
     </div>
     <div class="bg-white rounded-lg shadow p-5">
-      <p class="text-sm text-gray-500">With Image Extraction</p>
-      <p class="text-2xl font-bold">{scrapers.filter(s => s.hasImages).length}</p>
+      <p class="text-sm text-gray-500">Active Scrapers</p>
+      <p class="text-2xl font-bold">{activeCount}</p>
+      <p class="text-xs text-gray-400 mt-1">with extractions</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Avg Quality</p>
+      <p class="text-2xl font-bold">{activeCount > 0 ? `${avgRate}%` : '—'}</p>
+      <p class="text-xs text-gray-400 mt-1">across active scrapers</p>
     </div>
   </div>
 
@@ -68,22 +72,40 @@ const scrapers = mappingNames.map((name) => {
           <tr class="text-left text-gray-500 border-b border-gray-200">
             <th class="py-2 px-5 font-medium">Scraper</th>
             <th class="py-2 px-5 font-medium">Status</th>
+            <th class="py-2 px-5 font-medium">Quality</th>
+            <th class="py-2 px-5 font-medium">Avg Rate</th>
+            <th class="py-2 px-5 font-medium">Extractions</th>
+            <th class="py-2 px-5 font-medium">Expected</th>
             <th class="py-2 px-5 font-medium">Fields</th>
             <th class="py-2 px-5 font-medium">Images</th>
-            <th class="py-2 px-5 font-medium">Hosts</th>
             <th class="py-2 px-5 font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
           {scrapers.map((s) => (
             <tr class="border-b border-gray-100 hover:bg-gray-50">
-              <td class="py-2 px-5 font-mono text-sm">{s.name}</td>
+              <td class="py-2 px-5">
+                <a href={`/admin/scrapers/${s.name}`} class="font-mono text-sm text-blue-600 hover:underline no-underline">{s.name}</a>
+              </td>
               <td class="py-2 px-5">
                 {s.loaded ? (
                   <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">loaded</span>
                 ) : (
                   <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">not loaded</span>
                 )}
+              </td>
+              <td class="py-2 px-5">
+                {s.lastQualityGrade
+                  ? <QualityBadge grade={s.lastQualityGrade} />
+                  : <span class="text-gray-400 text-xs">n/a</span>
+                }
+              </td>
+              <td class="py-2 px-5 text-gray-600">
+                {s.extractionCount > 0 ? `${Math.round(s.avgExtractionRate * 100)}%` : '—'}
+              </td>
+              <td class="py-2 px-5 text-gray-600">{s.extractionCount}</td>
+              <td class="py-2 px-5 text-gray-600">
+                {s.expectedExtractionRate != null ? `${Math.round(s.expectedExtractionRate * 100)}%` : '—'}
               </td>
               <td class="py-2 px-5 text-gray-600">{s.fieldCount}</td>
               <td class="py-2 px-5">
@@ -93,15 +115,10 @@ const scrapers = mappingNames.map((name) => {
                   <span class="text-gray-400">no</span>
                 )}
               </td>
-              <td class="py-2 px-5 text-gray-500 text-xs">
-                {s.hosts.length > 0 ? s.hosts.join(', ') : <span class="text-gray-400 italic">none</span>}
-              </td>
               <td class="py-2 px-5">
                 <button
                   class="test-btn px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition"
                   data-scraper={s.name}
-                  data-fields={JSON.stringify(s.fields)}
-                  data-defaults={JSON.stringify(s.defaultValues)}
                 >
                   Test
                 </button>
@@ -281,16 +298,22 @@ const scrapers = mappingNames.map((name) => {
 
         resultsEl.classList.remove('hidden');
 
-        // Show diagnostics summary if available
+        // Show diagnostics summary with quality grade
         if (data.diagnostics) {
           const diag = data.diagnostics;
-          const isWarning = diag.populatedFields === 0;
-          const bgClass = isWarning ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-200';
-          const textClass = isWarning ? 'text-amber-800' : 'text-blue-800';
-          let html = `<div class="${bgClass} border rounded px-4 py-3 text-sm ${textClass}">`;
+          const gradeColors: Record<string, string> = {
+            A: 'bg-green-50 border-green-200 text-green-800',
+            B: 'bg-blue-50 border-blue-200 text-blue-800',
+            C: 'bg-amber-50 border-amber-200 text-amber-800',
+            F: 'bg-red-50 border-red-200 text-red-800',
+          };
+          const colorClass = gradeColors[diag.qualityGrade] || gradeColors.F;
+          let html = `<div class="${colorClass} border rounded px-4 py-3 text-sm">`;
+          html += `<strong>Grade ${diag.qualityGrade}</strong>: `;
           html += `<strong>${diag.populatedFields}/${diag.totalFields}</strong> fields populated`;
+          html += ` (${Math.round((diag.extractionRate || 0) * 100)}%)`;
           html += ` using <span class="font-mono">${diag.scraperName}</span>`;
-          if (diag.emptyFields.length > 0) {
+          if (diag.emptyFields && diag.emptyFields.length > 0) {
             html += `<div class="mt-1 text-xs">Empty: ${diag.emptyFields.join(', ')}</div>`;
           }
           html += '</div>';

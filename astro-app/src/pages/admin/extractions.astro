@@ -1,0 +1,149 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import QualityBadge from '../../components/admin/QualityBadge.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+import { getRecentExtractions } from '@lib/services/extraction-stats.js';
+import { allMappingNames } from '@lib/extractor/mapping-loader.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+
+const url = new URL(Astro.request.url);
+const filterScraper = url.searchParams.get('scraper') || '';
+const filterGrade = url.searchParams.get('grade') || '';
+const filterSearch = url.searchParams.get('search') || '';
+
+let extractions = await getRecentExtractions(200);
+const totalCount = extractions.length;
+
+if (filterScraper) {
+  extractions = extractions.filter(e => e.scraperName === filterScraper);
+}
+if (filterGrade) {
+  extractions = extractions.filter(e => e.qualityGrade === filterGrade);
+}
+if (filterSearch) {
+  const q = filterSearch.toLowerCase();
+  extractions = extractions.filter(e =>
+    e.sourceUrl.toLowerCase().includes(q) || e.title.toLowerCase().includes(q)
+  );
+}
+
+const mappingNames = allMappingNames();
+
+const gradeCounts = { A: 0, B: 0, C: 0, F: 0 };
+for (const ext of extractions) {
+  gradeCounts[ext.qualityGrade as keyof typeof gradeCounts]++;
+}
+
+function timeAgo(ts: number): string {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+  return `${Math.floor(diff / 86400000)}d ago`;
+}
+
+function truncate(str: string, len: number): string {
+  return str.length > len ? str.slice(0, len) + '...' : str;
+}
+---
+<AdminLayout title="Extractions — Admin" activePage="extractions">
+  <h1 class="text-2xl font-bold mb-6">Extractions</h1>
+
+  <!-- Filter bar -->
+  <div class="bg-white rounded-lg shadow mb-6 p-4">
+    <form method="get" class="flex flex-wrap gap-3 items-end">
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Scraper</label>
+        <select name="scraper" class="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">All</option>
+          {mappingNames.map(n => (
+            <option value={n} selected={n === filterScraper}>{n}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Grade</label>
+        <select name="grade" class="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">All</option>
+          {(['A', 'B', 'C', 'F'] as const).map(g => (
+            <option value={g} selected={g === filterGrade}>{g}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Search</label>
+        <input
+          type="text"
+          name="search"
+          value={filterSearch}
+          placeholder="URL or title..."
+          class="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <button type="submit" class="px-4 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition">
+        Filter
+      </button>
+      {(filterScraper || filterGrade || filterSearch) && (
+        <a href="/admin/extractions" class="px-4 py-1.5 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 no-underline">
+          Clear
+        </a>
+      )}
+    </form>
+  </div>
+
+  <!-- Summary row -->
+  <div class="text-sm text-gray-600 mb-4">
+    Showing {extractions.length} of {totalCount}
+    {extractions.length > 0 && (
+      <span class="ml-2">
+        — A: {gradeCounts.A}, B: {gradeCounts.B}, C: {gradeCounts.C}, F: {gradeCounts.F}
+      </span>
+    )}
+  </div>
+
+  <!-- Extractions table -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="overflow-x-auto">
+      {extractions.length === 0 ? (
+        <div class="p-8 text-center text-gray-400 text-sm">No extractions found</div>
+      ) : (
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-500 border-b border-gray-200">
+              <th class="py-2 px-4 font-medium">Time</th>
+              <th class="py-2 px-4 font-medium">Source URL</th>
+              <th class="py-2 px-4 font-medium">Scraper</th>
+              <th class="py-2 px-4 font-medium">Quality</th>
+              <th class="py-2 px-4 font-medium">Rate</th>
+              <th class="py-2 px-4 font-medium">Fields</th>
+              <th class="py-2 px-4 font-medium">Title</th>
+              <th class="py-2 px-4 font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {extractions.map((ext) => (
+              <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-2 px-4 text-xs text-gray-500 whitespace-nowrap">{timeAgo(ext.timestamp)}</td>
+                <td class="py-2 px-4 text-xs max-w-[200px] truncate" title={ext.sourceUrl}>
+                  {truncate(ext.sourceUrl, 40)}
+                </td>
+                <td class="py-2 px-4 font-mono text-xs">{ext.scraperName}</td>
+                <td class="py-2 px-4"><QualityBadge grade={ext.qualityGrade} /></td>
+                <td class="py-2 px-4 text-xs">{Math.round(ext.extractionRate * 100)}%</td>
+                <td class="py-2 px-4 text-xs">{ext.populatedExtractableFields}/{ext.extractableFields}</td>
+                <td class="py-2 px-4 text-xs max-w-[150px] truncate" title={ext.title}>
+                  {truncate(ext.title, 30)}
+                </td>
+                <td class="py-2 px-4">
+                  <a href={`/admin/extractions/${ext.id}`} class="text-blue-600 hover:underline no-underline text-xs">View</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  </div>
+</AdminLayout>

@@ -88,6 +88,10 @@ export async function getAllListings(): Promise<Array<{ id: string; listing: Lis
   return Array.from(store.entries()).map(([id, listing]) => ({ id, listing }));
 }
 
+export async function getAllDiagnostics(): Promise<Array<{ id: string; diagnostics: ExtractionDiagnostics }>> {
+  return Array.from(diagnosticsStore.entries()).map(([id, diagnostics]) => ({ id, diagnostics }));
+}
+
 export function getStoreStats(): { count: number } {
   return { count: store.size };
 }
