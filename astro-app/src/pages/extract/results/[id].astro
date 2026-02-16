@@ -8,7 +8,21 @@ const { id } = Astro.params;
 const listing = id ? await getListing(id) : undefined;
 const diagnostics = id ? await getDiagnostics(id) : undefined;
 const imageUrls = listing?.image_urls || [];
-const hasFields = diagnostics ? diagnostics.populatedFields > 0 : true;
+
+// Determine if extraction actually found data.
+// When diagnostics exist, trust populatedFields. Otherwise, check the listing
+// for meaningful field values (ignoring model defaults like area_unit='sqmt').
+const significantFields = ['reference', 'title', 'price_string', 'price_float',
+  'address_string', 'longitude', 'latitude', 'count_bedrooms', 'count_bathrooms'];
+const hasFields = diagnostics
+  ? diagnostics.populatedFields > 0
+  : listing
+    ? significantFields.some((attr) => {
+        const val = (listing as any)[attr];
+        return val != null && val !== '' && val !== 0 && val !== false;
+      })
+    : false;
+
 const attrs = [
   'reference', 'title', 'description', 'price_string', 'price_float',
   'area_unit', 'address_string', 'currency', 'country', 'longitude',
