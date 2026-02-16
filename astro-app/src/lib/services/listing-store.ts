@@ -1,4 +1,5 @@
 import type { Listing } from '../models/listing.js';
+import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 
 /**
  * KV-backed store for extracted listings, with in-memory fallback.
@@ -9,6 +10,7 @@ import type { Listing } from '../models/listing.js';
 
 let kv: any = null;
 const store = new Map<string, Listing>();
+const diagnosticsStore = new Map<string, ExtractionDiagnostics>();
 let counter = 0;
 
 /** Call once per request with the RESULTS KV binding from Astro.locals.runtime.env */
@@ -41,6 +43,26 @@ export async function getListing(id: string): Promise<Listing | undefined> {
   return undefined;
 }
 
+export async function storeDiagnostics(id: string, diagnostics: ExtractionDiagnostics): Promise<void> {
+  diagnosticsStore.set(id, diagnostics);
+  if (kv) {
+    await kv.put(`diagnostics:${id}`, JSON.stringify(diagnostics), { expirationTtl: 3600 });
+  }
+}
+
+export async function getDiagnostics(id: string): Promise<ExtractionDiagnostics | undefined> {
+  const cached = diagnosticsStore.get(id);
+  if (cached) return cached;
+  if (kv) {
+    const data = await kv.get(`diagnostics:${id}`, 'json') as ExtractionDiagnostics | null;
+    if (data) {
+      diagnosticsStore.set(id, data);
+      return data;
+    }
+  }
+  return undefined;
+}
+
 export async function getAllListings(): Promise<Array<{ id: string; listing: Listing }>> {
   // In-memory listings only; KV list is not practical for browsing
   return Array.from(store.entries()).map(([id, listing]) => ({ id, listing }));
@@ -52,4 +74,5 @@ export function getStoreStats(): { count: number } {
 
 export function clearListingStore(): void {
   store.clear();
+  diagnosticsStore.clear();
 }

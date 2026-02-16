@@ -1,5 +1,6 @@
 import { validateUrl, UNSUPPORTED } from './url-validator.js';
 import { extractFromHtml } from '../extractor/html-extractor.js';
+import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { findByName } from '../extractor/mapping-loader.js';
 import { Listing } from '../models/listing.js';
 import { WhereChain } from '../firestore/base-model.js';
@@ -9,6 +10,7 @@ export interface RetrievalResult {
   success: boolean;
   errorMessage?: string;
   retrievedListing?: Listing;
+  diagnostics?: ExtractionDiagnostics;
 }
 
 /**
@@ -81,6 +83,8 @@ export async function retrieveListing(
     }
 
     // Extract from HTML
+    let diagnostics: ExtractionDiagnostics | undefined;
+
     if (html) {
       const result = extractFromHtml({
         html,
@@ -88,12 +92,14 @@ export async function retrieveListing(
         scraperMapping,
       });
 
+      diagnostics = result.diagnostics;
+
       if (result.success && result.properties.length > 0) {
         listing.import_host_slug = importHost.slug;
         listing.last_retrieved_at = new Date();
         Listing.updateFromHash(listing, result.properties[0]);
 
-        const fieldsFound = Object.entries(result.properties[0]).filter(([, v]) => {
+        const fieldsFound = diagnostics?.populatedFields ?? Object.entries(result.properties[0]).filter(([, v]) => {
           if (v === null || v === undefined || v === '' || v === 0 || v === false) return false;
           if (Array.isArray(v) && v.length === 0) return false;
           return true;
@@ -106,6 +112,7 @@ export async function retrieveListing(
           sourceUrl: importUrl,
           scraperName: importHost.scraper_name,
           fieldsFound,
+          diagnostics,
         });
 
         try {
@@ -128,7 +135,7 @@ export async function retrieveListing(
       });
     }
 
-    return { success: true, retrievedListing: listing };
+    return { success: true, retrievedListing: listing, diagnostics };
   } catch (err: unknown) {
     logActivity({
       level: 'error',

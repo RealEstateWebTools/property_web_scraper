@@ -1,12 +1,14 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { initKV, getListing } from '@lib/services/listing-store.js';
+import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
 
 const { id } = Astro.params;
 const listing = id ? await getListing(id) : undefined;
+const diagnostics = id ? await getDiagnostics(id) : undefined;
 const imageUrls = listing?.image_urls || [];
+const hasFields = diagnostics ? diagnostics.populatedFields > 0 : true;
 const attrs = [
   'reference', 'title', 'description', 'price_string', 'price_float',
   'area_unit', 'address_string', 'currency', 'country', 'longitude',
@@ -33,9 +35,19 @@ const attrs = [
         </div>
       ) : (
         <>
-          <div class="flex items-center gap-3 bg-green-100 text-green-900 px-5 py-3 rounded-xl mb-6 font-medium">
-            <i class="bi bi-check-circle-fill text-xl"></i> Property data extracted successfully
-          </div>
+          {hasFields ? (
+            <div class="flex items-center gap-3 bg-green-100 text-green-900 px-5 py-3 rounded-xl mb-6 font-medium">
+              <i class="bi bi-check-circle-fill text-xl"></i>
+              {diagnostics
+                ? `Extracted ${diagnostics.populatedFields}/${diagnostics.totalFields} fields using ${diagnostics.scraperName}`
+                : 'Property data extracted successfully'}
+            </div>
+          ) : (
+            <div class="flex items-center gap-3 bg-amber-100 text-amber-900 px-5 py-3 rounded-xl mb-6 font-medium">
+              <i class="bi bi-exclamation-triangle-fill text-xl"></i>
+              No fields extracted — the scraper mapping may need updating{diagnostics ? ` (${diagnostics.scraperName})` : ''}
+            </div>
+          )}
 
           <div class="rounded-2xl shadow-md overflow-hidden mb-4">
             {imageUrls.length > 0 && imageUrls[0] && (
@@ -116,6 +128,55 @@ const attrs = [
                   </>
                 )}
               </div>
+
+              {diagnostics && (
+                <>
+                  <button class="pws-diag-toggle text-sm text-gray-500 cursor-pointer inline-flex items-center gap-1.5 border-0 bg-transparent p-0 mt-3 hover:underline" type="button">
+                    <i class="bi bi-chevron-down"></i> Extraction diagnostics
+                  </button>
+
+                  <div class="hidden mt-3" id="diagnostics-panel">
+                    <div class="text-xs text-gray-500 mb-2">
+                      Scraper: <span class="font-mono font-medium">{diagnostics.scraperName}</span> &middot;
+                      {diagnostics.populatedFields}/{diagnostics.totalFields} fields populated
+                    </div>
+
+                    {diagnostics.emptyFields.length > 0 && (
+                      <div class="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-2 rounded mb-3">
+                        <strong>Empty fields:</strong> {diagnostics.emptyFields.join(', ')}
+                      </div>
+                    )}
+
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-xs border border-gray-200 rounded">
+                        <thead>
+                          <tr class="text-left text-gray-500 bg-gray-50">
+                            <th class="py-1.5 px-2 font-medium">Field</th>
+                            <th class="py-1.5 px-2 font-medium">Section</th>
+                            <th class="py-1.5 px-2 font-medium">Strategy</th>
+                            <th class="py-1.5 px-2 font-medium">Raw Text</th>
+                            <th class="py-1.5 px-2 font-medium">Value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {diagnostics.fieldTraces.map((trace) => {
+                            const isEmpty = trace.rawText === '' || trace.value === 0 || trace.value === false || trace.value === '';
+                            return (
+                              <tr class={`border-b border-gray-100 ${isEmpty ? 'bg-red-50' : ''}`}>
+                                <td class="py-1.5 px-2 font-mono">{trace.field}</td>
+                                <td class="py-1.5 px-2 text-gray-500">{trace.section}</td>
+                                <td class="py-1.5 px-2 text-gray-500 max-w-[200px] truncate" title={trace.strategy}>{trace.strategy}</td>
+                                <td class="py-1.5 px-2 max-w-[200px] truncate" title={trace.rawText}>{trace.rawText || <span class="text-red-400 italic">empty</span>}</td>
+                                <td class="py-1.5 px-2 max-w-[200px] truncate" title={String(trace.value)}>{JSON.stringify(trace.value)}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </>
@@ -127,18 +188,22 @@ const attrs = [
 
 <script is:inline>
 document.addEventListener('DOMContentLoaded', () => {
-  const toggle = document.querySelector('.pws-details-toggle');
-  const target = document.getElementById('all-fields');
-  if (toggle && target) {
-    toggle.addEventListener('click', () => {
-      target.classList.toggle('hidden');
-      const icon = toggle.querySelector('i');
-      if (icon) {
-        icon.classList.toggle('bi-chevron-down');
-        icon.classList.toggle('bi-chevron-up');
-      }
-    });
+  function setupToggle(btnSelector, targetId) {
+    const toggle = document.querySelector(btnSelector);
+    const target = document.getElementById(targetId);
+    if (toggle && target) {
+      toggle.addEventListener('click', () => {
+        target.classList.toggle('hidden');
+        const icon = toggle.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('bi-chevron-down');
+          icon.classList.toggle('bi-chevron-up');
+        }
+      });
+    }
   }
+  setupToggle('.pws-details-toggle', 'all-fields');
+  setupToggle('.pws-diag-toggle', 'diagnostics-panel');
 });
 </script>
 

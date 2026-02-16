@@ -158,6 +158,10 @@ const scrapers = mappingNames.map((name) => {
         <span id="test-status" class="text-sm text-gray-500"></span>
       </div>
 
+      <!-- Diagnostics summary -->
+      <div id="test-diagnostics" class="hidden">
+      </div>
+
       <!-- Results -->
       <div id="test-results" class="hidden">
         <h3 class="text-sm font-semibold text-gray-700 mb-2">Extraction Results</h3>
@@ -203,9 +207,12 @@ const scrapers = mappingNames.map((name) => {
       const resultsEl = document.getElementById('test-results')!;
       const errorEl = document.getElementById('test-error')!;
       const bodyEl = document.getElementById('results-body')!;
+      const diagEl = document.getElementById('test-diagnostics')!;
 
       resultsEl.classList.add('hidden');
       errorEl.classList.add('hidden');
+      diagEl.classList.add('hidden');
+      diagEl.innerHTML = '';
 
       if (!scraper || !sourceUrl || !html) {
         errorEl.textContent = 'Please fill in scraper, source URL, and HTML content.';
@@ -273,6 +280,24 @@ const scrapers = mappingNames.map((name) => {
         }
 
         resultsEl.classList.remove('hidden');
+
+        // Show diagnostics summary if available
+        if (data.diagnostics) {
+          const diag = data.diagnostics;
+          const isWarning = diag.populatedFields === 0;
+          const bgClass = isWarning ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-200';
+          const textClass = isWarning ? 'text-amber-800' : 'text-blue-800';
+          let html = `<div class="${bgClass} border rounded px-4 py-3 text-sm ${textClass}">`;
+          html += `<strong>${diag.populatedFields}/${diag.totalFields}</strong> fields populated`;
+          html += ` using <span class="font-mono">${diag.scraperName}</span>`;
+          if (diag.emptyFields.length > 0) {
+            html += `<div class="mt-1 text-xs">Empty: ${diag.emptyFields.join(', ')}</div>`;
+          }
+          html += '</div>';
+          diagEl.innerHTML = html;
+          diagEl.classList.remove('hidden');
+        }
+
         statusEl.textContent = `Extracted ${entries.length} fields`;
       } catch (err) {
         errorEl.textContent = 'Network error: ' + (err instanceof Error ? err.message : String(err));

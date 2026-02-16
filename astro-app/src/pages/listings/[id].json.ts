@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { initKV, getListing } from '@lib/services/listing-store.js';
+import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
 
 export const GET: APIRoute = async ({ params, locals }) => {
   initKV((locals as any).runtime?.env?.RESULTS);
@@ -12,9 +12,12 @@ export const GET: APIRoute = async ({ params, locals }) => {
     });
   }
 
+  const diagnostics = params.id ? await getDiagnostics(params.id) : undefined;
+
   return new Response(JSON.stringify({
     success: true,
     listing: listing.asJson(),
+    ...(diagnostics ? { diagnostics } : {}),
   }), {
     headers: { 'Content-Type': 'application/json' },
   });
