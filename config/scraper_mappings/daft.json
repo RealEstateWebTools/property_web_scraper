@@ -10,7 +10,7 @@
   "intFields": {
     "count_bedrooms": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.listing.numBedrooms"
+      "scriptJsonPath": "props.pageProps.listing.nonFormatted.beds"
     },
     "count_bathrooms": {
       "scriptJsonVar": "__NEXT_DATA__",
@@ -24,7 +24,7 @@
   "floatFields": {
     "price_float": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.listing.numericPrice"
+      "scriptJsonPath": "props.pageProps.listing.nonFormatted.price"
     },
     "latitude": {
       "scriptJsonVar": "__NEXT_DATA__",
@@ -51,17 +51,21 @@
       "scriptJsonVar": "__NEXT_DATA__",
       "scriptJsonPath": "props.pageProps.listing.price"
     },
-    "postal_code": {
-      "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.listing.eircode"
-    },
     "address_string": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.listing.address"
+      "scriptJsonPath": "props.pageProps.listing.title"
     },
     "property_type": {
       "scriptJsonVar": "__NEXT_DATA__",
       "scriptJsonPath": "props.pageProps.listing.propertyType"
+    },
+    "city": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.addressDetails.addressLocality"
+    },
+    "region": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.listing.addressDetails.addressRegion"
     },
     "main_image_url": {
       "cssLocator": "meta[property='og:image']",
