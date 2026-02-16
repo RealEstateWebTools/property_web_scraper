@@ -48,10 +48,10 @@
     },
     "price_float":
     {
-      "cssLocator": "#content > div:nth-child(2) > div:nth-child(1) > p",
-      "splitTextCharacter": "\r",
+      "cssLocator": ".propertymain .left p",
+      "splitTextCharacter": "\n",
       "splitTextArrayId": "1",
-      "stripString": "$",
+      "stripString": "Price: $",
       "stripPunct": "true"
     },
     "latitude":
@@ -72,9 +72,10 @@
   {
     "reference":
     {
-      "cssLocator": "#content > div:nth-child(2) > div:nth-child(1) > p",
-      "splitTextCharacter": "\r",
-      "splitTextArrayId": "0"
+      "cssLocator": ".propertymain .left p",
+      "splitTextCharacter": "\n",
+      "splitTextArrayId": "0",
+      "stripString": "MLS: "
     },
     "title":
     {
@@ -86,9 +87,10 @@
     },
     "price_string":
     {
-      "cssLocator": "#content > div:nth-child(2) > div:nth-child(1) > p",
-      "splitTextCharacter": "\r",
-      "splitTextArrayId": "1"
+      "cssLocator": ".propertymain .left p",
+      "splitTextCharacter": "\n",
+      "splitTextArrayId": "1",
+      "stripString": "Price: "
     }
   },
   "booleanFields":

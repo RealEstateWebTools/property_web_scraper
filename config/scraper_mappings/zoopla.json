@@ -17,16 +17,16 @@
       "stripPunct": "true"
     },
     "price_float": {
-      "cssLocator": "#listing-details > div:nth-child(1) > div > strong",
+      "cssLocator": ".listing-details-price > strong",
       "stripFirstChar": "true",
       "stripPunct": "true",
-      "splitTextCharacter": " ",
+      "splitTextCharacter": "(",
       "splitTextArrayId": "0"
     }
   },
   "intFields": {
     "count_bedrooms": {
-      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(3) > span"
+      "cssLocator": "span.num-beds"
     }
   },
   "textFields": {
@@ -42,8 +42,8 @@
       "cssLocator": "#tab-details > div.bottom-plus-half > div > p"
     },
     "price_string": {
-      "cssLocator": "#listing-details > div:nth-child(1) > div > strong",
-      "splitTextCharacter": " ",
+      "cssLocator": ".listing-details-price > strong",
+      "splitTextCharacter": "(",
       "splitTextArrayId": "0"
     }
   },
