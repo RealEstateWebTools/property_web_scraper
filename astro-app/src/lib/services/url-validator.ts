@@ -16,7 +16,7 @@ export const UNSUPPORTED = 'unsupported';
  * Local fallback mapping: hostname → scraper name + slug.
  * Used when Firestore is unavailable.
  */
-const LOCAL_HOST_MAP: Record<string, { scraper_name: string; slug: string }> = {
+export const LOCAL_HOST_MAP: Record<string, { scraper_name: string; slug: string }> = {
   'www.idealista.com': { scraper_name: 'idealista', slug: 'idealista' },
   'idealista.com': { scraper_name: 'idealista', slug: 'idealista' },
   'www.rightmove.co.uk': { scraper_name: 'rightmove', slug: 'rightmove' },
