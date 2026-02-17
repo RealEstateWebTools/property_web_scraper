@@ -1,6 +1,7 @@
 import type { CheerioAPI, Cheerio, AnyNode } from 'cheerio';
 import type { FieldMapping } from './mapping-loader.js';
 import { getTextFromCss, cleanUpString } from './strategies.js';
+import { normalizeImageUrl } from './image-normalizer.js';
 
 /**
  * Extract an array of image URLs from HTML.
@@ -44,6 +45,12 @@ export function extractImages(
     console.warn(`[ImageExtractor] XPath is no longer supported, skipping: ${mapping.xpath}`);
   }
 
-  // Clean up all results
-  return retrieved.map((s) => cleanUpString(s, mapping));
+  // Clean up all results, then normalize URLs
+  return retrieved
+    .map((s) => cleanUpString(s, mapping))
+    .map((url) => normalizeImageUrl(url, {
+      enforceHttps: true,
+      thumbnailPatterns: mapping.thumbnailPatterns,
+    }))
+    .filter((url): url is string => url !== null);
 }

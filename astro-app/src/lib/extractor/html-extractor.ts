@@ -13,6 +13,7 @@ import {
   type FieldResult,
 } from './quality-scorer.js';
 import { splitPropertyHash, type SplitSchema } from './schema-splitter.js';
+import { computeFingerprint } from '../services/listing-fingerprint.js';
 
 export interface FieldTrace {
   field: string;
@@ -50,12 +51,17 @@ export interface ExtractionDiagnostics {
   contentAnalysis?: ContentAnalysis;
 }
 
+export type ExtractionStatus = 'full' | 'partial' | 'blocked' | 'failed';
+
 export interface ExtractionResult {
   success: boolean;
+  status: ExtractionStatus;
   properties: Record<string, unknown>[];
   errorMessage?: string;
+  warnings: string[];
   diagnostics?: ExtractionDiagnostics;
   splitSchema?: SplitSchema;
+  fingerprint?: string;
 }
 
 export interface ExtractParams {
@@ -149,10 +155,14 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   } catch (err: unknown) {
     return {
       success: false,
+      status: 'failed' as ExtractionStatus,
       properties: [],
+      warnings: [],
       errorMessage: err instanceof Error ? err.message : String(err),
     };
   }
+
+  const warnings: string[] = [];
 
   const $ = cheerio.load(html);
   const uri = new URL(sourceUrl);
@@ -334,7 +344,39 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
     contentAnalysis,
   };
 
-  console.log(`[Extractor] ${mapping.name}: Grade ${quality.grade} (${quality.label}) — ${populatedExtractableFields}/${extractableFields} extractable fields (${Math.round(extractionRate * 100)}%), weighted ${Math.round((quality.weightedRate || 0) * 100)}%`);
+  // Collect warnings
+  if (contentAnalysis.appearsBlocked) {
+    warnings.push('Page appears to be blocked by bot detection');
+  }
+  if (contentAnalysis.appearsJsOnly) {
+    warnings.push('Page appears to be a JS-only shell — content may require browser rendering');
+  }
+  if (quality.criticalFieldsMissing && quality.criticalFieldsMissing.length > 0) {
+    warnings.push(`Critical fields missing: ${quality.criticalFieldsMissing.join(', ')}`);
+  }
+
+  // Determine extraction status
+  let extractionStatus: ExtractionStatus;
+  if (contentAnalysis.appearsBlocked) {
+    extractionStatus = 'blocked';
+  } else if (extractableFields > 0 && populatedExtractableFields === 0) {
+    extractionStatus = 'failed';
+  } else if (quality.criticalFieldsMissing && quality.criticalFieldsMissing.length > 0) {
+    extractionStatus = 'partial';
+  } else if (quality.grade === 'A' || quality.grade === 'B') {
+    extractionStatus = 'full';
+  } else {
+    extractionStatus = 'partial';
+  }
+
+  // Compute content fingerprint for deduplication
+  const fingerprint = computeFingerprint({
+    title: typeof propertyHash.title === 'string' ? propertyHash.title : undefined,
+    price_float: typeof propertyHash.price_float === 'number' ? propertyHash.price_float : undefined,
+    address_string: typeof propertyHash.address_string === 'string' ? propertyHash.address_string : undefined,
+  });
+
+  console.log(`[Extractor] ${mapping.name}: Grade ${quality.grade} (${quality.label}) — ${populatedExtractableFields}/${extractableFields} extractable fields (${Math.round(extractionRate * 100)}%), weighted ${Math.round((quality.weightedRate || 0) * 100)}% [${extractionStatus}]`);
   if (quality.criticalFieldsMissing && quality.criticalFieldsMissing.length > 0) {
     console.log(`[Extractor] Critical fields missing: ${quality.criticalFieldsMissing.join(', ')}`);
   }
@@ -347,5 +389,13 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
     console.log(`[Extractor]   ${status} ${t.field} (${t.strategy}${fb}) \u2192 ${JSON.stringify(t.value)}`);
   }
 
-  return { success: true, properties: [propertyHash], diagnostics, splitSchema: split };
+  return {
+    success: true,
+    status: extractionStatus,
+    properties: [propertyHash],
+    warnings,
+    diagnostics,
+    splitSchema: split,
+    fingerprint,
+  };
 }

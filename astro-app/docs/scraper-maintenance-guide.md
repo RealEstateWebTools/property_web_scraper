@@ -326,3 +326,116 @@ capture-fixture [url]
 | `stripPunct` scope | Only removes `.` and `,`. Does not remove currency symbols or other punctuation. |
 | `parseFloat` / `parseInt` fallback | Returns `0` on NaN, not an error. Silent data loss. |
 | Copy-pasted mappings | Must verify every selector, not just a few. Fields may "work" by coincidence. |
+
+---
+
+## API Bypass Strategy
+
+When CSS selectors are fragile or a site relies heavily on client-side rendering,
+it may be more reliable to extract listing data directly from the site's internal
+API endpoints instead of parsing HTML.
+
+### When to Consider API Bypass
+
+- The site's HTML selectors break frequently (more than once per quarter)
+- The site heavily uses client-side rendering (React, Vue, Angular SPAs) where
+  listing data is loaded via AJAX after the initial page load
+- The HTML fixture captured via `capture-fixture` is missing key data because
+  the content is injected by JavaScript after page load
+- The site serves different HTML structures to different user agents or locales,
+  making CSS selectors unreliable
+
+### Investigation Process
+
+1. **Open browser DevTools** -- Navigate to the Network tab before loading the page.
+2. **Load a property listing page** -- Let the page fully render, including any
+   lazy-loaded content.
+3. **Filter for XHR/Fetch requests** -- In the Network tab, filter by "Fetch/XHR"
+   to see only API calls.
+4. **Look for JSON responses containing listing data** -- Inspect response bodies
+   for structured data: price, title, address, image URLs, bedroom/bathroom
+   counts. The endpoint URL often contains patterns like `/api/`, `/v1/`,
+   `/graphql`, or `/detail/`.
+5. **Test if the endpoint works without authentication cookies** -- Copy the
+   request URL and fetch it in an incognito window or via `curl` without cookies.
+   If it returns the same data, the endpoint is usable without session state.
+6. **Check if a mobile app exists** -- Mobile APIs often have weaker bot
+   detection, simpler response formats, and more stable endpoint contracts.
+   Inspect mobile app traffic using a proxy tool (e.g. mitmproxy, Charles) to
+   discover these endpoints.
+
+### How to Implement
+
+Add `apiEndpoint` and `apiJsonPath` fields to the scraper mapping JSON. When
+`apiEndpoint` is present, the extractor fetches the API response instead of
+parsing HTML, then uses dot-path navigation to extract fields from the JSON.
+
+The `apiEndpoint` value can include `{id}` as a placeholder that gets replaced
+with the property ID extracted from the listing URL.
+
+The `apiJsonPath` values use dot notation to navigate the JSON response. Array
+indices are supported with bracket notation.
+
+### Example
+
+A hypothetical mapping snippet using API bypass:
+
+```json
+{
+  "name": "example-portal",
+  "apiEndpoint": "https://api.example-portal.com/v2/listings/{id}",
+  "defaultValues": {
+    "country": { "value": "Spain" },
+    "currency": { "value": "EUR" }
+  },
+  "textFields": {
+    "title": {
+      "apiJsonPath": "data.listing.title"
+    },
+    "price_string": {
+      "apiJsonPath": "data.listing.formattedPrice"
+    },
+    "description": {
+      "apiJsonPath": "data.listing.description"
+    }
+  },
+  "floatFields": {
+    "price_float": {
+      "apiJsonPath": "data.listing.price.amount"
+    },
+    "latitude": {
+      "apiJsonPath": "data.listing.location.lat"
+    },
+    "longitude": {
+      "apiJsonPath": "data.listing.location.lng"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "apiJsonPath": "data.listing.features.bedrooms"
+    },
+    "count_bathrooms": {
+      "apiJsonPath": "data.listing.features.bathrooms"
+    }
+  },
+  "images": {
+    "images": {
+      "apiJsonPath": "data.listing.media.images[*].url"
+    }
+  }
+}
+```
+
+### Limitations
+
+- **Authentication**: Many API endpoints require session cookies, OAuth tokens,
+  or API keys that cannot be easily obtained or maintained programmatically.
+- **Stricter rate limiting**: APIs typically enforce tighter rate limits than
+  HTML pages, and exceeding them can result in IP bans.
+- **Endpoint instability**: API endpoints change without notice, without the
+  deprecation periods that public-facing HTML typically gets. There are no
+  guarantees of backward compatibility.
+- **CORS restrictions**: Browser-based fetching may be blocked by CORS policies.
+  Server-side fetching avoids this but requires a backend proxy.
+- **Legal considerations**: Some sites explicitly prohibit API access in their
+  terms of service, even when the endpoints are technically accessible.

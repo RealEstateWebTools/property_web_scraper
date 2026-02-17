@@ -18,3 +18,4 @@ spec/dummy/node_modules
 .yardoc/
 firebase/creds.json
 test-results/
+astro-app/docs/fredy-learnings.md
