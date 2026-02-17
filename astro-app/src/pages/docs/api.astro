@@ -32,9 +32,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <div class="bg-white rounded-xl shadow-md p-6 mb-5">
     <h3 class="text-lg font-semibold mb-3"><i class="bi bi-globe mr-2 text-blue-600"></i>CORS</h3>
     <p class="text-sm text-gray-600 mb-3">
-      All API responses include CORS headers for browser-based consumers:
+      CORS is configurable with <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">PWS_ALLOWED_ORIGINS</code> (comma-separated origins).
+      When configured, only matching origins receive <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">Access-Control-Allow-Origin</code>.
     </p>
-    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>Access-Control-Allow-Origin: *
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>Access-Control-Allow-Origin: https://app.example.com
 Access-Control-Allow-Methods: GET, POST, OPTIONS
 Access-Control-Allow-Headers: Content-Type, X-Api-Key</code></pre>
     <p class="text-sm text-gray-600 mt-3">

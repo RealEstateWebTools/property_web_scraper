@@ -50,6 +50,7 @@ export function checkRateLimit(request: Request): { allowed: boolean; retryAfter
         ApiErrorCode.RATE_LIMITED,
         'Too many requests. Please try again later.',
         { 'Retry-After': String(retryAfter) },
+        request,
       ),
     };
   }

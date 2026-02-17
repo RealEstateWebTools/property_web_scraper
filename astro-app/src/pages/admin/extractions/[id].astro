@@ -49,16 +49,18 @@ const colors = gradeColors[grade] || gradeColors.F;
     <>
       {/* Top banner */}
       {diagnostics && (
-        <div class={`flex items-center gap-3 ${colors.bg} ${colors.text} border ${colors.border} px-5 py-3 rounded-lg mb-2 font-medium`}>
-          <QualityBadge grade={grade} size="md" />
-          <span>{diagnostics.qualityLabel} — {diagnostics.populatedExtractableFields}/{diagnostics.extractableFields} fields ({ratePercent}%{weightedPercent != null ? `, weighted ${weightedPercent}%` : ''})</span>
-        </div>
-        {criticalMissing.length > 0 && (
-          <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2 rounded-lg mb-2 text-sm">
-            <i class="bi bi-exclamation-octagon"></i>
-            Critical fields missing: {criticalMissing.join(', ')}
+        <>
+          <div class={`flex items-center gap-3 ${colors.bg} ${colors.text} border ${colors.border} px-5 py-3 rounded-lg mb-2 font-medium`}>
+            <QualityBadge grade={grade} size="md" />
+            <span>{diagnostics.qualityLabel} — {diagnostics.populatedExtractableFields}/{diagnostics.extractableFields} fields ({ratePercent}%{weightedPercent != null ? `, weighted ${weightedPercent}%` : ''})</span>
           </div>
-        )}
+          {criticalMissing.length > 0 && (
+            <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2 rounded-lg mb-2 text-sm">
+              <i class="bi bi-exclamation-octagon"></i>
+              Critical fields missing: {criticalMissing.join(', ')}
+            </div>
+          )}
+        </>
       )}
       {diagnostics && !diagnostics.meetsExpectation && diagnostics.expectedExtractionRate != null && (
         <div class="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-lg mb-4 text-sm">

@@ -36,7 +36,7 @@ function countExtractedFields(props: Record<string, unknown>): number {
   return count;
 }
 
-export const OPTIONS: APIRoute = () => corsPreflightResponse();
+export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
 /**
  * GET /public_api/v1/listings?url=...
@@ -56,7 +56,7 @@ export const GET: APIRoute = async ({ request }) => {
     try {
       validateUrlLength(url);
     } catch (error) {
-      const resp = errorResponse(ApiErrorCode.INVALID_URL, error instanceof Error ? error.message : 'Invalid URL');
+      const resp = errorResponse(ApiErrorCode.INVALID_URL, error instanceof Error ? error.message : 'Invalid URL', request);
       logActivity({
         level: 'warn',
         category: 'api_request',
@@ -73,7 +73,7 @@ export const GET: APIRoute = async ({ request }) => {
 
   const validation = await validateUrl(url);
   if (!validation.valid) {
-    const resp = errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!);
+    const resp = errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!, request);
     logActivity({
       level: 'warn',
       category: 'api_request',
@@ -100,7 +100,7 @@ export const GET: APIRoute = async ({ request }) => {
       durationMs: Date.now() - startTime,
       errorCode: ApiErrorCode.MISSING_SCRAPER,
     });
-    return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found');
+    return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found', request);
   }
 
   let listing: Listing;
@@ -126,7 +126,7 @@ export const GET: APIRoute = async ({ request }) => {
     retry_duration: 0,
     urls_remaining: 0,
     listings: [listing.asJson()],
-  });
+  }, request);
 };
 
 /**
@@ -155,7 +155,7 @@ export const POST: APIRoute = async ({ request }) => {
       durationMs: Date.now() - startTime,
       errorCode: ApiErrorCode.UNSUPPORTED_CONTENT_TYPE,
     });
-    return errorResponse(ApiErrorCode.UNSUPPORTED_CONTENT_TYPE, 'Content-Type must be application/json or multipart/form-data');
+    return errorResponse(ApiErrorCode.UNSUPPORTED_CONTENT_TYPE, 'Content-Type must be application/json or multipart/form-data', request);
   }
 
   let url: string | null = null;
@@ -177,7 +177,7 @@ export const POST: APIRoute = async ({ request }) => {
           durationMs: Date.now() - startTime,
           errorCode: ApiErrorCode.PAYLOAD_TOO_LARGE,
         });
-        return errorResponse(ApiErrorCode.PAYLOAD_TOO_LARGE, 'HTML payload exceeds 10MB limit');
+        return errorResponse(ApiErrorCode.PAYLOAD_TOO_LARGE, 'HTML payload exceeds 10MB limit', request);
       }
       html = await htmlFile.text();
     } else {
@@ -200,7 +200,7 @@ export const POST: APIRoute = async ({ request }) => {
       durationMs: Date.now() - startTime,
       errorCode: ApiErrorCode.PAYLOAD_TOO_LARGE,
     });
-    return errorResponse(ApiErrorCode.PAYLOAD_TOO_LARGE, 'HTML payload exceeds 10MB limit');
+    return errorResponse(ApiErrorCode.PAYLOAD_TOO_LARGE, 'HTML payload exceeds 10MB limit', request);
   }
 
   if (!url) {
@@ -214,13 +214,13 @@ export const POST: APIRoute = async ({ request }) => {
       durationMs: Date.now() - startTime,
       errorCode: ApiErrorCode.MISSING_URL,
     });
-    return errorResponse(ApiErrorCode.MISSING_URL, 'Please provide a url');
+    return errorResponse(ApiErrorCode.MISSING_URL, 'Please provide a url', request);
   }
 
   try {
     validateUrlLength(url);
   } catch (error) {
-    const resp = errorResponse(ApiErrorCode.INVALID_URL, error instanceof Error ? error.message : 'Invalid URL');
+    const resp = errorResponse(ApiErrorCode.INVALID_URL, error instanceof Error ? error.message : 'Invalid URL', request);
     logActivity({
       level: 'warn',
       category: 'api_request',
@@ -236,7 +236,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const validation = await validateUrl(url);
   if (!validation.valid) {
-    const resp = errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!);
+    const resp = errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!, request);
     logActivity({
       level: 'warn',
       category: 'api_request',
@@ -263,7 +263,7 @@ export const POST: APIRoute = async ({ request }) => {
       durationMs: Date.now() - startTime,
       errorCode: ApiErrorCode.MISSING_SCRAPER,
     });
-    return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found');
+    return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found', request);
   }
 
   let listing: Listing;
@@ -359,5 +359,5 @@ export const POST: APIRoute = async ({ request }) => {
     durationMs: Date.now() - startTime,
   });
 
-  return successResponse(response);
+  return successResponse(response, request);
 };

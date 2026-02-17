@@ -33,7 +33,7 @@ export function authenticateApiKey(request: Request): { authorized: boolean; err
     });
     return {
       authorized: false,
-      errorResponse: errorResponse(ApiErrorCode.UNAUTHORIZED, 'Unauthorized'),
+      errorResponse: errorResponse(ApiErrorCode.UNAUTHORIZED, 'Unauthorized', request),
     };
   }
 

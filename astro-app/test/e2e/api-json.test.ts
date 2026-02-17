@@ -45,7 +45,7 @@ test.describe('/public_api/v1/listings API', () => {
 
   test('GET response includes CORS headers', async ({ request }) => {
     const res = await request.get('/public_api/v1/listings?url=https://www.idealista.com/inmueble/12345/');
-    expect(res.headers()['access-control-allow-origin']).toBe('*');
+    expect(res.headers()['access-control-allow-origin']).toBe('http://localhost:4327');
   });
 
   test('POST without url returns 400 with MISSING_URL', async ({ request }) => {
