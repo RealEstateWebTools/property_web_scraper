@@ -79,6 +79,10 @@ console.log(JSON.stringify({
 "
 ```
 
+### Option E: Extract via MCP tool
+
+When the `property-scraper` MCP server is running, the `extract_property` tool can perform extraction directly. Pass the HTML content and source URL to get full diagnostics without needing to write inline scripts.
+
 ## Output format
 
 Present results in a clear format:

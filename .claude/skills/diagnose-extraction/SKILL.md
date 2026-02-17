@@ -107,3 +107,10 @@ Present the specific JSON changes needed and offer to:
 | CSS selector fails | Check if classes changed, try ID-based or microdata selectors |
 | Critical fields missing | Priority fix — grade capped at C until resolved |
 | Fallback used | Primary strategy is broken, should be updated |
+
+## MCP tools
+
+When the `property-scraper` MCP server is running, these tools can assist with diagnosis:
+- `get_scraper_mapping` — inspect the full mapping definition (selectors, regex, fallbacks)
+- `list_supported_portals` — check portal metadata and expected extraction rates
+- `extract_property` — re-run extraction with full diagnostics on modified HTML
