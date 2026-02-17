@@ -1,0 +1,43 @@
+---
+interface EnvVarInfo {
+  name: string;
+  configured: boolean;
+  required: boolean;
+  description: string;
+}
+
+interface Props {
+  vars: EnvVarInfo[];
+}
+const { vars } = Astro.props;
+---
+<div class="overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-gray-200 text-left">
+        <th class="py-2 pr-4 font-medium text-gray-500">Variable</th>
+        <th class="py-2 pr-4 font-medium text-gray-500">Status</th>
+        <th class="py-2 font-medium text-gray-500">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {vars.map((v) => (
+        <tr class="border-b border-gray-50">
+          <td class="py-2 pr-4 font-mono text-xs">{v.name}</td>
+          <td class="py-2 pr-4">
+            {v.configured ? (
+              <span class="inline-block px-2 py-0.5 text-xs rounded font-medium bg-green-100 text-green-700">
+                Configured
+              </span>
+            ) : (
+              <span class={`inline-block px-2 py-0.5 text-xs rounded font-medium ${v.required ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-500'}`}>
+                {v.required ? 'Missing' : 'Not set'}
+              </span>
+            )}
+          </td>
+          <td class="py-2 text-gray-600">{v.description}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
