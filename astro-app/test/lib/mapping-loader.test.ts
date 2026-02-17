@@ -48,6 +48,6 @@ describe('MappingLoader', () => {
     expect(names).toContain('uk_rightmove');
     expect(names).toContain('uk_zoopla');
     expect(names).toContain('us_realtor');
-    expect(names.length).toBeGreaterThanOrEqual(14);
+    expect(names.length).toBeGreaterThanOrEqual(13);
   });
 });

@@ -113,30 +113,7 @@ export const fixtures: FixtureEntry[] = [
       for_sale: true,
     },
   },
-  {
-    scraper: 'es_inmo1',
-    fixture: 'inmo1',
-    sourceUrl: 'https://www.inmo1.com/propiedad/12345',
-    expected: {
-      country: 'Spain',
-      currency: 'EUR',
-      title: 'Acogedor piso en Anton Martin',
-      reference: 'BUHARDILLA CALLE ATOCHA ANTON MARTIN',
-      property_type: 'Apartment',
-      city: 'Madrid',
-      region: 'Atocha',
-      postal_code: '28012',
-      count_bedrooms: 2,
-      count_bathrooms: 2,
-      constructed_area: 75,
-      price_float: 1700,
-      latitude: 40.411213,
-      longitude: -3.70364310000002,
-      for_sale: false,
-      for_rent: true,
-      for_rent_long_term: true,
-    },
-  },
+
   {
     scraper: 'us_wyomingmls',
     fixture: 'wyomingmls',
@@ -156,35 +133,8 @@ export const fixtures: FixtureEntry[] = [
       reference: '20176813',
     },
   },
-  {
-    scraper: 'us_cerdfw',
-    fixture: 'cerdfw',
-    sourceUrl: 'https://www.cerdfw.com/listing/12345',
-    expected: {
-      country: 'USA',
-      currency: 'USD',
-      title: '123 Oak Street, Fort Worth, TX 76102',
-      price_string: '$285,000',
-      reference: 'MLS-20240567',
-      city: 'Fort Worth',
-      address_string: '123 Oak Street',
-      latitude: 32.7555,
-      longitude: -97.3308,
-    },
-  },
-  {
-    scraper: 'it_carusoimmobiliare',
-    fixture: 'carusoimmobiliare',
-    sourceUrl: 'https://www.carusoimmobiliare.com/immobile/12345',
-    expected: {
-      country: 'IT',
-      currency: 'EUR',
-      title: 'Appartamento in vendita a Trapani - Caruso Immobiliare',
-      city: 'Trapani',
-      latitude: 38.0174,
-      longitude: 12.5365,
-    },
-  },
+
+
   {
     scraper: 'us_forsalebyowner',
     fixture: 'forsalebyowner',
@@ -196,22 +146,7 @@ export const fixtures: FixtureEntry[] = [
       description: 'Charming 4 bedroom home with modern updates throughout. Open floor plan with hardwood floors.',
     },
   },
-  {
-    scraper: 'es_weebrix',
-    fixture: 'weebrix',
-    sourceUrl: 'https://www.weebrix.com/property/12345',
-    expected: {
-      country: 'Spain',
-      currency: 'EUR',
-      reference: 'WBX-MAR-2024',
-      property_type: 'Villa',
-      city: 'Marbella',
-      region: 'Costa del Sol',
-      postal_code: '29602',
-      latitude: 36.5099,
-      longitude: -4.8861,
-    },
-  },
+
   {
     scraper: 'uk_rightmove',
     fixture: 'rightmove_v2',

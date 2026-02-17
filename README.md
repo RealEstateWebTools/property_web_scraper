@@ -4,7 +4,7 @@
 
 **From the team behind [PropertyWebBuilder](https://github.com/etewiah/property_web_builder)** — the open-source real estate platform.
 
-A real estate listing extraction API. Given a property listing URL (or pre-rendered HTML), it returns structured data: title, price, coordinates, images, and 70+ fields across 17 supported portals in 6 countries.
+A real estate listing extraction API. Given a property listing URL (or pre-rendered HTML), it returns structured data: title, price, coordinates, images, and 70+ fields across 13 supported portals in 5 countries.
 
 Built with [Astro](https://astro.build/) (SSR mode), TypeScript, and [Cheerio](https://cheerio.js.org/).
 
@@ -13,10 +13,9 @@ Built with [Astro](https://astro.build/) (SSR mode), TypeScript, and [Cheerio](h
 | Country | Portals |
 |---------|---------|
 | UK | Rightmove, Zoopla, OnTheMarket, Jitty |
-| Spain | Idealista, Fotocasa, Pisos.com, Inmo1, Weebrix |
-| USA | Realtor.com, ForSaleByOwner, MLSListings, CERDFW, WyomingMLS |
+| Spain | Idealista, Fotocasa, Pisos.com |
+| USA | Realtor.com, ForSaleByOwner, MLSListings, WyomingMLS |
 | India | RealEstateIndia |
-| Italy | Caruso Immobiliare |
 | Ireland | Daft.ie |
 
 ## How It Works
