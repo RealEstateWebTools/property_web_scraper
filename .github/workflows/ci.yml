@@ -10,31 +10,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        ruby-version: ['3.2', '3.3']
-
-    env:
-      RAILS_ENV: test
-      FIRESTORE_PROJECT_ID: test-project
-
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v4
         with:
-          ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: astro-app/package-lock.json
 
-      - name: Run specs
-        run: bundle exec rspec
+      - name: Install dependencies
+        working-directory: astro-app
+        run: npm ci
 
-      - name: Run bundler-audit
-        run: |
-          gem install bundler-audit
-          bundler-audit check --update
-
-      - name: Run rubocop
-        run: |
-          gem install rubocop
-          rubocop --parallel || true
+      - name: Run tests
+        working-directory: astro-app
+        run: npx vitest run
