@@ -72,6 +72,16 @@ const HOSTNAME_MAP: Record<string, string> = {
   'daft.ie': 'ie_daft',
   'www.idealista.pt': 'pt_idealista',
   'idealista.pt': 'pt_idealista',
+  'www.immobilienscout24.de': 'de_immoscout',
+  'immobilienscout24.de': 'de_immoscout',
+  'www.seloger.com': 'fr_seloger',
+  'seloger.com': 'fr_seloger',
+  'www.leboncoin.fr': 'fr_leboncoin',
+  'leboncoin.fr': 'fr_leboncoin',
+  'www.domain.com.au': 'au_domain',
+  'domain.com.au': 'au_domain',
+  'www.realestate.com.au': 'au_realestate',
+  'realestate.com.au': 'au_realestate',
 };
 
 const HELP_TEXT = `

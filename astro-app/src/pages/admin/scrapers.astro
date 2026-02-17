@@ -179,21 +179,36 @@ const scrapersForTest = mappingNames.map((name) => {
       <div id="test-diagnostics" class="hidden">
       </div>
 
-      <!-- Results -->
+      <!-- Results: split pane -->
       <div id="test-results" class="hidden">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Extraction Results</h3>
-        <div class="overflow-x-auto">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-sm font-semibold text-gray-700">Extraction Results</h3>
+          <div class="flex gap-2">
+            <button id="view-table-btn" class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700 font-medium">Table</button>
+            <button id="view-json-btn" class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-500 font-medium">JSON</button>
+          </div>
+        </div>
+
+        <!-- Table view -->
+        <div id="table-view" class="overflow-x-auto">
           <table class="w-full text-sm border border-gray-200 rounded">
             <thead>
               <tr class="text-left text-gray-500 bg-gray-50">
                 <th class="py-2 px-3 font-medium">Field</th>
                 <th class="py-2 px-3 font-medium">Value</th>
                 <th class="py-2 px-3 font-medium">Type</th>
+                <th class="py-2 px-3 font-medium">Importance</th>
+                <th class="py-2 px-3 font-medium">Strategy</th>
               </tr>
             </thead>
             <tbody id="results-body">
             </tbody>
           </table>
+        </div>
+
+        <!-- JSON view -->
+        <div id="json-view" class="hidden">
+          <pre id="json-output" class="bg-gray-50 border border-gray-200 rounded p-4 text-xs font-mono overflow-auto max-h-96"></pre>
         </div>
       </div>
 
@@ -204,6 +219,24 @@ const scrapersForTest = mappingNames.map((name) => {
   </div>
 
   <script>
+    // Field importance map (mirrors quality-scorer.ts)
+    const FIELD_IMPORTANCE: Record<string, string> = {
+      title: 'critical', price_string: 'critical', price_float: 'critical',
+      latitude: 'important', longitude: 'important', address_string: 'important',
+      count_bedrooms: 'important', count_bathrooms: 'important', description: 'important',
+      image_urls: 'important', reference: 'important',
+    };
+
+    const importanceBadge = (field: string) => {
+      const imp = FIELD_IMPORTANCE[field] || 'optional';
+      const colors: Record<string, string> = {
+        critical: 'bg-red-50 text-red-600',
+        important: 'bg-amber-50 text-amber-600',
+        optional: 'bg-gray-50 text-gray-400',
+      };
+      return `<span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${colors[imp]}">${imp}</span>`;
+    };
+
     // Handle "Test" button clicks in the scraper table
     document.querySelectorAll('.test-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -212,6 +245,20 @@ const scrapersForTest = mappingNames.map((name) => {
         selectEl.value = scraper;
         document.getElementById('test-panel')?.scrollIntoView({ behavior: 'smooth' });
       });
+    });
+
+    // Toggle table/JSON views
+    document.getElementById('view-table-btn')?.addEventListener('click', () => {
+      document.getElementById('table-view')!.classList.remove('hidden');
+      document.getElementById('json-view')!.classList.add('hidden');
+      document.getElementById('view-table-btn')!.className = 'px-2 py-1 text-xs rounded bg-blue-100 text-blue-700 font-medium';
+      document.getElementById('view-json-btn')!.className = 'px-2 py-1 text-xs rounded bg-gray-100 text-gray-500 font-medium';
+    });
+    document.getElementById('view-json-btn')?.addEventListener('click', () => {
+      document.getElementById('table-view')!.classList.add('hidden');
+      document.getElementById('json-view')!.classList.remove('hidden');
+      document.getElementById('view-json-btn')!.className = 'px-2 py-1 text-xs rounded bg-blue-100 text-blue-700 font-medium';
+      document.getElementById('view-table-btn')!.className = 'px-2 py-1 text-xs rounded bg-gray-100 text-gray-500 font-medium';
     });
 
     // Run extraction test
@@ -263,8 +310,17 @@ const scrapersForTest = mappingNames.map((name) => {
         }
 
         const props = data.properties[0] || {};
-        bodyEl.innerHTML = '';
 
+        // Build field traces map from diagnostics
+        const traces: Record<string, string> = {};
+        if (data.diagnostics?.fieldTraces) {
+          for (const [field, trace] of Object.entries(data.diagnostics.fieldTraces as Record<string, string>)) {
+            traces[field] = trace as string;
+          }
+        }
+
+        // Populate table
+        bodyEl.innerHTML = '';
         const entries = Object.entries(props).sort(([a], [b]) => a.localeCompare(b));
         for (const [key, value] of entries) {
           const tr = document.createElement('tr');
@@ -290,11 +346,25 @@ const scrapersForTest = mappingNames.map((name) => {
           tdType.className = 'py-2 px-3 text-xs text-gray-400';
           tdType.textContent = Array.isArray(value) ? 'array' : typeof value;
 
+          const tdImp = document.createElement('td');
+          tdImp.className = 'py-2 px-3';
+          tdImp.innerHTML = importanceBadge(key);
+
+          const tdStrategy = document.createElement('td');
+          tdStrategy.className = 'py-2 px-3 font-mono text-[10px] text-gray-400 max-w-xs truncate';
+          tdStrategy.textContent = traces[key] || '—';
+          tdStrategy.title = traces[key] || '';
+
           tr.appendChild(tdField);
           tr.appendChild(tdValue);
           tr.appendChild(tdType);
+          tr.appendChild(tdImp);
+          tr.appendChild(tdStrategy);
           bodyEl.appendChild(tr);
         }
+
+        // Populate JSON view
+        document.getElementById('json-output')!.textContent = JSON.stringify(props, null, 2);
 
         resultsEl.classList.remove('hidden');
 
@@ -308,16 +378,16 @@ const scrapersForTest = mappingNames.map((name) => {
             F: 'bg-red-50 border-red-200 text-red-800',
           };
           const colorClass = gradeColors[diag.qualityGrade] || gradeColors.F;
-          let html = `<div class="${colorClass} border rounded px-4 py-3 text-sm">`;
-          html += `<strong>Grade ${diag.qualityGrade}</strong>: `;
-          html += `<strong>${diag.populatedFields}/${diag.totalFields}</strong> fields populated`;
-          html += ` (${Math.round((diag.extractionRate || 0) * 100)}%)`;
-          html += ` using <span class="font-mono">${diag.scraperName}</span>`;
+          let diagHtml = `<div class="${colorClass} border rounded px-4 py-3 text-sm">`;
+          diagHtml += `<strong>Grade ${diag.qualityGrade}</strong>: `;
+          diagHtml += `<strong>${diag.populatedFields}/${diag.totalFields}</strong> fields populated`;
+          diagHtml += ` (${Math.round((diag.extractionRate || 0) * 100)}%)`;
+          diagHtml += ` using <span class="font-mono">${diag.scraperName}</span>`;
           if (diag.emptyFields && diag.emptyFields.length > 0) {
-            html += `<div class="mt-1 text-xs">Empty: ${diag.emptyFields.join(', ')}</div>`;
+            diagHtml += `<div class="mt-1 text-xs">Empty: ${diag.emptyFields.join(', ')}</div>`;
           }
-          html += '</div>';
-          diagEl.innerHTML = html;
+          diagHtml += '</div>';
+          diagEl.innerHTML = diagHtml;
           diagEl.classList.remove('hidden');
         }
 
