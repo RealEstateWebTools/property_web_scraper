@@ -1,5 +1,5 @@
 [{
-  "name": "pisos",
+  "name": "es_pisos",
   "expectedExtractionRate": 0.45,
   "defaultValues": {
     "country": {

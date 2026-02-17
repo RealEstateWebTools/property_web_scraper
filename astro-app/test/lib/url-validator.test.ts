@@ -62,19 +62,19 @@ describe('url-validator', () => {
       expect(result.valid).toBe(true);
       expect(result.uri).toBeInstanceOf(URL);
       expect(result.importHost).toBeDefined();
-      expect(result.importHost!.scraper_name).toBe('idealista');
+      expect(result.importHost!.scraper_name).toBe('es_idealista');
     });
 
     it('accepts rightmove URL', async () => {
       const result = await validateUrl('https://www.rightmove.co.uk/properties/123');
       expect(result.valid).toBe(true);
-      expect(result.importHost!.scraper_name).toBe('rightmove');
+      expect(result.importHost!.scraper_name).toBe('uk_rightmove');
     });
 
     it('accepts URL with leading/trailing whitespace', async () => {
       const result = await validateUrl('  https://www.idealista.com/inmueble/12345/  ');
       expect(result.valid).toBe(true);
-      expect(result.importHost!.scraper_name).toBe('idealista');
+      expect(result.importHost!.scraper_name).toBe('es_idealista');
     });
 
     it('accepts http:// URLs', async () => {
@@ -85,7 +85,7 @@ describe('url-validator', () => {
     it('accepts URLs without www prefix', async () => {
       const result = await validateUrl('https://idealista.com/inmueble/12345/');
       expect(result.valid).toBe(true);
-      expect(result.importHost!.scraper_name).toBe('idealista');
+      expect(result.importHost!.scraper_name).toBe('es_idealista');
     });
   });
 

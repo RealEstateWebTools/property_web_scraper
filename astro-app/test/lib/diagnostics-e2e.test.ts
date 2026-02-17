@@ -52,16 +52,16 @@ function computeHasFields(
 
 describe('extractFromHtml diagnostics contract', () => {
   it('returns diagnostics when extraction succeeds with real fixture', () => {
-    const html = loadFixture('rightmove');
+    const html = loadFixture('rightmove_v2');
     const result = extractFromHtml({
       html,
       sourceUrl: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
-      scraperMappingName: 'rightmove',
+      scraperMappingName: 'uk_rightmove',
     });
 
     expect(result.success).toBe(true);
     expect(result.diagnostics).toBeDefined();
-    expect(result.diagnostics!.scraperName).toBe('rightmove');
+    expect(result.diagnostics!.scraperName).toBe('uk_rightmove');
     expect(result.diagnostics!.populatedFields).toBeGreaterThan(0);
     expect(result.diagnostics!.totalFields).toBeGreaterThan(0);
     expect(result.diagnostics!.fieldTraces.length).toBe(result.diagnostics!.totalFields);
@@ -71,7 +71,7 @@ describe('extractFromHtml diagnostics contract', () => {
     const result = extractFromHtml({
       html: '<html><body><p>Nothing useful</p></body></html>',
       sourceUrl: 'http://www.rightmove.co.uk/property-to-rent/property-99999999.html',
-      scraperMappingName: 'rightmove',
+      scraperMappingName: 'uk_rightmove',
     });
 
     expect(result.success).toBe(true);
@@ -85,7 +85,7 @@ describe('extractFromHtml diagnostics contract', () => {
     const result = extractFromHtml({
       html: '',
       sourceUrl: 'http://www.rightmove.co.uk/property-to-rent/property-99999999.html',
-      scraperMappingName: 'rightmove',
+      scraperMappingName: 'uk_rightmove',
     });
 
     expect(result.success).toBe(true);
@@ -98,7 +98,7 @@ describe('extractFromHtml diagnostics contract', () => {
 
 describe('retrieveListing diagnostics passthrough', () => {
   it('returns diagnostics when HTML is provided and extraction succeeds', async () => {
-    const html = loadFixture('rightmove');
+    const html = loadFixture('rightmove_v2');
     const result = await retrieveListing(
       'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
       html,
@@ -106,7 +106,7 @@ describe('retrieveListing diagnostics passthrough', () => {
 
     expect(result.success).toBe(true);
     expect(result.diagnostics).toBeDefined();
-    expect(result.diagnostics!.scraperName).toBe('rightmove');
+    expect(result.diagnostics!.scraperName).toBe('uk_rightmove');
     expect(result.diagnostics!.populatedFields).toBeGreaterThan(0);
   });
 
@@ -142,7 +142,7 @@ describe('listing-store diagnostics storage', () => {
   it('stores and retrieves diagnostics by ID', async () => {
     const id = generateId();
     const diag: ExtractionDiagnostics = {
-      scraperName: 'rightmove',
+      scraperName: 'uk_rightmove',
       fieldTraces: [
         { field: 'title', section: 'textFields', strategy: 'cssLocator:h1', rawText: 'Test', value: 'Test' },
       ],
@@ -155,7 +155,7 @@ describe('listing-store diagnostics storage', () => {
     const retrieved = await getDiagnostics(id);
 
     expect(retrieved).toBeDefined();
-    expect(retrieved!.scraperName).toBe('rightmove');
+    expect(retrieved!.scraperName).toBe('uk_rightmove');
     expect(retrieved!.populatedFields).toBe(1);
     expect(retrieved!.fieldTraces).toHaveLength(1);
   });
@@ -240,7 +240,7 @@ describe('full pipeline end-to-end', () => {
 
   it('rightmove with real fixture: diagnostics survive full round-trip', async () => {
     // Step 1: Retrieve with HTML
-    const html = loadFixture('rightmove');
+    const html = loadFixture('rightmove_v2');
     const result = await retrieveListing(
       'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
       html,
@@ -262,7 +262,7 @@ describe('full pipeline end-to-end', () => {
 
     expect(listing).toBeDefined();
     expect(diagnostics).toBeDefined();
-    expect(diagnostics!.scraperName).toBe('rightmove');
+    expect(diagnostics!.scraperName).toBe('uk_rightmove');
     expect(diagnostics!.populatedFields).toBeGreaterThan(0);
 
     // Step 4: Banner logic
@@ -337,7 +337,7 @@ describe('JSON endpoint listing serialization', () => {
   });
 
   it('listing.asJson() works after store/retrieve round-trip', async () => {
-    const html = loadFixture('rightmove');
+    const html = loadFixture('rightmove_v2');
     const result = await retrieveListing(
       'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
       html,
@@ -364,10 +364,10 @@ describe('JSON endpoint listing serialization', () => {
 
     expect(json.listing).toBeDefined();
     expect(json.listing.title).toBe(
-      '4 bedroom detached house to rent in School Road, Birmingham, B14, B14'
+      '2 bedroom apartment for sale in Augustine Way, Oxford, OX4'
     );
     expect(json.diagnostics).toBeDefined();
-    expect(json.diagnostics!.scraperName).toBe('rightmove');
+    expect(json.diagnostics!.scraperName).toBe('uk_rightmove');
   });
 
   it('listing.asJson() works even after plain-object insertion', async () => {

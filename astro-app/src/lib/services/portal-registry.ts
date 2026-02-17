@@ -19,9 +19,9 @@ export interface PortalConfig {
  * Portals defined here take precedence over auto-discovered ones.
  */
 export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
-  rightmove: {
-    scraperName: 'rightmove',
-    slug: 'rightmove',
+  uk_rightmove: {
+    scraperName: 'uk_rightmove',
+    slug: 'uk_rightmove',
     hosts: ['www.rightmove.co.uk', 'rightmove.co.uk'],
     country: 'GB',
     currency: 'GBP',
@@ -31,9 +31,9 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
-  idealista: {
-    scraperName: 'idealista',
-    slug: 'idealista',
+  es_idealista: {
+    scraperName: 'es_idealista',
+    slug: 'es_idealista',
     hosts: ['www.idealista.com', 'idealista.com'],
     country: 'ES',
     currency: 'EUR',
@@ -43,9 +43,9 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
-  zoopla: {
-    scraperName: 'zoopla_v2',
-    slug: 'zoopla_v2',
+  uk_zoopla: {
+    scraperName: 'uk_zoopla',
+    slug: 'uk_zoopla',
     hosts: ['www.zoopla.co.uk', 'zoopla.co.uk'],
     country: 'GB',
     currency: 'GBP',
@@ -55,9 +55,9 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
-  realtor: {
-    scraperName: 'realtor',
-    slug: 'realtor',
+  us_realtor: {
+    scraperName: 'us_realtor',
+    slug: 'us_realtor',
     hosts: ['www.realtor.com', 'realtor.com'],
     country: 'US',
     currency: 'USD',
@@ -67,9 +67,9 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
-  fotocasa: {
-    scraperName: 'fotocasa',
-    slug: 'fotocasa',
+  es_fotocasa: {
+    scraperName: 'es_fotocasa',
+    slug: 'es_fotocasa',
     hosts: ['www.fotocasa.es', 'fotocasa.es'],
     country: 'ES',
     currency: 'EUR',
@@ -79,9 +79,9 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
-  pisos: {
-    scraperName: 'pisos',
-    slug: 'pisos',
+  es_pisos: {
+    scraperName: 'es_pisos',
+    slug: 'es_pisos',
     hosts: ['www.pisos.com', 'pisos.com'],
     country: 'ES',
     currency: 'EUR',
@@ -91,9 +91,9 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
-  realestateindia: {
-    scraperName: 'realestateindia',
-    slug: 'realestateindia',
+  in_realestateindia: {
+    scraperName: 'in_realestateindia',
+    slug: 'in_realestateindia',
     hosts: ['www.realestateindia.com', 'realestateindia.com'],
     country: 'IN',
     currency: 'INR',
@@ -103,9 +103,9 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
-  forsalebyowner: {
-    scraperName: 'forsalebyowner',
-    slug: 'forsalebyowner',
+  us_forsalebyowner: {
+    scraperName: 'us_forsalebyowner',
+    slug: 'us_forsalebyowner',
     hosts: ['www.forsalebyowner.com', 'forsalebyowner.com'],
     country: 'US',
     currency: 'USD',
@@ -127,9 +127,9 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
-  onthemarket: {
-    scraperName: 'onthemarket',
-    slug: 'onthemarket',
+  uk_onthemarket: {
+    scraperName: 'uk_onthemarket',
+    slug: 'uk_onthemarket',
     hosts: ['www.onthemarket.com', 'onthemarket.com'],
     country: 'GB',
     currency: 'GBP',
@@ -139,9 +139,9 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
-  daft: {
-    scraperName: 'daft',
-    slug: 'daft',
+  ie_daft: {
+    scraperName: 'ie_daft',
+    slug: 'ie_daft',
     hosts: ['www.daft.ie', 'daft.ie'],
     country: 'IE',
     currency: 'EUR',

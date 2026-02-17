@@ -1,5 +1,5 @@
 [{
-  "name": "mlslistings",
+  "name": "us_mlslistings",
   "expectedExtractionRate": 0.95,
   "unRetrievedFields": [
     "count_bathrooms"

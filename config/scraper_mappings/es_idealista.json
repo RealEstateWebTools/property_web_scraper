@@ -1,5 +1,5 @@
 [{
-  "name": "idealista_v2",
+  "name": "es_idealista",
   "expectedExtractionRate": 0.90,
   "defaultValues": {
     "country": { "value": "Spain" },

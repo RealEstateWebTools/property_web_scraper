@@ -37,33 +37,33 @@ describe('retrieveListing', () => {
   });
 
   it('succeeds with valid URL and HTML', async () => {
-    const html = loadFixture('rightmove');
+    const html = loadFixture('rightmove_v2');
     const result = await retrieveListing(
-      'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+      'https://www.rightmove.co.uk/properties/168908774',
       html,
     );
     expect(result.success).toBe(true);
     expect(result.retrievedListing).toBeDefined();
     expect(result.retrievedListing!.title).toBe(
-      '4 bedroom detached house to rent in School Road, Birmingham, B14, B14'
+      '2 bedroom apartment for sale in Augustine Way, Oxford, OX4'
     );
   });
 
   it('returns listing with diagnostics when HTML is provided', async () => {
-    const html = loadFixture('rightmove');
+    const html = loadFixture('rightmove_v2');
     const result = await retrieveListing(
-      'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+      'https://www.rightmove.co.uk/properties/168908774',
       html,
     );
     expect(result.success).toBe(true);
     expect(result.diagnostics).toBeDefined();
-    expect(result.diagnostics!.scraperName).toBe('rightmove');
+    expect(result.diagnostics!.scraperName).toBe('uk_rightmove');
     expect(result.diagnostics!.populatedFields).toBeGreaterThan(0);
   });
 
   it('returns undefined diagnostics in URL-only mode', async () => {
     const result = await retrieveListing(
-      'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+      'https://www.rightmove.co.uk/properties/168908774',
     );
     expect(result.success).toBe(true);
     expect(result.diagnostics).toBeUndefined();
@@ -91,31 +91,31 @@ describe('retrieveListing', () => {
   });
 
   it('sets import_host_slug on listing when extraction succeeds', async () => {
-    const html = loadFixture('rightmove');
+    const html = loadFixture('rightmove_v2');
     const result = await retrieveListing(
-      'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+      'https://www.rightmove.co.uk/properties/168908774',
       html,
     );
     expect(result.success).toBe(true);
-    expect(result.retrievedListing!.import_host_slug).toBe('rightmove');
+    expect(result.retrievedListing!.import_host_slug).toBe('uk_rightmove');
   });
 
   it('works with idealista URL and fixture', async () => {
-    const html = loadFixture('idealista_2018_01');
+    const html = loadFixture('idealista_v2');
     const result = await retrieveListing(
-      'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+      'https://www.idealista.com/inmueble/98765432/',
       html,
     );
     expect(result.success).toBe(true);
-    expect(result.retrievedListing!.title).toBe('Piso en venta en goya, 54, Goya, Madrid');
-    expect(result.diagnostics!.scraperName).toBe('idealista');
+    expect(result.retrievedListing!.title).toBe('Piso en venta en calle de Serrano, 50, Salamanca, Madrid');
+    expect(result.diagnostics!.scraperName).toBe('es_idealista');
   });
 
   describe('price normalization', () => {
     it('sets price_cents and price_currency for rightmove', async () => {
-      const html = loadFixture('rightmove');
+      const html = loadFixture('rightmove_v2');
       const result = await retrieveListing(
-        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        'https://www.rightmove.co.uk/properties/168908774',
         html,
       );
 
@@ -126,7 +126,7 @@ describe('retrieveListing', () => {
     });
 
     it('uses EUR currency for idealista', async () => {
-      const html = loadFixture('idealista_2018_01');
+      const html = loadFixture('idealista_v2');
       const result = await retrieveListing(
         'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
         html,
@@ -140,7 +140,7 @@ describe('retrieveListing', () => {
 
     it('sets price_cents to 0 when no price in HTML', async () => {
       const result = await retrieveListing(
-        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        'https://www.rightmove.co.uk/properties/168908774',
         '<html><body></body></html>',
       );
 
@@ -149,9 +149,9 @@ describe('retrieveListing', () => {
     });
 
     it('includes price_cents in listing asJson output', async () => {
-      const html = loadFixture('rightmove');
+      const html = loadFixture('rightmove_v2');
       const result = await retrieveListing(
-        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        'https://www.rightmove.co.uk/properties/168908774',
         html,
       );
 
@@ -164,7 +164,7 @@ describe('retrieveListing', () => {
 
   describe('URL deduplication', () => {
     it('reuses existing listing from store', async () => {
-      const url = 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html';
+      const url = 'https://www.rightmove.co.uk/properties/168908774';
       const listing = new Listing();
       listing.assignAttributes({ import_url: url, title: 'Stored Listing' });
 
@@ -178,7 +178,7 @@ describe('retrieveListing', () => {
     });
 
     it('deduplicates URLs ignoring tracking params', async () => {
-      const url = 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html';
+      const url = 'https://www.rightmove.co.uk/properties/168908774';
       const listing = new Listing();
       listing.assignAttributes({ import_url: url, title: 'Original' });
 
@@ -192,9 +192,9 @@ describe('retrieveListing', () => {
 
   describe('weighted diagnostics', () => {
     it('includes weightedExtractionRate', async () => {
-      const html = loadFixture('rightmove');
+      const html = loadFixture('rightmove_v2');
       const result = await retrieveListing(
-        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        'https://www.rightmove.co.uk/properties/168908774',
         html,
       );
 
@@ -203,9 +203,9 @@ describe('retrieveListing', () => {
     });
 
     it('includes criticalFieldsMissing', async () => {
-      const html = loadFixture('rightmove');
+      const html = loadFixture('rightmove_v2');
       const result = await retrieveListing(
-        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        'https://www.rightmove.co.uk/properties/168908774',
         html,
       );
 
@@ -214,9 +214,9 @@ describe('retrieveListing', () => {
     });
 
     it('includes contentAnalysis', async () => {
-      const html = loadFixture('rightmove');
+      const html = loadFixture('rightmove_v2');
       const result = await retrieveListing(
-        'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
+        'https://www.rightmove.co.uk/properties/168908774',
         html,
       );
 

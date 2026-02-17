@@ -31,17 +31,17 @@ describe('portal-registry', () => {
 
     it('has expected portals', () => {
       const names = Object.keys(PORTAL_REGISTRY);
-      expect(names).toContain('rightmove');
-      expect(names).toContain('idealista');
-      expect(names).toContain('zoopla');
-      expect(names).toContain('realtor');
-      expect(names).toContain('fotocasa');
-      expect(names).toContain('pisos');
-      expect(names).toContain('realestateindia');
-      expect(names).toContain('forsalebyowner');
+      expect(names).toContain('uk_rightmove');
+      expect(names).toContain('es_idealista');
+      expect(names).toContain('uk_zoopla');
+      expect(names).toContain('us_realtor');
+      expect(names).toContain('es_fotocasa');
+      expect(names).toContain('es_pisos');
+      expect(names).toContain('in_realestateindia');
+      expect(names).toContain('us_forsalebyowner');
       expect(names).toContain('uk_jitty');
-      expect(names).toContain('onthemarket');
-      expect(names).toContain('daft');
+      expect(names).toContain('uk_onthemarket');
+      expect(names).toContain('ie_daft');
     });
   });
 
@@ -49,7 +49,7 @@ describe('portal-registry', () => {
     it('finds rightmove by www hostname', () => {
       const portal = findPortalByHost('www.rightmove.co.uk');
       expect(portal).toBeDefined();
-      expect(portal!.scraperName).toBe('rightmove');
+      expect(portal!.scraperName).toBe('uk_rightmove');
       expect(portal!.country).toBe('GB');
       expect(portal!.currency).toBe('GBP');
     });
@@ -57,13 +57,13 @@ describe('portal-registry', () => {
     it('finds rightmove by bare hostname', () => {
       const portal = findPortalByHost('rightmove.co.uk');
       expect(portal).toBeDefined();
-      expect(portal!.scraperName).toBe('rightmove');
+      expect(portal!.scraperName).toBe('uk_rightmove');
     });
 
     it('finds idealista', () => {
       const portal = findPortalByHost('www.idealista.com');
       expect(portal).toBeDefined();
-      expect(portal!.scraperName).toBe('idealista');
+      expect(portal!.scraperName).toBe('es_idealista');
       expect(portal!.country).toBe('ES');
       expect(portal!.currency).toBe('EUR');
     });
@@ -71,7 +71,7 @@ describe('portal-registry', () => {
     it('finds daft.ie', () => {
       const portal = findPortalByHost('www.daft.ie');
       expect(portal).toBeDefined();
-      expect(portal!.scraperName).toBe('daft');
+      expect(portal!.scraperName).toBe('ie_daft');
       expect(portal!.country).toBe('IE');
     });
 
@@ -86,15 +86,15 @@ describe('portal-registry', () => {
 
   describe('findPortalByName', () => {
     it('finds portal by registry key', () => {
-      const portal = findPortalByName('rightmove');
+      const portal = findPortalByName('uk_rightmove');
       expect(portal).toBeDefined();
-      expect(portal!.scraperName).toBe('rightmove');
+      expect(portal!.scraperName).toBe('uk_rightmove');
     });
 
-    it('finds zoopla (key differs from scraperName)', () => {
-      const portal = findPortalByName('zoopla');
+    it('finds zoopla by new key', () => {
+      const portal = findPortalByName('uk_zoopla');
       expect(portal).toBeDefined();
-      expect(portal!.scraperName).toBe('zoopla_v2');
+      expect(portal!.scraperName).toBe('uk_zoopla');
     });
 
     it('returns undefined for unknown name', () => {
@@ -106,8 +106,8 @@ describe('portal-registry', () => {
     it('returns array of all portal names', () => {
       const names = allPortalNames();
       expect(names).toHaveLength(11);
-      expect(names).toContain('rightmove');
-      expect(names).toContain('idealista');
+      expect(names).toContain('uk_rightmove');
+      expect(names).toContain('es_idealista');
     });
 
     it('returns strings', () => {

@@ -1,5 +1,5 @@
 [{
-  "name": "realestateindia",
+  "name": "in_realestateindia",
   "expectedExtractionRate": 0.55,
   "defaultValues": {
     "country": {

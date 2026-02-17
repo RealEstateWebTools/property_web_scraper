@@ -69,8 +69,8 @@ describe('Models', () => {
     it('finds import host by host name', async () => {
       const host = await ImportHost.findByHost('www.idealista.com');
       expect(host).not.toBeNull();
-      expect(host!.scraper_name).toBe('idealista');
-      expect(host!.slug).toBe('idealista');
+      expect(host!.scraper_name).toBe('es_idealista');
+      expect(host!.slug).toBe('es_idealista');
     });
 
     it('returns null for unknown host', async () => {

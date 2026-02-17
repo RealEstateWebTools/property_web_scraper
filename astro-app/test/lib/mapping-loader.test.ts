@@ -7,9 +7,9 @@ describe('MappingLoader', () => {
   });
 
   it('loads the idealista mapping', () => {
-    const mapping = findByName('idealista');
+    const mapping = findByName('es_idealista');
     expect(mapping).not.toBeNull();
-    expect(mapping!.name).toBe('idealista');
+    expect(mapping!.name).toBe('es_idealista');
     expect(mapping!.textFields).toBeDefined();
     expect(mapping!.floatFields).toBeDefined();
     expect(mapping!.intFields).toBeDefined();
@@ -18,17 +18,17 @@ describe('MappingLoader', () => {
   });
 
   it('loads the rightmove mapping', () => {
-    const mapping = findByName('rightmove');
+    const mapping = findByName('uk_rightmove');
     expect(mapping).not.toBeNull();
-    expect(mapping!.name).toBe('rightmove');
+    expect(mapping!.name).toBe('uk_rightmove');
     expect(mapping!.defaultValues).toBeDefined();
     expect(mapping!.defaultValues!['country']!.value).toBe('UK');
   });
 
   it('loads the zoopla mapping', () => {
-    const mapping = findByName('zoopla');
+    const mapping = findByName('uk_zoopla');
     expect(mapping).not.toBeNull();
-    expect(mapping!.name).toBe('zoopla');
+    expect(mapping!.name).toBe('uk_zoopla');
   });
 
   it('returns null for unknown mapping', () => {
@@ -37,17 +37,17 @@ describe('MappingLoader', () => {
   });
 
   it('caches mappings', () => {
-    const first = findByName('idealista');
-    const second = findByName('idealista');
+    const first = findByName('es_idealista');
+    const second = findByName('es_idealista');
     expect(first).toBe(second); // same object reference
   });
 
   it('lists all known mapping names', () => {
     const names = allMappingNames();
-    expect(names).toContain('idealista');
-    expect(names).toContain('rightmove');
-    expect(names).toContain('zoopla');
-    expect(names).toContain('realtor');
+    expect(names).toContain('es_idealista');
+    expect(names).toContain('uk_rightmove');
+    expect(names).toContain('uk_zoopla');
+    expect(names).toContain('us_realtor');
     expect(names.length).toBeGreaterThanOrEqual(14);
   });
 });

@@ -21,7 +21,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('accepts a pre-loaded scraper mapping', () => {
-      const mapping = findByName('idealista');
+      const mapping = findByName('es_idealista');
       const result = extractFromHtml({
         html: '<html></html>',
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
@@ -32,7 +32,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('handles empty HTML gracefully', () => {
-      const mapping = findByName('idealista');
+      const mapping = findByName('es_idealista');
       const result = extractFromHtml({
         html: '',
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
@@ -43,7 +43,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('handles malformed HTML gracefully', () => {
-      const mapping = findByName('idealista');
+      const mapping = findByName('es_idealista');
       const result = extractFromHtml({
         html: '<div><p>unclosed',
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
@@ -56,7 +56,7 @@ describe('HtmlExtractor', () => {
 
   describe('extraction diagnostics', () => {
     it('includes diagnostics in the result', () => {
-      const mapping = findByName('idealista');
+      const mapping = findByName('es_idealista');
       const result = extractFromHtml({
         html: '<html></html>',
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
@@ -64,18 +64,18 @@ describe('HtmlExtractor', () => {
       });
 
       expect(result.diagnostics).toBeDefined();
-      expect(result.diagnostics!.scraperName).toBe('idealista');
+      expect(result.diagnostics!.scraperName).toBe('es_idealista');
       expect(result.diagnostics!.fieldTraces).toBeInstanceOf(Array);
       expect(result.diagnostics!.fieldTraces.length).toBe(result.diagnostics!.totalFields);
       expect(result.diagnostics!.emptyFields).toBeInstanceOf(Array);
     });
 
     it('traces contain expected properties', () => {
-      const html = loadFixture('idealista_2018_01');
+      const html = loadFixture('idealista_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       const diag = result.diagnostics!;
@@ -90,7 +90,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('reports empty fields when HTML has no matching data', () => {
-      const mapping = findByName('idealista');
+      const mapping = findByName('es_idealista');
       const result = extractFromHtml({
         html: '<html><body></body></html>',
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
@@ -103,11 +103,11 @@ describe('HtmlExtractor', () => {
     });
 
     it('includes quality scoring fields in diagnostics', () => {
-      const html = loadFixture('idealista_2018_01');
+      const html = loadFixture('idealista_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       const diag = result.diagnostics!;
@@ -122,7 +122,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('excludes defaultValues from extractable field count', () => {
-      const mapping = findByName('idealista');
+      const mapping = findByName('es_idealista');
       const result = extractFromHtml({
         html: '<html><body></body></html>',
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
@@ -136,7 +136,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('assigns grade F for empty HTML with no extractable data', () => {
-      const mapping = findByName('idealista');
+      const mapping = findByName('es_idealista');
       const result = extractFromHtml({
         html: '',
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
@@ -150,7 +150,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('passes through expectedExtractionRate from mapping', () => {
-      const mapping = findByName('idealista');
+      const mapping = findByName('es_idealista');
       const result = extractFromHtml({
         html: '<html></html>',
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
@@ -163,64 +163,58 @@ describe('HtmlExtractor', () => {
   });
 
   describe('idealista extraction from raw HTML', () => {
-    it('extracts the same values as the Ruby specs', () => {
-      const html = loadFixture('idealista_2018_01');
-      const sourceUrl = 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/';
+    it('extracts the same values as the manifest', () => {
+      const html = loadFixture('idealista_v2');
+      const sourceUrl = 'https://www.idealista.com/inmueble/98765432/';
 
       const result = extractFromHtml({
         html,
         sourceUrl,
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       expect(result.success).toBe(true);
       const props = result.properties[0];
 
-      expect(props['title']).toBe('Piso en venta en goya, 54, Goya, Madrid');
-      expect(props['price_string']).toBe('990.000');
-      expect(props['price_float']).toBe(990000.0);
+      expect(props['title']).toBe('Piso en venta en calle de Serrano, 50, Salamanca, Madrid');
+      expect(props['price_float']).toBe(1250000);
       expect(props['currency']).toBe('EUR');
-      expect(props['constructed_area']).toBe(172);
-      expect(props['reference']).toBe('38604738');
+      expect(props['constructed_area']).toBe(185);
+      expect(props['reference']).toBe('98765432');
       expect(props['for_sale']).toBe(true);
-      expect(props['latitude']).toBe(40.4246556);
-      expect(props['longitude']).toBe(-3.678188);
-      expect(props['image_urls']).toBeInstanceOf(Array);
-      expect(props['image_urls'][18]).toBe(
-        'https://img3.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/48/37/34/254187544.jpg'
-      );
+      expect(props['for_rent']).toBe(false);
+      expect(props['latitude']).toBe(40.4308);
+      expect(props['longitude']).toBe(-3.6868);
     });
   });
 
   describe('rightmove extraction from raw HTML', () => {
-    it('extracts the same values as the Ruby specs', () => {
-      const html = loadFixture('rightmove');
-      const sourceUrl = 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html';
+    it('extracts the same values as the manifest', () => {
+      const html = loadFixture('rightmove_v2');
+      const sourceUrl = 'https://www.rightmove.co.uk/properties/168908774';
 
       const result = extractFromHtml({
         html,
         sourceUrl,
-        scraperMappingName: 'rightmove',
+        scraperMappingName: 'uk_rightmove',
       });
 
       expect(result.success).toBe(true);
       const props = result.properties[0];
 
-      expect(props['for_rent']).toBe(true);
-      expect(props['longitude']).toBe(-1.8683744229091472);
-      expect(props['latitude']).toBe(52.413249369181294);
-      expect(props['postal_code']).toBe('B14 4JP');
-      expect(props['reference']).toBe('51775029');
-      expect(props['image_urls'][0]).toBe(
-        'https://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg'
-      );
-      expect(props['title']).toBe(
-        '4 bedroom detached house to rent in School Road, Birmingham, B14, B14'
-      );
-      expect(props['address_string']).toBe('School Road, Birmingham, B14');
+      expect(props['title']).toBe('2 bedroom apartment for sale in Augustine Way, Oxford, OX4');
+      expect(props['address_string']).toBe('Augustine Way, Oxford');
+      expect(props['price_string']).toBe('\u00A3105,000');
+      expect(props['price_float']).toBe(105000);
+      expect(props['count_bedrooms']).toBe(2);
+      expect(props['count_bathrooms']).toBe(1);
+      expect(props['latitude']).toBe(51.73383);
+      expect(props['longitude']).toBe(-1.23336);
+      expect(props['reference']).toBe('168908774');
+      expect(props['postal_code']).toBe('OX4 4DG');
       expect(props['currency']).toBe('GBP');
-      expect(props['price_string']).toBe('\u00A3995 pcm');
-      expect(props['price_float']).toBe(995.0);
+      expect(props['for_sale']).toBe(true);
+      expect(props['for_rent']).toBe(false);
     });
   });
 
@@ -233,7 +227,7 @@ describe('HtmlExtractor', () => {
       const result = extractFromHtml({
         html,
         sourceUrl,
-        scraperMappingName: 'realtor',
+        scraperMappingName: 'us_realtor',
       });
 
       expect(result.success).toBe(true);
@@ -245,11 +239,11 @@ describe('HtmlExtractor', () => {
 
   describe('weighted quality scoring in diagnostics', () => {
     it('includes weightedExtractionRate in diagnostics', () => {
-      const html = loadFixture('idealista_2018_01');
+      const html = loadFixture('idealista_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       const diag = result.diagnostics!;
@@ -259,11 +253,11 @@ describe('HtmlExtractor', () => {
     });
 
     it('includes criticalFieldsMissing in diagnostics', () => {
-      const html = loadFixture('idealista_2018_01');
+      const html = loadFixture('idealista_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       const diag = result.diagnostics!;
@@ -275,7 +269,7 @@ describe('HtmlExtractor', () => {
       const result = extractFromHtml({
         html: '<html><body></body></html>',
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       const diag = result.diagnostics!;
@@ -286,11 +280,11 @@ describe('HtmlExtractor', () => {
 
   describe('content analysis in diagnostics', () => {
     it('includes contentAnalysis in diagnostics', () => {
-      const html = loadFixture('rightmove');
+      const html = loadFixture('rightmove_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
-        scraperMappingName: 'rightmove',
+        scraperMappingName: 'uk_rightmove',
       });
 
       const ca = result.diagnostics!.contentAnalysis!;
@@ -304,11 +298,11 @@ describe('HtmlExtractor', () => {
     });
 
     it('detects known script vars in rightmove fixture', () => {
-      const html = loadFixture('rightmove');
+      const html = loadFixture('rightmove_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
-        scraperMappingName: 'rightmove',
+        scraperMappingName: 'uk_rightmove',
       });
 
       const ca = result.diagnostics!.contentAnalysis!;
@@ -321,7 +315,7 @@ describe('HtmlExtractor', () => {
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/inmueble/123/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       const ca = result.diagnostics!.contentAnalysis!;
@@ -329,11 +323,11 @@ describe('HtmlExtractor', () => {
     });
 
     it('does not flag normal page as blocked', () => {
-      const html = loadFixture('idealista_2018_01');
+      const html = loadFixture('idealista_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       const ca = result.diagnostics!.contentAnalysis!;
@@ -343,11 +337,11 @@ describe('HtmlExtractor', () => {
 
   describe('split schema in result', () => {
     it('includes splitSchema in extraction result', () => {
-      const html = loadFixture('idealista_2018_01');
+      const html = loadFixture('idealista_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       expect(result.splitSchema).toBeDefined();
@@ -357,25 +351,25 @@ describe('HtmlExtractor', () => {
     });
 
     it('places title in assetData', () => {
-      const html = loadFixture('idealista_2018_01');
+      const html = loadFixture('idealista_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
       expect(result.splitSchema!.assetData.title).toBeTruthy();
     });
 
     it('places price fields in listingData', () => {
-      const html = loadFixture('idealista_2018_01');
+      const html = loadFixture('idealista_v2');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
-        scraperMappingName: 'idealista',
+        scraperMappingName: 'es_idealista',
       });
 
-      expect(result.splitSchema!.listingData.price_string).toBeTruthy();
+      expect(result.splitSchema!.listingData.price_float).toBeTruthy();
       expect(result.splitSchema!.listingData.for_sale).toBeDefined();
     });
   });
