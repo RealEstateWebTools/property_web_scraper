@@ -16,6 +16,7 @@ import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { normalizePrice } from '@lib/extractor/price-normalizer.js';
 import { fireWebhooks } from '@lib/services/webhook-service.js';
 import { recordSnapshot } from '@lib/services/price-history.js';
+import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 
 function countAvailableFields(mapping: ScraperMapping): number {
   let count = 0;
@@ -361,6 +362,18 @@ export const POST: APIRoute = async ({ request }) => {
         quality_grade: result.diagnostics?.qualityGrade,
         title: props.title,
       }).catch(() => { /* price history failure shouldn't affect API response */ });
+
+      // Record scrape metadata (fire-and-forget)
+      recordScrapeAndUpdatePortal({
+        sourceUrl: url,
+        html: html!,
+        sourceType: contentType.includes('multipart/form-data') ? 'api_multipart_html' : 'api_json_html',
+        scraperName: importHost.scraper_name,
+        portalSlug: importHost.slug,
+        requestContentType: contentType,
+        clientUserAgent: request.headers.get('user-agent'),
+        diagnostics: result.diagnostics,
+      }).catch(() => { /* scrape metadata failure shouldn't affect API response */ });
     }
   }
 

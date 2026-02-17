@@ -1,12 +1,15 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
+import { initScrapeMetadataKV, getLatestScrapeForListing } from '@lib/services/scrape-metadata.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
+initScrapeMetadataKV((Astro.locals as any).runtime?.env?.RESULTS);
 
 const { id } = Astro.params;
 const listing = id ? await getListing(id) : undefined;
 const diagnostics = id ? await getDiagnostics(id) : undefined;
+const scrapeRecord = id ? await getLatestScrapeForListing(id) : undefined;
 const imageUrls = listing?.image_urls || [];
 
 // Quality grade color mapping: A=green, B=blue, C=amber, F=red
@@ -94,6 +97,29 @@ const attrs = [
             <div class="flex items-center gap-3 bg-amber-100 text-amber-900 px-5 py-3 rounded-xl mb-6 font-medium">
               <i class="bi bi-exclamation-triangle-fill text-xl"></i>
               No fields extracted — the scraper mapping may need updating
+            </div>
+          )}
+
+          {scrapeRecord?.better_html_hint?.suggested && (
+            <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 text-amber-900 px-5 py-4 rounded-xl mb-4" id="better-html-banner">
+              <i class="bi bi-lightbulb text-xl text-amber-600 mt-0.5"></i>
+              <div class="flex-1">
+                <h6 class="font-semibold mb-1">Better results available</h6>
+                <p class="text-sm mb-2">{scrapeRecord.better_html_hint.recommendation}</p>
+                <ul class="text-sm list-disc pl-4 mb-2 space-y-0.5">
+                  {scrapeRecord.better_html_hint.suggestedActions.map((action) => (
+                    <li>{action}</li>
+                  ))}
+                </ul>
+                <div class="flex gap-2 text-sm">
+                  <a href="/extract/html" class="text-amber-700 hover:underline font-medium">Paste HTML</a>
+                  <span class="text-amber-400">|</span>
+                  <a href="/extract/upload" class="text-amber-700 hover:underline font-medium">Upload File</a>
+                </div>
+              </div>
+              <button type="button" class="text-amber-400 hover:text-amber-600 border-0 bg-transparent cursor-pointer" onclick="this.closest('#better-html-banner').remove()">
+                <i class="bi bi-x-lg"></i>
+              </button>
             </div>
           )}
 
@@ -250,6 +276,74 @@ const attrs = [
                   </div>
                 </>
               )}
+
+              {scrapeRecord && (
+                <>
+                  <button class="pws-scrape-toggle text-sm text-gray-500 cursor-pointer inline-flex items-center gap-1.5 border-0 bg-transparent p-0 mt-3 hover:underline" type="button">
+                    <i class="bi bi-chevron-down"></i> Scrape metadata
+                  </button>
+
+                  <div class="hidden mt-3" id="scrape-metadata-panel">
+                    <div class="flex flex-wrap gap-2 mb-3">
+                      <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-medium px-2 py-1 rounded">
+                        <i class="bi bi-arrow-down-circle"></i> {scrapeRecord.source_type.replace(/_/g, ' ')}
+                      </span>
+                      <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+                        {scrapeRecord.html_size_kb} KB
+                      </span>
+                      {typeof scrapeRecord.fetch_duration_ms === 'number' && (
+                        <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+                          {scrapeRecord.fetch_duration_ms} ms
+                        </span>
+                      )}
+                      <span class={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded ${
+                        scrapeRecord.render_mode === 'client' ? 'bg-amber-50 text-amber-700'
+                        : scrapeRecord.render_mode === 'hybrid' ? 'bg-purple-50 text-purple-700'
+                        : 'bg-green-50 text-green-700'
+                      }`}>
+                        {scrapeRecord.render_mode} rendered
+                      </span>
+                    </div>
+
+                    {scrapeRecord.technology_stack.length > 0 && (
+                      <div class="flex flex-wrap gap-1.5 mb-2">
+                        <span class="text-xs text-gray-500">Tech:</span>
+                        {scrapeRecord.technology_stack.map((tech) => (
+                          <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded">{tech}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    {scrapeRecord.anti_scraping_signals.length > 0 && (
+                      <div class="flex flex-wrap gap-1.5 mb-2">
+                        <span class="text-xs text-gray-500">Signals:</span>
+                        {scrapeRecord.anti_scraping_signals.map((signal) => (
+                          <span class="inline-flex items-center bg-red-50 text-red-700 text-xs px-2 py-0.5 rounded">{signal.replace(/_/g, ' ')}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              <button class="pws-update-toggle text-sm text-gray-500 cursor-pointer inline-flex items-center gap-1.5 border-0 bg-transparent p-0 mt-3 hover:underline" type="button">
+                <i class="bi bi-chevron-down"></i> Re-extract with new HTML
+              </button>
+
+              <div class="hidden mt-3" id="update-html-panel">
+                <form method="POST" action={`/extract/results/${id}/update-html`}>
+                  <input type="hidden" name="import_url" value={(listing as any).import_url || scrapeRecord?.source_url || ''} />
+                  <textarea
+                    name="html"
+                    rows={6}
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none resize-y mb-2"
+                    placeholder="Paste fully-rendered HTML here..."
+                  ></textarea>
+                  <button type="submit" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 inline-flex items-center gap-1.5 cursor-pointer">
+                    <i class="bi bi-arrow-repeat"></i> Re-extract
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </>
@@ -277,6 +371,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   setupToggle('.pws-details-toggle', 'all-fields');
   setupToggle('.pws-diag-toggle', 'diagnostics-panel');
+  setupToggle('.pws-scrape-toggle', 'scrape-metadata-panel');
+  setupToggle('.pws-update-toggle', 'update-html-panel');
 
   const enrichBtn = document.getElementById('enrich-images-btn');
   const enrichStatus = document.getElementById('enrich-status');
