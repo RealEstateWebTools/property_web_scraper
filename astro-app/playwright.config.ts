@@ -20,6 +20,7 @@ export default defineConfig({
       ...process.env,
       PWS_API_KEY: '',
       PWS_ADMIN_KEY: '',
+      PWS_ALLOWED_ORIGINS: 'http://localhost:4327',
     },
   },
 });

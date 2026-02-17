@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import {
   ApiErrorCode,
   errorResponse,
@@ -7,6 +7,14 @@ import {
 } from '../../src/lib/services/api-response.js';
 
 describe('api-response', () => {
+  const originalImportMetaAllowed = (import.meta.env as any).PWS_ALLOWED_ORIGINS;
+  const originalProcessAllowed = process.env.PWS_ALLOWED_ORIGINS;
+
+  afterEach(() => {
+    (import.meta.env as any).PWS_ALLOWED_ORIGINS = originalImportMetaAllowed;
+    process.env.PWS_ALLOWED_ORIGINS = originalProcessAllowed;
+  });
+
   describe('errorResponse', () => {
     it('returns 400 for MISSING_URL', async () => {
       const res = errorResponse(ApiErrorCode.MISSING_URL, 'Please provide a url');
@@ -82,6 +90,35 @@ describe('api-response', () => {
       const res = successResponse({});
       const json = await res.json();
       expect(json).toEqual({ success: true });
+    });
+  });
+
+  describe('cors behavior', () => {
+    it('defaults to wildcard when allowlist is not configured', () => {
+      (import.meta.env as any).PWS_ALLOWED_ORIGINS = '';
+      process.env.PWS_ALLOWED_ORIGINS = '';
+      const res = successResponse({});
+      expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*');
+    });
+
+    it('returns matching origin when allowlist is configured and origin is allowed', () => {
+      (import.meta.env as any).PWS_ALLOWED_ORIGINS = 'https://app.example.com,https://admin.example.com';
+      const req = new Request('https://api.example.com/public_api/v1/health', {
+        headers: { Origin: 'https://admin.example.com' },
+      });
+      const res = successResponse({}, req);
+      expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://admin.example.com');
+      expect(res.headers.get('Vary')).toBe('Origin');
+    });
+
+    it('omits allow-origin header for disallowed origins when allowlist is configured', () => {
+      (import.meta.env as any).PWS_ALLOWED_ORIGINS = 'https://app.example.com';
+      const req = new Request('https://api.example.com/public_api/v1/health', {
+        headers: { Origin: 'https://evil.example.com' },
+      });
+      const res = successResponse({}, req);
+      expect(res.headers.get('Access-Control-Allow-Origin')).toBeNull();
+      expect(res.headers.get('Vary')).toBe('Origin');
     });
   });
 

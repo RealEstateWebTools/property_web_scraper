@@ -36,31 +36,103 @@ export function mapValidatorError(validatorCode: string | undefined): ApiErrorCo
   return (validatorCode && VALIDATOR_CODE_MAP[validatorCode]) || ApiErrorCode.INVALID_URL;
 }
 
-const CORS_HEADERS: Record<string, string> = {
-  'Access-Control-Allow-Origin': '*',
+function getAllowedOrigins(): string[] {
+  let raw = '';
+  try {
+    raw = ((import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env?.PWS_ALLOWED_ORIGINS || '').trim();
+  } catch {
+    raw = '';
+  }
+  if (!raw && typeof process !== 'undefined') {
+    raw = (process.env.PWS_ALLOWED_ORIGINS || '').trim();
+  }
+  if (!raw) return [];
+  return raw
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
+function resolveAllowOrigin(request?: Request): { allowOrigin: string | null; usingAllowlist: boolean } {
+  const allowedOrigins = getAllowedOrigins();
+  if (allowedOrigins.length === 0) {
+    return { allowOrigin: '*', usingAllowlist: false };
+  }
+
+  const fallbackOrigin = allowedOrigins[0];
+  if (!request) {
+    return { allowOrigin: fallbackOrigin, usingAllowlist: true };
+  }
+
+  const origin = request.headers.get('origin');
+  if (!origin) {
+    return { allowOrigin: fallbackOrigin, usingAllowlist: true };
+  }
+
+  if (allowedOrigins.includes(origin)) {
+    return { allowOrigin: origin, usingAllowlist: true };
+  }
+
+  return { allowOrigin: null, usingAllowlist: true };
+}
+
+function buildCorsHeaders(request?: Request): Record<string, string> {
+  const { allowOrigin, usingAllowlist } = resolveAllowOrigin(request);
+  const headers: Record<string, string> = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Api-Key',
 };
+  if (allowOrigin) {
+    headers['Access-Control-Allow-Origin'] = allowOrigin;
+  }
+  if (usingAllowlist) {
+    headers['Vary'] = 'Origin';
+  }
+  return headers;
+}
 
-export function errorResponse(code: ApiErrorCodeValue, message: string, extraHeaders?: Record<string, string>): Response {
+function normalizeErrorResponseArgs(
+  extraHeadersOrRequest?: Record<string, string> | Request,
+  request?: Request
+): { extraHeaders?: Record<string, string>; request?: Request } {
+  if (extraHeadersOrRequest instanceof Request) {
+    return { request: extraHeadersOrRequest };
+  }
+  return { extraHeaders: extraHeadersOrRequest, request };
+}
+
+export function errorResponse(
+  code: ApiErrorCodeValue,
+  message: string,
+  extraHeadersOrRequest?: Record<string, string> | Request,
+  request?: Request
+): Response {
+  const normalized = normalizeErrorResponseArgs(extraHeadersOrRequest, request);
   return new Response(
     JSON.stringify({ success: false, error: { code, message } }),
-    { status: HTTP_STATUS[code], headers: { 'Content-Type': 'application/json', ...CORS_HEADERS, ...extraHeaders } },
+    {
+      status: HTTP_STATUS[code],
+      headers: {
+        'Content-Type': 'application/json',
+        ...buildCorsHeaders(normalized.request),
+        ...(normalized.extraHeaders || {}),
+      },
+    },
   );
 }
 
-export function successResponse(data: Record<string, unknown>): Response {
+export function successResponse(data: Record<string, unknown>, request?: Request): Response {
   return new Response(
     JSON.stringify({ success: true, ...data }),
-    { status: 200, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } },
+    { status: 200, headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request) } },
   );
 }
 
-export function corsPreflightResponse(): Response {
+export function corsPreflightResponse(request?: Request): Response {
   return new Response(null, {
     status: 204,
     headers: {
-      ...CORS_HEADERS,
+      ...buildCorsHeaders(request),
       'Content-Length': '0',
     },
   });

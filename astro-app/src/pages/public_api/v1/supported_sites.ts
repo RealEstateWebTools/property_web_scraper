@@ -5,7 +5,7 @@ import { checkRateLimit } from '@lib/services/rate-limiter.js';
 import { successResponse, corsPreflightResponse } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
 
-export const OPTIONS: APIRoute = () => corsPreflightResponse();
+export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
 export const GET: APIRoute = async ({ request }) => {
   const startTime = Date.now();
@@ -37,5 +37,5 @@ export const GET: APIRoute = async ({ request }) => {
     durationMs: Date.now() - startTime,
   });
 
-  return successResponse({ sites });
+  return successResponse({ sites }, request);
 };
