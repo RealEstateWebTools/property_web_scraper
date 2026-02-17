@@ -1,5 +1,6 @@
 import { BaseModel, type AttributeDefinition } from '../firestore/base-model.js';
 import { sanitizePropertyHash } from '../extractor/field-processors.js';
+import type { ImageInfo } from '../types/image-info.js';
 
 /**
  * Represents a scraped real estate listing.
@@ -125,7 +126,7 @@ export class Listing extends BaseModel {
   latitude = 0;
   longitude = 0;
   main_image_url = '';
-  image_urls: string[] = [];
+  image_urls: ImageInfo[] = [];
   related_urls: string[] = [];
   features: string[] = [];
   unknown_fields: string[] = [];
@@ -184,8 +185,14 @@ export class Listing extends BaseModel {
       }
     }
 
-    listing.image_urls = Array.isArray(sanitized['image_urls'])
-      ? (sanitized['image_urls'] as string[])
-      : [];
+    if (Array.isArray(sanitized['image_urls'])) {
+      listing.image_urls = (sanitized['image_urls'] as unknown[]).map((item) => {
+        if (typeof item === 'string') return { url: item };
+        if (typeof item === 'object' && item !== null && 'url' in item) return item as ImageInfo;
+        return null;
+      }).filter((img): img is ImageInfo => img !== null);
+    } else {
+      listing.image_urls = [];
+    }
   }
 }

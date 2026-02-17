@@ -99,7 +99,7 @@ const attrs = [
 
           <div class="rounded-2xl shadow-md overflow-hidden mb-4">
             {imageUrls.length > 0 && imageUrls[0] && (
-              <img src={imageUrls[0]} alt="Property image" class="w-full h-[200px] object-cover bg-gray-200" />
+              <img src={imageUrls[0].url} alt="Property image" class="w-full h-[200px] object-cover bg-gray-200" />
             )}
 
             <div class="p-6">
@@ -162,11 +162,17 @@ const attrs = [
 
                 {imageUrls.length > 0 && (
                   <>
-                    <p class="font-semibold mb-2 text-sm">{imageUrls.length} image{imageUrls.length === 1 ? '' : 's'} found</p>
+                    <div class="flex items-center gap-3 mb-2">
+                      <p class="font-semibold text-sm m-0">{imageUrls.length} image{imageUrls.length === 1 ? '' : 's'} found</p>
+                      <button id="enrich-images-btn" type="button" class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-lg hover:bg-blue-100 transition cursor-pointer inline-flex items-center gap-1">
+                        <i class="bi bi-arrow-clockwise"></i> Fetch Image Details
+                      </button>
+                      <span id="enrich-status" class="text-xs text-gray-500 hidden"></span>
+                    </div>
                     <div class="flex flex-wrap gap-2 mb-2">
-                      {imageUrls.slice(0, 6).map((imgUrl) => (
-                        <a href={imgUrl} target="_blank">
-                          <img src={imgUrl} alt="Property" class="w-20 h-15 object-cover rounded-md border border-gray-200" />
+                      {imageUrls.slice(0, 6).map((img) => (
+                        <a href={img.url} target="_blank">
+                          <img src={img.url} alt="Property" class="w-20 h-15 object-cover rounded-md border border-gray-200" />
                         </a>
                       ))}
                       {imageUrls.length > 6 && (
@@ -271,6 +277,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   setupToggle('.pws-details-toggle', 'all-fields');
   setupToggle('.pws-diag-toggle', 'diagnostics-panel');
+
+  const enrichBtn = document.getElementById('enrich-images-btn');
+  const enrichStatus = document.getElementById('enrich-status');
+  if (enrichBtn && enrichStatus) {
+    enrichBtn.addEventListener('click', async () => {
+      enrichBtn.disabled = true;
+      enrichBtn.textContent = 'Fetching...';
+      enrichStatus.classList.remove('hidden');
+      enrichStatus.textContent = '';
+      try {
+        const listingId = window.location.pathname.split('/').pop();
+        const res = await fetch('/public_api/v1/listings/' + listingId + '/enrich-images', { method: 'POST' });
+        if (!res.ok) throw new Error('Failed: ' + res.status);
+        const data = await res.json();
+        const images = data.data?.image_urls || [];
+        const enriched = images.filter(function(img) { return img.enriched; });
+        enrichStatus.textContent = enriched.length + '/' + images.length + ' images enriched';
+        // Update image thumbnails with dimension badges
+        const thumbs = document.querySelectorAll('#all-fields .flex.flex-wrap.gap-2 a');
+        thumbs.forEach(function(a, i) {
+          if (i < images.length && images[i].enriched) {
+            var badge = document.createElement('span');
+            badge.className = 'text-[10px] bg-gray-800/70 text-white px-1 py-0.5 rounded absolute bottom-0.5 left-0.5';
+            var parts = [];
+            if (images[i].width && images[i].height) parts.push(images[i].width + 'x' + images[i].height);
+            if (images[i].sizeBytes) parts.push(Math.round(images[i].sizeBytes / 1024) + 'KB');
+            if (images[i].format) parts.push(images[i].format);
+            badge.textContent = parts.join(' ');
+            a.style.position = 'relative';
+            a.appendChild(badge);
+          }
+        });
+      } catch (e) {
+        enrichStatus.textContent = 'Error: ' + e.message;
+      }
+      enrichBtn.textContent = 'Fetch Image Details';
+      enrichBtn.disabled = false;
+    });
+  }
 });
 </script>
 

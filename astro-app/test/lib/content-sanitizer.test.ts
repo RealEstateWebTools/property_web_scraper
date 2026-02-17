@@ -46,21 +46,21 @@ describe('sanitizePropertyHash', () => {
     expect(result.main_image_url).toBe('https://cdn.example.com/image.jpg');
   });
 
-  it('filters invalid URLs from arrays', () => {
+  it('filters invalid URLs from image_urls objects', () => {
     const input = {
       image_urls: [
-        'https://example.com/1.jpg',
-        'javascript:alert(1)',
-        'https://example.com/2.jpg',
-        'data:text/html,bad',
-        '//cdn.example.com/3.jpg',
+        { url: 'https://example.com/1.jpg' },
+        { url: 'javascript:alert(1)' },
+        { url: 'https://example.com/2.jpg' },
+        { url: 'data:text/html,bad' },
+        { url: '//cdn.example.com/3.jpg' },
       ],
     };
     const result = sanitizePropertyHash(input);
     expect(result.image_urls).toEqual([
-      'https://example.com/1.jpg',
-      'https://example.com/2.jpg',
-      'https://cdn.example.com/3.jpg',
+      { url: 'https://example.com/1.jpg' },
+      { url: 'https://example.com/2.jpg' },
+      { url: 'https://cdn.example.com/3.jpg' },
     ]);
   });
 

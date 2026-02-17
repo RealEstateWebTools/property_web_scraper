@@ -19,7 +19,7 @@ const TEXT_FIELDS = [
 ];
 
 const URL_FIELDS = ['main_image_url'];
-const URL_ARRAY_FIELDS = ['image_urls', 'related_urls'];
+const URL_ARRAY_FIELDS = ['related_urls'];
 const SAFE_SCHEMES = ['http:', 'https:'];
 
 /**
@@ -107,6 +107,16 @@ export function sanitizePropertyHash(
         .map(sanitizeUrl)
         .filter((url): url is string => url !== null);
     }
+  }
+
+  // Sanitize image_urls (array of ImageInfo objects)
+  if (Array.isArray(sanitized.image_urls)) {
+    sanitized.image_urls = (sanitized.image_urls as Array<{ url: string }>)
+      .map((img) => {
+        const cleaned = sanitizeUrl(img.url);
+        return cleaned ? { ...img, url: cleaned } : null;
+      })
+      .filter((img): img is { url: string } => img !== null);
   }
 
   // Sanitize features array

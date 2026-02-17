@@ -18,7 +18,7 @@ if (listing) {
     });
   }
   if (listing.image_urls?.length > 0) {
-    mainImageUrl = listing.image_urls[0];
+    mainImageUrl = listing.image_urls[0].url;
   }
 }
 
@@ -68,9 +68,9 @@ if (listing) {
             <div id="propertyCarousel" class="relative">
               <div class="overflow-hidden">
                 <div id="carouselTrack" class="flex transition-transform duration-300 ease-in-out">
-                  {listing.image_urls.map((imageUrl: string, i: number) => (
+                  {listing.image_urls.map((img, i: number) => (
                     <div class="w-full flex-shrink-0">
-                      <img src={imageUrl} class="block w-full max-h-[450px] object-cover" alt={`Property image ${i + 1}`} />
+                      <img src={img.url} class="block w-full max-h-[450px] object-cover" alt={`Property image ${i + 1}`} />
                     </div>
                   ))}
                 </div>

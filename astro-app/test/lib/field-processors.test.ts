@@ -140,29 +140,29 @@ describe('sanitizePropertyHash', () => {
     expect(result['main_image_url']).toBeNull();
   });
 
-  it('sanitizes URL array fields — filters out invalid URLs', () => {
+  it('sanitizes image_urls objects — filters out invalid URLs', () => {
     const hash = {
       image_urls: [
-        'https://example.com/a.jpg',
-        'javascript:alert(1)',
-        '//cdn.example.com/b.jpg',
-        '',
-        'ftp://badscheme.com/c.jpg',
-        'https://example.com/d.jpg',
+        { url: 'https://example.com/a.jpg' },
+        { url: 'javascript:alert(1)' },
+        { url: '//cdn.example.com/b.jpg' },
+        { url: '' },
+        { url: 'ftp://badscheme.com/c.jpg' },
+        { url: 'https://example.com/d.jpg' },
       ],
     };
     const result = sanitizePropertyHash(hash);
     expect(result['image_urls']).toEqual([
-      'https://example.com/a.jpg',
-      'https://cdn.example.com/b.jpg',
-      'https://example.com/d.jpg',
+      { url: 'https://example.com/a.jpg' },
+      { url: 'https://cdn.example.com/b.jpg' },
+      { url: 'https://example.com/d.jpg' },
     ]);
   });
 
-  it('sanitizes URL array fields — filters non-string entries', () => {
-    const hash = { image_urls: ['https://example.com/a.jpg', 42, null, undefined] };
+  it('sanitizes image_urls objects — filters entries with null URLs', () => {
+    const hash = { image_urls: [{ url: 'https://example.com/a.jpg' }, { url: '' }, { url: 'ftp://bad.com/c.jpg' }] };
     const result = sanitizePropertyHash(hash);
-    expect(result['image_urls']).toEqual(['https://example.com/a.jpg']);
+    expect(result['image_urls']).toEqual([{ url: 'https://example.com/a.jpg' }]);
   });
 
   it('strips HTML from features array', () => {
