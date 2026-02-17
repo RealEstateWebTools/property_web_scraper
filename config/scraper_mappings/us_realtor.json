@@ -1,6 +1,6 @@
 [
 {
-  "name": "realtor",
+  "name": "us_realtor",
   "expectedExtractionRate": 0.85,
   "defaultValues":
   {

@@ -1,5 +1,5 @@
 [{
-  "name": "pwb",
+  "name": "es_weebrix",
   "expectedExtractionRate": 0.85,
   "defaultValues": {
     "country": {

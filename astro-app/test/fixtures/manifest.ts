@@ -25,43 +25,7 @@ export interface FixtureEntry {
 
 export const fixtures: FixtureEntry[] = [
   {
-    scraper: 'idealista',
-    fixture: 'idealista_2018_01',
-    sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
-    expected: {
-      title: 'Piso en venta en goya, 54, Goya, Madrid',
-      price_string: '990.000',
-      price_float: 990000.0,
-      currency: 'EUR',
-      constructed_area: 172,
-      reference: '38604738',
-      for_sale: true,
-      for_rent: false,
-      latitude: 40.4246556,
-      longitude: -3.678188,
-    },
-  },
-  {
-    scraper: 'rightmove',
-    fixture: 'rightmove',
-    sourceUrl: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
-    expected: {
-      for_rent: true,
-      for_sale: false,
-      longitude: -1.8683744229091472,
-      latitude: 52.413249369181294,
-      postal_code: 'B14 4JP',
-      reference: '51775029',
-      title: '4 bedroom detached house to rent in School Road, Birmingham, B14, B14',
-      address_string: 'School Road, Birmingham, B14',
-      currency: 'GBP',
-      price_string: '\u00A3995 pcm',
-      price_float: 995.0,
-      count_bedrooms: 4,
-    },
-  },
-  {
-    scraper: 'realtor',
+    scraper: 'us_realtor',
     fixture: 'realtor',
     sourceUrl: 'http://www.realtor.com/realestateandhomes-detail/5804-Cedar-Glen-Ln_Bakersfield_CA_93313_M12147-18296',
     expected: {
@@ -85,7 +49,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'fotocasa',
+    scraper: 'es_fotocasa',
     fixture: 'fotocasa',
     sourceUrl: 'https://www.fotocasa.es/vivienda/madrid/piso-123',
     expected: {
@@ -104,22 +68,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'zoopla',
-    fixture: 'zoopla',
-    sourceUrl: 'https://www.zoopla.co.uk/to-rent/details/12345678',
-    expected: {
-      country: 'UK',
-      currency: 'GBP',
-      title: '4 bed flat for sale',
-      address_string: '38 St. Pauls Square, Birmingham B3',
-      constructed_area: 2205,
-      price_float: 875000,
-      price_string: '\u00A3875,000',
-      count_bedrooms: 4,
-    },
-  },
-  {
-    scraper: 'pisos',
+    scraper: 'es_pisos',
     fixture: 'pisos_dot_com',
     sourceUrl: 'https://www.pisos.com/comprar/piso-madrid_capital/12345/',
     expected: {
@@ -130,7 +79,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'realestateindia',
+    scraper: 'in_realestateindia',
     fixture: 'realestateindia',
     sourceUrl: 'https://www.realestateindia.com/property-detail/residential-property-for-sale-in-delhi-12345.htm',
     expected: {
@@ -147,7 +96,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'mlslistings',
+    scraper: 'us_mlslistings',
     fixture: 'mlslistings',
     sourceUrl: 'https://www.mlslistings.com/property/ml81234567/some-address',
     expected: {
@@ -165,22 +114,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'pwb',
-    fixture: 'pwb',
-    sourceUrl: 'https://www.propertyweb.co.za/property/12345/some-property',
-    expected: {
-      title: 'Chalet in Cala Blava / Llucmajor',
-      reference: 'Gu_001',
-      property_type: 'Chalet',
-      latitude: 39.4828874,
-      longitude: 2.73674249999999,
-      postal_code: '07609',
-      for_sale: true,
-      for_rent: false,
-    },
-  },
-  {
-    scraper: 'inmo1',
+    scraper: 'es_inmo1',
     fixture: 'inmo1',
     sourceUrl: 'https://www.inmo1.com/propiedad/12345',
     expected: {
@@ -204,7 +138,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'wyomingmls',
+    scraper: 'us_wyomingmls',
     fixture: 'wyomingmls',
     sourceUrl: 'https://www.wyomingmls.com/listing/12345',
     expected: {
@@ -223,26 +157,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'idealista_2017',
-    fixture: 'idealista_2017',
-    sourceUrl: 'https://www.idealista.com/inmueble/12345/',
-    expected: {
-      country: 'Spain',
-      currency: 'EUR',
-      title: 'D\u00FAplex en venta en calle Subida Amargura, 2, El Molar',
-      price_string: '82.000',
-      price_float: 82000,
-      constructed_area: 70,
-      count_bedrooms: 2,
-      reference: '1678322',
-      latitude: 40.732845,
-      longitude: -3.5815072,
-      for_sale: true,
-      for_rent: false,
-    },
-  },
-  {
-    scraper: 'cerdfw',
+    scraper: 'us_cerdfw',
     fixture: 'cerdfw',
     sourceUrl: 'https://www.cerdfw.com/listing/12345',
     expected: {
@@ -258,7 +173,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'carusoimmobiliare',
+    scraper: 'it_carusoimmobiliare',
     fixture: 'carusoimmobiliare',
     sourceUrl: 'https://www.carusoimmobiliare.com/immobile/12345',
     expected: {
@@ -271,7 +186,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'forsalebyowner',
+    scraper: 'us_forsalebyowner',
     fixture: 'forsalebyowner',
     sourceUrl: 'https://www.forsalebyowner.com/listing/12345',
     expected: {
@@ -282,7 +197,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'weebrix',
+    scraper: 'es_weebrix',
     fixture: 'weebrix',
     sourceUrl: 'https://www.weebrix.com/property/12345',
     expected: {
@@ -298,7 +213,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'rightmove_v2',
+    scraper: 'uk_rightmove',
     fixture: 'rightmove_v2',
     sourceUrl: 'https://www.rightmove.co.uk/properties/168908774',
     expected: {
@@ -349,7 +264,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'zoopla_v2',
+    scraper: 'uk_zoopla',
     fixture: 'zoopla_v2',
     sourceUrl: 'https://www.zoopla.co.uk/for-sale/details/71695439/',
     expected: {
@@ -371,7 +286,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'onthemarket',
+    scraper: 'uk_onthemarket',
     fixture: 'onthemarket',
     sourceUrl: 'https://www.onthemarket.com/details/15269498/',
     expected: {
@@ -393,7 +308,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'daft',
+    scraper: 'ie_daft',
     fixture: 'daft',
     sourceUrl: 'https://www.daft.ie/for-sale/semi-detached-house-42-griffith-avenue-dublin-9/4567890',
     expected: {
@@ -418,7 +333,7 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'idealista_v2',
+    scraper: 'es_idealista',
     fixture: 'idealista_v2',
     sourceUrl: 'https://www.idealista.com/inmueble/98765432/',
     expected: {

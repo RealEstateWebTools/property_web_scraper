@@ -13,19 +13,18 @@ process.env.FIRESTORE_COLLECTION_PREFIX = '';
 
 // Seed import hosts before all tests
 const importHostsData = [
-  { slug: 'mlslistings', scraper_name: 'mlslistings', host: 'www.mlslistings.com' },
-  { slug: 'realtor', scraper_name: 'realtor', host: 'www.realtor.com' },
-  { slug: 'idealista', scraper_name: 'idealista', host: 'www.idealista.com' },
-  { slug: 'rightmove', scraper_name: 'rightmove', host: 'www.rightmove.co.uk' },
-  { slug: 'laventa', scraper_name: 'pwb', host: 'www.laventa-mallorca.com' },
-  { slug: 'zoopla', scraper_name: 'zoopla', host: 'www.zoopla.co.uk' },
-  { slug: 'carusoimmobiliare', scraper_name: 'carusoimmobiliare', host: 'www.carusoimmobiliare.it' },
-  { slug: 'wyomingmls', scraper_name: 'wyomingmls', host: 'www.wyomingmls.com' },
-  { slug: 'forsalebyowner', scraper_name: 'forsalebyowner', host: 'www.forsalebyowner.com' },
-  { slug: 'cerdfw', scraper_name: 'cerdfw', host: 'cerdfw.com' },
-  { slug: 'realestateindia', scraper_name: 'realestateindia', host: 'www.realestateindia.com' },
-  { slug: 'fotocasa', scraper_name: 'fotocasa', host: 'www.fotocasa.es' },
-  { slug: 'pisos', scraper_name: 'pisos', host: 'www.pisos.com' },
+  { slug: 'us_mlslistings', scraper_name: 'us_mlslistings', host: 'www.mlslistings.com' },
+  { slug: 'us_realtor', scraper_name: 'us_realtor', host: 'www.realtor.com' },
+  { slug: 'es_idealista', scraper_name: 'es_idealista', host: 'www.idealista.com' },
+  { slug: 'uk_rightmove', scraper_name: 'uk_rightmove', host: 'www.rightmove.co.uk' },
+  { slug: 'uk_zoopla', scraper_name: 'uk_zoopla', host: 'www.zoopla.co.uk' },
+  { slug: 'it_carusoimmobiliare', scraper_name: 'it_carusoimmobiliare', host: 'www.carusoimmobiliare.it' },
+  { slug: 'us_wyomingmls', scraper_name: 'us_wyomingmls', host: 'www.wyomingmls.com' },
+  { slug: 'us_forsalebyowner', scraper_name: 'us_forsalebyowner', host: 'www.forsalebyowner.com' },
+  { slug: 'us_cerdfw', scraper_name: 'us_cerdfw', host: 'cerdfw.com' },
+  { slug: 'in_realestateindia', scraper_name: 'in_realestateindia', host: 'www.realestateindia.com' },
+  { slug: 'es_fotocasa', scraper_name: 'es_fotocasa', host: 'www.fotocasa.es' },
+  { slug: 'es_pisos', scraper_name: 'es_pisos', host: 'www.pisos.com' },
 ];
 
 beforeAll(async () => {

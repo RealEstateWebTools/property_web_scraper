@@ -1,5 +1,5 @@
 [{
-  "name": "onthemarket",
+  "name": "uk_onthemarket",
   "expectedExtractionRate": 0.90,
   "defaultValues": {
     "country": { "value": "UK" },

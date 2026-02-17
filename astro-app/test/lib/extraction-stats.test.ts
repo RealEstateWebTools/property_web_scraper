@@ -16,7 +16,7 @@ import type { ExtractionDiagnostics } from '../../src/lib/extractor/html-extract
 
 function makeDiagnostics(overrides: Partial<ExtractionDiagnostics> = {}): ExtractionDiagnostics {
   return {
-    scraperName: 'rightmove',
+    scraperName: 'uk_rightmove',
     fieldTraces: [
       { field: 'title', section: 'textFields', strategy: 'cssLocator:title', rawText: 'Test', value: 'Test' },
       { field: 'price_string', section: 'textFields', strategy: 'cssLocator:.price', rawText: '£500,000', value: '£500,000' },
@@ -67,8 +67,8 @@ describe('extraction-stats', () => {
     });
 
     it('returns summaries for stored listings with diagnostics', async () => {
-      await storeTestListing('rightmove', 'Test House', '£500,000', 'https://www.rightmove.co.uk/properties/123');
-      await storeTestListing('idealista', 'Piso en Madrid', '990.000', 'https://www.idealista.com/inmueble/456/');
+      await storeTestListing('uk_rightmove', 'Test House', '£500,000', 'https://www.rightmove.co.uk/properties/123');
+      await storeTestListing('es_idealista', 'Piso en Madrid', '990.000', 'https://www.idealista.com/inmueble/456/');
 
       const result = await getRecentExtractions();
       expect(result).toHaveLength(2);
@@ -77,19 +77,19 @@ describe('extraction-stats', () => {
     });
 
     it('respects limit parameter', async () => {
-      await storeTestListing('rightmove', 'House 1', '£100,000', 'https://example.com/1');
-      await storeTestListing('rightmove', 'House 2', '£200,000', 'https://example.com/2');
-      await storeTestListing('rightmove', 'House 3', '£300,000', 'https://example.com/3');
+      await storeTestListing('uk_rightmove', 'House 1', '£100,000', 'https://example.com/1');
+      await storeTestListing('uk_rightmove', 'House 2', '£200,000', 'https://example.com/2');
+      await storeTestListing('uk_rightmove', 'House 3', '£300,000', 'https://example.com/3');
 
       const result = await getRecentExtractions(2);
       expect(result).toHaveLength(2);
     });
 
     it('sorts by timestamp descending (most recent first)', async () => {
-      await storeTestListing('rightmove', 'Old House', '£100,000', 'https://example.com/old');
+      await storeTestListing('uk_rightmove', 'Old House', '£100,000', 'https://example.com/old');
       // Small delay to ensure different timestamp
       await new Promise(r => setTimeout(r, 5));
-      await storeTestListing('rightmove', 'New House', '£200,000', 'https://example.com/new');
+      await storeTestListing('uk_rightmove', 'New House', '£200,000', 'https://example.com/new');
 
       const result = await getRecentExtractions();
       expect(result[0].title).toBe('New House');
@@ -97,7 +97,7 @@ describe('extraction-stats', () => {
     });
 
     it('includes weighted extraction rate when present', async () => {
-      await storeTestListing('rightmove', 'Test', '£500', 'https://example.com/1', {
+      await storeTestListing('uk_rightmove', 'Test', '£500', 'https://example.com/1', {
         weightedExtractionRate: 0.65,
       });
 
@@ -106,7 +106,7 @@ describe('extraction-stats', () => {
     });
 
     it('includes critical fields missing when present', async () => {
-      await storeTestListing('rightmove', 'Test', '£500', 'https://example.com/1', {
+      await storeTestListing('uk_rightmove', 'Test', '£500', 'https://example.com/1', {
         criticalFieldsMissing: ['title', 'price_string'],
       });
 
@@ -127,8 +127,8 @@ describe('extraction-stats', () => {
 
   describe('getScraperStats', () => {
     it('returns stats for a known scraper with no extractions', async () => {
-      const stats = await getScraperStats('rightmove');
-      expect(stats.name).toBe('rightmove');
+      const stats = await getScraperStats('uk_rightmove');
+      expect(stats.name).toBe('uk_rightmove');
       expect(stats.loaded).toBe(true);
       expect(stats.extractionCount).toBe(0);
       expect(stats.avgExtractionRate).toBe(0);
@@ -142,55 +142,55 @@ describe('extraction-stats', () => {
     });
 
     it('counts extractions and computes average rate', async () => {
-      await storeTestListing('rightmove', 'House 1', '£100', 'https://example.com/1', {
+      await storeTestListing('uk_rightmove', 'House 1', '£100', 'https://example.com/1', {
         extractionRate: 0.8,
       });
-      await storeTestListing('rightmove', 'House 2', '£200', 'https://example.com/2', {
+      await storeTestListing('uk_rightmove', 'House 2', '£200', 'https://example.com/2', {
         extractionRate: 0.6,
       });
 
-      const stats = await getScraperStats('rightmove');
+      const stats = await getScraperStats('uk_rightmove');
       expect(stats.extractionCount).toBe(2);
       expect(stats.avgExtractionRate).toBeCloseTo(0.7, 1);
     });
 
     it('tracks grade distribution', async () => {
-      await storeTestListing('rightmove', 'A House', '£100', 'https://example.com/1', {
+      await storeTestListing('uk_rightmove', 'A House', '£100', 'https://example.com/1', {
         qualityGrade: 'A',
       });
-      await storeTestListing('rightmove', 'C House', '£200', 'https://example.com/2', {
+      await storeTestListing('uk_rightmove', 'C House', '£200', 'https://example.com/2', {
         qualityGrade: 'C',
       });
-      await storeTestListing('rightmove', 'C House 2', '£300', 'https://example.com/3', {
+      await storeTestListing('uk_rightmove', 'C House 2', '£300', 'https://example.com/3', {
         qualityGrade: 'C',
       });
 
-      const stats = await getScraperStats('rightmove');
+      const stats = await getScraperStats('uk_rightmove');
       expect(stats.gradeDistribution.A).toBe(1);
       expect(stats.gradeDistribution.C).toBe(2);
       expect(stats.gradeDistribution.F).toBe(0);
     });
 
     it('tracks field success rates from traces', async () => {
-      await storeTestListing('rightmove', 'House', '£100', 'https://example.com/1', {
+      await storeTestListing('uk_rightmove', 'House', '£100', 'https://example.com/1', {
         fieldTraces: [
           { field: 'title', section: 'textFields', strategy: 'css', rawText: 'Test', value: 'Test' },
           { field: 'price_string', section: 'textFields', strategy: 'css', rawText: '', value: '' },
         ],
       });
 
-      const stats = await getScraperStats('rightmove');
+      const stats = await getScraperStats('uk_rightmove');
       expect(stats.fieldSuccessRates['title']).toBe(1);
       expect(stats.fieldSuccessRates['price_string']).toBe(0);
     });
 
     it('includes expected extraction rate from mapping', async () => {
-      const stats = await getScraperStats('rightmove');
-      expect(stats.expectedExtractionRate).toBe(0.90);
+      const stats = await getScraperStats('uk_rightmove');
+      expect(stats.expectedExtractionRate).toBe(0.85);
     });
 
     it('lists hosts for the scraper', async () => {
-      const stats = await getScraperStats('rightmove');
+      const stats = await getScraperStats('uk_rightmove');
       expect(stats.hosts).toContain('www.rightmove.co.uk');
     });
   });
@@ -200,8 +200,8 @@ describe('extraction-stats', () => {
       const allStats = await getAllScraperStats();
       expect(allStats.length).toBeGreaterThan(0);
       const names = allStats.map(s => s.name);
-      expect(names).toContain('rightmove');
-      expect(names).toContain('idealista');
+      expect(names).toContain('uk_rightmove');
+      expect(names).toContain('es_idealista');
     });
   });
 
@@ -214,11 +214,11 @@ describe('extraction-stats', () => {
     });
 
     it('aggregates data across scrapers', async () => {
-      await storeTestListing('rightmove', 'RM House', '£100', 'https://example.com/1', {
+      await storeTestListing('uk_rightmove', 'RM House', '£100', 'https://example.com/1', {
         extractionRate: 0.8,
         qualityGrade: 'A',
       });
-      await storeTestListing('idealista', 'ID House', '100.000', 'https://example.com/2', {
+      await storeTestListing('es_idealista', 'ID House', '100.000', 'https://example.com/2', {
         extractionRate: 0.6,
         qualityGrade: 'C',
       });
@@ -228,13 +228,13 @@ describe('extraction-stats', () => {
       expect(overview.avgExtractionRate).toBeCloseTo(0.7, 1);
       expect(overview.gradeDistribution.A).toBe(1);
       expect(overview.gradeDistribution.C).toBe(1);
-      expect(overview.scraperUsage['rightmove']).toBe(1);
-      expect(overview.scraperUsage['idealista']).toBe(1);
+      expect(overview.scraperUsage['uk_rightmove']).toBe(1);
+      expect(overview.scraperUsage['es_idealista']).toBe(1);
     });
 
     it('limits recent extractions to 10', async () => {
       for (let i = 0; i < 15; i++) {
-        await storeTestListing('rightmove', `House ${i}`, '£100', `https://example.com/${i}`);
+        await storeTestListing('uk_rightmove', `House ${i}`, '£100', `https://example.com/${i}`);
       }
 
       const overview = await getSystemOverview();

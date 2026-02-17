@@ -1,6 +1,6 @@
 [
 {
-  "name": "rightmove_v2",
+  "name": "uk_rightmove",
   "expectedExtractionRate": 0.85,
   "defaultValues":
   {

@@ -18,8 +18,9 @@ module PropertyWebScraper
     use_multiple_files
     # when adding new files, need to restart server and ensure correct name
     # is used in corresponding json file
-    set_filenames 'pwb', 'mlslistings', 'realtor', 'fotocasa',
-      'idealista', 'zoopla', 'rightmove', 'wyomingmls', 'carusoimmobiliare',
-      'forsalebyowner', 'realestateindia', 'cerdfw', 'pisos', 'inmo1'
+    set_filenames 'us_mlslistings', 'us_realtor', 'es_fotocasa',
+      'es_idealista', 'uk_zoopla', 'uk_rightmove', 'us_wyomingmls', 'it_carusoimmobiliare',
+      'us_forsalebyowner', 'in_realestateindia', 'us_cerdfw', 'es_pisos', 'es_inmo1',
+      'uk_jitty', 'uk_onthemarket', 'ie_daft', 'es_weebrix'
   end
 end

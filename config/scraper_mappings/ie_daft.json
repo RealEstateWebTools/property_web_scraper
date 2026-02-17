@@ -1,5 +1,5 @@
 [{
-  "name": "daft",
+  "name": "ie_daft",
   "expectedExtractionRate": 0.90,
   "defaultValues": {
     "country": { "value": "Ireland" },
