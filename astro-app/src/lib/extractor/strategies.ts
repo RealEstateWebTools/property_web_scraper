@@ -137,7 +137,7 @@ export function getOrParseScriptJson($: cheerio.CheerioAPI, varName: string): un
     }
   }
 
-  // Strategy 2: Look for window.VAR = {...} assignment
+  // Strategy 2: Look for window.VAR = {...} or window.VAR = JSON.parse("...") assignment
   if (result === undefined) {
     const pattern = new RegExp(`(?:window\\.)?${varName}\\s*=\\s*`);
 
@@ -147,14 +147,48 @@ export function getOrParseScriptJson($: cheerio.CheerioAPI, varName: string): un
       const match = pattern.exec(text);
       if (!match) return;
 
-      const jsonStart = match.index + match[0].length;
-      // Find the JSON by counting braces
+      const afterEquals = match.index + match[0].length;
+      const rest = text.slice(afterEquals);
+
+      // Strategy 2a: JSON.parse("...") pattern (e.g. fotocasa __INITIAL_PROPS__)
+      if (rest.startsWith('JSON.parse(')) {
+        const innerStart = afterEquals + 'JSON.parse('.length;
+        const quote = text[innerStart];
+        if (quote === '"' || quote === "'") {
+          // Find matching closing quote + )
+          let i = innerStart + 1;
+          let str = '';
+          while (i < text.length) {
+            if (text[i] === '\\' && i + 1 < text.length) {
+              str += text[i] + text[i + 1];
+              i += 2;
+              continue;
+            }
+            if (text[i] === quote) break;
+            str += text[i];
+            i++;
+          }
+          if (text[i] === quote) {
+            try {
+              // The string content is already escaped JS — parse as JSON string
+              // to unescape \" sequences, then parse the result as JSON
+              const unescaped = JSON.parse('"' + str + '"');
+              result = JSON.parse(unescaped);
+            } catch {
+              // malformed JSON
+            }
+          }
+        }
+        return;
+      }
+
+      // Strategy 2b: Direct {...} or [...] assignment (brace counting)
       let depth = 0;
       let inString = false;
       let escaped = false;
-      let end = jsonStart;
+      let end = afterEquals;
 
-      for (let i = jsonStart; i < text.length; i++) {
+      for (let i = afterEquals; i < text.length; i++) {
         const ch = text[i];
         if (escaped) { escaped = false; continue; }
         if (ch === '\\') { escaped = true; continue; }
@@ -167,9 +201,9 @@ export function getOrParseScriptJson($: cheerio.CheerioAPI, varName: string): un
         }
       }
 
-      if (end > jsonStart) {
+      if (end > afterEquals) {
         try {
-          result = JSON.parse(text.slice(jsonStart, end));
+          result = JSON.parse(text.slice(afterEquals, end));
         } catch {
           // malformed JSON
         }

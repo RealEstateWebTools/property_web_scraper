@@ -30,10 +30,10 @@
     },
     {
       "scraper": "es_fotocasa",
-      "grade": "B",
-      "extractionRate": 0.42857142857142855,
-      "populatedFields": 11,
-      "totalFields": 19
+      "grade": "F",
+      "extractionRate": 0.05263157894736842,
+      "populatedFields": 6,
+      "totalFields": 24
     },
     {
       "scraper": "es_pisos",
@@ -92,5 +92,5 @@
       "totalFields": 23
     }
   ],
-  "savedAt": "2026-02-17T22:26:54.929Z"
+  "savedAt": "2026-02-17T22:37:21.915Z"
 }

@@ -1,6 +1,6 @@
 [{
   "name": "es_fotocasa",
-  "expectedExtractionRate": 0.35,
+  "expectedExtractionRate": 0.70,
   "defaultValues": {
     "country": {
       "value": "Spain"
@@ -18,78 +18,110 @@
       "value": "es"
     }
   },
-  "floatFields": {
-    "constructed_area": {
-      "cssLocator": "#main > div > div > section > div.info-data > span:nth-child(2) > span"
-    },
-    "price_float": {
-      "cssLocator": "#priceContainer",
-      "stripPunct": "true"
-    },
-    "latitude":
+  "images": [
     {
-      // below is actually "latitude:[^\,]*" but had to escape the \
-      "scriptRegEx": "latitude:[^\\,]*",
-      "splitTextCharacter": "\"",
-      "splitTextArrayId": "1"
-    },
-    "longitude":
-    {
-      "scriptRegEx": "longitude:[^\\,]*",
-      "splitTextCharacter": "\"",
-      "splitTextArrayId": "1"
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.multimedia",
+      "cssAttr": "src"
     }
-  },
+  ],
   "intFields": {
     "count_bedrooms": {
-      "cssLocator": "#litRooms > b"
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.features.rooms",
+      "fallbacks": [
+        { "cssLocator": ".re-DetailHeader-rooms span span" }
+      ]
     },
     "count_bathrooms": {
-      "cssLocator": "#litBaths"
-    } 
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.features.bathrooms",
+      "fallbacks": [
+        { "cssLocator": ".re-DetailHeader-bathrooms span span" }
+      ]
+    }
+  },
+  "floatFields": {
+    "constructed_area": {
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.features.surface",
+      "fallbacks": [
+        { "cssLocator": ".re-DetailHeader-surface span span" }
+      ]
+    },
+    "price_float": {
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.price",
+      "fallbacks": [
+        { "cssLocator": ".re-DetailHeader-price", "stripPunct": "true" }
+      ]
+    },
+    "latitude": {
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.coordinates.latitude"
+    },
+    "longitude": {
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.coordinates.longitude"
+    }
   },
   "textFields": {
     "reference": {
-      "cssLocator": "input#hid_PropertyId",
-      "cssAttr": "value"
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.id"
     },
     "title": {
-      "cssLocator": "#property-title > h1"
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "title" }
+      ]
     },
     "description": {
-      "cssLocator": "#details > div.commentsContainer > div"
+      "cssLocator": "p.re-DetailDescription",
+      "fallbacks": [
+        { "cssLocator": "meta[name='description']", "cssAttr": "content" }
+      ]
     },
     "price_string": {
-      
-      "cssLocator": "#priceContainer"
+      "cssLocator": ".re-DetailHeader-price"
+    },
+    "address_string": {
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.address.neighborhood"
+    },
+    "postal_code": {
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.address.zipCode"
+    },
+    "city": {
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.address.city"
+    },
+    "region": {
+      "scriptJsonVar": "__INITIAL_PROPS__",
+      "scriptJsonPath": "realEstate.address.province"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
     }
   },
-  "images": [
-    {
-      "cssLocator": "#grid-multimedia img",
-      "stripString": ",WEB_DETAIL"
-    }
-  ],
   "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "2",
+      "evaluator": "==",
+      "evaluatorParam": "comprar"
+    },
     "for_rent": {
-      "cssLocator": ".txt-deposit",
+      "urlPathPart": "2",
       "evaluator": "include?",
-      "evaluatorParam": "ianza"
+      "evaluatorParam": "alquil"
     },
     "for_rent_long_term": {
-      "cssLocator": ".txt-deposit",
+      "urlPathPart": "2",
       "evaluator": "include?",
-      "evaluatorParam": "ianza"
-    },
-    "for_sale": {
-      "cssLocator": ".txt-mortgage",
-      "evaluator": "include?",
-      "evaluatorParam": "hipoteca"
-    }
-  },
-  "extraFields": {
-    "images": {
-      "imagesCssLocator": "#main-multimedia > div > img"
+      "evaluatorParam": "alquil"
     }
   }
 }]
