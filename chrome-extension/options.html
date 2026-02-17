@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Property Web Scraper — Settings</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f8f9fb;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+    }
+
+    .card-header h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .card-header p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #f8f9fb;
+      color: #1a1a2e;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      font-family: 'SF Mono', Monaco, 'Cascadia Mono', monospace;
+    }
+
+    input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .card-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-save {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .btn-save:hover {
+      background: #2563eb;
+    }
+
+    .status {
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .status.show {
+      opacity: 1;
+    }
+
+    .status.success { color: #16a34a; }
+    .status.error { color: #dc2626; }
+
+    .portals-section {
+      padding: 20px 24px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .portals-section h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .portal-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .portal-tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <h1>⚙️ Settings</h1>
+      <p>Configure your Property Web Scraper connection</p>
+    </div>
+
+    <div class="card-body">
+      <div class="field">
+        <label for="api-key">API Key</label>
+        <input type="password" id="api-key" placeholder="Enter your API key" />
+        <p class="hint">Your Property Web Scraper API key. Get one at your dashboard.</p>
+      </div>
+
+      <div class="field">
+        <label for="api-url">API URL</label>
+        <input type="text" id="api-url" placeholder="https://property-web-scraper.pages.dev" />
+        <p class="hint">Override this only if you're self-hosting. Default is the production URL.</p>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <span id="status" class="status"></span>
+      <button id="save-btn" class="btn btn-save">Save Settings</button>
+    </div>
+
+    <div class="portals-section">
+      <h3>Supported Portals (17)</h3>
+      <div class="portal-list">
+        <span class="portal-tag">🇬🇧 Rightmove</span>
+        <span class="portal-tag">🇬🇧 Zoopla</span>
+        <span class="portal-tag">🇬🇧 OnTheMarket</span>
+        <span class="portal-tag">🇪🇸 Idealista</span>
+        <span class="portal-tag">🇪🇸 Fotocasa</span>
+        <span class="portal-tag">🇪🇸 Pisos</span>
+        <span class="portal-tag">🇵🇹 Idealista PT</span>
+        <span class="portal-tag">🇮🇪 Daft</span>
+        <span class="portal-tag">🇺🇸 Realtor</span>
+        <span class="portal-tag">🇺🇸 ForSaleByOwner</span>
+        <span class="portal-tag">🇮🇳 RealEstateIndia</span>
+        <span class="portal-tag">🇳🇱 Jitty</span>
+        <span class="portal-tag">🇩🇪 ImmobilienScout24</span>
+        <span class="portal-tag">🇫🇷 SeLoger</span>
+        <span class="portal-tag">🇫🇷 Leboncoin</span>
+        <span class="portal-tag">🇦🇺 Domain</span>
+        <span class="portal-tag">🇦🇺 RealEstate.com.au</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
