@@ -15,13 +15,15 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.0.0",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.0.0",
     "bootstrap-icons": "^1.13.1",
     "cheerio": "^1.0.0",
     "json5": "^2.2.3",
     "sanitize-html": "^2.13.0",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

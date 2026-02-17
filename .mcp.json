@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "property-scraper": {
+      "command": "npx",
+      "args": ["tsx", "astro-app/mcp-server.ts"],
+      "cwd": "."
+    }
+  }
+}
