@@ -30,7 +30,7 @@ const TEXT_FIELDS = new Set([
 ]);
 
 const URL_FIELDS = new Set(['main_image_url']);
-const URL_ARRAY_FIELDS = new Set(['image_urls', 'related_urls']);
+const URL_ARRAY_FIELDS = new Set(['related_urls']);
 const SAFE_SCHEMES = new Set(['http:', 'https:']);
 
 /**
@@ -82,6 +82,16 @@ export function sanitizePropertyHash(hash: Record<string, unknown>): Record<stri
         .map(sanitizeUrl)
         .filter((url): url is string => url !== null);
     }
+  }
+
+  // Sanitize image_urls (array of ImageInfo objects)
+  if (Array.isArray(hash['image_urls'])) {
+    hash['image_urls'] = (hash['image_urls'] as Array<{ url: string }>)
+      .map((img) => {
+        const sanitized = sanitizeUrl(img.url);
+        return sanitized ? { ...img, url: sanitized } : null;
+      })
+      .filter((img): img is { url: string } => img !== null);
   }
 
   if (Array.isArray(hash['features'])) {

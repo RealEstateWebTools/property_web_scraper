@@ -197,13 +197,13 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   if (mapping.images) {
     for (const imageMapping of mapping.images) {
       propertyHash['image_urls'] = extractImages($, html, imageMapping, uri);
-      const urls = propertyHash['image_urls'] as string[];
+      const images = propertyHash['image_urls'] as Array<{ url: string }>;
       traces.push({
         field: 'image_urls',
         section: 'images',
         strategy: describeStrategy(imageMapping),
-        rawText: urls.length > 0 ? `${urls.length} images` : '',
-        value: urls,
+        rawText: images.length > 0 ? `${images.length} images` : '',
+        value: images,
       });
     }
   }

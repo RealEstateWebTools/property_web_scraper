@@ -14,7 +14,7 @@ export class PwbListing extends Listing {
   }
 
   get propertyPhotos(): Array<{ url: string }> {
-    return (this.image_urls || []).map((url) => ({ url }));
+    return (this.image_urls || []).map((img) => ({ url: img.url }));
   }
 
   override asJson(): Record<string, unknown> {

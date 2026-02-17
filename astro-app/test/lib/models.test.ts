@@ -36,7 +36,7 @@ describe('Models', () => {
         price_float: 750000,
         currency: 'EUR',
         count_bedrooms: 4,
-        image_urls: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
+        image_urls: [{ url: 'https://example.com/img1.jpg' }, { url: 'https://example.com/img2.jpg' }],
         for_sale: true,
       };
 
@@ -110,7 +110,7 @@ describe('Models', () => {
 
     it('computes property_photos', () => {
       const listing = new PwbListing();
-      listing.image_urls = ['https://example.com/1.jpg', 'https://example.com/2.jpg'];
+      listing.image_urls = [{ url: 'https://example.com/1.jpg' }, { url: 'https://example.com/2.jpg' }];
       expect(listing.propertyPhotos).toEqual([
         { url: 'https://example.com/1.jpg' },
         { url: 'https://example.com/2.jpg' },

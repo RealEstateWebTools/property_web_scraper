@@ -2,9 +2,10 @@ import type { CheerioAPI, Cheerio, AnyNode } from 'cheerio';
 import type { FieldMapping } from './mapping-loader.js';
 import { getTextFromCss, cleanUpString, getOrParseScriptJson, getByDotPath } from './strategies.js';
 import { normalizeImageUrl } from './image-normalizer.js';
+import type { ImageInfo } from '../types/image-info.js';
 
 /**
- * Extract an array of image URLs from HTML.
+ * Extract an array of image objects from HTML.
  * Port of Ruby retrieve_images_array.
  */
 export function extractImages(
@@ -12,7 +13,7 @@ export function extractImages(
   html: string,
   mapping: FieldMapping,
   uri: URL
-): string[] {
+): ImageInfo[] {
   const retrieved: string[] = [];
 
   // Script JSON path strategy — extract image URLs from embedded JSON
@@ -61,12 +62,13 @@ export function extractImages(
     console.warn(`[ImageExtractor] XPath is no longer supported, skipping: ${mapping.xpath}`);
   }
 
-  // Clean up all results, then normalize URLs
+  // Clean up all results, normalize URLs, wrap as ImageInfo objects
   return retrieved
     .map((s) => cleanUpString(s, mapping))
     .map((url) => normalizeImageUrl(url, {
       enforceHttps: true,
       thumbnailPatterns: mapping.thumbnailPatterns,
     }))
-    .filter((url): url is string => url !== null);
+    .filter((url): url is string => url !== null)
+    .map((url) => ({ url }));
 }

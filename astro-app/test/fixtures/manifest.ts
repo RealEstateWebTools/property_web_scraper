@@ -170,9 +170,9 @@ export const fixtures: FixtureEntry[] = [
       for_sale: true,
       for_rent: false,
       image_urls: [
-        'https://media.rightmove.co.uk/property-photo/799f82da2/168908774/799f82da296fe5e11e0c47c124f200b5.jpeg',
-        'https://media.rightmove.co.uk/property-photo/799f82da2/168908774/img2.jpeg',
-        'https://media.rightmove.co.uk/property-photo/799f82da2/168908774/img3.jpeg',
+        { url: 'https://media.rightmove.co.uk/property-photo/799f82da2/168908774/799f82da296fe5e11e0c47c124f200b5.jpeg' },
+        { url: 'https://media.rightmove.co.uk/property-photo/799f82da2/168908774/img2.jpeg' },
+        { url: 'https://media.rightmove.co.uk/property-photo/799f82da2/168908774/img3.jpeg' },
       ],
       features: [
         'Ground floor apartment',
@@ -254,8 +254,8 @@ export const fixtures: FixtureEntry[] = [
       for_sale: true,
       for_rent: false,
       image_urls: [
-        'https://media.onthemarket.com/properties/15269498/img_0_0_ls.jpg',
-        'https://media.onthemarket.com/properties/15269498/img_1_0_ls.jpg',
+        { url: 'https://media.onthemarket.com/properties/15269498/img_0_0_ls.jpg' },
+        { url: 'https://media.onthemarket.com/properties/15269498/img_1_0_ls.jpg' },
       ],
       features: [
         'Garden',
@@ -288,7 +288,7 @@ export const fixtures: FixtureEntry[] = [
       for_sale: true,
       for_rent: false,
       image_urls: [
-        'https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYS1tYXN0ZXIiLCJrZXkiOiIxL2UvMTIzNDU2NzguanBnIn0=/image.jpg',
+        { url: 'https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYS1tYXN0ZXIiLCJrZXkiOiIxL2UvMTIzNDU2NzguanBnIn0=/image.jpg' },
       ],
     },
   },
@@ -315,8 +315,8 @@ export const fixtures: FixtureEntry[] = [
       for_sale: true,
       for_rent: false,
       image_urls: [
-        'https://img3.idealista.com/blur/WEB_DETAIL/0/id.pro.es/46/12/34/567890123_xxl.jpg',
-        'https://img3.idealista.com/blur/WEB_DETAIL/0/id.pro.es/46/12/34/567890124_xxl.jpg',
+        { url: 'https://img3.idealista.com/blur/WEB_DETAIL/0/id.pro.es/46/12/34/567890123_xxl.jpg' },
+        { url: 'https://img3.idealista.com/blur/WEB_DETAIL/0/id.pro.es/46/12/34/567890124_xxl.jpg' },
       ],
     },
   },

@@ -15,7 +15,7 @@ describe('extractImages', () => {
     const mapping = makeMapping();
 
     const result = extractImages($, html, mapping, uri);
-    expect(result).toEqual(['https://example.com/a.jpg', 'https://example.com/b.jpg']);
+    expect(result).toEqual([{ url: 'https://example.com/a.jpg' }, { url: 'https://example.com/b.jpg' }]);
   });
 
   it('converts relative URLs to absolute using source URL', () => {
@@ -25,7 +25,7 @@ describe('extractImages', () => {
     const mapping = makeMapping();
 
     const result = extractImages($, html, mapping, uri);
-    expect(result).toEqual(['https://example.com/images/photo.jpg']);
+    expect(result).toEqual([{ url: 'https://example.com/images/photo.jpg' }]);
   });
 
   it('applies imagePathPrefix to relative URLs', () => {
@@ -35,7 +35,7 @@ describe('extractImages', () => {
     const mapping = makeMapping({ imagePathPrefix: '/cdn' });
 
     const result = extractImages($, html, mapping, uri);
-    expect(result).toEqual(['https://example.com/cdn/photo.jpg']);
+    expect(result).toEqual([{ url: 'https://example.com/cdn/photo.jpg' }]);
   });
 
   it('does not apply imagePathPrefix to absolute URLs', () => {
@@ -45,7 +45,7 @@ describe('extractImages', () => {
     const mapping = makeMapping({ imagePathPrefix: '/cdn' });
 
     const result = extractImages($, html, mapping, uri);
-    expect(result).toEqual(['https://cdn.example.com/photo.jpg']);
+    expect(result).toEqual([{ url: 'https://cdn.example.com/photo.jpg' }]);
   });
 
   it('returns empty array when no elements match', () => {
@@ -75,7 +75,7 @@ describe('extractImages', () => {
     const mapping = makeMapping({ stripString: '?v=123' });
 
     const result = extractImages($, html, mapping, uri);
-    expect(result).toEqual(['https://example.com/photo.jpg']);
+    expect(result).toEqual([{ url: 'https://example.com/photo.jpg' }]);
   });
 
   it('warns but does not crash on xpath mapping', () => {
@@ -98,6 +98,6 @@ describe('extractImages', () => {
     const mapping: FieldMapping = { cssLocator: 'div.img', cssAttr: 'data-src' };
 
     const result = extractImages($, html, mapping, uri);
-    expect(result).toEqual(['https://example.com/lazy.jpg']);
+    expect(result).toEqual([{ url: 'https://example.com/lazy.jpg' }]);
   });
 });
