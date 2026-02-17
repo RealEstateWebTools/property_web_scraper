@@ -34,10 +34,10 @@ export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/webhooks';
 
-  const auth = authenticateApiKey(request);
+  const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request);
+  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   let body: { url?: string; events?: string[]; secret?: string };
@@ -105,7 +105,7 @@ export const POST: APIRoute = async ({ request }) => {
  * GET /public_api/v1/webhooks — List registered webhooks.
  */
 export const GET: APIRoute = async ({ request }) => {
-  const auth = authenticateApiKey(request);
+  const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
   const webhooks = await listWebhooks();
@@ -126,7 +126,7 @@ export const DELETE: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/webhooks';
 
-  const auth = authenticateApiKey(request);
+  const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
   const id = new URL(request.url).searchParams.get('id');

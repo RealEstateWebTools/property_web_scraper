@@ -11,10 +11,10 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
   const startTime = Date.now();
   const path = `/public_api/v1/listings/${params.id}/scrapes`;
 
-  const auth = authenticateApiKey(request);
+  const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request);
+  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   const id = params.id;

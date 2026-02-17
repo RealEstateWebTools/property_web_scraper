@@ -48,10 +48,10 @@ export const GET: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/listings';
 
-  const auth = authenticateApiKey(request);
+  const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request);
+  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   const url = new URL(request.url).searchParams.get('url');
@@ -139,10 +139,10 @@ export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/listings';
 
-  const auth = authenticateApiKey(request);
+  const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request);
+  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   const contentType = request.headers.get('content-type') || '';

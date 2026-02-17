@@ -1,60 +1,82 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+
+// Mock api-key-service so auth.ts can import it
+vi.mock('../../src/lib/services/api-key-service.js', () => ({
+  validateApiKey: vi.fn().mockResolvedValue(null),
+}));
+
 import {
   authenticateApiKey,
   extractHtmlInput,
   validateUrlLength,
   MAX_HTML_SIZE,
 } from '../../src/lib/services/auth.js';
-
-// Mock import.meta.env for auth tests
-const originalEnv = import.meta.env;
+import { validateApiKey as mockValidateApiKey } from '../../src/lib/services/api-key-service.js';
 
 describe('authenticateApiKey', () => {
   afterEach(() => {
-    // Restore env
     import.meta.env.PWS_API_KEY = '';
+    vi.mocked(mockValidateApiKey).mockReset().mockResolvedValue(null);
   });
 
-  it('skips auth when no key is configured (backwards compatible)', () => {
+  it('skips auth when no key is configured (backwards compatible)', async () => {
     import.meta.env.PWS_API_KEY = '';
     const request = new Request('http://localhost/api/test');
-    const result = authenticateApiKey(request);
+    const result = await authenticateApiKey(request);
     expect(result.authorized).toBe(true);
-    expect(result.errorResponse).toBeUndefined();
+    expect(result.userId).toBe('anonymous');
+    expect(result.tier).toBe('free');
   });
 
-  it('authorizes when valid key is provided via header', () => {
+  it('authorizes master key via header with enterprise tier', async () => {
     import.meta.env.PWS_API_KEY = 'secret-key-123';
     const request = new Request('http://localhost/api/test', {
       headers: { 'X-Api-Key': 'secret-key-123' },
     });
-    const result = authenticateApiKey(request);
+    const result = await authenticateApiKey(request);
     expect(result.authorized).toBe(true);
-    expect(result.errorResponse).toBeUndefined();
+    expect(result.userId).toBe('master');
+    expect(result.tier).toBe('enterprise');
   });
 
-  it('authorizes when valid key is provided via query param', () => {
+  it('authorizes master key via query param', async () => {
     import.meta.env.PWS_API_KEY = 'secret-key-123';
     const request = new Request('http://localhost/api/test?api_key=secret-key-123');
-    const result = authenticateApiKey(request);
+    const result = await authenticateApiKey(request);
     expect(result.authorized).toBe(true);
-    expect(result.errorResponse).toBeUndefined();
+    expect(result.userId).toBe('master');
   });
 
-  it('rejects when invalid key is provided', () => {
+  it('authorizes per-user key when api-key-service validates', async () => {
+    import.meta.env.PWS_API_KEY = 'master';
+    vi.mocked(mockValidateApiKey).mockResolvedValue({
+      userId: 'user-42',
+      tier: 'starter',
+      label: 'my-key',
+    });
+    const request = new Request('http://localhost/api/test', {
+      headers: { 'X-Api-Key': 'pws_live_0123456789abcdef0123456789abcdef' },
+    });
+    const result = await authenticateApiKey(request);
+    expect(result.authorized).toBe(true);
+    expect(result.userId).toBe('user-42');
+    expect(result.tier).toBe('starter');
+  });
+
+  it('rejects when invalid key is provided', async () => {
     import.meta.env.PWS_API_KEY = 'secret-key-123';
     const request = new Request('http://localhost/api/test', {
       headers: { 'X-Api-Key': 'wrong-key' },
     });
-    const result = authenticateApiKey(request);
+    const result = await authenticateApiKey(request);
     expect(result.authorized).toBe(false);
     expect(result.errorResponse).toBeInstanceOf(Response);
   });
 
-  it('rejects when no key is provided but one is expected', () => {
+  it('rejects when no key is provided but one is expected', async () => {
     import.meta.env.PWS_API_KEY = 'secret-key-123';
     const request = new Request('http://localhost/api/test');
-    const result = authenticateApiKey(request);
+    const result = await authenticateApiKey(request);
     expect(result.authorized).toBe(false);
     expect(result.errorResponse).toBeInstanceOf(Response);
   });
@@ -62,20 +84,30 @@ describe('authenticateApiKey', () => {
   it('error response has 401 status', async () => {
     import.meta.env.PWS_API_KEY = 'secret-key-123';
     const request = new Request('http://localhost/api/test');
-    const result = authenticateApiKey(request);
+    const result = await authenticateApiKey(request);
     expect(result.errorResponse!.status).toBe(401);
     const body = await result.errorResponse!.json();
     expect(body.success).toBe(false);
     expect(body.error.code).toBe('UNAUTHORIZED');
   });
 
-  it('prefers header over query param', () => {
+  it('prefers header over query param', async () => {
     import.meta.env.PWS_API_KEY = 'secret-key-123';
     const request = new Request('http://localhost/api/test?api_key=wrong', {
       headers: { 'X-Api-Key': 'secret-key-123' },
     });
-    const result = authenticateApiKey(request);
+    const result = await authenticateApiKey(request);
     expect(result.authorized).toBe(true);
+  });
+
+  it('rejects pws_live_ key when api-key-service returns null', async () => {
+    import.meta.env.PWS_API_KEY = 'master';
+    vi.mocked(mockValidateApiKey).mockResolvedValue(null);
+    const request = new Request('http://localhost/api/test', {
+      headers: { 'X-Api-Key': 'pws_live_invalidinvalidinvalidinvalid' },
+    });
+    const result = await authenticateApiKey(request);
+    expect(result.authorized).toBe(false);
   });
 });
 
