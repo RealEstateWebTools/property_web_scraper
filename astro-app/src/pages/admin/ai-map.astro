@@ -1,0 +1,393 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="AI Mapping Generator" activePage="ai-map">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">AI Mapping Generator</h1>
+        <p class="text-sm text-gray-500 mt-1">Generate scraper mappings from listing page HTML using AI</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-gray-600">Provider:</label>
+        <select id="provider" class="rounded border-gray-300 text-sm px-2 py-1">
+          <option value="gemini">Gemini</option>
+          <option value="openai">OpenAI</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 1: Input -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">1</span>
+        Input HTML
+      </h2>
+      <div class="grid grid-cols-1 gap-4">
+        <div class="flex gap-4 items-end">
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Listing URL</label>
+            <input type="url" id="sourceUrl" placeholder="https://www.rightmove.co.uk/properties/123456"
+                   class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+          <button id="fetchBtn" class="px-4 py-2 bg-gray-600 text-white rounded-md text-sm font-medium hover:bg-gray-700 transition whitespace-nowrap">
+            Fetch HTML
+          </button>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Scraper Name</label>
+          <input type="text" id="scraperName" placeholder="e.g. de_immoscout"
+                 class="w-full max-w-xs border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            HTML Content
+            <span id="htmlSize" class="text-gray-400 font-normal ml-2"></span>
+          </label>
+          <textarea id="htmlInput" rows="8" placeholder="Paste listing page HTML here, or use Fetch HTML above..."
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+        <div class="flex gap-3">
+          <button id="analyzeBtn" class="px-4 py-2 bg-gray-500 text-white rounded-md text-sm font-medium hover:bg-gray-600 transition">
+            Analyze Structure
+          </button>
+          <button id="generateBtn" class="px-5 py-2 bg-blue-600 text-white rounded-md text-sm font-bold hover:bg-blue-700 transition flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Generate Mapping
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analysis Results (hidden initially) -->
+    <div id="analysisPanel" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 hidden">
+      <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-100 text-purple-700 text-xs font-bold">⚡</span>
+        HTML Analysis
+      </h2>
+      <div id="analysisContent" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+    </div>
+
+    <!-- Step 2: Generated Mapping -->
+    <div id="resultPanel" class="hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Left: Mapping JSON -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-700 text-xs font-bold">2</span>
+              Draft Mapping
+            </h2>
+            <div class="flex items-center gap-2">
+              <span id="confidenceBadge" class="text-xs font-medium px-2 py-1 rounded-full"></span>
+              <button id="copyBtn" class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition">Copy</button>
+            </div>
+          </div>
+          <textarea id="mappingEditor" rows="20"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"></textarea>
+          <div id="mappingNotes" class="mt-3 space-y-1"></div>
+          <div class="mt-4 flex gap-3">
+            <button id="testBtn" class="px-4 py-2 bg-amber-500 text-white rounded-md text-sm font-medium hover:bg-amber-600 transition">
+              Test Extraction
+            </button>
+            <button id="saveBtn" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-bold hover:bg-green-700 transition">
+              Save Mapping
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Test Results -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">3</span>
+            Test Results
+          </h2>
+          <div id="testResults" class="text-sm text-gray-500">
+            <p>Click "Test Extraction" to preview results using the draft mapping.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/30 items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-xl p-8 shadow-2xl flex flex-col items-center gap-4">
+        <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p id="loadingText" class="text-sm text-gray-600">Analyzing...</p>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  const htmlInput = document.getElementById('htmlInput') as HTMLTextAreaElement;
+  const sourceUrl = document.getElementById('sourceUrl') as HTMLInputElement;
+  const scraperName = document.getElementById('scraperName') as HTMLInputElement;
+  const provider = document.getElementById('provider') as HTMLSelectElement;
+  const htmlSize = document.getElementById('htmlSize') as HTMLSpanElement;
+  const fetchBtn = document.getElementById('fetchBtn') as HTMLButtonElement;
+  const analyzeBtn = document.getElementById('analyzeBtn') as HTMLButtonElement;
+  const generateBtn = document.getElementById('generateBtn') as HTMLButtonElement;
+  const testBtn = document.getElementById('testBtn') as HTMLButtonElement;
+  const saveBtn = document.getElementById('saveBtn') as HTMLButtonElement;
+  const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+  const analysisPanel = document.getElementById('analysisPanel') as HTMLDivElement;
+  const analysisContent = document.getElementById('analysisContent') as HTMLDivElement;
+  const resultPanel = document.getElementById('resultPanel') as HTMLDivElement;
+  const mappingEditor = document.getElementById('mappingEditor') as HTMLTextAreaElement;
+  const mappingNotes = document.getElementById('mappingNotes') as HTMLDivElement;
+  const confidenceBadge = document.getElementById('confidenceBadge') as HTMLSpanElement;
+  const testResults = document.getElementById('testResults') as HTMLDivElement;
+  const loadingOverlay = document.getElementById('loadingOverlay') as HTMLDivElement;
+  const loadingText = document.getElementById('loadingText') as HTMLParagraphElement;
+
+  // Update HTML size counter
+  htmlInput.addEventListener('input', () => {
+    const kb = (htmlInput.value.length / 1024).toFixed(1);
+    htmlSize.textContent = htmlInput.value.length > 0 ? `(${kb} KB)` : '';
+  });
+
+  function showLoading(msg: string) {
+    loadingText.textContent = msg;
+    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.classList.add('flex');
+  }
+
+  function hideLoading() {
+    loadingOverlay.classList.add('hidden');
+    loadingOverlay.classList.remove('flex');
+  }
+
+  // Fetch HTML from URL
+  fetchBtn.addEventListener('click', async () => {
+    const url = sourceUrl.value.trim();
+    if (!url) return alert('Enter a URL first');
+    showLoading('Fetching page...');
+    try {
+      const resp = await fetch(`/admin/api/ai-map`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html: '<fetch>', sourceUrl: url, analyzeOnly: true }),
+      });
+      // For now, use a proxy approach — the user pastes HTML directly
+      // or we could add a fetch-html admin endpoint later
+      hideLoading();
+      alert('Paste the HTML directly for now. A fetch proxy endpoint can be added later.');
+    } catch (err) {
+      hideLoading();
+      alert('Error: ' + (err as Error).message);
+    }
+  });
+
+  // Auto-generate scraper name from URL
+  sourceUrl.addEventListener('blur', () => {
+    if (scraperName.value) return;
+    try {
+      const url = new URL(sourceUrl.value);
+      const host = url.hostname.replace('www.', '');
+      const parts = host.split('.');
+      const name = parts[0].replace(/[^a-z0-9]/g, '');
+      scraperName.value = name ? `xx_${name}` : '';
+    } catch { /* ignore */ }
+  });
+
+  // Analyze HTML structure
+  analyzeBtn.addEventListener('click', async () => {
+    if (!htmlInput.value.trim()) return alert('Paste HTML first');
+    showLoading('Analyzing HTML structure...');
+    try {
+      const resp = await fetch('/admin/api/ai-map', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html: htmlInput.value, analyzeOnly: true }),
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+      renderAnalysis(data.analysis);
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      hideLoading();
+    }
+  });
+
+  function renderAnalysis(analysis: any) {
+    analysisPanel.classList.remove('hidden');
+    const cards = [
+      { label: 'Size', value: `${(analysis.htmlLength / 1024).toFixed(0)} KB`, color: 'blue' },
+      { label: 'Source', value: analysis.detectedSource, color: 'purple' },
+      { label: 'JSON-LD', value: analysis.hasJsonLd ? `✅ ${analysis.jsonLdTypes.join(', ')}` : '❌ None', color: analysis.hasJsonLd ? 'green' : 'gray' },
+      { label: 'Script Vars', value: analysis.scriptVars.length > 0 ? `✅ ${analysis.scriptVars.join(', ')}` : '❌ None', color: analysis.scriptVars.length > 0 ? 'green' : 'gray' },
+    ];
+    analysisContent.innerHTML = cards.map(c => `
+      <div class="bg-${c.color}-50 border border-${c.color}-200 rounded-lg p-3">
+        <div class="text-xs font-medium text-${c.color}-600 uppercase">${c.label}</div>
+        <div class="text-sm font-semibold text-${c.color}-900 mt-1">${c.value}</div>
+      </div>
+    `).join('');
+  }
+
+  // Generate mapping via LLM
+  generateBtn.addEventListener('click', async () => {
+    if (!htmlInput.value.trim()) return alert('Paste HTML first');
+    if (!scraperName.value.trim()) return alert('Enter a scraper name');
+    if (!sourceUrl.value.trim()) return alert('Enter the source URL');
+
+    showLoading('Generating mapping with AI... (this may take 10-30 seconds)');
+    try {
+      const resp = await fetch('/admin/api/ai-map', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          html: htmlInput.value,
+          sourceUrl: sourceUrl.value,
+          scraperName: scraperName.value,
+          provider: provider.value,
+        }),
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+      renderSuggestion(data);
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      hideLoading();
+    }
+  });
+
+  function renderSuggestion(suggestion: any) {
+    resultPanel.classList.remove('hidden');
+
+    // Format mapping as JSON array (matches existing file format)
+    const mappingJson = JSON.stringify([suggestion.mapping], null, 2);
+    mappingEditor.value = mappingJson;
+
+    // Confidence badge
+    const conf = suggestion.confidence;
+    const confColor = conf >= 0.7 ? 'green' : conf >= 0.4 ? 'amber' : 'red';
+    confidenceBadge.textContent = `${Math.round(conf * 100)}% confidence`;
+    confidenceBadge.className = `text-xs font-medium px-2 py-1 rounded-full bg-${confColor}-100 text-${confColor}-700`;
+
+    // Notes
+    mappingNotes.innerHTML = suggestion.notes.map((n: string) =>
+      `<p class="text-xs text-gray-600">${n}</p>`
+    ).join('');
+  }
+
+  // Copy mapping to clipboard
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(mappingEditor.value);
+    copyBtn.textContent = 'Copied!';
+    setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+  });
+
+  // Test extraction with the draft mapping
+  testBtn.addEventListener('click', async () => {
+    if (!htmlInput.value.trim() || !mappingEditor.value.trim()) return;
+
+    showLoading('Testing extraction...');
+    try {
+      // Parse the mapping from the editor
+      let mapping;
+      try {
+        const parsed = JSON.parse(mappingEditor.value);
+        mapping = Array.isArray(parsed) ? parsed[0] : parsed;
+      } catch (e) {
+        throw new Error('Invalid JSON in mapping editor');
+      }
+
+      const resp = await fetch('/admin/scrapers/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scraper: mapping.name,
+          html: htmlInput.value,
+          sourceUrl: sourceUrl.value || 'https://example.com/test',
+        }),
+      });
+      const data = await resp.json();
+      renderTestResults(data);
+    } catch (err) {
+      testResults.innerHTML = `<p class="text-red-600 font-medium">${(err as Error).message}</p>`;
+    } finally {
+      hideLoading();
+    }
+  });
+
+  function renderTestResults(data: any) {
+    if (data.error) {
+      testResults.innerHTML = `<p class="text-red-600">${data.error}</p>`;
+      return;
+    }
+
+    const props = data.properties?.[0] || {};
+    const diag = data.diagnostics;
+
+    let html = '';
+
+    // Quality badge
+    if (diag) {
+      const gradeColor: Record<string, string> = { A: 'green', B: 'blue', C: 'amber', F: 'red' };
+      const gc = gradeColor[diag.qualityGrade] || 'gray';
+      html += `
+        <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
+          <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-${gc}-100 text-${gc}-700 font-bold text-lg">${diag.qualityGrade}</span>
+          <div>
+            <div class="text-sm font-medium">${diag.populatedFields}/${diag.totalFields} fields extracted</div>
+            <div class="text-xs text-gray-500">${Math.round(diag.extractionRate * 100)}% extraction rate</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Fields table
+    const entries = Object.entries(props).sort(([a], [b]) => a.localeCompare(b));
+    if (entries.length > 0) {
+      html += `<table class="w-full text-xs"><thead><tr class="text-left text-gray-500 bg-gray-50">
+        <th class="py-1 px-2 font-medium">Field</th>
+        <th class="py-1 px-2 font-medium">Value</th>
+      </tr></thead><tbody>`;
+      for (const [key, value] of entries) {
+        const isEmpty = value === null || value === undefined || value === '' || value === 0;
+        const cls = isEmpty ? 'text-gray-300' : 'text-gray-900';
+        const display = Array.isArray(value) ? `[${value.length} items]` : String(value).slice(0, 80);
+        html += `<tr class="border-t border-gray-100"><td class="py-1 px-2 font-mono ${cls}">${key}</td><td class="py-1 px-2 ${cls}">${display}</td></tr>`;
+      }
+      html += '</tbody></table>';
+    } else {
+      html += '<p class="text-gray-400">No fields extracted</p>';
+    }
+
+    testResults.innerHTML = html;
+  }
+
+  // Save mapping
+  saveBtn.addEventListener('click', async () => {
+    if (!mappingEditor.value.trim()) return;
+    const name = scraperName.value.trim();
+    if (!name) return alert('Enter a scraper name');
+
+    const confirmed = confirm(`Save mapping as config/scraper_mappings/${name}.json?\n\nThis will overwrite any existing file.`);
+    if (!confirmed) return;
+
+    showLoading('Saving mapping...');
+    try {
+      const resp = await fetch('/admin/api/ai-map-save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scraperName: name,
+          mappingJson: mappingEditor.value,
+        }),
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+      alert(`✅ Saved to ${data.path}`);
+    } catch (err) {
+      alert('Error: ' + (err as Error).message);
+    } finally {
+      hideLoading();
+    }
+  });
+</script>

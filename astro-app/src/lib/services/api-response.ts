@@ -7,6 +7,8 @@ export const ApiErrorCode = {
   MISSING_SCRAPER: 'MISSING_SCRAPER',
   UNAUTHORIZED: 'UNAUTHORIZED',
   LISTING_NOT_FOUND: 'LISTING_NOT_FOUND',
+  NOT_FOUND: 'NOT_FOUND',
+  INVALID_REQUEST: 'INVALID_REQUEST',
   RATE_LIMITED: 'RATE_LIMITED',
   PAYLOAD_TOO_LARGE: 'PAYLOAD_TOO_LARGE',
   UNSUPPORTED_CONTENT_TYPE: 'UNSUPPORTED_CONTENT_TYPE',
@@ -18,9 +20,11 @@ const HTTP_STATUS: Record<ApiErrorCodeValue, number> = {
   [ApiErrorCode.MISSING_URL]: 400,
   [ApiErrorCode.INVALID_URL]: 400,
   [ApiErrorCode.UNSUPPORTED_HOST]: 400,
+  [ApiErrorCode.INVALID_REQUEST]: 400,
   [ApiErrorCode.MISSING_SCRAPER]: 500,
   [ApiErrorCode.UNAUTHORIZED]: 401,
   [ApiErrorCode.LISTING_NOT_FOUND]: 404,
+  [ApiErrorCode.NOT_FOUND]: 404,
   [ApiErrorCode.RATE_LIMITED]: 429,
   [ApiErrorCode.PAYLOAD_TOO_LARGE]: 413,
   [ApiErrorCode.UNSUPPORTED_CONTENT_TYPE]: 415,
@@ -121,10 +125,10 @@ export function errorResponse(
   );
 }
 
-export function successResponse(data: Record<string, unknown>, request?: Request): Response {
+export function successResponse(data: Record<string, unknown>, request?: Request, statusCode = 200): Response {
   return new Response(
     JSON.stringify({ success: true, ...data }),
-    { status: 200, headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request) } },
+    { status: statusCode, headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request) } },
   );
 }
 

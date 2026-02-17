@@ -14,6 +14,8 @@ import { logActivity } from '@lib/services/activity-logger.js';
 import type { ScraperMapping } from '@lib/extractor/mapping-loader.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { normalizePrice } from '@lib/extractor/price-normalizer.js';
+import { fireWebhooks } from '@lib/services/webhook-service.js';
+import { recordSnapshot } from '@lib/services/price-history.js';
 
 function countAvailableFields(mapping: ScraperMapping): number {
   let count = 0;
@@ -336,6 +338,29 @@ export const POST: APIRoute = async ({ request }) => {
         fieldsFound: fieldsExtracted,
         fieldsAvailable,
       });
+
+      // Fire webhooks asynchronously (fire-and-forget)
+      fireWebhooks('extraction.completed', {
+        listing_url: url,
+        scraper: importHost.scraper_name,
+        quality_grade: result.diagnostics?.qualityGrade || 'F',
+        extraction_rate: result.diagnostics?.extractionRate || 0,
+        fields_extracted: fieldsExtracted,
+        fields_available: fieldsAvailable,
+        properties: result.properties[0],
+      }).catch(() => { /* webhook delivery failure shouldn't affect API response */ });
+
+      // Record price snapshot for historical tracking (fire-and-forget)
+      const props = result.properties[0] || {};
+      recordSnapshot({
+        url,
+        scraper: importHost.scraper_name,
+        price_float: props.price_float,
+        price_string: props.price_string,
+        price_currency: props.price_currency || props.currency,
+        quality_grade: result.diagnostics?.qualityGrade,
+        title: props.title,
+      }).catch(() => { /* price history failure shouldn't affect API response */ });
     }
   }
 
