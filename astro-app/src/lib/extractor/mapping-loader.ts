@@ -1,5 +1,10 @@
 import mappings from './mappings-bundle.js';
 
+export interface ThumbnailPattern {
+  match: string;
+  replace: string;
+}
+
 export interface FieldMapping {
   cssLocator?: string;
   xpath?: string;
@@ -24,6 +29,21 @@ export interface FieldMapping {
   evaluatorParam?: string;
   caseInsensitive?: boolean;
   fallbacks?: FieldMapping[];
+  modifiers?: string[];
+  thumbnailPatterns?: ThumbnailPattern[];
+  apiEndpoint?: string;
+  apiJsonPath?: string;
+}
+
+export interface PortalMetadata {
+  hosts: string[];
+  country: string;
+  currency: string;
+  localeCode: string;
+  areaUnit: string;
+  contentSource?: 'html' | 'script-json' | 'json-ld' | 'flight-data';
+  stripTrailingSlash?: boolean;
+  requiresJsRendering?: boolean;
 }
 
 export interface ScraperMapping {
@@ -37,6 +57,7 @@ export interface ScraperMapping {
   features?: FieldMapping[];
   extraFields?: Record<string, FieldMapping>;
   expectedExtractionRate?: number;
+  portal?: PortalMetadata;
 }
 
 const mappingCache = new Map<string, ScraperMapping>();
@@ -63,4 +84,12 @@ export function allMappingNames(): string[] {
 
 export function getCacheStats(): { size: number; names: string[] } {
   return { size: mappingCache.size, names: Array.from(mappingCache.keys()) };
+}
+
+/**
+ * Return all mappings keyed by name.
+ * Used by portal-registry to auto-discover portals from mapping metadata.
+ */
+export function allMappings(): Record<string, ScraperMapping> {
+  return mappings;
 }

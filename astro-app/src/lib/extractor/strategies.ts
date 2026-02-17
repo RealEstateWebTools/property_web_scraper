@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio';
 import type { FieldMapping } from './mapping-loader.js';
 import { parseFlightData, searchFlightData } from './flight-data-parser.js';
+import { applyModifiers } from './modifiers.js';
 
 export interface RetrievalResult {
   text: string;
@@ -203,8 +204,9 @@ function searchJsonLd(objects: unknown[], dotPath: string, typeFilter?: string):
 
 /**
  * Navigate a dot-path into a parsed object.
+ * Exported for use by API-based extraction strategies.
  */
-function getByDotPath(obj: unknown, dotPath: string): unknown {
+export function getByDotPath(obj: unknown, dotPath: string): unknown {
   let current = obj;
   for (const seg of dotPath.split('.')) {
     if (current === null || current === undefined || typeof current !== 'object') {
@@ -337,6 +339,11 @@ export function cleanUpString(str: string, mapping: FieldMapping): string {
 
   if (mapping.stripString) {
     result = result.replace(mapping.stripString, '');
+  }
+
+  // Apply composable modifier pipeline (runs after legacy post-processing)
+  if (mapping.modifiers && mapping.modifiers.length > 0) {
+    result = applyModifiers(result, mapping.modifiers);
   }
 
   return result;

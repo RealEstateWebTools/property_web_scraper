@@ -1,3 +1,5 @@
+import { allMappings } from '../extractor/mapping-loader.js';
+
 export interface PortalConfig {
   scraperName: string;
   slug: string;
@@ -12,6 +14,10 @@ export interface PortalConfig {
   requiresJsRendering: boolean;
 }
 
+/**
+ * Hardcoded portal registry — serves as the primary source of truth.
+ * Portals defined here take precedence over auto-discovered ones.
+ */
 export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
   rightmove: {
     scraperName: 'rightmove',
@@ -147,9 +153,47 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
   },
 };
 
-/** Reverse index: hostname → PortalConfig */
+/**
+ * Build additional portal configs from mapping metadata.
+ * Mappings with a `portal` key get auto-registered.
+ * Hardcoded entries in PORTAL_REGISTRY take precedence.
+ */
+function buildAutoDiscoveredPortals(): Record<string, PortalConfig> {
+  const discovered: Record<string, PortalConfig> = {};
+  try {
+    const mappings = allMappings();
+    for (const [name, mapping] of Object.entries(mappings)) {
+      if (!mapping.portal) continue;
+      // Skip if already in hardcoded registry
+      if (PORTAL_REGISTRY[name]) continue;
+      discovered[name] = {
+        scraperName: name,
+        slug: name,
+        hosts: mapping.portal.hosts,
+        country: mapping.portal.country,
+        currency: mapping.portal.currency,
+        localeCode: mapping.portal.localeCode,
+        areaUnit: mapping.portal.areaUnit,
+        contentSource: mapping.portal.contentSource || 'html',
+        stripTrailingSlash: mapping.portal.stripTrailingSlash || false,
+        requiresJsRendering: mapping.portal.requiresJsRendering || false,
+      };
+    }
+  } catch {
+    // Mapping bundle not available (e.g. during tests without Vite)
+  }
+  return discovered;
+}
+
+/** Merged registry: hardcoded + auto-discovered from mapping metadata. */
+const mergedRegistry: Record<string, PortalConfig> = {
+  ...buildAutoDiscoveredPortals(),
+  ...PORTAL_REGISTRY, // hardcoded takes precedence
+};
+
+/** Reverse index: hostname -> PortalConfig */
 const hostIndex = new Map<string, PortalConfig>();
-for (const config of Object.values(PORTAL_REGISTRY)) {
+for (const config of Object.values(mergedRegistry)) {
   for (const host of config.hosts) {
     hostIndex.set(host, config);
   }
@@ -160,9 +204,9 @@ export function findPortalByHost(hostname: string): PortalConfig | undefined {
 }
 
 export function findPortalByName(name: string): PortalConfig | undefined {
-  return PORTAL_REGISTRY[name];
+  return mergedRegistry[name];
 }
 
 export function allPortalNames(): string[] {
-  return Object.keys(PORTAL_REGISTRY);
+  return Object.keys(mergedRegistry);
 }

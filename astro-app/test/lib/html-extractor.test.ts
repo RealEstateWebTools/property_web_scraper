@@ -212,7 +212,7 @@ describe('HtmlExtractor', () => {
       expect(props['postal_code']).toBe('B14 4JP');
       expect(props['reference']).toBe('51775029');
       expect(props['image_urls'][0]).toBe(
-        'http://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg'
+        'https://media.rightmove.co.uk/dir/147k/146672/51775029/146672_87_School_Rd_IMG_00_0000.jpg'
       );
       expect(props['title']).toBe(
         '4 bedroom detached house to rent in School Road, Birmingham, B14, B14'
