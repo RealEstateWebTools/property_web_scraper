@@ -2,172 +2,125 @@
 
 [![CI](https://github.com/RealEstateWebTools/property_web_scraper/actions/workflows/ci.yml/badge.svg)](https://github.com/RealEstateWebTools/property_web_scraper/actions/workflows/ci.yml)
 
-Web based UI to make scraping data from real estate websites super simple.
+**From the team behind [PropertyWebBuilder](https://github.com/etewiah/property_web_builder)** — the open-source real estate platform.
 
-## Requirements
+A real estate listing extraction API. Given a property listing URL (or pre-rendered HTML), it returns structured data: title, price, coordinates, images, and 70+ fields across 17 supported portals in 6 countries.
 
-- Ruby >= 3.1
-- Rails >= 7.1
-- Google Cloud Firestore (or local emulator)
+Built with [Astro](https://astro.build/) (SSR mode), TypeScript, and [Cheerio](https://cheerio.js.org/).
 
-## Installation
+## Supported Sites
 
-Install into an existing Rails project by adding this line to your application's Gemfile:
+| Country | Portals |
+|---------|---------|
+| UK | Rightmove, Zoopla, OnTheMarket, Jitty |
+| Spain | Idealista, Fotocasa, Pisos.com, Inmo1, Weebrix |
+| USA | Realtor.com, ForSaleByOwner, MLSListings, CERDFW, WyomingMLS |
+| India | RealEstateIndia |
+| Italy | Caruso Immobiliare |
+| Ireland | Daft.ie |
 
-```ruby
-gem 'property_web_scraper', git: 'https://github.com/RealEstateWebTools/property_web_scraper', branch: 'master'
-```
+## How It Works
 
-Then execute:
-```bash
-$ bundle
-```
+The extraction engine takes fully-rendered HTML and a source URL, then applies configurable JSON mappings (CSS selectors, script JSON paths, regex patterns) to extract structured property data. No browser automation or JS rendering happens inside the engine itself — the caller provides the HTML.
 
-Set the required environment variables:
+This makes it easy to integrate with Chrome extensions, Puppeteer scripts, or any tool that can capture a rendered page.
 
-```bash
-export FIRESTORE_PROJECT_ID=your-gcp-project-id
-# Production: path to your service account JSON key
-export FIRESTORE_CREDENTIALS=/path/to/service-account.json
-# Development/test: use the Firestore emulator instead
-export FIRESTORE_EMULATOR_HOST=localhost:8080
-
-# Optional: protect API endpoints with a shared key
-export PROPERTY_SCRAPER_API_KEY=your-secret-api-key
-```
-
-Mount PropertyWebScraper by adding the following to your routes.rb file:
-```ruby
-mount PropertyWebScraper::Engine => '/'
-```
-
-Seed the initial scraper host data:
-```bash
-rails property_web_scraper:db:seed
-```
-
-## Development Setup
-
-Clone the repository and install dependencies:
+## Quick Start
 
 ```bash
-git clone https://github.com/RealEstateWebTools/property_web_scraper.git
-cd property_web_scraper
-bundle install
+cd astro-app
+npm install
+npm run dev
 ```
 
-Start the Firestore emulator and seed data:
+The dev server starts at `http://localhost:4321`. You can extract a listing via the web UI or the API.
 
-```bash
-firebase emulators:start --only firestore --project test-project &
-sleep 5
-export FIRESTORE_EMULATOR_HOST=localhost:8080
-export FIRESTORE_PROJECT_ID=test-project
-bundle exec rails runner "load 'db/seeds/import_hosts.rb'"
+## API
+
+### Extract from URL
+
+```
+POST /extract/url
+Content-Type: application/x-www-form-urlencoded
+
+url=https://www.rightmove.co.uk/properties/168908774
 ```
 
-Run the test suite:
+### Extract from HTML
 
-```bash
-firebase emulators:start --only firestore --project test-project &
-sleep 5
-FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec
+```
+POST /extract/html
+Content-Type: application/x-www-form-urlencoded
+
+url=https://www.rightmove.co.uk/properties/168908774&html=<html>...</html>
 ```
 
-## Architecture Overview
+### Public API
 
-**Models:**
-
-- `Listing` -- core model storing scraped property data (price, location, images, features)
-- `ImportHost` -- maps a website hostname to its scraper configuration
-- `PwbListing` -- extends Listing with PropertyWebBuilder-compatible JSON serialization
-- `ScraperMapping` -- loads JSON scraper configs from `config/scraper_mappings/` via ActiveHash
-
-**Services:**
-
-- `Scraper` -- fetches an HTML page and extracts property fields using a ScraperMapping
-- `ListingRetriever` -- validates a URL, resolves the ImportHost, and delegates to Scraper
-- `UrlValidator` -- shared URL validation returning a result object with URI, ImportHost, and error info
-- `ScrapedContentSanitizer` -- strips HTML tags and blocks dangerous URI schemes before persistence
-
-**Controllers:**
-
-- `ApplicationController` -- base controller providing `authenticate_api_key!` for API authentication
-- `ScraperController` -- welcome page, config endpoint, JSON retrieval, AJAX form handler
-- `SinglePropertyViewController` -- renders a single property page with map
-- `Api::V1::ListingsController` -- REST JSON endpoint returning PwbListing data
-
-**Config Mappings:**
-
-JSON files in `config/scraper_mappings/` define CSS selectors, XPath expressions, and regex patterns for each supported website.
-
-## API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/config/as_json` | Returns scraper field configuration for realtor.com |
-| GET/POST | `/retriever/as_json` | Scrapes a property URL and returns listing JSON |
-| GET | `/api/v1/listings?url=...` | Returns a PwbListing-formatted JSON array |
-
-All endpoints accept a `url` parameter and return JSON with a `success` boolean and either the listing data or an `error_message`.
-
-## Authentication
-
-API endpoints can be protected with a shared API key. Set the `PROPERTY_SCRAPER_API_KEY` environment variable to enable authentication. When set, requests must include the key in one of:
-
-- **Header:** `X-Api-Key: your-secret-api-key`
-- **Query parameter:** `?api_key=your-secret-api-key`
-
-If `PROPERTY_SCRAPER_API_KEY` is not set, authentication is skipped for backwards compatibility.
-
-## Data Sanitization
-
-All scraped content is automatically sanitized by `ScrapedContentSanitizer` before it is persisted via `Listing.update_from_hash`. The sanitizer strips HTML tags from text fields (title, description, address, etc.), rejects URLs with dangerous schemes (`javascript:`, `data:`), and converts protocol-relative URLs to HTTPS.
+```
+GET /public_api/v1/listings?url=https://www.rightmove.co.uk/properties/168908774
+GET /public_api/v1/supported_sites
+GET /public_api/v1/health
+```
 
 ## Running Tests
 
-Start the Firestore emulator before running any tests:
-
 ```bash
-firebase emulators:start --only firestore --project test-project &
-sleep 5
+cd astro-app
+npx vitest run
 ```
 
-Then run specs with the emulator environment variables:
+## Project Structure
 
-```bash
-# Full suite
-FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec
-
-# Models only
-FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/models
-
-# Services only
-FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/services
-
-# Firestore library specs
-FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/lib
-
-# A single spec file
-FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec spec/models/property_web_scraper/listing_spec.rb
+```
+property_web_scraper/
+├── astro-app/                  # Astro 5 SSR application (active development)
+│   ├── src/lib/extractor/      # Core extraction pipeline
+│   ├── src/lib/services/       # URL validation, auth, rate limiting
+│   ├── src/pages/              # Astro pages and API endpoints
+│   ├── test/                   # Vitest tests and HTML fixtures
+│   └── scripts/                # CLI utilities (capture-fixture)
+├── config/scraper_mappings/    # JSON mapping files per portal
+│   └── archive/                # Legacy mappings (kept for reference)
+├── app/                        # Legacy Rails engine (see RAILS_README.md)
+└── spec/                       # Legacy Rails RSpec tests
 ```
 
-## Contribute and spread the love
+## Scraper Mappings
 
-We encourage you to contribute to this project and file issues for any problems you encounter.
+Each supported site has a JSON mapping file in `config/scraper_mappings/` with a country-code prefix (e.g. `uk_rightmove.json`, `es_idealista.json`). These define CSS selectors, script JSON paths, regex patterns, and post-processing rules for extracting fields from that site's HTML.
 
-If you like it, please star it and spread the word on [Twitter](https://twitter.com/prptywebbuilder), [LinkedIn](https://www.linkedin.com/company/propertywebbuilder) and [Facebook](https://www.facebook.com/propertywebbuilder). You can also subscribe to GitHub notifications on this project.
+## Projects Using This API
 
-Please consider making a contribution to the development of PropertyWebScraper. If you wish to pay for specific enhancements, please email me directly (opensource at propertywebbuilder.com).
+PropertyWebScraper is part of the [PropertyWebBuilder](https://github.com/etewiah/property_web_builder) ecosystem. These projects all use it as their extraction backend:
 
----
+| Project | What it does | Stack |
+|---------|-------------|-------|
+| [HomesToCompare](https://homestocompare.com/) | AI-powered side-by-side property comparisons with 11 analysis sections and Firestore sync | Astro, React, Firestore |
+| [HousePriceGuess](https://housepriceguess.com/) | Gamified property price guessing with AI dossiers, 18+ white-label brands, and embeddable widgets | Astro, React, Tailwind |
+| [SinglePropertyPages](https://singlepropertypages.com/) | SaaS for dedicated property microsites with lead capture, analytics, and WYSIWYG editor | Astro, TypeScript |
+| [PropertySquares](https://propertysquares.com/) | 48-step first-time buyer journey across multiple markets | Astro, TypeScript |
+
+**Building a real estate project?** PropertyWebScraper gives you structured listing data from 17 portals in 6 countries via a simple API. [Open an issue](https://github.com/RealEstateWebTools/property_web_scraper/issues) to get your project listed here.
+
+## Legacy Rails Engine
+
+This project was originally a Ruby on Rails engine. The Rails code in `app/` and `spec/` is kept for legacy purposes but is no longer under active development. See [RAILS_README.md](RAILS_README.md) for details on the Rails integration.
+
+## Contributing
+
+The easiest way to contribute is to **add a scraper for a property portal in your country**. We have a step-by-step guide in [CONTRIBUTING.md](CONTRIBUTING.md) that walks you through the process — no deep knowledge of the codebase required.
+
+We also welcome bug fixes, test improvements, and documentation updates. See the [open issues](https://github.com/RealEstateWebTools/property_web_scraper/issues) for ideas.
+
+If you like this project, please star it and spread the word on [Twitter](https://twitter.com/prptywebbuilder), [LinkedIn](https://www.linkedin.com/company/propertywebbuilder) and [Facebook](https://www.facebook.com/propertywebbuilder).
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+Available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
 ## Disclaimer
 
 While scraping can sometimes be used as a legitimate way to access all kinds of data on the internet, it's also important to consider the legal implications. There are cases where scraping data may be considered illegal, or open you to the possibility of being sued.
 
-I created this tool in part as a learning exercise and am sharing it in case others find it useful. If you do decide to use this tool to scrape a website it is your responsibility to ensure that what you are doing is legal.
+This tool was created in part as a learning exercise and is shared in case others find it useful. If you do decide to use this tool to scrape a website it is your responsibility to ensure that what you are doing is legal.

@@ -1,4 +1,4 @@
-$LOAD_PATH.push File.expand_path('../lib', __FILE__)
+$LOAD_PATH.push File.expand_path('lib', __dir__)
 
 # Maintain your gem's version:
 require 'property_web_scraper/version'
@@ -7,8 +7,8 @@ require 'property_web_scraper/version'
 Gem::Specification.new do |s|
   s.name        = 'property_web_scraper'
   s.version     = PropertyWebScraper::VERSION
-  s.authors     = ['Ed Tewiah']
-  s.email       = ['etewiah@hotmail.com']
+  s.authors     = ['Ed Tee']
+  s.email       = ['africajam@hotmail.com']
   s.homepage    = ''
   s.summary     = 'Web based UI to make scraping data from real estate websites super simple.'
   s.description = 'PropertyWebScraper makes it easy for anyone to scrape data from real estate websites.'
@@ -17,23 +17,23 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
   s.test_files = Dir['spec/**/*']
 
-  s.add_dependency 'rails', '>= 7.2'
   s.add_dependency 'google-cloud-firestore', '~> 2.16'
+  s.add_dependency 'rails', '>= 7.2'
 
-  s.add_dependency 'nokogiri', '>= 1.13'
-  s.add_dependency 'faraday', '~> 2.0'
   s.add_dependency 'active_hash'
+  s.add_dependency 'faraday', '~> 2.0'
+  s.add_dependency 'nokogiri', '>= 1.13'
+  s.add_dependency 'ostruct'
   s.add_dependency 'rack-cors', '~> 3.0'
   s.add_dependency 'sprockets-rails'
-  s.add_dependency 'turbo-rails', '>= 2.0'
   s.add_dependency 'stimulus-rails', '>= 1.3'
-  s.add_dependency 'ostruct'
+  s.add_dependency 'turbo-rails', '>= 2.0'
 
   s.add_development_dependency 'debug'
 
-  s.add_development_dependency 'rspec-rails', '~> 8.0'
+  s.add_development_dependency 'climate_control', '~> 1.0'
   s.add_development_dependency 'factory_bot_rails', '~> 6.0'
+  s.add_development_dependency 'rspec-rails', '~> 8.0'
   s.add_development_dependency 'vcr', '~> 6.0'
   s.add_development_dependency 'webmock', '~> 3.19'
-  s.add_development_dependency 'climate_control', '~> 1.0'
 end
