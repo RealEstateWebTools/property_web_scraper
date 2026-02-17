@@ -221,6 +221,7 @@ export const fixtures: FixtureEntry[] = [
       currency: 'GBP',
       title: '2 bedroom apartment for sale in Augustine Way, Oxford, OX4',
       address_string: 'Augustine Way, Oxford',
+      region: 'England',
       price_string: '\u00A3105,000',
       price_float: 105000,
       count_bedrooms: 2,
@@ -233,6 +234,17 @@ export const fixtures: FixtureEntry[] = [
       tenure: 'LEASEHOLD',
       for_sale: true,
       for_rent: false,
+      image_urls: [
+        'https://media.rightmove.co.uk/property-photo/799f82da2/168908774/799f82da296fe5e11e0c47c124f200b5.jpeg',
+        'https://media.rightmove.co.uk/property-photo/799f82da2/168908774/img2.jpeg',
+        'https://media.rightmove.co.uk/property-photo/799f82da2/168908774/img3.jpeg',
+      ],
+      features: [
+        'Ground floor apartment',
+        'Two double bedrooms',
+        'Allocated parking space',
+        'Communal gardens',
+      ],
     },
   },
   {

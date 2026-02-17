@@ -1,6 +1,6 @@
 import type { CheerioAPI, Cheerio, AnyNode } from 'cheerio';
 import type { FieldMapping } from './mapping-loader.js';
-import { getTextFromCss, cleanUpString } from './strategies.js';
+import { getTextFromCss, cleanUpString, getOrParseScriptJson, getByDotPath } from './strategies.js';
 import { normalizeImageUrl } from './image-normalizer.js';
 
 /**
@@ -14,6 +14,22 @@ export function extractImages(
   uri: URL
 ): string[] {
   const retrieved: string[] = [];
+
+  // Script JSON path strategy — extract image URLs from embedded JSON
+  if (mapping.scriptJsonPath && mapping.scriptJsonVar) {
+    const parsed = getOrParseScriptJson($, mapping.scriptJsonVar);
+    const value = getByDotPath(parsed, mapping.scriptJsonPath);
+    if (Array.isArray(value)) {
+      const attrKey = mapping.cssAttr || mapping.xmlAttr || 'url';
+      for (const item of value) {
+        if (typeof item === 'string') {
+          retrieved.push(item);
+        } else if (typeof item === 'object' && item !== null && attrKey in item) {
+          retrieved.push(String((item as Record<string, unknown>)[attrKey]));
+        }
+      }
+    }
+  }
 
   // CSS selector path
   if (mapping.cssLocator) {

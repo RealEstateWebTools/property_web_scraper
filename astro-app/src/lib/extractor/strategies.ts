@@ -82,7 +82,7 @@ const scriptJsonCache = new WeakMap<cheerio.CheerioAPI, Map<string, unknown>>();
  *   - `window.VAR = {...}` or `var VAR = {...}` (Rightmove PAGE_MODEL, Idealista __INITIAL_STATE__)
  *   - `<script id="VAR" type="application/json">{...}</script>` (Next.js __NEXT_DATA__)
  */
-function getOrParseScriptJson($: cheerio.CheerioAPI, varName: string): unknown {
+export function getOrParseScriptJson($: cheerio.CheerioAPI, varName: string): unknown {
   let cacheMap = scriptJsonCache.get($);
   if (!cacheMap) {
     cacheMap = new Map();

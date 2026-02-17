@@ -1,6 +1,6 @@
 import type { CheerioAPI } from 'cheerio';
 import type { FieldMapping } from './mapping-loader.js';
-import { getTextFromCss, cleanUpString } from './strategies.js';
+import { getTextFromCss, cleanUpString, getOrParseScriptJson, getByDotPath } from './strategies.js';
 
 /**
  * Extract an array of feature strings from HTML.
@@ -12,6 +12,19 @@ export function extractFeatures(
   _uri: URL
 ): string[] {
   const retrieved: string[] = [];
+
+  // Script JSON path strategy — extract features from embedded JSON
+  if (mapping.scriptJsonPath && mapping.scriptJsonVar) {
+    const parsed = getOrParseScriptJson($, mapping.scriptJsonVar);
+    const value = getByDotPath(parsed, mapping.scriptJsonPath);
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'string') {
+          retrieved.push(item);
+        }
+      }
+    }
+  }
 
   if (mapping.cssLocator) {
     const elements = $(mapping.cssLocator);
