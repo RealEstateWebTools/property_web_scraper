@@ -1,0 +1,96 @@
+name: Contract Tests
+
+on:
+  schedule:
+    # Weekly on Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      scraper:
+        description: 'Specific scraper to test (leave empty for all)'
+        required: false
+        type: string
+      min_grade:
+        description: 'Minimum quality grade (A, B, C)'
+        required: false
+        default: 'C'
+        type: choice
+        options:
+          - A
+          - B
+          - C
+
+jobs:
+  contract-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: astro-app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: astro-app
+        run: npm ci
+
+      - name: Run contract tests
+        working-directory: astro-app
+        env:
+          SCRAPER_FILTER: ${{ inputs.scraper }}
+          MIN_GRADE: ${{ inputs.min_grade || 'C' }}
+        run: |
+          ARGS="--json --min-grade=$MIN_GRADE"
+          if [ -n "$SCRAPER_FILTER" ]; then
+            ARGS="$ARGS --scraper=$SCRAPER_FILTER"
+          fi
+          npx tsx scripts/contract-test.ts $ARGS | tee contract-results.json
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-test-results
+          path: astro-app/contract-results.json
+          retention-days: 30
+
+      - name: Comment on failure
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let results;
+            try {
+              results = JSON.parse(fs.readFileSync('astro-app/contract-results.json', 'utf-8'));
+            } catch {
+              results = { results: [], error: 'Could not parse results' };
+            }
+            const failures = (results.results || []).filter(r => r.status !== 'pass');
+            if (failures.length === 0) return;
+
+            const body = [
+              '## 🧪 Contract Test Failures',
+              '',
+              `**${failures.length} scraper(s) failed** at ${results.timestamp || 'unknown time'}`,
+              '',
+              '| Scraper | Grade | Required | Rate | Critical Missing |',
+              '|---------|-------|----------|------|-----------------|',
+              ...failures.map(f =>
+                `| ${f.scraper} | ${f.grade || 'ERR'} | ${f.requiredGrade} | ${f.extractionRate != null ? Math.round(f.extractionRate * 100) + '%' : 'N/A'} | ${(f.criticalMissing || []).join(', ') || f.error || '—'} |`
+              ),
+              '',
+              `Run manually: \`npx tsx scripts/contract-test.ts\``,
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Contract Tests] ${failures.length} scraper(s) failing`,
+              body,
+              labels: ['scraper-health'],
+            });

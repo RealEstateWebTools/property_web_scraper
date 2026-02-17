@@ -1,0 +1,96 @@
+{
+  "entries": [
+    {
+      "scraper": "us_realtor",
+      "grade": "A",
+      "extractionRate": 0.8947368421052632,
+      "populatedFields": 21,
+      "totalFields": 23
+    },
+    {
+      "scraper": "uk_rightmove",
+      "grade": "A",
+      "extractionRate": 0.9,
+      "populatedFields": 23,
+      "totalFields": 25
+    },
+    {
+      "scraper": "uk_zoopla",
+      "grade": "A",
+      "extractionRate": 0.8823529411764706,
+      "populatedFields": 20,
+      "totalFields": 22
+    },
+    {
+      "scraper": "es_idealista",
+      "grade": "A",
+      "extractionRate": 0.9411764705882353,
+      "populatedFields": 21,
+      "totalFields": 22
+    },
+    {
+      "scraper": "es_fotocasa",
+      "grade": "B",
+      "extractionRate": 0.42857142857142855,
+      "populatedFields": 11,
+      "totalFields": 19
+    },
+    {
+      "scraper": "es_pisos",
+      "grade": "B",
+      "extractionRate": 0.5,
+      "populatedFields": 7,
+      "totalFields": 9
+    },
+    {
+      "scraper": "in_realestateindia",
+      "grade": "B",
+      "extractionRate": 0.625,
+      "populatedFields": 10,
+      "totalFields": 13
+    },
+    {
+      "scraper": "us_mlslistings",
+      "grade": "A",
+      "extractionRate": 1,
+      "populatedFields": 14,
+      "totalFields": 14
+    },
+    {
+      "scraper": "us_wyomingmls",
+      "grade": "A",
+      "extractionRate": 1,
+      "populatedFields": 19,
+      "totalFields": 19
+    },
+    {
+      "scraper": "us_forsalebyowner",
+      "grade": "A",
+      "extractionRate": 1,
+      "populatedFields": 8,
+      "totalFields": 8
+    },
+    {
+      "scraper": "uk_jitty",
+      "grade": "A",
+      "extractionRate": 0.8235294117647058,
+      "populatedFields": 19,
+      "totalFields": 22
+    },
+    {
+      "scraper": "uk_onthemarket",
+      "grade": "A",
+      "extractionRate": 0.9411764705882353,
+      "populatedFields": 21,
+      "totalFields": 22
+    },
+    {
+      "scraper": "ie_daft",
+      "grade": "A",
+      "extractionRate": 0.9444444444444444,
+      "populatedFields": 22,
+      "totalFields": 23
+    }
+  ],
+  "savedAt": "2026-02-17T17:51:38.164Z"
+}

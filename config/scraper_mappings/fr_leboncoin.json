@@ -1,0 +1,88 @@
+[
+  {
+    "name": "fr_leboncoin",
+    "expectedExtractionRate": 0.8,
+    "defaultValues": {
+      "country": {
+        "value": "FR"
+      },
+      "area_unit": {
+        "value": "sqmt"
+      },
+      "currency": {
+        "value": "EUR"
+      },
+      "for_rent_short_term": {
+        "value": "false"
+      },
+      "locale_code": {
+        "value": "fr-FR"
+      }
+    },
+    "intFields": {
+      "count_bedrooms": {
+        "scriptJsonVar": "TODO_VAR",
+        "scriptJsonPath": "TODO_PATH"
+      },
+      "count_bathrooms": {
+        "scriptJsonVar": "TODO_VAR",
+        "scriptJsonPath": "TODO_PATH"
+      }
+    },
+    "floatFields": {
+      "price_float": {
+        "scriptJsonVar": "TODO_VAR",
+        "scriptJsonPath": "TODO_PATH"
+      },
+      "latitude": {
+        "scriptJsonVar": "TODO_VAR",
+        "scriptJsonPath": "TODO_PATH"
+      },
+      "longitude": {
+        "scriptJsonVar": "TODO_VAR",
+        "scriptJsonPath": "TODO_PATH"
+      }
+    },
+    "textFields": {
+      "title": {
+        "cssLocator": "title",
+        "fallbacks": [
+          {
+            "cssLocator": "meta[property='og:title']",
+            "cssAttr": "content"
+          },
+          {
+            "cssLocator": "h1"
+          }
+        ]
+      },
+      "description": {
+        "cssLocator": "meta[property='og:description']",
+        "cssAttr": "content",
+        "fallbacks": [
+          {
+            "cssLocator": "meta[name='description']",
+            "cssAttr": "content"
+          }
+        ]
+      },
+      "address_string": {
+        "scriptJsonVar": "TODO_VAR",
+        "scriptJsonPath": "TODO_PATH"
+      },
+      "main_image_url": {
+        "cssLocator": "meta[property='og:image']",
+        "cssAttr": "content"
+      }
+    },
+    "images": [],
+    "booleanFields": {
+      "for_sale": {
+        "scriptJsonVar": "TODO_VAR",
+        "scriptJsonPath": "TODO_PATH",
+        "evaluator": "include?",
+        "evaluatorParam": "sale"
+      }
+    }
+  }
+]
