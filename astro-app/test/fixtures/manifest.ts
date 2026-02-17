@@ -1,7 +1,11 @@
 /**
  * Scraper Validation Manifest
  *
- * Workflow for fixing broken scrapers:
+ * Central registry of all scrapers and their expected extraction results.
+ * Used by `scraper-validation.test.ts` to verify each scraper against
+ * saved HTML fixtures in `test/fixtures/*.html`.
+ *
+ * ## Workflow for fixing broken scrapers
  *
  * 1. **Identify failures**: Run `npx vitest run test/lib/scraper-validation.test.ts`
  * 2. **Inspect HTML**: Open `test/fixtures/SCRAPER.html`, find the actual DOM elements
@@ -9,18 +13,65 @@
  * 4. **Update manifest**: Update expected values in `test/fixtures/manifest.ts`
  * 5. **Verify**: Re-run tests
  *
- * Common pitfalls:
+ * ## Adding a new scraper
+ *
+ * 1. Save a listing page as `test/fixtures/{scraper_name}.html`
+ * 2. Add an entry to the `fixtures` array below
+ * 3. Fill in `expected` with values you manually confirmed from the HTML
+ * 4. Run `npx vitest run test/lib/scraper-validation.test.ts` to verify
+ *
+ * ## Common pitfalls
+ *
  * - Field in multiple sections → last wins (textFields overwrites intFields)
  * - No `cssCountId` → Cheerio concatenates ALL matched elements
  * - Cheerio converts `<br>` → `\n` not `\r`
  * - `defaultValues` always produces strings (e.g. `for_sale: "true"`)
  * - Processing order: defaults → images → features → int → float → text → boolean
+ *
+ * ## Coverage
+ *
+ * Entries with `fixture: null` are scrapers that don't have HTML fixtures yet.
+ * These are automatically skipped in tests. To add a fixture:
+ *   `npx tsx scripts/capture-fixture.ts <listing-url>`
+ */
+
+/**
+ * A single scraper validation entry.
  */
 export interface FixtureEntry {
+  /** Scraper mapping name, e.g. 'uk_rightmove'. Must match a file in config/scraper_mappings/ */
   scraper: string;
+  /** HTML fixture filename (without .html extension), or null if no fixture exists yet */
   fixture: string | null;
+  /** Source URL used for extraction context (hostname detection, URL-based fields) */
   sourceUrl: string;
+  /** Expected extracted property values. Only listed fields are asserted — unlisted fields are ignored */
   expected: Record<string, unknown>;
+}
+
+/**
+ * Get only entries that have HTML fixtures available for testing.
+ */
+export function getTestableFixtures(): FixtureEntry[] {
+  return fixtures.filter(f => f.fixture !== null && Object.keys(f.expected).length > 0);
+}
+
+/**
+ * Get entries that still need HTML fixtures captured.
+ */
+export function getMissingFixtures(): FixtureEntry[] {
+  return fixtures.filter(f => f.fixture === null);
+}
+
+/**
+ * Get a summary of fixture coverage.
+ */
+export function getCoverageSummary() {
+  const total = fixtures.length;
+  const withFixture = fixtures.filter(f => f.fixture !== null).length;
+  const withExpected = fixtures.filter(f => Object.keys(f.expected).length > 1).length;
+  const totalExpectedFields = fixtures.reduce((sum, f) => sum + Object.keys(f.expected).length, 0);
+  return { total, withFixture, withExpected, totalExpectedFields, coveragePercent: Math.round((withFixture / total) * 100) };
 }
 
 export const fixtures: FixtureEntry[] = [

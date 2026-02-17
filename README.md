@@ -4,7 +4,7 @@
 
 **From the team behind [PropertyWebBuilder](https://github.com/etewiah/property_web_builder)** — the open-source real estate platform.
 
-A real estate listing extraction API. Given a property listing URL (or pre-rendered HTML), it returns structured data: title, price, coordinates, images, and 70+ fields across 13 supported portals in 5 countries.
+A real estate listing extraction API and Chrome extension. Given a property listing URL (or pre-rendered HTML), it returns structured data: title, price, coordinates, images, and 70+ fields across 17 supported portals in 8 countries.
 
 Built with [Astro](https://astro.build/) (SSR mode), TypeScript, and [Cheerio](https://cheerio.js.org/).
 
@@ -12,11 +12,28 @@ Built with [Astro](https://astro.build/) (SSR mode), TypeScript, and [Cheerio](h
 
 | Country | Portals |
 |---------|---------|
-| UK | Rightmove, Zoopla, OnTheMarket, Jitty |
-| Spain | Idealista, Fotocasa, Pisos.com |
-| USA | Realtor.com, ForSaleByOwner, MLSListings, WyomingMLS |
-| India | RealEstateIndia |
-| Ireland | Daft.ie |
+| 🇬🇧 UK | Rightmove, Zoopla, OnTheMarket, Jitty |
+| 🇪🇸 Spain | Idealista, Fotocasa, Pisos.com |
+| 🇵🇹 Portugal | Idealista PT |
+| 🇮🇪 Ireland | Daft.ie |
+| 🇺🇸 USA | Realtor.com, ForSaleByOwner, MLSListings, WyomingMLS |
+| 🇮🇳 India | RealEstateIndia |
+| 🇩🇪 Germany | ImmobilienScout24 |
+| 🇫🇷 France | SeLoger, Leboncoin |
+| 🇦🇺 Australia | Domain, RealEstate.com.au |
+
+## Chrome Extension
+
+The project includes a **Manifest V3 Chrome extension** that makes extraction available with one click on any supported listing page.
+
+- 🟢 **Badge indicator** — green ✓ on supported sites
+- 📊 **Property card popup** — image, price, stats, quality grade
+- 📋 **Copy to clipboard** — JSON or listing URL
+- ⚙️ **Configurable** — API key and endpoint settings
+
+**Install (dev mode):** Open `chrome://extensions/` → enable Developer mode → Load unpacked → select `chrome-extension/` folder.
+
+See the full [Chrome Extension documentation](chrome-extension/README.md) for architecture details, screenshots, and configuration.
 
 ## How It Works
 
@@ -79,6 +96,7 @@ property_web_scraper/
 │   ├── src/pages/              # Astro pages and API endpoints
 │   ├── test/                   # Vitest tests and HTML fixtures
 │   └── scripts/                # CLI utilities (capture-fixture)
+├── chrome-extension/           # MV3 Chrome extension (popup, content script, service worker)
 ├── config/scraper_mappings/    # JSON mapping files per portal
 │   └── archive/                # Legacy mappings (kept for reference)
 ├── app/                        # Legacy Rails engine (see RAILS_README.md)
