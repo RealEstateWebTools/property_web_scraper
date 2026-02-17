@@ -14,6 +14,7 @@ import {
 } from './quality-scorer.js';
 import { splitPropertyHash, type SplitSchema } from './schema-splitter.js';
 import { computeFingerprint } from '../services/listing-fingerprint.js';
+import { sanitizePropertyHash } from '../services/content-sanitizer.js';
 
 export interface FieldTrace {
   field: string;
@@ -329,8 +330,11 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
 
   const quality: QualityAssessment = assessQualityWeighted(fieldResults, mapping.expectedExtractionRate);
 
+  // Sanitize extracted data (strip HTML, validate URLs)
+  const sanitizedHash = sanitizePropertyHash(propertyHash);
+
   // Split schema
-  const split = splitPropertyHash(propertyHash);
+  const split = splitPropertyHash(sanitizedHash);
 
   const diagnostics: ExtractionDiagnostics = {
     scraperName: mapping.name,
@@ -398,7 +402,7 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
   return {
     success: true,
     status: extractionStatus,
-    properties: [propertyHash],
+    properties: [sanitizedHash],
     warnings,
     diagnostics,
     splitSchema: split,

@@ -12,37 +12,31 @@ This roadmap consolidates ideas from `AUDIT_SUMMARY.md`, `CRITICAL_FIXES.md`, `Q
 > [!CAUTION]
 > These should be done before any production deployment if not already in place.
 
-### 1.1 Fix Timing Attack in API Key Comparison
+### 1.1 ✅ Fix Timing Attack in API Key Comparison
 **Files:** `auth.ts`, `admin-auth.ts`  
-Replace `===` string comparison with `timingSafeEqual` to prevent brute-forcing.  
-**Effort:** 30 min
+Already uses `constantTimeCompare` from `constant-time.ts`.  
 
-### 1.2 Add Input Sanitization
+### 1.2 ✅ Add Input Sanitization *(newly implemented)*
 **File:** [NEW] `content-sanitizer.ts`  
-Strip HTML tags from text fields, reject `javascript:` URLs, sanitize image URL arrays.  
-**Effort:** 2 hours
+Strips HTML tags from text fields, rejects `javascript:` URLs, sanitizes image URL arrays. Decodes HTML entities post-strip. Integrated into `html-extractor.ts` pipeline.
 
-### 1.3 Add Security Headers Middleware
-**File:** [NEW] `middleware.ts`  
-`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `X-XSS-Protection`.  
-**Effort:** 1 hour
+### 1.3 ✅ Add Security Headers Middleware
+**File:** `middleware.ts`  
+Already sets `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `X-XSS-Protection`, `Permissions-Policy`.  
 
-### 1.4 Structured Console Logging
+### 1.4 ✅ Structured Console Logging
 **File:** `activity-logger.ts`  
-Output `JSON.stringify` to console in production so logs appear in Cloudflare dashboard.  
-**Effort:** 30 min
+Already outputs structured JSON to console in production (error/warn/info levels).  
 
-### 1.5 Environment Variable Validation
-**File:** [NEW] `env-validator.ts`  
-Warn on startup if `PWS_API_KEY`, `GOOGLE_MAPS_API_KEY` etc. are missing.  
-**Effort:** 1 hour
+### 1.5 ✅ Environment Variable Validation
+**File:** `env-validator.ts`  
+Already called from middleware on every request.  
 
-### 1.6 Pre-commit Hook + CI Audit
-**Files:** `.husky/pre-commit`, `.github/workflows/ci.yml`, `.github/dependabot.yml`  
-Run tests + `tsc --noEmit` pre-commit. Add `npm audit --audit-level=high` to CI. Enable Dependabot.  
-**Effort:** 1 hour
+### 1.6 ✅ CI Audit + Dependabot
+**Files:** `.github/dependabot.yml`, `.github/workflows/ci.yml`  
+Already configured.  
 
-**Phase 1 total: ~1 day**
+**Phase 1 total: ✅ Complete**
 
 ---
 
@@ -50,32 +44,27 @@ Run tests + `tsc --noEmit` pre-commit. Add `npm audit --audit-level=high` to CI.
 
 These improve data quality and enable new portals.
 
-### 2.1 `__NEXT_DATA__` Strategy Support ⭐ High Priority
+### 2.1 ✅ `__NEXT_DATA__` Strategy Support
 **File:** `strategies.ts`  
-Find `<script id="__NEXT_DATA__">`, parse JSON, access via `scriptJsonPath`. Unblocks Zoopla v2, OnTheMarket, and Daft.ie scrapers.  
-**Effort:** 3 hours
+Already implemented in `getOrParseScriptJson` — looks for `<script id="VAR">` tag, then falls back to `window.VAR = {...}` regex.  
 
-### 2.2 JSON-LD Extraction Strategy
+### 2.2 ✅ JSON-LD Extraction Strategy
 **Files:** `strategies.ts`, `mapping-loader.ts`  
-Parse `<script type="application/ld+json">` with `@type` filtering (`RealEstateListing`, `Product`, etc.). Add `jsonLdPath` to `FieldMapping`.  
-**Effort:** 4 hours
+Already has `getOrParseJsonLd`, `searchJsonLd`, and `jsonLdPath`/`jsonLdType` in field mappings.  
 
-### 2.3 Fallback Strategy Chains
-**Files:** `mapping-loader.ts`, `strategies.ts`, `html-extractor.ts`  
-Add `fallbacks?: FieldMapping[]` to try multiple extraction strategies per field. If CSS fails, try script JSON, then JSON-LD. Backward-compatible.  
-**Effort:** 1 day
+### 2.3 ✅ Fallback Strategy Chains
+**Files:** `mapping-loader.ts`, `strategies.ts`  
+Already supports `fallbacks?: FieldMapping[]` with fallback chain iteration in `retrieveTargetText`.  
 
-### 2.4 Weighted Quality Scoring
+### 2.4 ✅ Weighted Quality Scoring
 **File:** `quality-scorer.ts`  
-Field importance tiers: critical (title, price) 3×, important (coords, bedrooms) 2×, optional 1×. Cap grade at C if critical fields missing.  
-**Effort:** 4 hours
+Already has `assessQualityWeighted` with critical/important/optional field tiers and grade capping.  
 
-### 2.5 Selector Caching + Lazy Script Parsing
-**Files:** `strategies.ts`, `html-extractor.ts`  
-Cache compiled CSS selectors. Only parse `<script>` text when a field needs it. ~20-30% faster extraction.  
-**Effort:** 2 hours
+### 2.5 ✅ Selector Caching + Lazy Script Parsing
+**Files:** `strategies.ts`  
+Already has `selectorCache` and `scriptTextCache` WeakMaps for per-document caching.  
 
-**Phase 2 total: ~3-4 days**
+**Phase 2 total: ✅ Complete**
 
 ---
 
