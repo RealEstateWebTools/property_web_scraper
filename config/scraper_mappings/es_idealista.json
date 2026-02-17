@@ -42,11 +42,19 @@
       "scriptJsonPath": "detail.adDetail.id"
     },
     "title": {
-      "cssLocator": "title"
+      "cssLocator": "title",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
+        { "cssLocator": "h1" }
+      ]
     },
     "description": {
       "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.description"
+      "scriptJsonPath": "detail.adDetail.description",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" },
+        { "cssLocator": "meta[name='description']", "cssAttr": "content" }
+      ]
     },
     "address_string": {
       "scriptJsonVar": "__INITIAL_STATE__",
@@ -66,12 +74,16 @@
     },
     "main_image_url": {
       "cssLocator": "meta[property='og:image']",
-      "cssAttr": "content"
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "meta[name='twitter:image']", "cssAttr": "content" }
+      ]
     }
   },
   "images": [{
-    "cssLocator": "meta[property='og:image']",
-    "cssAttr": "content"
+    "scriptJsonVar": "__INITIAL_STATE__",
+    "scriptJsonPath": "detail.adDetail.multimedia.images",
+    "cssAttr": "url"
   }],
   "booleanFields": {
     "for_sale": {

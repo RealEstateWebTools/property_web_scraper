@@ -315,8 +315,18 @@ export const fixtures: FixtureEntry[] = [
       longitude: -0.1227,
       reference: '15269498',
       property_type: 'Semi-detached house',
+      tenure: 'Freehold',
       for_sale: true,
       for_rent: false,
+      image_urls: [
+        'https://media.onthemarket.com/properties/15269498/img_0_0_ls.jpg',
+        'https://media.onthemarket.com/properties/15269498/img_1_0_ls.jpg',
+      ],
+      features: [
+        'Garden',
+        'Garage',
+        'Central Heating',
+      ],
     },
   },
   {
@@ -342,6 +352,9 @@ export const fixtures: FixtureEntry[] = [
       region: 'Dublin',
       for_sale: true,
       for_rent: false,
+      image_urls: [
+        'https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYS1tYXN0ZXIiLCJrZXkiOiIxL2UvMTIzNDU2NzguanBnIn0=/image.jpg',
+      ],
     },
   },
   {
@@ -366,6 +379,10 @@ export const fixtures: FixtureEntry[] = [
       region: 'Salamanca',
       for_sale: true,
       for_rent: false,
+      image_urls: [
+        'https://img3.idealista.com/blur/WEB_DETAIL/0/id.pro.es/46/12/34/567890123_xxl.jpg',
+        'https://img3.idealista.com/blur/WEB_DETAIL/0/id.pro.es/46/12/34/567890124_xxl.jpg',
+      ],
     },
   },
 ];
