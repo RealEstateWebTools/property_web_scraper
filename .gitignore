@@ -1,21 +1,32 @@
-spec/dummy/node_modules/
-
+# Dependencies
+node_modules/
 .bundle/
-log/*.log
+
+# Build artifacts
 pkg/
-spec/dummy/db/*.sqlite3
-spec/dummy/db/*.sqlite3-journal
-spec/dummy/log/*.log
-spec/dummy/tmp/
-spec/dummy/.byebug_history
-spec/dummy/config/secrets.yml
-.byebug_history
+*.cache
+.yardoc/
+test-results/
+
+# Logs
+*.log
+log/
+
+# Temp files
+tmp/
+*.pid
+
+# Database
+*.sqlite3
+*.sqlite3-journal
+
+# Secrets and credentials
 .env
 .env.local
+.byebug_history
 config/firebase-credentials.json
-
-spec/dummy/node_modules
-.yardoc/
 firebase/creds.json
-test-results/
+**/config/secrets.yml
+
+# Project-specific
 astro-app/docs/fredy-learnings.md
