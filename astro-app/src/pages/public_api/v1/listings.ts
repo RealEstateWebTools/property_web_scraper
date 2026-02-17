@@ -17,6 +17,7 @@ import { normalizePrice } from '@lib/extractor/price-normalizer.js';
 import { fireWebhooks } from '@lib/services/webhook-service.js';
 import { recordSnapshot } from '@lib/services/price-history.js';
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
+import { recordUsage } from '@lib/services/usage-meter.js';
 
 function countAvailableFields(mapping: ScraperMapping): number {
   let count = 0;
@@ -374,6 +375,11 @@ export const POST: APIRoute = async ({ request }) => {
         clientUserAgent: request.headers.get('user-agent'),
         diagnostics: result.diagnostics,
       }).catch(() => { /* scrape metadata failure shouldn't affect API response */ });
+
+      // Record usage for billing/quota (fire-and-forget)
+      if (auth.userId) {
+        recordUsage(auth.userId).catch(() => { /* usage recording failure shouldn't affect API response */ });
+      }
     }
   }
 
