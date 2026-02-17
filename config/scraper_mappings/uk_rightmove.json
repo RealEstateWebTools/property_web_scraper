@@ -59,12 +59,19 @@
     },
     "title":
     {
-      "cssLocator": "title"
+      "cssLocator": "title",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
+        { "cssLocator": "h1" }
+      ]
     },
     "description":
     {
       "scriptJsonVar": "PAGE_MODEL",
-      "scriptJsonPath": "propertyData.text.description"
+      "scriptJsonPath": "propertyData.text.description",
+      "fallbacks": [
+        { "cssLocator": "meta[name='description']", "cssAttr": "content" }
+      ]
     },
     "price_string":
     {
@@ -81,6 +88,11 @@
       "scriptJsonVar": "PAGE_MODEL",
       "scriptJsonPath": "propertyData.address.displayAddress"
     },
+    "region":
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.address.ukCountry"
+    },
     "property_type":
     {
       "scriptJsonVar": "PAGE_MODEL",
@@ -89,7 +101,10 @@
     "main_image_url":
     {
       "cssLocator": "meta[property='og:image']",
-      "cssAttr": "content"
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "meta[name='twitter:image']", "cssAttr": "content" }
+      ]
     },
     "tenure":
     {
@@ -99,8 +114,15 @@
   },
   "images": [
     {
-      "cssLocator": "meta[property='og:image']",
-      "cssAttr": "content"
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.images",
+      "cssAttr": "url"
+    }
+  ],
+  "features": [
+    {
+      "scriptJsonVar": "PAGE_MODEL",
+      "scriptJsonPath": "propertyData.keyFeatures"
     }
   ],
   "booleanFields": {
