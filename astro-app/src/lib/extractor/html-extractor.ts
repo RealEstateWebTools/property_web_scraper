@@ -111,10 +111,16 @@ function analyzeContent($: cheerio.CheerioAPI, html: string): ContentAnalysis {
   const jsonLdCount = $('script[type="application/ld+json"]').length;
 
   const scriptJsonVarsFound: string[] = [];
-  const scriptText = scriptTags.text();
+  let scriptText: string | null = null;
+  const getScriptText = (): string => {
+    if (scriptText === null) {
+      scriptText = scriptTags.text();
+    }
+    return scriptText;
+  };
   for (const varName of KNOWN_SCRIPT_VARS) {
     const pattern = new RegExp(`(?:window\\.)?${varName}\\s*=`);
-    if (pattern.test(scriptText) || $(`script#${varName}`).length > 0) {
+    if (pattern.test(getScriptText()) || $(`script#${varName}`).length > 0) {
       scriptJsonVarsFound.push(varName);
     }
   }

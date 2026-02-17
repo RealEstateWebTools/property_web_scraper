@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { authenticateApiKey } from '@lib/services/auth.js';
+import { authenticateApiKey, validateUrlLength, MAX_HTML_SIZE } from '@lib/services/auth.js';
 import { validateUrl } from '@lib/services/url-validator.js';
 import { extractFromHtml } from '@lib/extractor/html-extractor.js';
 import { findByName } from '@lib/extractor/mapping-loader.js';
@@ -14,8 +14,6 @@ import { logActivity } from '@lib/services/activity-logger.js';
 import type { ScraperMapping } from '@lib/extractor/mapping-loader.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { normalizePrice } from '@lib/extractor/price-normalizer.js';
-
-const MAX_HTML_SIZE = 10_000_000; // 10 MB
 
 function countAvailableFields(mapping: ScraperMapping): number {
   let count = 0;
@@ -54,6 +52,25 @@ export const GET: APIRoute = async ({ request }) => {
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   const url = new URL(request.url).searchParams.get('url');
+  if (url) {
+    try {
+      validateUrlLength(url);
+    } catch (error) {
+      const resp = errorResponse(ApiErrorCode.INVALID_URL, error instanceof Error ? error.message : 'Invalid URL');
+      logActivity({
+        level: 'warn',
+        category: 'api_request',
+        message: `GET listings: ${error instanceof Error ? error.message : 'Invalid URL'}`,
+        method: 'GET',
+        path,
+        statusCode: resp.status,
+        durationMs: Date.now() - startTime,
+        errorCode: ApiErrorCode.INVALID_URL,
+      });
+      return resp;
+    }
+  }
+
   const validation = await validateUrl(url);
   if (!validation.valid) {
     const resp = errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!);
@@ -149,6 +166,19 @@ export const POST: APIRoute = async ({ request }) => {
     url = formData.get('url') as string || null;
     const htmlFile = formData.get('html_file');
     if (htmlFile && htmlFile instanceof File) {
+      if (htmlFile.size > MAX_HTML_SIZE) {
+        logActivity({
+          level: 'warn',
+          category: 'api_request',
+          message: 'POST listings: payload too large',
+          method: 'POST',
+          path,
+          statusCode: 413,
+          durationMs: Date.now() - startTime,
+          errorCode: ApiErrorCode.PAYLOAD_TOO_LARGE,
+        });
+        return errorResponse(ApiErrorCode.PAYLOAD_TOO_LARGE, 'HTML payload exceeds 10MB limit');
+      }
       html = await htmlFile.text();
     } else {
       html = formData.get('html') as string || null;
@@ -185,6 +215,23 @@ export const POST: APIRoute = async ({ request }) => {
       errorCode: ApiErrorCode.MISSING_URL,
     });
     return errorResponse(ApiErrorCode.MISSING_URL, 'Please provide a url');
+  }
+
+  try {
+    validateUrlLength(url);
+  } catch (error) {
+    const resp = errorResponse(ApiErrorCode.INVALID_URL, error instanceof Error ? error.message : 'Invalid URL');
+    logActivity({
+      level: 'warn',
+      category: 'api_request',
+      message: `POST listings: ${error instanceof Error ? error.message : 'Invalid URL'}`,
+      method: 'POST',
+      path,
+      statusCode: resp.status,
+      durationMs: Date.now() - startTime,
+      errorCode: ApiErrorCode.INVALID_URL,
+    });
+    return resp;
   }
 
   const validation = await validateUrl(url);
