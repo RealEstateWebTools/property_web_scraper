@@ -1,0 +1,156 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import StatCard from '../../components/admin/StatCard.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+
+// Note: In production with KV, you'd list users from KV.
+// For now this page shows a placeholder for manual user management
+// and instructions for using the API key management endpoints.
+---
+<AdminLayout title="Users & API Keys — Admin" activePage="users">
+  <h1 class="text-2xl font-bold mb-6">Users & API Keys</h1>
+
+  <!-- Quick Info -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <StatCard
+      title="Subscription Tiers"
+      value="4"
+      subtitle="Free, Starter, Pro, Enterprise"
+      icon="bi-layers"
+      color="text-blue-600"
+    />
+    <StatCard
+      title="Key Format"
+      value="pws_live_"
+      subtitle="SHA-256 hashed storage"
+      icon="bi-key"
+      color="text-green-600"
+    />
+    <StatCard
+      title="Rate Limits"
+      value="30–1K"
+      subtitle="requests/min by tier"
+      icon="bi-speedometer"
+      color="text-orange-600"
+    />
+  </div>
+
+  <!-- Tier Details -->
+  <div class="bg-white rounded-lg shadow mb-8">
+    <div class="px-5 py-4 border-b border-gray-200">
+      <h2 class="font-semibold">Subscription Tiers</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-200">
+            <th class="py-2 px-4 font-medium">Tier</th>
+            <th class="py-2 px-4 font-medium">Rate Limit</th>
+            <th class="py-2 px-4 font-medium">Daily Quota</th>
+            <th class="py-2 px-4 font-medium">Stripe Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-gray-100">
+            <td class="py-2 px-4"><span class="inline-block bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Free</span></td>
+            <td class="py-2 px-4">30/min</td>
+            <td class="py-2 px-4">500/day</td>
+            <td class="py-2 px-4 text-gray-400">—</td>
+          </tr>
+          <tr class="border-b border-gray-100">
+            <td class="py-2 px-4"><span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded">Starter</span></td>
+            <td class="py-2 px-4">120/min</td>
+            <td class="py-2 px-4">5,000/day</td>
+            <td class="py-2 px-4 font-mono text-xs">{import.meta.env.STRIPE_PRICE_STARTER || 'Not configured'}</td>
+          </tr>
+          <tr class="border-b border-gray-100">
+            <td class="py-2 px-4"><span class="inline-block bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded">Pro</span></td>
+            <td class="py-2 px-4">300/min</td>
+            <td class="py-2 px-4">25,000/day</td>
+            <td class="py-2 px-4 font-mono text-xs">{import.meta.env.STRIPE_PRICE_PRO || 'Not configured'}</td>
+          </tr>
+          <tr class="border-b border-gray-100">
+            <td class="py-2 px-4"><span class="inline-block bg-amber-100 text-amber-800 text-xs font-medium px-2 py-0.5 rounded">Enterprise</span></td>
+            <td class="py-2 px-4">1,000/min</td>
+            <td class="py-2 px-4">100,000/day</td>
+            <td class="py-2 px-4 text-gray-400">Custom</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- API Key Management Guide -->
+  <div class="bg-white rounded-lg shadow mb-8">
+    <div class="px-5 py-4 border-b border-gray-200">
+      <h2 class="font-semibold">API Key Management</h2>
+    </div>
+    <div class="p-5 space-y-4 text-sm">
+      <div>
+        <h3 class="font-medium mb-2">Create a new API key</h3>
+        <pre class="bg-gray-900 text-green-400 p-3 rounded overflow-x-auto text-xs"><code>curl -X POST /public_api/v1/auth/keys \
+  -H "X-Api-Key: $MASTER_KEY" \
+  -H "Content-Type: application/json" \
+  -d '&#123;"label": "production"&#125;'</code></pre>
+      </div>
+      <div>
+        <h3 class="font-medium mb-2">List API keys</h3>
+        <pre class="bg-gray-900 text-green-400 p-3 rounded overflow-x-auto text-xs"><code>curl /public_api/v1/auth/keys \
+  -H "X-Api-Key: $YOUR_KEY"</code></pre>
+      </div>
+      <div>
+        <h3 class="font-medium mb-2">Revoke an API key</h3>
+        <pre class="bg-gray-900 text-green-400 p-3 rounded overflow-x-auto text-xs"><code>curl -X DELETE "/public_api/v1/auth/keys?prefix=pws_live_xxxx" \
+  -H "X-Api-Key: $YOUR_KEY"</code></pre>
+      </div>
+      <div>
+        <h3 class="font-medium mb-2">Check usage</h3>
+        <pre class="bg-gray-900 text-green-400 p-3 rounded overflow-x-auto text-xs"><code>curl /public_api/v1/usage \
+  -H "X-Api-Key: $YOUR_KEY"</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Billing Endpoints -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-5 py-4 border-b border-gray-200">
+      <h2 class="font-semibold">Billing Endpoints</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-200">
+            <th class="py-2 px-4 font-medium">Method</th>
+            <th class="py-2 px-4 font-medium">Path</th>
+            <th class="py-2 px-4 font-medium">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-gray-100">
+            <td class="py-2 px-4"><span class="bg-green-100 text-green-800 text-xs font-mono px-1.5 py-0.5 rounded">POST</span></td>
+            <td class="py-2 px-4 font-mono text-xs">/public_api/v1/billing/checkout</td>
+            <td class="py-2 px-4 text-xs">Create Stripe Checkout session</td>
+          </tr>
+          <tr class="border-b border-gray-100">
+            <td class="py-2 px-4"><span class="bg-green-100 text-green-800 text-xs font-mono px-1.5 py-0.5 rounded">POST</span></td>
+            <td class="py-2 px-4 font-mono text-xs">/public_api/v1/billing/portal</td>
+            <td class="py-2 px-4 text-xs">Open Stripe Customer Portal</td>
+          </tr>
+          <tr class="border-b border-gray-100">
+            <td class="py-2 px-4"><span class="bg-yellow-100 text-yellow-800 text-xs font-mono px-1.5 py-0.5 rounded">POST</span></td>
+            <td class="py-2 px-4 font-mono text-xs">/public_api/v1/stripe-webhook</td>
+            <td class="py-2 px-4 text-xs">Stripe webhook (auto-syncs tier)</td>
+          </tr>
+          <tr>
+            <td class="py-2 px-4"><span class="bg-blue-100 text-blue-800 text-xs font-mono px-1.5 py-0.5 rounded">GET</span></td>
+            <td class="py-2 px-4 font-mono text-xs">/public_api/v1/usage</td>
+            <td class="py-2 px-4 text-xs">Usage stats & quota</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</AdminLayout>
