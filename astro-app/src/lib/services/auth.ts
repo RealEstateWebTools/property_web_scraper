@@ -1,43 +1,73 @@
 import { errorResponse, ApiErrorCode } from './api-response.js';
 import { logActivity } from './activity-logger.js';
 import { constantTimeCompare } from './constant-time.js';
+import { validateApiKey } from './api-key-service.js';
+import type { SubscriptionTier } from './api-key-service.js';
 
 export const MAX_HTML_SIZE = 10_000_000; // 10 MB
 export const MAX_URL_LENGTH = 2048;
 
+export interface AuthResult {
+  authorized: boolean;
+  userId?: string;
+  tier?: SubscriptionTier;
+  errorResponse?: Response;
+}
+
 /**
  * API key authentication.
- * Port of Ruby ApplicationController#authenticate_api_key!
+ *
+ * Authentication priority:
+ * 1. Master key (`PWS_API_KEY` env var) → enterprise tier, userId="master"
+ * 2. Per-user key (`pws_live_...`) → validated via api-key-service (KV lookup)
+ * 3. No key when none configured → auth skipped (backwards compatible dev mode)
  */
-export function authenticateApiKey(request: Request): { authorized: boolean; errorResponse?: Response } {
-  const expectedKey = import.meta.env.PWS_API_KEY || '';
-  if (!expectedKey) {
-    // No key configured = auth is skipped (backwards compatible)
-    return { authorized: true };
-  }
+export async function authenticateApiKey(request: Request): Promise<AuthResult> {
+  const masterKey = import.meta.env.PWS_API_KEY || '';
 
   const providedKey =
     request.headers.get('X-Api-Key') ||
     new URL(request.url).searchParams.get('api_key') ||
     '';
 
-  if (!providedKey || !constantTimeCompare(providedKey, expectedKey)) {
-    logActivity({
-      level: 'warn',
-      category: 'auth',
-      message: `Auth failed: ${providedKey ? 'invalid key' : 'no key provided'}`,
-      path: new URL(request.url).pathname,
-      method: request.method,
-      statusCode: 401,
-      errorCode: ApiErrorCode.UNAUTHORIZED,
-    });
-    return {
-      authorized: false,
-      errorResponse: errorResponse(ApiErrorCode.UNAUTHORIZED, 'Unauthorized', request),
-    };
+  // No key provided
+  if (!providedKey) {
+    if (!masterKey) {
+      // No master key configured = auth skipped (dev mode)
+      return { authorized: true, userId: 'anonymous', tier: 'free' };
+    }
+    logAuthFailure('no key provided', request);
+    return { authorized: false, errorResponse: errorResponse(ApiErrorCode.UNAUTHORIZED, 'Unauthorized', request) };
   }
 
-  return { authorized: true };
+  // Check master key first (constant-time comparison)
+  if (masterKey && constantTimeCompare(providedKey, masterKey)) {
+    return { authorized: true, userId: 'master', tier: 'enterprise' };
+  }
+
+  // Check per-user key via api-key-service
+  if (providedKey.startsWith('pws_live_')) {
+    const keyInfo = await validateApiKey(providedKey);
+    if (keyInfo) {
+      return { authorized: true, userId: keyInfo.userId, tier: keyInfo.tier };
+    }
+  }
+
+  // Key provided but doesn't match anything
+  logAuthFailure('invalid key', request);
+  return { authorized: false, errorResponse: errorResponse(ApiErrorCode.UNAUTHORIZED, 'Unauthorized', request) };
+}
+
+function logAuthFailure(reason: string, request: Request): void {
+  logActivity({
+    level: 'warn',
+    category: 'auth',
+    message: `Auth failed: ${reason}`,
+    path: new URL(request.url).pathname,
+    method: request.method,
+    statusCode: 401,
+    errorCode: ApiErrorCode.UNAUTHORIZED,
+  });
 }
 
 /**

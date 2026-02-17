@@ -20,10 +20,10 @@ import { getHistory, getPriceChanges } from '@lib/services/price-history.js';
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
 export const GET: APIRoute = async ({ request }) => {
-  const auth = authenticateApiKey(request);
+  const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request);
+  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   const params = new URL(request.url).searchParams;

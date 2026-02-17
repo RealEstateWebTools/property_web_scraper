@@ -10,10 +10,10 @@ export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request)
 export const GET: APIRoute = async ({ request }) => {
   const startTime = Date.now();
 
-  const auth = authenticateApiKey(request);
+  const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request);
+  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   // Deduplicate www/non-www hosts — keep only the canonical (www) version

@@ -1,9 +1,18 @@
 {
   "name": "property-web-scraper",
   "compatibility_date": "2026-02-01",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "pages_build_output_dir": "dist",
   "kv_namespaces": [
-    { "binding": "RESULTS", "id": "a256f3e986d048e8bda850e4a5ac967a" }
+    {
+      "binding": "RESULTS",
+      "id": "a256f3e986d048e8bda850e4a5ac967a"
+    },
+    {
+      "binding": "USERS",
+      "id": "TODO-create-with-wrangler-kv-namespace-create"
+    }
   ]
 }

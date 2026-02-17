@@ -10,10 +10,10 @@ export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request)
 export const POST: APIRoute = async ({ params, request, locals }) => {
   initKV((locals as any).runtime?.env?.RESULTS);
 
-  const auth = authenticateApiKey(request);
+  const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request);
+  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   const listing = params.id ? await getListing(params.id) : undefined;
