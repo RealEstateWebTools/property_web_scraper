@@ -83,7 +83,7 @@ property_web_scraper/
 ├── config/scraper_mappings/    # JSON mapping files per portal
 │   └── archive/                # Legacy mappings (kept for reference)
 ├── app/                        # Legacy Rails engine (see RAILS_README.md)
-└── spec/                       # Legacy Rails RSpec tests
+└── spec-archive/               # Archived Rails RSpec tests (not run in CI)
 ```
 
 ## Scraper Mappings

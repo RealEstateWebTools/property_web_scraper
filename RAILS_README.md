@@ -71,15 +71,9 @@ rails property_web_scraper:db:seed
 | GET/POST | `/retriever/as_json` | Scrapes a property URL and returns listing JSON |
 | GET | `/api/v1/listings?url=...` | Returns a PwbListing-formatted JSON array |
 
-## Running Rails Tests
+## Rails Tests (Archived)
 
-Start the Firestore emulator, then run RSpec:
-
-```bash
-firebase emulators:start --only firestore --project test-project &
-sleep 5
-FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=test-project bundle exec rspec
-```
+The Rails RSpec tests have been moved to `spec-archive/` and are no longer run in CI. They are kept for reference only. The project's CI now runs the Astro Vitest suite exclusively.
 
 ## Shared Config
 
