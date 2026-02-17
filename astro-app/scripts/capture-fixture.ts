@@ -70,6 +70,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'onthemarket.com': 'uk_onthemarket',
   'www.daft.ie': 'ie_daft',
   'daft.ie': 'ie_daft',
+  'www.idealista.pt': 'pt_idealista',
+  'idealista.pt': 'pt_idealista',
 };
 
 const HELP_TEXT = `
