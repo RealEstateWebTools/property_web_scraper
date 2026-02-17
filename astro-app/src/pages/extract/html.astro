@@ -2,8 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { retrieveListing } from '@lib/services/listing-retriever.js';
 import { initKV, generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
+import { initScrapeMetadataKV, recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
+initScrapeMetadataKV((Astro.locals as any).runtime?.env?.RESULTS);
 
 if (Astro.request.method === 'POST') {
   const formData = await Astro.request.formData();
@@ -30,6 +32,19 @@ if (Astro.request.method === 'POST') {
   if (result.diagnostics) {
     await storeDiagnostics(id, result.diagnostics);
   }
+
+  await recordScrapeAndUpdatePortal({
+    listingId: id,
+    sourceUrl: importUrl,
+    html,
+    sourceType: 'manual_html',
+    scraperName: result.diagnostics?.scraperName,
+    portalSlug: result.diagnostics?.scraperName,
+    requestContentType: Astro.request.headers.get('content-type') || undefined,
+    clientUserAgent: Astro.request.headers.get('user-agent'),
+    diagnostics: result.diagnostics,
+  });
+
   return Astro.redirect(`/extract/results/${id}`);
 }
 ---
