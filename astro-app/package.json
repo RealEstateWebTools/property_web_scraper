@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "capture-fixture": "tsx scripts/capture-fixture.ts"
+    "capture-fixture": "tsx scripts/capture-fixture.ts",
+    "create-scraper": "tsx scripts/create-scraper.ts"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.0.0",

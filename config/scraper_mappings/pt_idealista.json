@@ -1,0 +1,102 @@
+[{
+  "name": "pt_idealista",
+  "expectedExtractionRate": 0.90,
+  "defaultValues": {
+    "country": { "value": "Portugal" },
+    "area_unit": { "value": "sqm" },
+    "currency": { "value": "EUR" },
+    "for_rent_short_term": { "value": "false" },
+    "locale_code": { "value": "pt" }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.rooms"
+    },
+    "count_bathrooms": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.bathrooms"
+    },
+    "constructed_area": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.constructedArea"
+    }
+  },
+  "floatFields": {
+    "price_float": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.price"
+    },
+    "latitude": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.ubication.latitude"
+    },
+    "longitude": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.ubication.longitude"
+    }
+  },
+  "textFields": {
+    "reference": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.id"
+    },
+    "title": {
+      "cssLocator": "title",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
+        { "cssLocator": "h1" }
+      ]
+    },
+    "description": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.description",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" },
+        { "cssLocator": "meta[name='description']", "cssAttr": "content" }
+      ]
+    },
+    "address_string": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.address"
+    },
+    "postal_code": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.zipCode"
+    },
+    "city": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.municipality"
+    },
+    "region": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.district"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "meta[name='twitter:image']", "cssAttr": "content" }
+      ]
+    }
+  },
+  "images": [{
+    "scriptJsonVar": "__INITIAL_STATE__",
+    "scriptJsonPath": "detail.adDetail.multimedia.images",
+    "cssAttr": "url"
+  }],
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.operation",
+      "evaluator": "include?",
+      "evaluatorParam": "sale"
+    },
+    "for_rent": {
+      "scriptJsonVar": "__INITIAL_STATE__",
+      "scriptJsonPath": "detail.adDetail.operation",
+      "evaluator": "include?",
+      "evaluatorParam": "rent"
+    }
+  }
+}]

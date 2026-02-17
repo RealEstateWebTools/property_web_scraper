@@ -151,6 +151,18 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
+  pt_idealista: {
+    scraperName: 'pt_idealista',
+    slug: 'pt_idealista',
+    hosts: ['www.idealista.pt', 'idealista.pt'],
+    country: 'PT',
+    currency: 'EUR',
+    localeCode: 'pt',
+    areaUnit: 'sqmt',
+    contentSource: 'script-json',
+    stripTrailingSlash: false,
+    requiresJsRendering: false,
+  },
 };
 
 /**
