@@ -1,0 +1,68 @@
+{
+  "manifest_version": 3,
+  "name": "Property Web Scraper",
+  "version": "1.0.0",
+  "description": "Extract structured property data from real estate listing pages",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://*.rightmove.co.uk/*",
+    "https://*.zoopla.co.uk/*",
+    "https://*.onthemarket.com/*",
+    "https://*.idealista.com/*",
+    "https://*.idealista.pt/*",
+    "https://*.fotocasa.es/*",
+    "https://*.pisos.com/*",
+    "https://*.daft.ie/*",
+    "https://*.realtor.com/*",
+    "https://*.realestateindia.com/*",
+    "https://*.forsalebyowner.com/*",
+    "https://*.jitty.com/*",
+    "https://*.immobilienscout24.de/*",
+    "https://*.seloger.com/*",
+    "https://*.leboncoin.fr/*",
+    "https://*.domain.com.au/*",
+    "https://*.realestate.com.au/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.rightmove.co.uk/*",
+        "https://*.zoopla.co.uk/*",
+        "https://*.onthemarket.com/*",
+        "https://*.idealista.com/*",
+        "https://*.idealista.pt/*",
+        "https://*.fotocasa.es/*",
+        "https://*.pisos.com/*",
+        "https://*.daft.ie/*",
+        "https://*.realtor.com/*",
+        "https://*.realestateindia.com/*",
+        "https://*.forsalebyowner.com/*",
+        "https://*.jitty.com/*",
+        "https://*.immobilienscout24.de/*",
+        "https://*.seloger.com/*",
+        "https://*.leboncoin.fr/*",
+        "https://*.domain.com.au/*",
+        "https://*.realestate.com.au/*"
+      ],
+      "js": ["content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

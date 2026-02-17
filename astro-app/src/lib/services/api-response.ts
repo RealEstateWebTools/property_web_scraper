@@ -77,6 +77,11 @@ function resolveAllowOrigin(request?: Request): { allowOrigin: string | null; us
     return { allowOrigin: origin, usingAllowlist: true };
   }
 
+  // Allow Chrome extension origins
+  if (origin.startsWith('chrome-extension://')) {
+    return { allowOrigin: origin, usingAllowlist: true };
+  }
+
   return { allowOrigin: null, usingAllowlist: true };
 }
 
