@@ -62,14 +62,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'mlslistings.com': 'us_mlslistings',
   'www.wyomingmls.com': 'us_wyomingmls',
   'wyomingmls.com': 'us_wyomingmls',
-  'www.inmo1.com': 'es_inmo1',
-  'inmo1.com': 'es_inmo1',
-  'www.carusoimmobiliare.com': 'it_carusoimmobiliare',
-  'carusoimmobiliare.com': 'it_carusoimmobiliare',
-  'www.cerdfw.com': 'us_cerdfw',
-  'cerdfw.com': 'us_cerdfw',
-  'www.weebrix.com': 'es_weebrix',
-  'weebrix.com': 'es_weebrix',
+
+
   'jitty.com': 'uk_jitty',
   'www.jitty.com': 'uk_jitty',
   'www.onthemarket.com': 'uk_onthemarket',

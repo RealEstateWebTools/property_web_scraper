@@ -192,10 +192,7 @@ The pwb-pro-be `rightmove_pasarela.rb` extracts many fields we don't yet capture
 **Priority: Low** | **Effort: Medium**
 
 Four scrapers currently have no HTML fixtures (fixture: null in manifest):
-- `cerdfw`
-- `carusoimmobiliare`
 - `forsalebyowner`
-- `weebrix`
 
 ### Steps (for each):
 - [ ] Attempt to capture fixture using `npm run capture-fixture -- <url>`
