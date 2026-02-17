@@ -27,6 +27,7 @@ export interface UserRecord {
   name?: string;
   tier: SubscriptionTier;
   stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
   /** SHA-256 hashes of all keys (active + revoked) */
   keyHashes: string[];
   createdAt: string;
