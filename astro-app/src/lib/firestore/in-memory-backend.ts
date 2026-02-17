@@ -3,7 +3,15 @@
  * Port of Ruby InMemoryFirestore module.
  */
 
-type DocData = Record<string, unknown>;
+import type {
+  DocData,
+  FirestoreClient,
+  FirestoreCollectionReference,
+  FirestoreDocumentReference,
+  FirestoreDocumentSnapshot,
+  FirestoreQuery,
+  FirestoreQuerySnapshot,
+} from './types.js';
 
 const store: Map<string, Map<string, DocData>> = new Map();
 
@@ -28,7 +36,7 @@ function generateId(): string {
 }
 
 // DocumentSnapshot
-class InMemoryDocumentSnapshot {
+class InMemoryDocumentSnapshot implements FirestoreDocumentSnapshot {
   constructor(
     private collectionName: string,
     public readonly id: string,
@@ -49,7 +57,7 @@ class InMemoryDocumentSnapshot {
 }
 
 // DocumentReference
-class InMemoryDocumentReference {
+class InMemoryDocumentReference implements FirestoreDocumentReference {
   constructor(
     private collectionName: string,
     public readonly id: string
@@ -79,7 +87,7 @@ class InMemoryDocumentReference {
 }
 
 // QuerySnapshot
-class InMemoryQuerySnapshot {
+class InMemoryQuerySnapshot implements FirestoreQuerySnapshot {
   constructor(public readonly docs: InMemoryDocumentSnapshot[]) {}
 
   get empty(): boolean {
@@ -88,7 +96,7 @@ class InMemoryQuerySnapshot {
 }
 
 // Query
-class InMemoryQuery {
+class InMemoryQuery implements FirestoreQuery {
   constructor(
     private collectionName: string,
     private conditions: Array<[string, string, unknown]>
@@ -115,7 +123,7 @@ class InMemoryQuery {
 }
 
 // CollectionReference
-class InMemoryCollectionReference {
+class InMemoryCollectionReference implements FirestoreCollectionReference {
   constructor(private name: string) {}
 
   doc(id?: string): InMemoryDocumentReference {
@@ -127,6 +135,10 @@ class InMemoryCollectionReference {
     return new InMemoryQuery(this.name, [[field, op, value]]);
   }
 
+  async get(): Promise<InMemoryQuerySnapshot> {
+    return new InMemoryQuery(this.name, []).get();
+  }
+
   async listDocuments(): Promise<InMemoryDocumentReference[]> {
     const col = getCollection(this.name);
     return Array.from(col.keys()).map(
@@ -136,7 +148,7 @@ class InMemoryCollectionReference {
 }
 
 // Client
-export class InMemoryFirestoreClient {
+export class InMemoryFirestoreClient implements FirestoreClient {
   collection(name: string): InMemoryCollectionReference {
     return new InMemoryCollectionReference(name);
   }
@@ -146,7 +158,7 @@ export class InMemoryFirestoreClient {
     return this.collection(name);
   }
 
-  async transaction<T>(fn: (tx: InMemoryFirestoreClient) => Promise<T>): Promise<T> {
+  async transaction<T>(fn: (tx: FirestoreClient) => Promise<T>): Promise<T> {
     return fn(this);
   }
 }

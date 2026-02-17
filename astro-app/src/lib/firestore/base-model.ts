@@ -1,4 +1,9 @@
 import { getClient, getCollectionPrefix } from './client.js';
+import type {
+  FirestoreCollectionReference,
+  FirestoreDocumentSnapshot,
+  FirestoreQuery,
+} from './types.js';
 
 export interface AttributeDefinition {
   type: 'string' | 'integer' | 'float' | 'boolean' | 'datetime' | 'array' | 'hash';
@@ -38,7 +43,7 @@ export abstract class BaseModel {
     this: ModelConstructor<T>,
     conditions: Record<string, unknown>
   ): Promise<T | null> {
-    let query: FirebaseFirestore.Query = await this.collectionRef();
+    let query: FirestoreQuery = await this.collectionRef();
     for (const [field, value] of Object.entries(conditions)) {
       query = query.where(field, '==', value);
     }
@@ -66,7 +71,7 @@ export abstract class BaseModel {
 
   static buildFromSnapshot<T extends BaseModel>(
     this: ModelConstructor<T>,
-    doc: FirebaseFirestore.DocumentSnapshot
+    doc: FirestoreDocumentSnapshot
   ): T {
     const instance = new this();
     instance.id = doc.id;
@@ -170,8 +175,8 @@ type ModelConstructor<T extends BaseModel> = {
   _collectionName: string;
   _documentIdField: string | null;
   _attributeDefinitions: Record<string, AttributeDefinition>;
-  collectionRef(): Promise<FirebaseFirestore.CollectionReference>;
-  buildFromSnapshot(doc: FirebaseFirestore.DocumentSnapshot): T;
+  collectionRef(): Promise<FirestoreCollectionReference>;
+  buildFromSnapshot(doc: FirestoreDocumentSnapshot): T;
 };
 
 /**
@@ -185,7 +190,7 @@ export class WhereChain<T extends BaseModel> {
   ) {}
 
   async first(): Promise<T | null> {
-    let query: FirebaseFirestore.Query = await this.klass.collectionRef();
+    let query: FirestoreQuery = await this.klass.collectionRef();
     for (const [field, value] of Object.entries(this.conditions)) {
       query = query.where(field, '==', value);
     }
@@ -204,7 +209,7 @@ export class WhereChain<T extends BaseModel> {
   }
 
   async get(): Promise<T[]> {
-    let query: FirebaseFirestore.Query = await this.klass.collectionRef();
+    let query: FirestoreQuery = await this.klass.collectionRef();
     for (const [field, value] of Object.entries(this.conditions)) {
       query = query.where(field, '==', value);
     }

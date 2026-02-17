@@ -1,5 +1,7 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import StatusBadge from '../../components/admin/StatusBadge.astro';
+import EnvVarTable from '../../components/admin/EnvVarTable.astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
 import { getRuntimeConfig, updateRuntimeConfig, resetRuntimeConfig } from '@lib/services/runtime-config.js';
 import { getRateLimiterStats, resetRateLimiter } from '@lib/services/rate-limiter.js';
@@ -8,6 +10,7 @@ import { clearCache, allMappingNames } from '@lib/extractor/mapping-loader.js';
 import { getCacheStats } from '@lib/extractor/mapping-loader.js';
 import { getStoreStats, clearListingStore } from '@lib/services/listing-store.js';
 import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
+import { getSystemHealth } from '@lib/services/system-health.js';
 
 const auth = authenticateAdmin(Astro.request);
 if (!auth.authorized) return Astro.redirect('/admin/login');
@@ -65,9 +68,26 @@ const rateLimiterStats = getRateLimiterStats();
 const logStats = getLogStats();
 const cacheStats = getCacheStats();
 const storeStats = getStoreStats();
+const health = getSystemHealth();
 
 // Count unique supported sites
 const uniqueSites = new Set(Object.values(LOCAL_HOST_MAP).map(e => e.scraper_name));
+
+function formatUptime(seconds: number | null): string {
+  if (seconds === null) return 'N/A';
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return `${h}h ${m}m`;
+}
+
+function formatErrorRate(rate: number): string {
+  return `${(rate * 100).toFixed(1)}%`;
+}
+
+const storageHealthStatus = health.storage.error ? 'error' : health.storage.connected ? 'healthy' : 'degraded';
+const backendLabel = health.storage.backend === 'firestore_rest' ? 'Firestore REST' : 'In-Memory';
 ---
 <AdminLayout title="Config — Admin" activePage="config">
   <h1 class="text-2xl font-bold mb-6">Runtime Configuration</h1>
@@ -181,30 +201,131 @@ const uniqueSites = new Set(Object.values(LOCAL_HOST_MAP).map(e => e.scraper_nam
       </div>
     </div>
 
-    <!-- System Info -->
+    <!-- Storage Backend -->
     <div class="bg-white rounded-lg shadow lg:col-span-2">
       <div class="px-5 py-4 border-b border-gray-200">
         <h2 class="font-semibold flex items-center gap-2">
-          <i class="bi bi-info-circle"></i> System Info
+          <i class="bi bi-database"></i> Storage Backend
         </h2>
       </div>
       <div class="p-5">
+        <div class="flex items-center gap-3 mb-4">
+          <StatusBadge status={storageHealthStatus} label={backendLabel} size="md" />
+          {health.storage.projectId && (
+            <span class="text-sm text-gray-500">Project: <strong>{health.storage.projectId}</strong></span>
+          )}
+        </div>
+        {health.storage.error && (
+          <div class="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm mb-4">
+            {health.storage.error}
+          </div>
+        )}
         <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div>
-            <dt class="text-gray-500">Supported Sites</dt>
-            <dd class="font-medium">{uniqueSites.size}</dd>
+            <dt class="text-gray-500">Backend Type</dt>
+            <dd class="font-medium">{backendLabel}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Connection</dt>
+            <dd class="font-medium">{health.storage.connected ? 'Connected' : 'Disconnected'}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Listings Stored</dt>
+            <dd class="font-medium">{storeStats.count}</dd>
           </div>
           <div>
             <dt class="text-gray-500">Scrapers Available</dt>
             <dd class="font-medium">{allMappingNames().length}</dd>
           </div>
-          <div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Environment Variables -->
+    <div class="bg-white rounded-lg shadow lg:col-span-2">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold flex items-center gap-2">
+          <i class="bi bi-key"></i> Environment Variables
+        </h2>
+      </div>
+      <div class="p-5">
+        <EnvVarTable vars={health.environment} />
+      </div>
+    </div>
+
+    <!-- Runtime Info -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold flex items-center gap-2">
+          <i class="bi bi-cpu"></i> Runtime Info
+        </h2>
+      </div>
+      <div class="p-5">
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Platform</dt>
+            <dd class="font-medium">{health.runtime.platform}</dd>
+          </div>
+          {health.runtime.nodeVersion && (
+            <div class="flex justify-between">
+              <dt class="text-gray-500">Node Version</dt>
+              <dd class="font-medium">v{health.runtime.nodeVersion}</dd>
+            </div>
+          )}
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Uptime</dt>
+            <dd class="font-medium">{formatUptime(health.runtime.uptime)}</dd>
+          </div>
+          {health.runtime.memoryUsageMb !== null && (
+            <div class="flex justify-between">
+              <dt class="text-gray-500">Memory (RSS)</dt>
+              <dd class="font-medium">{health.runtime.memoryUsageMb} MB</dd>
+            </div>
+          )}
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Supported Sites</dt>
+            <dd class="font-medium">{uniqueSites.size}</dd>
+          </div>
+          <div class="flex justify-between">
             <dt class="text-gray-500">Scrapers Cached</dt>
             <dd class="font-medium">{cacheStats.size}</dd>
           </div>
-          <div>
-            <dt class="text-gray-500">Storage</dt>
-            <dd class="font-medium">In-memory + KV</dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Request Throughput -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold flex items-center gap-2">
+          <i class="bi bi-graph-up"></i> Request Throughput
+        </h2>
+      </div>
+      <div class="p-5">
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Requests / Minute</dt>
+            <dd class="font-medium">{health.throughput.requestsLastMinute}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Requests / Hour</dt>
+            <dd class="font-medium">{health.throughput.requestsLastHour}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Total Requests</dt>
+            <dd class="font-medium">{health.throughput.totalRequests}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Error Rate</dt>
+            <dd class="font-medium">{formatErrorRate(health.throughput.errorRate)}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Errors</dt>
+            <dd class="font-medium text-red-600">{health.throughput.errorCount}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Warnings</dt>
+            <dd class="font-medium text-amber-600">{health.throughput.warnCount}</dd>
           </div>
         </dl>
       </div>

@@ -1,0 +1,20 @@
+---
+interface Props {
+  status: 'healthy' | 'degraded' | 'error';
+  label?: string;
+  size?: 'sm' | 'md';
+}
+const { status, label, size = 'sm' } = Astro.props;
+
+const colorMap: Record<string, { bg: string; text: string }> = {
+  healthy: { bg: 'bg-green-100', text: 'text-green-700' },
+  degraded: { bg: 'bg-amber-100', text: 'text-amber-700' },
+  error: { bg: 'bg-red-100', text: 'text-red-700' },
+};
+const colors = colorMap[status] || colorMap.error;
+const sizeClass = size === 'md' ? 'px-3 py-1 text-sm' : 'px-2 py-0.5 text-xs';
+const displayLabel = label || status.charAt(0).toUpperCase() + status.slice(1);
+---
+<span class={`inline-block rounded font-medium ${colors.bg} ${colors.text} ${sizeClass}`}>
+  {displayLabel}
+</span>
