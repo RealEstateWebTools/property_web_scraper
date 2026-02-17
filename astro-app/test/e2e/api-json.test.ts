@@ -93,7 +93,7 @@ test.describe('/public_api/v1/listings API', () => {
     const json = await res.json();
     expect(json.success).toBe(true);
     if (json.extraction) {
-      expect(json.extraction.scraper_used).toBe('idealista');
+      expect(json.extraction.scraper_used).toBe('es_idealista');
       expect(typeof json.extraction.fields_extracted).toBe('number');
       expect(typeof json.extraction.fields_available).toBe('number');
     }
@@ -118,7 +118,7 @@ test.describe('/public_api/v1/listings POST diagnostics', () => {
       headers: { 'Content-Type': 'application/json' },
       data: JSON.stringify({
         url: 'http://www.rightmove.co.uk/property-to-rent/property-51775029.html',
-        html: loadFixture('rightmove'),
+        html: loadFixture('rightmove_v2'),
       }),
     });
     expect(res.status()).toBe(200);
@@ -128,7 +128,7 @@ test.describe('/public_api/v1/listings POST diagnostics', () => {
     // extraction block should contain diagnostics
     expect(json.extraction).toBeDefined();
     expect(json.extraction.diagnostics).toBeDefined();
-    expect(json.extraction.diagnostics.scraperName).toBe('rightmove');
+    expect(json.extraction.diagnostics.scraperName).toBe('uk_rightmove');
     expect(json.extraction.diagnostics.fieldTraces).toBeInstanceOf(Array);
     expect(json.extraction.diagnostics.fieldTraces.length).toBeGreaterThan(0);
     expect(json.extraction.diagnostics.populatedFields).toBeGreaterThan(0);
@@ -187,5 +187,26 @@ test.describe('/public_api/v1/health API', () => {
     expect(json.success).toBe(true);
     expect(json.status).toBe('ok');
     expect(json.scrapers_loaded).toBeGreaterThan(0);
+  });
+});
+
+test.describe('/health API', () => {
+  test('GET returns 200 with healthy status', async ({ request }) => {
+    const res = await request.get('/health');
+    expect(res.status()).toBe(200);
+    const json = await res.json();
+    expect(json.status).toBe('healthy');
+    expect(json.checks.scrapers_loaded).toBeGreaterThan(0);
+  });
+});
+
+test.describe('security headers', () => {
+  test('API responses include security headers', async ({ request }) => {
+    const res = await request.get('/public_api/v1/health');
+    expect(res.status()).toBe(200);
+    const headers = res.headers();
+    expect(headers['x-frame-options']).toBe('DENY');
+    expect(headers['x-content-type-options']).toBe('nosniff');
+    expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
   });
 });

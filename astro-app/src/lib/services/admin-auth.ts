@@ -1,3 +1,5 @@
+import { constantTimeCompare } from './constant-time.js';
+
 /**
  * Admin authentication.
  * Checks PWS_ADMIN_KEY from header, query param, or cookie.
@@ -36,7 +38,7 @@ export function authenticateAdmin(request: Request): AdminAuthResult {
     parseCookie(request.headers.get('cookie') || '', 'pws_admin_key') ||
     '';
 
-  if (!providedKey || providedKey !== expectedKey) {
+  if (!providedKey || !constantTimeCompare(providedKey, expectedKey)) {
     return { authorized: false, errorMessage: 'Invalid admin key' };
   }
 
@@ -53,7 +55,7 @@ export function validateAdminKey(key: string): boolean {
   } catch {
     expectedKey = '';
   }
-  return !!expectedKey && key === expectedKey;
+  return !!expectedKey && constantTimeCompare(key, expectedKey);
 }
 
 /**

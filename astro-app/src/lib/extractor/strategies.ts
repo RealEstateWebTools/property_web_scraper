@@ -9,6 +9,36 @@ export interface RetrievalResult {
   strategyDescription: string;
 }
 
+const selectorCache = new WeakMap<cheerio.CheerioAPI, Map<string, cheerio.Cheerio<cheerio.AnyNode>>>();
+const scriptTextCache = new WeakMap<cheerio.CheerioAPI, string>();
+
+function getCachedSelectorElements(
+  $: cheerio.CheerioAPI,
+  cssLocator: string
+): cheerio.Cheerio<cheerio.AnyNode> {
+  let perDocument = selectorCache.get($);
+  if (!perDocument) {
+    perDocument = new Map();
+    selectorCache.set($, perDocument);
+  }
+
+  const cached = perDocument.get(cssLocator);
+  if (cached) return cached;
+
+  const elements = $(cssLocator);
+  perDocument.set(cssLocator, elements);
+  return elements;
+}
+
+function getCombinedScriptText($: cheerio.CheerioAPI): string {
+  const cached = scriptTextCache.get($);
+  if (cached !== undefined) return cached;
+
+  const text = $('script').text();
+  scriptTextCache.set($, text);
+  return text;
+}
+
 /**
  * Extract text using a CSS selector (Cheerio).
  * Port of Ruby get_text_from_css.
@@ -253,7 +283,7 @@ function retrieveTargetTextSingle(
   // Regex strategy on <script> contents
   if (mapping.scriptRegEx) {
     const regex = new RegExp(mapping.scriptRegEx);
-    const scriptText = $('script').text();
+    const scriptText = getCombinedScriptText($);
     const match = scriptText.match(regex);
     retrievedText = match ? match[0] : '';
   }
@@ -265,7 +295,7 @@ function retrieveTargetTextSingle(
 
   // CSS selector strategy
   if (mapping.cssLocator) {
-    const elements = $(mapping.cssLocator);
+    const elements = getCachedSelectorElements($, mapping.cssLocator);
     retrievedText = getTextFromCss($, elements, mapping);
   }
 

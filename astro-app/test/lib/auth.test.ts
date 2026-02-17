@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { authenticateApiKey, extractHtmlInput } from '../../src/lib/services/auth.js';
+import {
+  authenticateApiKey,
+  extractHtmlInput,
+  validateUrlLength,
+  MAX_HTML_SIZE,
+} from '../../src/lib/services/auth.js';
 
 // Mock import.meta.env for auth tests
 const originalEnv = import.meta.env;
@@ -159,5 +164,26 @@ describe('extractHtmlInput', () => {
     });
     const result = await extractHtmlInput(request);
     expect(result).toBeNull();
+  });
+
+  it('throws when JSON html exceeds the max payload size', async () => {
+    const tooLargeHtml = 'a'.repeat(MAX_HTML_SIZE + 1);
+    const request = new Request('http://localhost/api/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ html: tooLargeHtml }),
+    });
+    await expect(extractHtmlInput(request)).rejects.toThrow(/exceeds/i);
+  });
+});
+
+describe('validateUrlLength', () => {
+  it('allows URL at or under the limit', () => {
+    expect(() => validateUrlLength('https://example.com/path')).not.toThrow();
+  });
+
+  it('throws for URLs above the limit', () => {
+    const veryLongUrl = `https://example.com/${'a'.repeat(2050)}`;
+    expect(() => validateUrlLength(veryLongUrl)).toThrow(/exceeds/i);
   });
 });

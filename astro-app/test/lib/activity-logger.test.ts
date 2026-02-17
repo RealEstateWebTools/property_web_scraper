@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   logActivity,
   queryLogs,
@@ -175,6 +175,39 @@ describe('activity-logger', () => {
       logActivity(makeEntry());
       const afterClear = queryLogs().entries[0].id;
       expect(parseInt(afterClear, 10)).toBeGreaterThan(parseInt(beforeClear, 10));
+    });
+  });
+
+  describe('production console logging', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+
+    beforeEach(() => {
+      process.env.NODE_ENV = 'production';
+    });
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalNodeEnv;
+    });
+
+    it('logs info entries to console.log in production', () => {
+      const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      logActivity(makeEntry({ level: 'info', message: 'prod info' }));
+      expect(spy).toHaveBeenCalledOnce();
+      spy.mockRestore();
+    });
+
+    it('logs warn entries to console.warn in production', () => {
+      const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      logActivity(makeEntry({ level: 'warn', message: 'prod warn' }));
+      expect(spy).toHaveBeenCalledOnce();
+      spy.mockRestore();
+    });
+
+    it('logs error entries to console.error in production', () => {
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      logActivity(makeEntry({ level: 'error', message: 'prod error' }));
+      expect(spy).toHaveBeenCalledOnce();
+      spy.mockRestore();
     });
   });
 });

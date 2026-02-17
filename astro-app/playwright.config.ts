@@ -16,5 +16,10 @@ export default defineConfig({
     command: 'npm run dev -- --port 4327',
     port: 4327,
     reuseExistingServer: !!process.env.CI,
+    env: {
+      ...process.env,
+      PWS_API_KEY: '',
+      PWS_ADMIN_KEY: '',
+    },
   },
 });

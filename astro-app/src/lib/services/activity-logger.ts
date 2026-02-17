@@ -58,6 +58,12 @@ let writePointer = 0;
 let entryCount = 0;
 let idCounter = 0;
 
+function shouldEmitConsoleLogs(): boolean {
+  const viteProd = Boolean((import.meta as ImportMeta & { env?: { PROD?: boolean } }).env?.PROD);
+  const nodeProd = typeof process !== 'undefined' && process.env.NODE_ENV === 'production';
+  return viteProd || nodeProd;
+}
+
 export function logActivity(input: LogInput): void {
   idCounter++;
   const entry: LogEntry = {
@@ -68,6 +74,20 @@ export function logActivity(input: LogInput): void {
   buffer[writePointer] = entry;
   writePointer = (writePointer + 1) % MAX_ENTRIES;
   if (entryCount < MAX_ENTRIES) entryCount++;
+
+  if (shouldEmitConsoleLogs()) {
+    const payload = JSON.stringify({
+      timestamp: new Date(entry.timestamp).toISOString(),
+      ...entry,
+    });
+    if (entry.level === 'error') {
+      console.error(payload);
+    } else if (entry.level === 'warn') {
+      console.warn(payload);
+    } else {
+      console.log(payload);
+    }
+  }
 }
 
 export function queryLogs(query: LogQuery = {}): LogQueryResult {

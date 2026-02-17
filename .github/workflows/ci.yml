@@ -23,6 +23,10 @@ jobs:
         working-directory: astro-app
         run: npm ci
 
+      - name: Security audit
+        working-directory: astro-app
+        run: npm audit --audit-level=high
+
       - name: Run tests
         working-directory: astro-app
         run: npx vitest run
