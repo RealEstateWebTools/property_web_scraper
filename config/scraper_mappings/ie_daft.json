@@ -42,11 +42,19 @@
       "scriptJsonPath": "props.pageProps.listing.id"
     },
     "title": {
-      "cssLocator": "title"
+      "cssLocator": "title",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
+        { "cssLocator": "h1" }
+      ]
     },
     "description": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.pageProps.listing.description"
+      "scriptJsonPath": "props.pageProps.listing.description",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" },
+        { "cssLocator": "meta[name='description']", "cssAttr": "content" }
+      ]
     },
     "price_string": {
       "scriptJsonVar": "__NEXT_DATA__",
@@ -70,12 +78,16 @@
     },
     "main_image_url": {
       "cssLocator": "meta[property='og:image']",
-      "cssAttr": "content"
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "meta[name='twitter:image']", "cssAttr": "content" }
+      ]
     }
   },
   "images": [{
-    "cssLocator": "meta[property='og:image']",
-    "cssAttr": "content"
+    "scriptJsonVar": "__NEXT_DATA__",
+    "scriptJsonPath": "props.pageProps.listing.media.images",
+    "cssAttr": "size720x480"
   }],
   "booleanFields": {
     "for_sale": {

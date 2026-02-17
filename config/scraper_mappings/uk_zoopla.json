@@ -36,11 +36,19 @@
       "scriptJsonPath": "listing_id"
     },
     "title": {
-      "cssLocator": "title"
+      "cssLocator": "title",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
+        { "cssLocator": "h1" }
+      ]
     },
     "description": {
       "jsonLdPath": "description",
-      "jsonLdType": "RealEstateListing"
+      "jsonLdType": "RealEstateListing",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" },
+        { "cssLocator": "meta[name='description']", "cssAttr": "content" }
+      ]
     },
     "price_string": {
       "jsonLdPath": "name",
@@ -59,7 +67,10 @@
     },
     "main_image_url": {
       "cssLocator": "meta[property='og:image']",
-      "cssAttr": "content"
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "meta[name='twitter:image']", "cssAttr": "content" }
+      ]
     }
   },
   "images": [{

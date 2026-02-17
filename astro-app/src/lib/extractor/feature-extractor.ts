@@ -18,9 +18,12 @@ export function extractFeatures(
     const parsed = getOrParseScriptJson($, mapping.scriptJsonVar);
     const value = getByDotPath(parsed, mapping.scriptJsonPath);
     if (Array.isArray(value)) {
+      const attrKey = mapping.cssAttr || mapping.xmlAttr;
       for (const item of value) {
         if (typeof item === 'string') {
           retrieved.push(item);
+        } else if (attrKey && typeof item === 'object' && item !== null && attrKey in item) {
+          retrieved.push(String((item as Record<string, unknown>)[attrKey]));
         }
       }
     }
