@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- WebSocket bridge between Chrome extension and MCP server — `capture_page` and `extension_status` tools let Claude Code capture rendered HTML from the browser's active tab and save it as a test fixture
+- Connection status indicator in extension popup — green/grey dot shows whether the MCP server bridge is active
+- `<all_urls>` host permissions for the Chrome extension, enabling HTML capture from any property portal
+- Directory restructure: `chrome-extension/` → `chrome-extensions/property-scraper/`
 - Portal configuration registry (`portal-registry.ts`) — centralized config for all 11 supported portals with country, currency, locale, content source, and JS rendering requirements
 - Weighted quality scoring — fields classified as critical/important/optional with 3/2/1 weights; grade capped at C when critical fields (title, price) are missing
 - Fallback strategy chains — `FieldMapping.fallbacks` array allows multiple extraction strategies per field, tried in order until one succeeds

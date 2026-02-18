@@ -400,6 +400,95 @@ Separates the extraction property hash into three categories:
 - **Listing data**: commercial attributes (price, currency, sale/rent flags, furnished)
 - **Unmapped**: fields not in either set
 
+## Chrome Extension ↔ MCP Server Bridge
+
+The Chrome extension connects to the MCP server over WebSocket, enabling Claude
+Code to capture fully-rendered HTML directly from the user's browser.
+
+### Architecture
+
+```
+  ┌────────────┐                         ┌──────────────────┐
+  │ Claude Code │  stdio (MCP protocol)  │   MCP Server     │
+  │   (client)  │ ◀────────────────────▶ │ (mcp-server.ts)  │
+  └────────────┘                         └──────────────────┘
+                                                │
+                                         WebSocket :17824
+                                                │
+                                         ┌──────────────────┐
+                                         │ Chrome Extension  │
+                                         │  background.js    │
+                                         │  (service worker) │
+                                         └──────────────────┘
+                                                │
+                                         chrome.tabs API
+                                                │
+                                         ┌──────────────────┐
+                                         │  Content Script   │
+                                         │  (active tab)     │
+                                         └──────────────────┘
+```
+
+The MCP protocol runs over **stdio** between Claude Code and the MCP server.
+The WebSocket on port 17824 is a separate side-channel used exclusively for
+the Chrome extension bridge. This avoids Native Messaging complexity (separate
+native host binary, per-browser manifest registration) while still allowing
+real-time bidirectional communication.
+
+### WebSocket Message Protocol
+
+All messages are JSON-serialized over `ws://localhost:17824`.
+
+| Direction | `type` | Fields | Description |
+|-----------|--------|--------|-------------|
+| ext → server | `tab_update` | `url`, `title` | Current tab info; sent on connect and tab changes |
+| ext → server | `capture_response` | `html`, `url`, `title` | Page HTML in response to `capture_request` |
+| ext → server | `capture_response` | `error` | Error message if capture failed |
+| server → ext | `capture_request` | _(none)_ | Asks the extension to capture the active tab |
+
+### MCP Tools
+
+#### `extension_status`
+
+Check if the Chrome extension is connected and what page the user is viewing.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| _(none)_  | —    | —        | —           |
+
+Returns:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `connected` | boolean | Whether the extension WebSocket is open |
+| `tabUrl` | string \| null | URL of the user's active tab |
+| `tabTitle` | string \| null | Title of the user's active tab |
+| `capturePort` | number | WebSocket port (default 17824) |
+
+#### `capture_page`
+
+Capture rendered HTML from the browser's active tab and save as a test fixture.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `save_as` | string | no | Fixture filename (without `.html`); auto-detected from URL hostname if omitted |
+| `force` | boolean | no | Overwrite existing fixture file (default `false`) |
+
+Returns the saved file path, size, extraction results summary, and a manifest
+entry stub for `astro-app/test/fixtures/manifest.ts`. Timeout: 15 seconds.
+
+### Capture Workflow
+
+1. User navigates to a property listing in Chrome
+2. Claude Code calls `extension_status` to confirm the extension is connected
+3. Claude Code calls `capture_page` (optionally with `save_as`)
+4. MCP server sends `capture_request` over WebSocket
+5. Extension injects content script into the active tab
+6. Content script returns `{ html, url, title }` to the service worker
+7. Service worker sends `capture_response` back over WebSocket
+8. MCP server saves the HTML to `astro-app/test/fixtures/` and runs extraction
+9. Claude Code receives the result with file path, extraction summary, and manifest stub
+
 ## Known Limitations
 
 1. **Boolean field evaluation uses `send`** - The `evaluator` field in boolean

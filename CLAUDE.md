@@ -83,6 +83,13 @@ Use the `/add-scraper` skill or follow the manual workflow:
 
 See `astro-app/docs/scraper-maintenance-guide.md` for the full diagnosis workflow.
 
+### Capture a fixture via MCP bridge
+
+With the Chrome extension installed and the MCP server running
+(`npx tsx astro-app/mcp-server.ts`), use the `capture_page` MCP tool to grab
+rendered HTML from the browser's active tab. Call `extension_status` first to
+confirm the extension is connected.
+
 ### Capture a test fixture
 
 ```bash

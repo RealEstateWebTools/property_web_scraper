@@ -31,9 +31,9 @@ The project includes a **Manifest V3 Chrome extension** that makes extraction av
 - 📋 **Copy to clipboard** — JSON or listing URL
 - ⚙️ **Configurable** — API key and endpoint settings
 
-**Install (dev mode):** Open `chrome://extensions/` → enable Developer mode → Load unpacked → select `chrome-extension/` folder.
+**Install (dev mode):** Open `chrome://extensions/` → enable Developer mode → Load unpacked → select `chrome-extensions/property-scraper/` folder.
 
-See the full [Chrome Extension documentation](chrome-extension/README.md) for architecture details, screenshots, and configuration.
+See the full [Chrome Extension documentation](chrome-extensions/property-scraper/README.md) for architecture details, screenshots, and configuration.
 
 ## How It Works
 
@@ -96,7 +96,8 @@ property_web_scraper/
 │   ├── src/pages/              # Astro pages and API endpoints
 │   ├── test/                   # Vitest tests and HTML fixtures
 │   └── scripts/                # CLI utilities (capture-fixture)
-├── chrome-extension/           # MV3 Chrome extension (popup, content script, service worker)
+├── chrome-extensions/          # Chrome extensions
+│   └── property-scraper/      # Main extension (popup, content script, WebSocket bridge)
 ├── config/scraper_mappings/    # JSON mapping files per portal
 │   └── archive/                # Legacy mappings (kept for reference)
 ├── app/                        # Legacy Rails engine (see RAILS_README.md)
