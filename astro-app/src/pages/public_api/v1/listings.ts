@@ -18,6 +18,10 @@ import { fireWebhooks } from '@lib/services/webhook-service.js';
 import { recordSnapshot } from '@lib/services/price-history.js';
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import { recordUsage } from '@lib/services/usage-meter.js';
+import { normalizePropertyType } from '@lib/extractor/property-type-normalizer.js';
+import { detectListingType } from '@lib/extractor/listing-type-detector.js';
+import type { SplitSchema } from '@lib/extractor/schema-splitter.js';
+import type { PortalConfig } from '@lib/services/portal-registry.js';
 
 function countAvailableFields(mapping: ScraperMapping): number {
   let count = 0;
@@ -38,6 +42,79 @@ function countExtractedFields(props: Record<string, unknown>): number {
     count++;
   }
   return count;
+}
+
+/**
+ * Build PWB-formatted response from extraction result.
+ * Transforms the flat extracted properties into PWB's {asset_data, listing_data, images} structure.
+ */
+function buildPwbResponse(
+  splitSchema: SplitSchema,
+  props: Record<string, unknown>,
+  sourceUrl: string,
+  portal: PortalConfig | undefined,
+  extractionRate: number,
+): Record<string, unknown> {
+  const { assetData, listingData } = splitSchema;
+
+  const assetResult: Record<string, unknown> = {
+    reference: assetData.reference,
+    street_address: assetData.street_address,
+    city: assetData.city,
+    region: assetData.region || assetData.province,
+    postal_code: assetData.postal_code,
+    country: assetData.country || portal?.country,
+    latitude: assetData.latitude,
+    longitude: assetData.longitude,
+    prop_type_key: normalizePropertyType(
+      (props.property_type as string) || (props.title as string),
+    ),
+    count_bedrooms: assetData.count_bedrooms,
+    count_bathrooms: assetData.count_bathrooms,
+    count_garages: assetData.count_garages,
+    constructed_area: assetData.constructed_area,
+    plot_area: assetData.plot_area,
+    year_construction: assetData.year_construction,
+    energy_rating: assetData.energy_rating,
+    energy_performance: assetData.energy_performance,
+  };
+
+  const listingType = detectListingType(props, sourceUrl);
+
+  const listingResult: Record<string, unknown> = {
+    title: listingData.title,
+    description: listingData.description,
+    price_sale_current: props.for_sale ? listingData.price_float : 0,
+    price_rental_monthly: (props.for_rent_long_term || props.for_rent_short_term) ? listingData.price_float : 0,
+    currency: listingData.currency || portal?.currency,
+    listing_type: listingType,
+    furnished: listingData.furnished,
+    for_sale: listingData.for_sale,
+    for_rent_long_term: listingData.for_rent_long_term,
+    for_rent_short_term: listingData.for_rent_short_term,
+    features: assetData.features,
+  };
+
+  // Flatten image_urls from [{url: "..."}] to ["..."]
+  const rawImages = assetData.image_urls;
+  let images: string[] = [];
+  if (Array.isArray(rawImages)) {
+    images = rawImages.map((img: unknown) => {
+      if (typeof img === 'string') return img;
+      if (img && typeof img === 'object' && 'url' in img) return (img as { url: string }).url;
+      return '';
+    }).filter(Boolean);
+  }
+
+  return {
+    portal: portal?.slug,
+    extraction_rate: extractionRate,
+    data: {
+      asset_data: assetResult,
+      listing_data: listingResult,
+      images,
+    },
+  };
 }
 
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
@@ -317,6 +394,7 @@ export const POST: APIRoute = async ({ request }) => {
         scraper_used: importHost.scraper_name,
         diagnostics: result.diagnostics,
         ...(result.splitSchema ? { split_schema: result.splitSchema } : {}),
+        _rawProps: result.properties[0],
       };
 
       if (fieldsExtracted === 0) {
@@ -383,6 +461,37 @@ export const POST: APIRoute = async ({ request }) => {
     }
   }
 
+  // Check for format=pwb query parameter
+  const requestUrl = new URL(request.url);
+  const format = requestUrl.searchParams.get('format');
+
+  if (format === 'pwb' && extraction && extraction.split_schema) {
+    const parsedUrl = new URL(url);
+    const portal = findPortalByHost(parsedUrl.hostname);
+    const props = (extraction as any)._rawProps || {};
+    const pwbData = buildPwbResponse(
+      extraction.split_schema as SplitSchema,
+      props,
+      url,
+      portal,
+      extraction.diagnostics
+        ? (extraction.diagnostics as any).extractionRate || 0
+        : 0,
+    );
+
+    logActivity({
+      level: 'info',
+      category: 'api_request',
+      message: `POST listings: OK (pwb format, extracted ${extraction.fields_extracted} fields)`,
+      method: 'POST',
+      path,
+      statusCode: 200,
+      durationMs: Date.now() - startTime,
+    });
+
+    return successResponse(pwbData, request);
+  }
+
   const response: Record<string, unknown> = {
     retry_duration: 0,
     urls_remaining: 0,
@@ -390,7 +499,9 @@ export const POST: APIRoute = async ({ request }) => {
   };
 
   if (extraction) {
-    response.extraction = extraction;
+    // Strip internal _rawProps before sending in standard response
+    const { _rawProps, ...publicExtraction } = extraction;
+    response.extraction = publicExtraction;
   }
 
   logActivity({

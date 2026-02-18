@@ -5,7 +5,7 @@ export interface SplitSchema {
 }
 
 const ASSET_FIELDS = new Set([
-  'reference', 'title', 'description', 'address_string',
+  'reference', 'address_string',
   'street_number', 'street_name', 'street_address', 'postal_code',
   'province', 'city', 'region', 'country',
   'latitude', 'longitude',
@@ -16,6 +16,7 @@ const ASSET_FIELDS = new Set([
 ]);
 
 const LISTING_FIELDS = new Set([
+  'title', 'description',
   'price_string', 'price_float', 'price_cents', 'price_currency',
   'currency', 'locale_code',
   'for_sale', 'for_rent', 'for_rent_short_term', 'for_rent_long_term',

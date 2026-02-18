@@ -348,7 +348,7 @@ describe('HtmlExtractor', () => {
       expect(result.splitSchema!.unmapped).toBeDefined();
     });
 
-    it('places title in assetData', () => {
+    it('places title in listingData', () => {
       const html = loadFixture('es_idealista');
       const result = extractFromHtml({
         html,
@@ -356,7 +356,7 @@ describe('HtmlExtractor', () => {
         scraperMappingName: 'es_idealista',
       });
 
-      expect(result.splitSchema!.assetData.title).toBeTruthy();
+      expect(result.splitSchema!.listingData.title).toBeTruthy();
     });
 
     it('places price fields in listingData', () => {
