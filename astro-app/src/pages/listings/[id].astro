@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ExportDropdown from '../../components/ExportDropdown.astro';
 import { initKV, getListing } from '@lib/services/listing-store.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
@@ -168,9 +169,9 @@ if (listing) {
                 <i class="bi bi-box-arrow-up-right mr-1"></i> View Original Listing
               </a>
             )}
-            <a href={`/listings/${id}.json`} class="block w-full text-center border border-gray-300 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50 transition no-underline mb-2">
-              <i class="bi bi-braces mr-1"></i> Get JSON
-            </a>
+            <div class="flex justify-center mb-2">
+              <ExportDropdown listingId={id!} buttonClass="w-full text-center border border-gray-300 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50 transition no-underline inline-flex items-center justify-center gap-1" />
+            </div>
           </div>
         </div>
       </div>

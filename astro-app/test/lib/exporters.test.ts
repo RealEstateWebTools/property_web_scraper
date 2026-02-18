@@ -3,6 +3,9 @@ import { Listing } from '../../src/lib/models/listing.js';
 import { JSONExporter } from '../../src/lib/exporters/json-exporter.js';
 import { CSVExporter } from '../../src/lib/exporters/csv-exporter.js';
 import { GeoJSONExporter } from '../../src/lib/exporters/geojson-exporter.js';
+import { XMLExporter } from '../../src/lib/exporters/xml-exporter.js';
+import { SchemaOrgExporter } from '../../src/lib/exporters/schema-org-exporter.js';
+import { ICalExporter } from '../../src/lib/exporters/ical-exporter.js';
 import {
   createExporter,
   getAvailableExporters,
@@ -359,6 +362,252 @@ describe('Exporters', () => {
     });
   });
 
+  describe('XMLExporter', () => {
+    it('exports listings as valid XML', async () => {
+      const exporter = new XMLExporter();
+      const result = await exporter.export([makeListing()]);
+
+      expect(result).toContain('<?xml version="1.0" encoding="UTF-8"?>');
+      expect(result).toContain('<Listings');
+      expect(result).toContain('<Listing>');
+      expect(result).toContain('</Listing>');
+      expect(result).toContain('</Listings>');
+    });
+
+    it('maps fields to RETS standard names', async () => {
+      const exporter = new XMLExporter();
+      const result = await exporter.export([makeListing()]);
+
+      expect(result).toContain('<ListingKey>REF-001</ListingKey>');
+      expect(result).toContain('<ListPrice>250000</ListPrice>');
+      expect(result).toContain('<BedroomsTotal>3</BedroomsTotal>');
+      expect(result).toContain('<BathroomsTotalInteger>2</BathroomsTotalInteger>');
+      expect(result).toContain('<City>Madrid</City>');
+      expect(result).toContain('<Country>Spain</Country>');
+    });
+
+    it('escapes XML special characters', async () => {
+      const listing = makeListing({ title: 'Apartment <3 beds> & pool' });
+      const exporter = new XMLExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('&lt;3 beds&gt;');
+      expect(result).toContain('&amp; pool');
+    });
+
+    it('includes image URLs in Media section', async () => {
+      const listing = makeListing();
+      listing.image_urls = [{ url: 'https://example.com/1.jpg' }, { url: 'https://example.com/2.jpg' }] as any;
+      const exporter = new XMLExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<Media>');
+      expect(result).toContain('<MediaURL>https://example.com/1.jpg</MediaURL>');
+      expect(result).toContain('<MediaURL>https://example.com/2.jpg</MediaURL>');
+      expect(result).toContain('</Media>');
+    });
+
+    it('includes features as separate elements', async () => {
+      const listing = makeListing();
+      listing.features = ['pool', 'garden'];
+      const exporter = new XMLExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<Features>');
+      expect(result).toContain('<Feature>pool</Feature>');
+      expect(result).toContain('<Feature>garden</Feature>');
+    });
+
+    it('exports multiple listings', async () => {
+      const exporter = new XMLExporter();
+      const listings = makeListings(3);
+      const result = await exporter.export(listings);
+
+      expect(result).toContain('count="3"');
+      const matches = result.match(/<Listing>/g);
+      expect(matches).toHaveLength(3);
+    });
+
+    it('throws on empty listings', async () => {
+      const exporter = new XMLExporter();
+      await expect(exporter.export([])).rejects.toThrow('Cannot export empty listing array');
+    });
+  });
+
+  describe('SchemaOrgExporter', () => {
+    it('exports listings as JSON-LD with @context and @graph', async () => {
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([makeListing()]);
+      const parsed = JSON.parse(result);
+
+      expect(parsed['@context']).toBe('https://schema.org');
+      expect(parsed['@graph']).toHaveLength(1);
+    });
+
+    it('uses RealEstateListing type', async () => {
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([makeListing()]);
+      const parsed = JSON.parse(result);
+      const node = parsed['@graph'][0];
+
+      expect(node['@type']).toBe('RealEstateListing');
+    });
+
+    it('includes price as Offer', async () => {
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([makeListing()]);
+      const parsed = JSON.parse(result);
+      const node = parsed['@graph'][0];
+
+      expect(node.offers).toBeDefined();
+      expect(node.offers['@type']).toBe('Offer');
+      expect(node.offers.price).toBe(250000);
+      expect(node.offers.priceCurrency).toBe('EUR');
+    });
+
+    it('includes accommodation details', async () => {
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([makeListing()]);
+      const parsed = JSON.parse(result);
+      const accommodation = parsed['@graph'][0].about;
+
+      expect(accommodation['@type']).toBeDefined();
+      expect(accommodation.numberOfBedrooms).toBe(3);
+      expect(accommodation.numberOfBathroomsTotal).toBe(2);
+    });
+
+    it('includes geo coordinates', async () => {
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([makeListing()]);
+      const parsed = JSON.parse(result);
+      const geo = parsed['@graph'][0].about.geo;
+
+      expect(geo['@type']).toBe('GeoCoordinates');
+      expect(geo.latitude).toBe(40.4168);
+      expect(geo.longitude).toBe(-3.7038);
+    });
+
+    it('includes floor size with unit', async () => {
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([makeListing()]);
+      const parsed = JSON.parse(result);
+      const floorSize = parsed['@graph'][0].about.floorSize;
+
+      expect(floorSize['@type']).toBe('QuantitativeValue');
+      expect(floorSize.value).toBe(120);
+      expect(floorSize.unitCode).toBe('MTK');
+    });
+
+    it('includes address as PostalAddress', async () => {
+      const listing = makeListing({ city: 'Madrid', country: 'Spain', postal_code: '28001' });
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([listing]);
+      const parsed = JSON.parse(result);
+      const address = parsed['@graph'][0].about.address;
+
+      expect(address['@type']).toBe('PostalAddress');
+      expect(address.addressLocality).toBe('Madrid');
+      expect(address.addressCountry).toBe('Spain');
+    });
+
+    it('exports multiple listings', async () => {
+      const exporter = new SchemaOrgExporter();
+      const listings = makeListings(3);
+      const result = await exporter.export(listings);
+      const parsed = JSON.parse(result);
+
+      expect(parsed['@graph']).toHaveLength(3);
+    });
+
+    it('throws on empty listings', async () => {
+      const exporter = new SchemaOrgExporter();
+      await expect(exporter.export([])).rejects.toThrow('Cannot export empty listing array');
+    });
+  });
+
+  describe('ICalExporter', () => {
+    it('exports listings as valid iCalendar', async () => {
+      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
+      const exporter = new ICalExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('BEGIN:VCALENDAR');
+      expect(result).toContain('VERSION:2.0');
+      expect(result).toContain('PRODID:-//PropertyWebScraper//Export//EN');
+      expect(result).toContain('END:VCALENDAR');
+    });
+
+    it('creates VEVENT entries for listings', async () => {
+      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
+      const exporter = new ICalExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('BEGIN:VEVENT');
+      expect(result).toContain('END:VEVENT');
+      expect(result).toContain('UID:REF-001@propertyscraper');
+    });
+
+    it('includes listing title as summary', async () => {
+      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
+      const exporter = new ICalExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('SUMMARY:Modern Apartment in Madrid');
+    });
+
+    it('includes location from address', async () => {
+      const listing = makeListing({
+        address_string: '123 Main St, Madrid',
+        last_retrieved_at: new Date('2024-01-15'),
+      });
+      const exporter = new ICalExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('LOCATION:123 Main St\\, Madrid');
+    });
+
+    it('includes geo coordinates', async () => {
+      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
+      const exporter = new ICalExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('GEO:40.4168;-3.7038');
+    });
+
+    it('includes URL', async () => {
+      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
+      const exporter = new ICalExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('URL:https://example.com/listing/1');
+    });
+
+    it('uses CRLF line endings', async () => {
+      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
+      const exporter = new ICalExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('\r\n');
+    });
+
+    it('exports multiple events', async () => {
+      const listings = makeListings(3).map(l => {
+        l.last_retrieved_at = new Date('2024-01-15');
+        return l;
+      });
+      const exporter = new ICalExporter();
+      const result = await exporter.export(listings);
+
+      const eventCount = (result.match(/BEGIN:VEVENT/g) || []).length;
+      expect(eventCount).toBe(3);
+    });
+
+    it('throws on empty listings', async () => {
+      const exporter = new ICalExporter();
+      await expect(exporter.export([])).rejects.toThrow('Cannot export empty listing array');
+    });
+  });
+
   describe('ExporterRegistry', () => {
     it('creates JSON exporter', () => {
       const exporter = createExporter('json');
@@ -375,20 +624,29 @@ describe('Exporters', () => {
       expect(exporter).toBeInstanceOf(GeoJSONExporter);
     });
 
-    it('throws for unimplemented formats', () => {
-      expect(() => createExporter('xml')).toThrow('not yet implemented');
-      expect(() => createExporter('schema-org')).toThrow('not yet implemented');
-      expect(() => createExporter('icalendar')).toThrow('not yet implemented');
+    it('creates XML exporter', () => {
+      const exporter = createExporter('xml');
+      expect(exporter).toBeInstanceOf(XMLExporter);
+    });
+
+    it('creates Schema.org exporter', () => {
+      const exporter = createExporter('schema-org');
+      expect(exporter).toBeInstanceOf(SchemaOrgExporter);
+    });
+
+    it('creates iCalendar exporter', () => {
+      const exporter = createExporter('icalendar');
+      expect(exporter).toBeInstanceOf(ICalExporter);
     });
 
     it('throws for unknown format', () => {
       expect(() => createExporter('pdf' as any)).toThrow('Unknown export format');
     });
 
-    it('returns only production-ready exporters', () => {
+    it('returns all production-ready exporters', () => {
       const available = getAvailableExporters();
       expect(available.every(e => e.isAvailable && e.isProduction)).toBe(true);
-      expect(available.length).toBe(3);
+      expect(available.length).toBe(6);
     });
 
     it('returns all registered exporters including planned', () => {
@@ -413,12 +671,18 @@ describe('Exporters', () => {
       expect(getMimeType('json')).toBe('application/json');
       expect(getMimeType('csv')).toBe('text/csv');
       expect(getMimeType('geojson')).toBe('application/geo+json');
+      expect(getMimeType('xml')).toBe('application/xml');
+      expect(getMimeType('schema-org')).toBe('application/ld+json');
+      expect(getMimeType('icalendar')).toBe('text/calendar');
     });
 
     it('returns correct file extensions', () => {
       expect(getFileExtension('json')).toBe('.json');
       expect(getFileExtension('csv')).toBe('.csv');
       expect(getFileExtension('geojson')).toBe('.geojson');
+      expect(getFileExtension('xml')).toBe('.xml');
+      expect(getFileExtension('schema-org')).toBe('.jsonld');
+      expect(getFileExtension('icalendar')).toBe('.ics');
     });
   });
 
@@ -463,11 +727,17 @@ describe('Exporters', () => {
       expect(parsed.type).toBe('FeatureCollection');
     });
 
-    it('rejects unavailable formats', async () => {
+    it('exports listings in XML format', async () => {
       const service = new ExportService();
-      await expect(
-        service.export({ format: 'xml', listings: [makeListing()] })
-      ).rejects.toThrow('not yet available');
+      const result = await service.export({
+        format: 'xml',
+        listings: [makeListing()],
+      });
+
+      expect(result.format).toBe('xml');
+      expect(result.mimeType).toBe('application/xml');
+      expect(result.data).toContain('<?xml');
+      expect(result.data).toContain('<Listings');
     });
 
     it('rejects geojson without valid coordinates', async () => {

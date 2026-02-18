@@ -94,12 +94,36 @@ function truncate(str: string, len: number): string {
   </div>
 
   <!-- Summary row -->
-  <div class="text-sm text-gray-600 mb-4">
-    Showing {extractions.length} of {totalCount}
+  <div class="flex items-center justify-between text-sm text-gray-600 mb-4">
+    <div>
+      Showing {extractions.length} of {totalCount}
+      {extractions.length > 0 && (
+        <span class="ml-2">
+          — A: {gradeCounts.A}, B: {gradeCounts.B}, C: {gradeCounts.C}, F: {gradeCounts.F}
+        </span>
+      )}
+    </div>
     {extractions.length > 0 && (
-      <span class="ml-2">
-        — A: {gradeCounts.A}, B: {gradeCounts.B}, C: {gradeCounts.C}, F: {gradeCounts.F}
-      </span>
+      <div class="pws-bulk-export relative inline-block">
+        <button
+          type="button"
+          class="px-3 py-1.5 bg-gray-700 text-white rounded text-xs font-medium hover:bg-gray-800 transition cursor-pointer inline-flex items-center gap-1"
+          data-bulk-export-toggle
+        >
+          <i class="bi bi-download"></i> Export filtered results <i class="bi bi-chevron-down text-[0.55rem] ml-0.5"></i>
+        </button>
+        <div class="hidden absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20" data-bulk-export-menu>
+          <button data-bulk-format="json" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left border-0 bg-transparent cursor-pointer">
+            <i class="bi bi-braces text-blue-600"></i> JSON
+          </button>
+          <button data-bulk-format="csv" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left border-0 bg-transparent cursor-pointer">
+            <i class="bi bi-file-earmark-spreadsheet text-green-600"></i> CSV
+          </button>
+          <button data-bulk-format="geojson" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left border-0 bg-transparent cursor-pointer">
+            <i class="bi bi-geo-alt text-orange-600"></i> GeoJSON
+          </button>
+        </div>
+      </div>
     )}
   </div>
 
@@ -124,7 +148,7 @@ function truncate(str: string, len: number): string {
           </thead>
           <tbody>
             {extractions.map((ext) => (
-              <tr class="border-b border-gray-100 hover:bg-gray-50">
+              <tr class="border-b border-gray-100 hover:bg-gray-50" data-listing-id={ext.id}>
                 <td class="py-2 px-4 text-xs text-gray-500 whitespace-nowrap">{timeAgo(ext.timestamp)}</td>
                 <td class="py-2 px-4 text-xs max-w-[200px] truncate" title={ext.sourceUrl}>
                   {truncate(ext.sourceUrl, 40)}
@@ -146,4 +170,60 @@ function truncate(str: string, len: number): string {
       )}
     </div>
   </div>
+
+  <script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.querySelector('[data-bulk-export-toggle]');
+    const menu = document.querySelector('[data-bulk-export-menu]');
+    if (toggle && menu) {
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+      });
+      document.addEventListener('click', () => menu.classList.add('hidden'));
+    }
+
+    document.querySelectorAll('[data-bulk-format]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const format = btn.getAttribute('data-bulk-format');
+        const rows = document.querySelectorAll('tr[data-listing-id]');
+        const ids = Array.from(rows).map(r => r.getAttribute('data-listing-id')).filter(Boolean);
+        if (ids.length === 0) return;
+
+        btn.textContent = 'Exporting...';
+        try {
+          const res = await fetch('/public_api/v1/export', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ format, listingIds: ids }),
+          });
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Export failed');
+          }
+          const disposition = res.headers.get('Content-Disposition') || '';
+          const match = disposition.match(/filename="(.+)"/);
+          const filename = match ? match[1] : `export.${format}`;
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+          URL.revokeObjectURL(url);
+        } catch (e) {
+          console.error('Bulk export error:', e);
+        }
+        menu.classList.add('hidden');
+        // Restore button labels
+        document.querySelectorAll('[data-bulk-format]').forEach(b => {
+          const fmt = b.getAttribute('data-bulk-format');
+          const icons = { json: 'bi-braces text-blue-600', csv: 'bi-file-earmark-spreadsheet text-green-600', geojson: 'bi-geo-alt text-orange-600' };
+          const labels = { json: 'JSON', csv: 'CSV', geojson: 'GeoJSON' };
+          b.innerHTML = '<i class="bi ' + (icons[fmt] || '') + '"></i> ' + (labels[fmt] || fmt);
+        });
+      });
+    });
+  });
+  </script>
 </AdminLayout>
