@@ -45,15 +45,29 @@ export interface FixtureEntry {
   fixture: string | null;
   /** Source URL used for extraction context (hostname detection, URL-based fields) */
   sourceUrl: string;
+  /** How the HTML was obtained. 'browser' = JS-rendered capture, 'server-fetched' = plain HTTP fetch. Defaults to 'browser'. */
+  source?: 'browser' | 'server-fetched';
   /** Expected extracted property values. Only listed fields are asserted — unlisted fields are ignored */
   expected: Record<string, unknown>;
 }
 
 /**
- * Get only entries that have HTML fixtures available for testing.
+ * Get the source of a fixture entry, defaulting to 'browser'.
  */
-export function getTestableFixtures(): FixtureEntry[] {
-  return fixtures.filter(f => f.fixture !== null && Object.keys(f.expected).length > 0);
+export function getFixtureSource(entry: FixtureEntry): 'browser' | 'server-fetched' {
+  return entry.source ?? 'browser';
+}
+
+/**
+ * Get only entries that have HTML fixtures available for testing.
+ * Optionally filter by source type.
+ */
+export function getTestableFixtures(source?: 'browser' | 'server-fetched'): FixtureEntry[] {
+  return fixtures.filter(f => {
+    if (f.fixture === null || Object.keys(f.expected).length === 0) return false;
+    if (source && getFixtureSource(f) !== source) return false;
+    return true;
+  });
 }
 
 /**
@@ -71,7 +85,8 @@ export function getCoverageSummary() {
   const withFixture = fixtures.filter(f => f.fixture !== null).length;
   const withExpected = fixtures.filter(f => Object.keys(f.expected).length > 1).length;
   const totalExpectedFields = fixtures.reduce((sum, f) => sum + Object.keys(f.expected).length, 0);
-  return { total, withFixture, withExpected, totalExpectedFields, coveragePercent: Math.round((withFixture / total) * 100) };
+  const serverFetchedFixtures = fixtures.filter(f => getFixtureSource(f) === 'server-fetched' && f.fixture !== null).length;
+  return { total, withFixture, withExpected, totalExpectedFields, serverFetchedFixtures, coveragePercent: Math.round((withFixture / total) * 100) };
 }
 
 export const fixtures: FixtureEntry[] = [
@@ -366,6 +381,17 @@ export const fixtures: FixtureEntry[] = [
       image_urls: [
         { url: 'https://img4.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/c0/ac/cc/1382500227.jpg' },
       ],
+    },
+  },
+  {
+    scraper: 'es_idealista',
+    fixture: 'es_idealista.server-fetched',
+    sourceUrl: 'https://www.idealista.com/en/inmueble/106387165/',
+    source: 'server-fetched',
+    expected: {
+      // Only default values survive — proves server-side fetch is useless
+      country: 'Spain',
+      currency: 'EUR',
     },
   },
   {

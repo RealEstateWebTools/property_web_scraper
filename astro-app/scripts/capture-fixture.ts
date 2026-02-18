@@ -99,6 +99,7 @@ Options:
   --url <url>            Source URL (required with --file/--stdin)
   --name <scraper>       Override scraper name detection
   --fixture-name <name>  Override output filename (without .html)
+  --server-fetched       Mark fixture as server-fetched (appends .server-fetched to name)
   --force                Overwrite existing fixture without warning
   --no-extract           Skip extraction preview
   --help                 Show this help
@@ -114,13 +115,14 @@ interface CliArgs {
   stdin: boolean;
   name?: string;
   fixtureName?: string;
+  serverFetched: boolean;
   force: boolean;
   noExtract: boolean;
   help: boolean;
 }
 
 function parseArgs(argv: string[]): CliArgs {
-  const args: CliArgs = { stdin: false, force: false, noExtract: false, help: false };
+  const args: CliArgs = { stdin: false, serverFetched: false, force: false, noExtract: false, help: false };
   let i = 0;
 
   while (i < argv.length) {
@@ -144,6 +146,9 @@ function parseArgs(argv: string[]): CliArgs {
         break;
       case '--fixture-name':
         args.fixtureName = argv[++i];
+        break;
+      case '--server-fetched':
+        args.serverFetched = true;
         break;
       case '--force':
         args.force = true;
@@ -366,7 +371,8 @@ function printManifestStub(
   scraperName: string,
   fixtureName: string,
   sourceUrl: string,
-  properties: Record<string, unknown>
+  properties: Record<string, unknown>,
+  serverFetched: boolean = false
 ): void {
   console.log('\nManifest stub (copy into test/fixtures/manifest.ts):');
 
@@ -380,10 +386,12 @@ function printManifestStub(
     entries.push(`      ${key}: ${JSON.stringify(value)},`);
   }
 
+  const sourceLine = serverFetched ? `\n    source: 'server-fetched',` : '';
+
   console.log(`  {
     scraper: '${scraperName}',
     fixture: '${fixtureName}',
-    sourceUrl: '${sourceUrl}',
+    sourceUrl: '${sourceUrl}',${sourceLine}
     expected: {
 ${entries.join('\n')}
     },
@@ -446,7 +454,7 @@ async function main(): Promise<void> {
   }
 
   // Determine fixture name and save
-  const fixtureName = args.fixtureName ?? scraperName;
+  const fixtureName = args.fixtureName ?? (args.serverFetched ? `${scraperName}.server-fetched` : scraperName);
   const outputPath = resolve(FIXTURES_DIR, `${fixtureName}.html`);
 
   if (existsSync(outputPath) && !args.force) {
@@ -470,13 +478,13 @@ async function main(): Promise<void> {
     } catch (err) {
       console.error(`\nWarning: Could not load mapping for '${scraperName}': ${err instanceof Error ? err.message : err}`);
       console.log('Skipping extraction preview. Use --no-extract to suppress this warning.');
-      printManifestStub(scraperName, fixtureName, args.url, {});
+      printManifestStub(scraperName, fixtureName, args.url, {}, args.serverFetched);
       return;
     }
 
     const { properties, fieldSources } = runExtraction(html, args.url, mapping);
     printExtractionPreview(properties, fieldSources);
-    printManifestStub(scraperName, fixtureName, args.url, properties);
+    printManifestStub(scraperName, fixtureName, args.url, properties, args.serverFetched);
   }
 }
 

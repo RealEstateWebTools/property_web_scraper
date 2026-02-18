@@ -2,41 +2,23 @@
   "entries": [
     {
       "scraper": "us_realtor",
+      "source": "browser",
       "grade": "A",
       "extractionRate": 0.8947368421052632,
       "populatedFields": 21,
       "totalFields": 23
     },
     {
-      "scraper": "uk_rightmove",
-      "grade": "A",
-      "extractionRate": 0.9,
-      "populatedFields": 23,
-      "totalFields": 25
-    },
-    {
-      "scraper": "uk_zoopla",
-      "grade": "A",
-      "extractionRate": 0.8823529411764706,
-      "populatedFields": 20,
-      "totalFields": 22
-    },
-    {
-      "scraper": "es_idealista",
-      "grade": "A",
-      "extractionRate": 0.9411764705882353,
-      "populatedFields": 21,
-      "totalFields": 22
-    },
-    {
       "scraper": "es_fotocasa",
-      "grade": "F",
-      "extractionRate": 0.05263157894736842,
-      "populatedFields": 6,
+      "source": "browser",
+      "grade": "A",
+      "extractionRate": 0.8947368421052632,
+      "populatedFields": 22,
       "totalFields": 24
     },
     {
       "scraper": "es_pisos",
+      "source": "browser",
       "grade": "B",
       "extractionRate": 0.5,
       "populatedFields": 7,
@@ -44,6 +26,7 @@
     },
     {
       "scraper": "in_realestateindia",
+      "source": "browser",
       "grade": "B",
       "extractionRate": 0.625,
       "populatedFields": 10,
@@ -51,6 +34,7 @@
     },
     {
       "scraper": "us_mlslistings",
+      "source": "browser",
       "grade": "A",
       "extractionRate": 1,
       "populatedFields": 14,
@@ -58,6 +42,7 @@
     },
     {
       "scraper": "us_wyomingmls",
+      "source": "browser",
       "grade": "A",
       "extractionRate": 1,
       "populatedFields": 19,
@@ -65,20 +50,39 @@
     },
     {
       "scraper": "us_forsalebyowner",
+      "source": "browser",
       "grade": "A",
       "extractionRate": 1,
       "populatedFields": 8,
       "totalFields": 8
     },
     {
-      "scraper": "uk_jitty",
+      "scraper": "uk_rightmove",
+      "source": "browser",
       "grade": "A",
-      "extractionRate": 0.8235294117647058,
-      "populatedFields": 19,
+      "extractionRate": 0.9,
+      "populatedFields": 23,
+      "totalFields": 25
+    },
+    {
+      "scraper": "uk_jitty",
+      "source": "browser",
+      "grade": "A",
+      "extractionRate": 0.8823529411764706,
+      "populatedFields": 20,
+      "totalFields": 22
+    },
+    {
+      "scraper": "uk_zoopla",
+      "source": "browser",
+      "grade": "A",
+      "extractionRate": 0.8823529411764706,
+      "populatedFields": 20,
       "totalFields": 22
     },
     {
       "scraper": "uk_onthemarket",
+      "source": "browser",
       "grade": "A",
       "extractionRate": 0.9411764705882353,
       "populatedFields": 21,
@@ -86,11 +90,28 @@
     },
     {
       "scraper": "ie_daft",
+      "source": "browser",
       "grade": "A",
       "extractionRate": 0.9444444444444444,
       "populatedFields": 22,
       "totalFields": 23
+    },
+    {
+      "scraper": "es_idealista",
+      "source": "browser",
+      "grade": "A",
+      "extractionRate": 0.9230769230769231,
+      "populatedFields": 17,
+      "totalFields": 18
+    },
+    {
+      "scraper": "es_idealista",
+      "source": "server-fetched",
+      "grade": "F",
+      "extractionRate": 0.07692307692307693,
+      "populatedFields": 6,
+      "totalFields": 18
     }
   ],
-  "savedAt": "2026-02-18T00:05:27.640Z"
+  "savedAt": "2026-02-18T12:16:33.890Z"
 }
