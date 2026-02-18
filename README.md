@@ -97,7 +97,8 @@ property_web_scraper/
 │   ├── test/                   # Vitest tests and HTML fixtures
 │   └── scripts/                # CLI utilities (capture-fixture)
 ├── chrome-extensions/          # Chrome extensions
-│   └── property-scraper/      # Main extension (popup, content script, WebSocket bridge)
+│   ├── property-scraper/      # Public extension (one-click extraction popup)
+│   └── mcp-bridge/            # Dev extension (WebSocket bridge to MCP server)
 ├── config/scraper_mappings/    # JSON mapping files per portal
 │   └── archive/                # Legacy mappings (kept for reference)
 ├── app/                        # Legacy Rails engine (see RAILS_README.md)

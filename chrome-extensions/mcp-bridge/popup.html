@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=300" />
+  <title>MCP Bridge</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <img src="icons/icon-48.png" alt="" class="header-icon" />
+      <h1 class="header-title">MCP Bridge</h1>
+    </div>
+  </header>
+
+  <div class="content">
+    <div id="ws-status" class="ws-status ws-disconnected">
+      <span class="ws-dot"></span>
+      <span id="ws-label">Not connected to Claude Code</span>
+    </div>
+    <p class="description">
+      Bridges Chrome to the MCP server so Claude Code can capture rendered HTML
+      from the active tab.
+    </p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

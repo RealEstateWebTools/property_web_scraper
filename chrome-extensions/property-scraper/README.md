@@ -1,6 +1,6 @@
 # Chrome Extension
 
-A Manifest V3 Chrome extension that extracts structured property data from supported real estate listing pages with one click — and bridges to Claude Code via WebSocket for MCP-powered fixture capture.
+A Manifest V3 Chrome extension that extracts structured property data from supported real estate listing pages with one click.
 
 ## Features
 
@@ -8,20 +8,18 @@ A Manifest V3 Chrome extension that extracts structured property data from suppo
 - **Badge indicator** — Green badge appears on supported sites so you know when extraction is available
 - **Property card UI** — Results shown in a polished popup with image, price, stats, features, and quality grade
 - **Copy actions** — Copy extracted JSON or listing URL to clipboard
-- **MCP bridge** — WebSocket connection to the MCP server lets Claude Code capture rendered HTML from the active tab
-- **Connection status** — Popup shows live connection state to Claude Code
 - **Configurable** — Set your API key and custom API URL via the settings page
 
 ## Architecture
 
 ```
 chrome-extensions/property-scraper/
-├── manifest.json       # MV3 manifest, <all_urls> host permissions
-├── content-script.js   # Injected into pages, captures HTML on demand
-├── background.js       # Service worker: badge updates, API proxy, WebSocket client
-├── popup.html          # Popup structure (includes connection status bar)
-├── popup.css           # Styling (dark header, grade badges, stats grid, WS status)
-├── popup.js            # Extraction flow + result rendering + WS status check
+├── manifest.json       # MV3 manifest, portal-specific host permissions
+├── content-script.js   # Injected into supported pages, captures HTML on demand
+├── background.js       # Service worker: badge updates, API proxy
+├── popup.html          # Popup structure
+├── popup.css           # Styling (dark header, grade badges, stats grid)
+├── popup.js            # Extraction flow + result rendering
 ├── options.html        # Settings page (API key, URL, portal list)
 ├── options.js          # Settings persistence via chrome.storage.sync
 └── icons/
@@ -31,10 +29,6 @@ chrome-extensions/property-scraper/
 ```
 
 ## How It Works
-
-The extension supports two flows: interactive popup extraction and MCP-driven capture.
-
-### Flow 1: Popup Extraction (user-initiated)
 
 ```
 User clicks extension icon
@@ -61,79 +55,6 @@ User clicks extension icon
 3. **Background service worker** forwards to the PWS API with API key
 4. **Popup** renders the property card with extracted data
 
-### Flow 2: MCP Capture (Claude Code-initiated)
-
-```
-   ┌────────────┐  stdio (MCP protocol)   ┌──────────────┐
-   │ Claude Code │ ◀─────────────────────▶  │  MCP Server   │
-   │             │                          │ (mcp-server.ts)│
-   └────────────┘                          └──────────────┘
-                                                  │
-                                           WebSocket :17824
-                                                  │
-                                           ┌──────────────┐
-                                           │  Background   │
-                                           │ Service Worker │
-                                           └──────────────┘
-                                                  │
-                                          chrome.tabs API
-                                                  │
-                                           ┌──────────────┐
-                                           │Content Script │
-                                           │ (active tab)  │
-                                           └──────────────┘
-```
-
-1. Claude Code calls `capture_page` MCP tool
-2. MCP server sends `capture_request` over WebSocket
-3. Background service worker injects content script into active tab
-4. Content script returns `{ html, url, title }`
-5. Background sends `capture_response` back over WebSocket
-6. MCP server saves HTML as test fixture and runs extraction
-
-## MCP Server Bridge
-
-The extension maintains a persistent WebSocket connection to the MCP server running on `localhost:17824`. This bridge enables Claude Code to:
-
-- **Check extension status** — query whether the extension is connected and what page the user is viewing (`extension_status` tool)
-- **Capture page HTML** — request the active tab's rendered HTML and save it as a test fixture (`capture_page` tool)
-
-### WebSocket Protocol
-
-All messages are JSON-serialized over `ws://localhost:17824`.
-
-#### Extension → Server
-
-| `type` | Fields | Description |
-|--------|--------|-------------|
-| `tab_update` | `url`, `title` | Sent on connect and on every tab switch/navigation |
-| `capture_response` | `html`, `url`, `title` | Page HTML in response to a `capture_request` |
-| `capture_response` | `error` | Error message if capture failed |
-
-#### Server → Extension
-
-| `type` | Fields | Description |
-|--------|--------|-------------|
-| `capture_request` | _(none)_ | Asks the extension to capture the active tab's HTML |
-
-### Connection Lifecycle
-
-- **Startup**: `connectWebSocket()` runs when the service worker starts
-- **Reconnect**: 5-second flat retry on disconnect or error (no backoff)
-- **Guard**: skips connection attempt if already CONNECTING or OPEN
-- **On connect**: immediately sends a `tab_update` with current tab info
-
-## Connection Status
-
-The popup displays a connection indicator below the header:
-
-| State | Indicator | Label |
-|-------|-----------|-------|
-| **Connected** | Green dot | "Connected to Claude Code" |
-| **Disconnected** | Grey dot | "Not connected to Claude Code" |
-
-The popup queries the background service worker via `GET_WS_STATUS` on open. The status reflects whether the WebSocket to `localhost:17824` is currently open.
-
 ## Installation (Development)
 
 1. Open `chrome://extensions/` in Chrome
@@ -141,14 +62,6 @@ The popup queries the background service worker via `GET_WS_STATUS` on open. The
 3. Click **Load unpacked** → select the `chrome-extensions/property-scraper/` folder
 4. Click the extension icon → gear icon → enter your API key
 5. Navigate to any supported listing page and click the extension icon
-
-To enable MCP capture, start the MCP server:
-
-```bash
-npx tsx astro-app/mcp-server.ts
-```
-
-The popup will show "Connected to Claude Code" when the bridge is active.
 
 ## Configuration
 
@@ -163,7 +76,7 @@ Settings are stored in `chrome.storage.sync` and synced across Chrome instances.
 
 ## Supported Portals
 
-The extension uses `<all_urls>` host permissions so it can capture HTML from any property portal. The green badge activates on these known portals:
+The extension uses portal-specific host permissions. The green badge activates on these known portals:
 
 | Country | Portals |
 |---------|---------|
@@ -189,8 +102,6 @@ The popup shows different states depending on the situation:
 | **Unsupported** | Current site is not a supported portal |
 | **No API Key** | API key not configured — links to settings |
 | **Error** | API call failed — shows message + retry button |
-| **Connected** | WebSocket to MCP server is open (green dot in status bar) |
-| **Disconnected** | WebSocket to MCP server is closed (grey dot in status bar) |
 
 ## Result Card Fields
 
@@ -213,10 +124,6 @@ The API server (`api-response.ts`) was updated to allow `chrome-extension://` or
 
 | Problem | Solution |
 |---------|----------|
-| Popup shows "Not connected to Claude Code" | Start the MCP server: `npx tsx astro-app/mcp-server.ts` |
-| Extension connects then immediately disconnects | Check that port 17824 is not in use by another process |
-| `capture_page` returns "No Chrome extension connected" | Reload the extension at `chrome://extensions/` |
-| `capture_page` times out (15s) | Ensure the active tab has finished loading; check for content script errors in the extension's service worker console |
 | Badge does not appear on supported sites | Check that the extension has host permissions granted |
 
 ## Publishing to Chrome Web Store
@@ -235,6 +142,3 @@ When ready for production distribution:
 - **`chrome.scripting.executeScript`** is used as fallback if the content script isn't injected
 - Badge logic uses `chrome.tabs.onUpdated` and `chrome.tabs.onActivated` listeners
 - No build step required — plain JS files, load directly
-- **WebSocket port**: `17824` (configurable server-side via `PWS_CAPTURE_PORT` env var)
-- **Reconnect interval**: 5 seconds (flat, no backoff)
-- **MCP transport**: stdio between Claude Code and the MCP server; WebSocket is a side-channel for the extension bridge only
