@@ -131,6 +131,24 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.status === 'complete') sendTabUpdate();
 });
 
+// ─── Keep-alive ──────────────────────────────────────────────
+// MV3 service workers are terminated after ~30s of inactivity,
+// which tears down the WebSocket. A periodic alarm wakes the
+// worker and sends a ping to keep the connection alive.
+
+const KEEPALIVE_ALARM = 'ws-keepalive';
+
+chrome.alarms.create(KEEPALIVE_ALARM, { periodInMinutes: 0.5 });
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name !== KEEPALIVE_ALARM) return;
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'ping' }));
+  } else {
+    connectWebSocket();
+  }
+});
+
 // ─── Start ───────────────────────────────────────────────────
 
 connectWebSocket();
