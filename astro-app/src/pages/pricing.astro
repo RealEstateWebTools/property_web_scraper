@@ -1,0 +1,319 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const plans = [
+  {
+    name: 'Free',
+    price: '$0',
+    period: 'forever',
+    description: 'Get started with basic extraction',
+    color: 'gray',
+    gradient: 'from-gray-500 to-gray-600',
+    badge: '',
+    features: [
+      { text: '30 requests / minute', included: true },
+      { text: '500 extractions / day', included: true },
+      { text: '1 API key', included: true },
+      { text: 'All supported portals', included: true },
+      { text: 'JSON responses', included: true },
+      { text: 'Standard support', included: true },
+      { text: 'Price history', included: false },
+      { text: 'Webhooks', included: false },
+    ],
+    cta: 'Get Free Key',
+    ctaHref: '/docs/api#authentication',
+    ctaStyle: 'border border-gray-300 text-gray-700 hover:bg-gray-50',
+  },
+  {
+    name: 'Starter',
+    price: '$29',
+    period: '/month',
+    description: 'For growing projects and side businesses',
+    color: 'blue',
+    gradient: 'from-blue-500 to-blue-700',
+    badge: '',
+    features: [
+      { text: '120 requests / minute', included: true },
+      { text: '5,000 extractions / day', included: true },
+      { text: '5 API keys', included: true },
+      { text: 'All supported portals', included: true },
+      { text: 'JSON responses', included: true },
+      { text: 'Priority support', included: true },
+      { text: 'Price history tracking', included: true },
+      { text: 'Webhooks', included: false },
+    ],
+    cta: 'Start Free Trial',
+    ctaHref: '#get-started',
+    ctaStyle: 'bg-blue-600 text-white hover:bg-blue-700',
+  },
+  {
+    name: 'Pro',
+    price: '$99',
+    period: '/month',
+    description: 'For production applications at scale',
+    color: 'purple',
+    gradient: 'from-purple-500 to-purple-700',
+    badge: 'Most Popular',
+    features: [
+      { text: '300 requests / minute', included: true },
+      { text: '25,000 extractions / day', included: true },
+      { text: 'Unlimited API keys', included: true },
+      { text: 'All supported portals', included: true },
+      { text: 'JSON responses', included: true },
+      { text: 'Dedicated support', included: true },
+      { text: 'Price history tracking', included: true },
+      { text: 'Webhooks & alerts', included: true },
+    ],
+    cta: 'Start Free Trial',
+    ctaHref: '#get-started',
+    ctaStyle: 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg shadow-purple-500/30',
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: '',
+    description: 'For teams with custom requirements',
+    color: 'amber',
+    gradient: 'from-amber-500 to-orange-600',
+    badge: '',
+    features: [
+      { text: '1,000+ requests / minute', included: true },
+      { text: '100,000+ extractions / day', included: true },
+      { text: 'Unlimited API keys', included: true },
+      { text: 'Custom portal mappings', included: true },
+      { text: 'Dedicated infrastructure', included: true },
+      { text: '24/7 priority support', included: true },
+      { text: 'Price history tracking', included: true },
+      { text: 'Webhooks, SLA & audit logs', included: true },
+    ],
+    cta: 'Contact Us',
+    ctaHref: 'mailto:hello@propertywebscraper.com?subject=Enterprise%20Plan',
+    ctaStyle: 'border border-amber-400 text-amber-700 hover:bg-amber-50',
+  },
+];
+---
+<BaseLayout title="Pricing — Property Web Scraper">
+
+<!-- Hero -->
+<section class="bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] text-white py-16 text-center">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="inline-block bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
+      <i class="bi bi-credit-card"></i> Simple, transparent pricing
+    </div>
+    <h1 class="text-4xl font-bold tracking-tight mb-3">Choose the right plan for<br>your extraction needs</h1>
+    <p class="text-lg opacity-85 max-w-xl mx-auto mb-2">
+      Start free. Upgrade when you need more speed, higher limits, and premium features.
+    </p>
+    <p class="text-sm opacity-60">All plans include access to every supported property portal.</p>
+  </div>
+</section>
+
+<!-- Pricing Cards -->
+<section class="py-16 -mt-8">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      {plans.map((plan) => (
+        <div class={`relative bg-white rounded-2xl shadow-lg border ${plan.badge ? 'border-purple-300 ring-2 ring-purple-200' : 'border-gray-200'} overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-xl flex flex-col`}>
+
+          {/* Badge */}
+          {plan.badge && (
+            <div class="absolute top-0 left-0 right-0 bg-gradient-to-r from-purple-500 to-purple-700 text-white text-center text-xs font-semibold py-1.5">
+              <i class="bi bi-star-fill mr-1"></i>{plan.badge}
+            </div>
+          )}
+
+          {/* Header */}
+          <div class={`bg-gradient-to-br ${plan.gradient} text-white p-6 ${plan.badge ? 'pt-10' : ''}`}>
+            <h3 class="text-lg font-bold mb-1">{plan.name}</h3>
+            <p class="text-white/75 text-xs mb-4">{plan.description}</p>
+            <div class="flex items-end gap-1">
+              <span class="text-3xl font-extrabold tracking-tight">{plan.price}</span>
+              {plan.period && <span class="text-sm text-white/70 mb-0.5">{plan.period}</span>}
+            </div>
+          </div>
+
+          {/* Features */}
+          <div class="p-6 flex-grow">
+            <ul class="space-y-3 text-sm">
+              {plan.features.map((feat) => (
+                <li class="flex items-start gap-2.5">
+                  {feat.included ? (
+                    <i class="bi bi-check-circle-fill text-green-500 mt-0.5 shrink-0"></i>
+                  ) : (
+                    <i class="bi bi-x-circle text-gray-300 mt-0.5 shrink-0"></i>
+                  )}
+                  <span class={feat.included ? 'text-gray-700' : 'text-gray-400'}>{feat.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* CTA */}
+          <div class="px-6 pb-6">
+            <a
+              href={plan.ctaHref}
+              class={`block w-full text-center rounded-lg py-3 font-semibold transition no-underline ${plan.ctaStyle}`}
+            >
+              {plan.cta}
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Comparison Table -->
+<section class="py-12 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4">
+    <h2 class="text-2xl font-bold text-center mb-8">Detailed Comparison</h2>
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-semibold text-gray-600">Feature</th>
+              <th class="text-center py-3 px-4 font-semibold text-gray-600">Free</th>
+              <th class="text-center py-3 px-4 font-semibold text-blue-600">Starter</th>
+              <th class="text-center py-3 px-4 font-semibold text-purple-600">Pro</th>
+              <th class="text-center py-3 px-4 font-semibold text-amber-600">Enterprise</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-100">
+              <td class="py-3 px-4 font-medium">Rate Limit</td>
+              <td class="py-3 px-4 text-center">30/min</td>
+              <td class="py-3 px-4 text-center">120/min</td>
+              <td class="py-3 px-4 text-center">300/min</td>
+              <td class="py-3 px-4 text-center">1,000/min</td>
+            </tr>
+            <tr class="border-b border-gray-100 bg-gray-50/50">
+              <td class="py-3 px-4 font-medium">Daily Quota</td>
+              <td class="py-3 px-4 text-center">500</td>
+              <td class="py-3 px-4 text-center">5,000</td>
+              <td class="py-3 px-4 text-center">25,000</td>
+              <td class="py-3 px-4 text-center">100,000+</td>
+            </tr>
+            <tr class="border-b border-gray-100">
+              <td class="py-3 px-4 font-medium">API Keys</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 text-center">5</td>
+              <td class="py-3 px-4 text-center">Unlimited</td>
+              <td class="py-3 px-4 text-center">Unlimited</td>
+            </tr>
+            <tr class="border-b border-gray-100 bg-gray-50/50">
+              <td class="py-3 px-4 font-medium">Supported Portals</td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+            </tr>
+            <tr class="border-b border-gray-100">
+              <td class="py-3 px-4 font-medium">Price History</td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-x-lg text-gray-300"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+            </tr>
+            <tr class="border-b border-gray-100 bg-gray-50/50">
+              <td class="py-3 px-4 font-medium">Webhooks</td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-x-lg text-gray-300"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-x-lg text-gray-300"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+            </tr>
+            <tr class="border-b border-gray-100">
+              <td class="py-3 px-4 font-medium">Usage Dashboard</td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+              <td class="py-3 px-4 text-center"><i class="bi bi-check-lg text-green-500"></i></td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium">Support</td>
+              <td class="py-3 px-4 text-center text-xs text-gray-500">Community</td>
+              <td class="py-3 px-4 text-center text-xs text-blue-600">Priority email</td>
+              <td class="py-3 px-4 text-center text-xs text-purple-600">Dedicated</td>
+              <td class="py-3 px-4 text-center text-xs text-amber-600">24/7 priority</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-16">
+  <div class="max-w-2xl mx-auto px-4">
+    <h2 class="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+    <div class="space-y-4">
+      <details class="bg-white rounded-lg shadow-sm border border-gray-100 group" open>
+        <summary class="px-6 py-4 text-sm font-medium cursor-pointer flex items-center justify-between hover:text-blue-600 transition">
+          How do I get my API key?
+          <i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600">
+          Sign up for a free account and generate your API key from the
+          <a href="/docs/api#authentication" class="text-blue-600 hover:underline">API documentation</a>.
+          Your key starts with <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">pws_live_</code> and should be sent in the
+          <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">X-Api-Key</code> header.
+        </div>
+      </details>
+
+      <details class="bg-white rounded-lg shadow-sm border border-gray-100 group">
+        <summary class="px-6 py-4 text-sm font-medium cursor-pointer flex items-center justify-between hover:text-blue-600 transition">
+          Can I upgrade or downgrade at any time?
+          <i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600">
+          Yes! You can change plans anytime from your billing portal. Upgrades take effect immediately,
+          and downgrades apply at the end of your current billing period.
+        </div>
+      </details>
+
+      <details class="bg-white rounded-lg shadow-sm border border-gray-100 group">
+        <summary class="px-6 py-4 text-sm font-medium cursor-pointer flex items-center justify-between hover:text-blue-600 transition">
+          What happens when I hit my daily quota?
+          <i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600">
+          You'll receive a <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">429 Too Many Requests</code> response
+          with a <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">Retry-After</code> header.
+          Your quota resets at midnight UTC. You can check your current usage via the
+          <a href="/docs/api" class="text-blue-600 hover:underline">Usage API endpoint</a>.
+        </div>
+      </details>
+
+      <details class="bg-white rounded-lg shadow-sm border border-gray-100 group">
+        <summary class="px-6 py-4 text-sm font-medium cursor-pointer flex items-center justify-between hover:text-blue-600 transition">
+          Do you offer annual billing?
+          <i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600">
+          Annual billing with a 20% discount is coming soon. Contact us at
+          <a href="mailto:hello@propertywebscraper.com" class="text-blue-600 hover:underline">hello@propertywebscraper.com</a>
+          for early access.
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Banner -->
+<section class="bg-gradient-to-r from-blue-600 to-purple-600 py-12 text-white text-center" id="get-started">
+  <div class="max-w-2xl mx-auto px-4">
+    <h2 class="text-2xl font-bold mb-3">Ready to start extracting?</h2>
+    <p class="opacity-85 mb-6">Get your free API key in seconds. No credit card required.</p>
+    <div class="flex flex-wrap gap-3 justify-center">
+      <a href="/docs/api" class="inline-block bg-white text-blue-700 rounded-lg px-8 py-3 font-semibold hover:bg-blue-50 transition no-underline shadow-lg">
+        <i class="bi bi-book mr-1"></i> Read the Docs
+      </a>
+      <a href="/extract/html" class="inline-block border-2 border-white/60 text-white rounded-lg px-8 py-3 font-semibold hover:bg-white/10 transition no-underline">
+        <i class="bi bi-code-slash mr-1"></i> Try It Now
+      </a>
+    </div>
+  </div>
+</section>
+
+</BaseLayout>
