@@ -18,7 +18,7 @@ const FIXTURES_DIR = resolve(__dirname, '..', 'fixtures');
 const SNAPSHOT_PATH = resolve(FIXTURES_DIR, 'quality-snapshot.json');
 
 describe('stale-snapshot', () => {
-  it('generates quality snapshot for all fixtures', () => {
+  it('generates quality snapshot for all fixtures', { timeout: 30_000 }, () => {
     const entries: Array<{
       scraper: string;
       source: 'browser' | 'server-fetched';

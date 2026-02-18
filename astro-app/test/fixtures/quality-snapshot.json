@@ -12,8 +12,8 @@
       "scraper": "es_fotocasa",
       "source": "browser",
       "grade": "A",
-      "extractionRate": 0.8947368421052632,
-      "populatedFields": 22,
+      "extractionRate": 0.8421052631578947,
+      "populatedFields": 21,
       "totalFields": 24
     },
     {
@@ -60,8 +60,8 @@
       "scraper": "uk_rightmove",
       "source": "browser",
       "grade": "A",
-      "extractionRate": 0.9,
-      "populatedFields": 23,
+      "extractionRate": 0.85,
+      "populatedFields": 22,
       "totalFields": 25
     },
     {
@@ -75,25 +75,25 @@
     {
       "scraper": "uk_zoopla",
       "source": "browser",
-      "grade": "A",
-      "extractionRate": 0.8823529411764706,
-      "populatedFields": 20,
+      "grade": "B",
+      "extractionRate": 0.7058823529411765,
+      "populatedFields": 17,
       "totalFields": 22
     },
     {
       "scraper": "uk_onthemarket",
       "source": "browser",
-      "grade": "A",
-      "extractionRate": 0.9411764705882353,
-      "populatedFields": 21,
+      "grade": "B",
+      "extractionRate": 0.7058823529411765,
+      "populatedFields": 17,
       "totalFields": 22
     },
     {
       "scraper": "ie_daft",
       "source": "browser",
       "grade": "A",
-      "extractionRate": 0.9444444444444444,
-      "populatedFields": 22,
+      "extractionRate": 0.8888888888888888,
+      "populatedFields": 21,
       "totalFields": 23
     },
     {
@@ -113,5 +113,5 @@
       "totalFields": 18
     }
   ],
-  "savedAt": "2026-02-18T12:16:33.890Z"
+  "savedAt": "2026-02-18T13:58:38.533Z"
 }
