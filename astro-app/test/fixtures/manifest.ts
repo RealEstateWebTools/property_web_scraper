@@ -364,10 +364,25 @@ export const fixtures: FixtureEntry[] = [
   },
   {
     scraper: 'au_domain',
-    fixture: null, // TODO: capture fixture with: npx tsx scripts/capture-fixture.ts <url>
-    sourceUrl: 'https://www.domain.com.au/TODO-listing-url',
+    fixture: 'au_domain',
+    sourceUrl: 'https://www.domain.com.au/133-bethany-road-hoppers-crossing-vic-3029-2020615556',
     expected: {
-      title: 'TODO',
+      country: 'AU',
+      currency: 'AUD',
+      title: '133 Bethany Road, Hoppers Crossing VIC 3029 | Domain',
+      address_string: '133 Bethany Road, Hoppers Crossing VIC 3029',
+      price_string: '$470,000 - $500,000',
+      count_bedrooms: 3,
+      count_bathrooms: 1,
+      latitude: -37.8539502,
+      longitude: 144.6720433,
+      postal_code: '3029',
+      city: 'Hoppers Crossing',
+      region: 'vic',
+      property_type: 'House',
+      reference: '2020615556',
+      for_sale: true,
+      for_rent: false,
     },
   },
   {

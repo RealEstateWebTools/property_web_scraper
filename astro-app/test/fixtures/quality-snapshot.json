@@ -111,7 +111,15 @@
       "extractionRate": 0.07692307692307693,
       "populatedFields": 6,
       "totalFields": 18
+    },
+    {
+      "scraper": "au_domain",
+      "source": "browser",
+      "grade": "A",
+      "extractionRate": 0.9473684210526315,
+      "populatedFields": 23,
+      "totalFields": 24
     }
   ],
-  "savedAt": "2026-02-18T15:23:36.200Z"
+  "savedAt": "2026-02-18T16:01:20.537Z"
 }
