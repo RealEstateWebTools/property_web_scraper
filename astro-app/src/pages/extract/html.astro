@@ -7,6 +7,8 @@ import { initScrapeMetadataKV, recordScrapeAndUpdatePortal } from '@lib/services
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
 initScrapeMetadataKV((Astro.locals as any).runtime?.env?.RESULTS);
 
+const prefillUrl = Astro.url.searchParams.get('url') || '';
+
 if (Astro.request.method === 'POST') {
   const formData = await Astro.request.formData();
   const importUrl = (formData.get('import_url') as string || '').trim();
@@ -78,7 +80,8 @@ if (Astro.request.method === 'POST') {
             <label for="import_url" class="block text-sm font-semibold mb-1">Property URL</label>
             <input type="text" name="import_url" id="import_url"
                    class="w-full px-4 py-2.5 border-[1.5px] border-gray-300 rounded-lg text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition"
-                   placeholder="https://www.idealista.com/inmueble/12345678/" required />
+                   placeholder="https://www.idealista.com/inmueble/12345678/"
+                   value={prefillUrl} required />
           </div>
 
           <div class="mb-4">

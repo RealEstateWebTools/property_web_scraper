@@ -4,9 +4,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 const reason = Astro.url.searchParams.get('reason') || 'error';
 const url = Astro.url.searchParams.get('url') || '';
 const message = Astro.url.searchParams.get('message') || '';
+const portal = Astro.url.searchParams.get('portal') || '';
 
 const isUnsupported = reason === 'unsupported';
 const isMissingUrl = reason === 'missing_url';
+const isFetchBlocked = reason === 'fetch_blocked';
 
 const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com'];
 ---
@@ -20,7 +22,34 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
           <i class="bi bi-exclamation-triangle"></i>
         </div>
 
-        {isMissingUrl ? (
+        {isFetchBlocked ? (
+          <>
+            <h5 class="font-semibold text-amber-900 mb-2">This site requires browser-rendered HTML</h5>
+            <p class="text-amber-800 text-sm">
+              {portal || 'This portal'} blocks server-side fetching, so we can't retrieve the page automatically.
+              You'll need to provide the HTML yourself.
+            </p>
+            {url && <p class="text-amber-700 text-xs mt-1 break-all">URL: {url}</p>}
+            <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+              <i class="bi bi-info-circle text-blue-600 mr-1"></i> <strong>How to get the HTML:</strong>
+              <ol class="mt-2 ml-4 list-decimal space-y-1 text-gray-600">
+                <li>Open the property page in your browser</li>
+                <li>Right-click and select <strong>View Page Source</strong> (or press Ctrl+U / Cmd+U)</li>
+                <li>Copy all the HTML, or save the page as an HTML file</li>
+              </ol>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <a href={`/extract/html${url ? `?url=${encodeURIComponent(url)}` : ''}`}
+                 class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+                <i class="bi bi-code-slash"></i> Paste HTML
+              </a>
+              <a href={`/extract/upload${url ? `?url=${encodeURIComponent(url)}` : ''}`}
+                 class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+                <i class="bi bi-file-earmark-arrow-up"></i> Upload HTML File
+              </a>
+            </div>
+          </>
+        ) : isMissingUrl ? (
           <>
             <h5 class="font-semibold text-amber-900 mb-2">No URL provided</h5>
             <p class="text-amber-800 text-sm">Please provide a property URL to extract data from.</p>
@@ -53,14 +82,16 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
           </>
         )}
 
-        <div class="mt-4 flex flex-wrap gap-2">
-          <a href="/extract/url" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
-            <i class="bi bi-arrow-left"></i> Try Again
-          </a>
-          <a href="/sites" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
-            <i class="bi bi-globe"></i> View Supported Sites
-          </a>
-        </div>
+        {!isFetchBlocked && (
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="/extract/url" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-arrow-left"></i> Try Again
+            </a>
+            <a href="/sites" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-globe"></i> View Supported Sites
+            </a>
+          </div>
+        )}
       </div>
     </div>
   </div>

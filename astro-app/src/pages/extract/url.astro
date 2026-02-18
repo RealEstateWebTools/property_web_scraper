@@ -4,6 +4,7 @@ import { retrieveListing } from '@lib/services/listing-retriever.js';
 import { fetchHtml } from '@lib/services/html-fetcher.js';
 import { initKV, generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
 import { initScrapeMetadataKV, recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
+import { findPortalByHost } from '@lib/services/portal-registry.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
 initScrapeMetadataKV((Astro.locals as any).runtime?.env?.RESULTS);
@@ -25,6 +26,17 @@ if (Astro.request.method === 'POST') {
 
   if (!importUrl) {
     return Astro.redirect('/extract/error?reason=missing_url');
+  }
+
+  // Check if this portal blocks server-side fetching
+  try {
+    const parsedUrl = new URL(importUrl);
+    const portal = findPortalByHost(parsedUrl.hostname);
+    if (portal?.requiresJsRendering) {
+      return Astro.redirect(`/extract/error?reason=fetch_blocked&url=${encodeURIComponent(importUrl)}&portal=${encodeURIComponent(portal.scraperName)}`);
+    }
+  } catch {
+    // Invalid URL — let fetchHtml handle the error
   }
 
   const fetchResult = await fetchHtml(importUrl);

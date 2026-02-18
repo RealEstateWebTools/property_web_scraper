@@ -41,7 +41,7 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     areaUnit: 'sqmt',
     contentSource: 'html',
     stripTrailingSlash: false,
-    requiresJsRendering: false,
+    requiresJsRendering: true,
   },
   uk_zoopla: {
     scraperName: 'uk_zoopla',
@@ -161,7 +161,7 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     areaUnit: 'sqmt',
     contentSource: 'script-json',
     stripTrailingSlash: false,
-    requiresJsRendering: false,
+    requiresJsRendering: true,
   },
   de_immoscout: {
     scraperName: 'de_immoscout',
