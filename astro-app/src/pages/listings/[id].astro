@@ -8,22 +8,21 @@ initKV((Astro.locals as any).runtime?.env?.RESULTS);
 const { id } = Astro.params;
 const listing = id ? await getListing(id) : undefined;
 
-let markers: Array<{title: string; position: {lat: number; lng: number}}> = [];
 let mainImageUrl = 'https://placehold.co/500x250?text=No+Image';
+let osmDirectionsUrl = '';
+let googleDirectionsUrl = '';
 
 if (listing) {
-  if (listing.latitude && listing.longitude) {
-    markers.push({
-      title: listing.title || '',
-      position: { lat: listing.latitude, lng: listing.longitude },
-    });
+  if (typeof listing.latitude === 'number' && typeof listing.longitude === 'number' && (listing.latitude !== 0 || listing.longitude !== 0)) {
+    const lat = listing.latitude;
+    const lng = listing.longitude;
+    osmDirectionsUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${lat}%2C${lng}`;
+    googleDirectionsUrl = `https://www.google.com/maps/search/?api=1&query=${lat}%2C${lng}`;
   }
   if (listing.image_urls?.length > 0) {
     mainImageUrl = listing.image_urls[0].url;
   }
 }
-
-const googleMapsApiKey = import.meta.env.GOOGLE_MAPS_API_KEY || '';
 
 const details: [string, any][] = [];
 if (listing) {
@@ -100,10 +99,32 @@ if (listing) {
           </div>
         )}
 
-        {markers.length > 0 && googleMapsApiKey && (
+        {osmDirectionsUrl && (
           <div class="bg-white rounded-xl shadow-md p-6 mb-5">
             <h5 class="font-semibold text-base text-gray-800 mb-4"><i class="bi bi-geo-alt mr-2"></i>Location</h5>
-            <div id="map" class="min-h-[300px] w-full rounded-lg" data-markers={JSON.stringify(markers)} data-zoom="15" data-api-key={googleMapsApiKey}></div>
+            <div class="rounded-lg border border-gray-200 p-4 bg-gray-50 text-sm text-gray-700">
+              <p class="mb-2">Interactive map embed has been removed to avoid third-party map SDK dependency.</p>
+              <div class="flex flex-wrap gap-2">
+                <a
+                  href={osmDirectionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 rounded-md border border-blue-600 px-3 py-1.5 text-blue-600 no-underline hover:bg-blue-50 transition"
+                >
+                  <i class="bi bi-sign-turn-right"></i>
+                  Open directions (OpenStreetMap)
+                </a>
+                <a
+                  href={googleDirectionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 no-underline hover:bg-gray-100 transition"
+                >
+                  <i class="bi bi-box-arrow-up-right"></i>
+                  Open in external map app
+                </a>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -204,28 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const mapEl = document.getElementById('map');
-  if (!mapEl) return;
-  const apiKey = mapEl.dataset.apiKey;
-  if (!apiKey) return;
-
-  const markers = JSON.parse(mapEl.dataset.markers || '[]');
-  const zoom = parseInt(mapEl.dataset.zoom || '15', 10);
-
-  const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
-  script.async = true;
-  window.initMap = function() {
-    if (markers.length === 0) return;
-    const map = new google.maps.Map(mapEl, {
-      center: markers[0].position,
-      zoom: zoom,
-    });
-    markers.forEach(m => {
-      new google.maps.Marker({ position: m.position, map: map, title: m.title });
-    });
-  };
-  document.head.appendChild(script);
 });
 </script>
 

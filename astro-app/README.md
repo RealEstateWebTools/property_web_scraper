@@ -28,7 +28,8 @@ Copy `.env.example` to `.env` and fill in the values you need:
 | `GOOGLE_APPLICATION_CREDENTIALS` | No | Path to Firebase service account JSON |
 | `FIRESTORE_COLLECTION_PREFIX` | No | Optional prefix for Firestore collection names |
 | `PWS_API_KEY` | No | API key protecting `/retriever/as_json` and `/api/v1/listings`. When empty, auth is skipped |
-| `GOOGLE_MAPS_API_KEY` | No | Enables the map on the single property view page |
+
+Note: the Astro app does not require a Google Maps API key. The listing page uses external map links rather than embedding a provider SDK.
 
 ## Project Structure
 

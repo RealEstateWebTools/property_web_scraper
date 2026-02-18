@@ -287,10 +287,6 @@ export function validateEnv(): void {
     warnings.push('PWS_API_KEY not set - API authentication disabled');
   }
   
-  if (!import.meta.env.GOOGLE_MAPS_API_KEY) {
-    warnings.push('GOOGLE_MAPS_API_KEY not set - maps disabled');
-  }
-  
   if (warnings.length > 0) {
     console.warn('Environment configuration warnings:');
     warnings.forEach(w => console.warn(`  - ${w}`));
