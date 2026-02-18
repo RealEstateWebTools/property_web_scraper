@@ -111,6 +111,20 @@ describe('retrieveListing', () => {
     expect(result.diagnostics!.scraperName).toBe('es_idealista');
   });
 
+  it('extracts from requiresJsRendering portal when HTML is provided', async () => {
+    // The requiresJsRendering flag only blocks server-side fetching;
+    // extraction should work normally when HTML is supplied directly.
+    const html = loadFixture('es_idealista');
+    const result = await retrieveListing(
+      'https://www.idealista.com/en/inmueble/106387165/',
+      html,
+    );
+    expect(result.success).toBe(true);
+    expect(result.retrievedListing).toBeDefined();
+    expect(result.diagnostics!.scraperName).toBe('es_idealista');
+    expect(result.diagnostics!.populatedFields).toBeGreaterThan(0);
+  });
+
   describe('price normalization', () => {
     it('sets price_cents and price_currency for rightmove', async () => {
       const html = loadFixture('rightmove_v2');

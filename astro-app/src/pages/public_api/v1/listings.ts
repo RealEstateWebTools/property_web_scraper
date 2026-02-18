@@ -331,6 +331,31 @@ export const POST: APIRoute = async ({ request }) => {
     return resp;
   }
 
+  // Block URL-only requests for portals that require JS rendering
+  if (!html) {
+    try {
+      const parsedUrl = new URL(url);
+      const portal = findPortalByHost(parsedUrl.hostname);
+      if (portal?.requiresJsRendering) {
+        logActivity({
+          level: 'warn',
+          category: 'api_request',
+          message: `POST listings: fetch blocked for ${portal.scraperName}`,
+          method: 'POST',
+          path,
+          statusCode: 422,
+          durationMs: Date.now() - startTime,
+          errorCode: ApiErrorCode.FETCH_BLOCKED,
+        });
+        return errorResponse(
+          ApiErrorCode.FETCH_BLOCKED,
+          'This portal blocks server-side fetching. Please provide the fully-rendered HTML in the request body.',
+          request,
+        );
+      }
+    } catch { /* URL parse failed, continue to normal flow */ }
+  }
+
   const importHost = validation.importHost!;
   const scraperMapping = findByName(importHost.scraper_name);
   if (!scraperMapping) {
