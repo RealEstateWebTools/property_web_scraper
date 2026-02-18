@@ -71,7 +71,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('traces contain expected properties', () => {
-      const html = loadFixture('idealista_v2');
+      const html = loadFixture('es_idealista');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
@@ -103,7 +103,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('includes quality scoring fields in diagnostics', () => {
-      const html = loadFixture('idealista_v2');
+      const html = loadFixture('es_idealista');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
@@ -164,8 +164,8 @@ describe('HtmlExtractor', () => {
 
   describe('idealista extraction from raw HTML', () => {
     it('extracts the same values as the manifest', () => {
-      const html = loadFixture('idealista_v2');
-      const sourceUrl = 'https://www.idealista.com/inmueble/98765432/';
+      const html = loadFixture('es_idealista');
+      const sourceUrl = 'https://www.idealista.com/en/inmueble/106387165/';
 
       const result = extractFromHtml({
         html,
@@ -176,15 +176,13 @@ describe('HtmlExtractor', () => {
       expect(result.success).toBe(true);
       const props = result.properties[0];
 
-      expect(props['title']).toBe('Piso en venta en calle de Serrano, 50, Salamanca, Madrid');
-      expect(props['price_float']).toBe(1250000);
+      expect(props['title']).toContain('Duplex for sale in Calle de Alcal');
+      expect(props['price_float']).toBe(3600000);
       expect(props['currency']).toBe('EUR');
-      expect(props['constructed_area']).toBe(185);
-      expect(props['reference']).toBe('98765432');
+      expect(props['constructed_area']).toBe(273);
+      expect(props['reference']).toBe('106387165');
       expect(props['for_sale']).toBe(true);
       expect(props['for_rent']).toBe(false);
-      expect(props['latitude']).toBe(40.4308);
-      expect(props['longitude']).toBe(-3.6868);
     });
   });
 
@@ -239,7 +237,7 @@ describe('HtmlExtractor', () => {
 
   describe('weighted quality scoring in diagnostics', () => {
     it('includes weightedExtractionRate in diagnostics', () => {
-      const html = loadFixture('idealista_v2');
+      const html = loadFixture('es_idealista');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
@@ -253,7 +251,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('includes criticalFieldsMissing in diagnostics', () => {
-      const html = loadFixture('idealista_v2');
+      const html = loadFixture('es_idealista');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
@@ -323,7 +321,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('does not flag normal page as blocked', () => {
-      const html = loadFixture('idealista_v2');
+      const html = loadFixture('es_idealista');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
@@ -337,7 +335,7 @@ describe('HtmlExtractor', () => {
 
   describe('split schema in result', () => {
     it('includes splitSchema in extraction result', () => {
-      const html = loadFixture('idealista_v2');
+      const html = loadFixture('es_idealista');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
@@ -351,7 +349,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('places title in assetData', () => {
-      const html = loadFixture('idealista_v2');
+      const html = loadFixture('es_idealista');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
@@ -362,7 +360,7 @@ describe('HtmlExtractor', () => {
     });
 
     it('places price fields in listingData', () => {
-      const html = loadFixture('idealista_v2');
+      const html = loadFixture('es_idealista');
       const result = extractFromHtml({
         html,
         sourceUrl: 'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',

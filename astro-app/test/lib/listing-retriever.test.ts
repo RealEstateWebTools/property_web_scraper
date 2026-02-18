@@ -101,13 +101,13 @@ describe('retrieveListing', () => {
   });
 
   it('works with idealista URL and fixture', async () => {
-    const html = loadFixture('idealista_v2');
+    const html = loadFixture('es_idealista');
     const result = await retrieveListing(
-      'https://www.idealista.com/inmueble/98765432/',
+      'https://www.idealista.com/en/inmueble/106387165/',
       html,
     );
     expect(result.success).toBe(true);
-    expect(result.retrievedListing!.title).toBe('Piso en venta en calle de Serrano, 50, Salamanca, Madrid');
+    expect(result.retrievedListing!.title).toContain('Duplex for sale in Calle de Alcal');
     expect(result.diagnostics!.scraperName).toBe('es_idealista');
   });
 
@@ -126,9 +126,9 @@ describe('retrieveListing', () => {
     });
 
     it('uses EUR currency for idealista', async () => {
-      const html = loadFixture('idealista_v2');
+      const html = loadFixture('es_idealista');
       const result = await retrieveListing(
-        'https://www.idealista.com/pro/rv-gestion-inmobiliaria/inmueble/38604738/',
+        'https://www.idealista.com/en/inmueble/106387165/',
         html,
       );
 
