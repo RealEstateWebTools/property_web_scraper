@@ -26,6 +26,8 @@ property_web_scraper/
 │   ├── test/lib/           # Vitest unit tests
 │   ├── scripts/            # CLI utilities (capture-fixture)
 │   └── docs/               # Maintenance guides
+├── chrome-extensions/       # Chrome extensions
+│   └── property-scraper/   # Main extension (WebSocket bridge to MCP server)
 ├── config/scraper_mappings/ # JSON mapping files (shared by both)
 ├── spec/                   # Rails RSpec tests
 ├── DESIGN.md               # Architecture and API reference
