@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- Split Chrome extension into two: `chrome-extensions/property-scraper/` (public, one-click extraction) and `chrome-extensions/mcp-bridge/` (dev-only WebSocket bridge to MCP server) — cleaner separation of concerns and no `<all_urls>` permission needed for the public extension
+
 ### Added
 - WebSocket bridge between Chrome extension and MCP server — `capture_page` and `extension_status` tools let Claude Code capture rendered HTML from the browser's active tab and save it as a test fixture
 - Connection status indicator in extension popup — green/grey dot shows whether the MCP server bridge is active

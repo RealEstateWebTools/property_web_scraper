@@ -402,8 +402,11 @@ Separates the extraction property hash into three categories:
 
 ## Chrome Extension ↔ MCP Server Bridge
 
-The Chrome extension connects to the MCP server over WebSocket, enabling Claude
-Code to capture fully-rendered HTML directly from the user's browser.
+The **MCP Bridge** extension (`chrome-extensions/mcp-bridge/`) connects to the
+MCP server over WebSocket, enabling Claude Code to capture fully-rendered HTML
+directly from the user's browser. This is separate from the public
+**Property Scraper** extension (`chrome-extensions/property-scraper/`), which
+handles one-click extraction via the popup UI.
 
 ### Architecture
 
@@ -416,7 +419,7 @@ Code to capture fully-rendered HTML directly from the user's browser.
                                          WebSocket :17824
                                                 │
                                          ┌──────────────────┐
-                                         │ Chrome Extension  │
+                                         │  MCP Bridge Ext   │
                                          │  background.js    │
                                          │  (service worker) │
                                          └──────────────────┘
@@ -431,7 +434,7 @@ Code to capture fully-rendered HTML directly from the user's browser.
 
 The MCP protocol runs over **stdio** between Claude Code and the MCP server.
 The WebSocket on port 17824 is a separate side-channel used exclusively for
-the Chrome extension bridge. This avoids Native Messaging complexity (separate
+the MCP Bridge extension. This avoids Native Messaging complexity (separate
 native host binary, per-browser manifest registration) while still allowing
 real-time bidirectional communication.
 

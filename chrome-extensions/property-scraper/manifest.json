@@ -5,7 +5,23 @@
   "description": "Extract structured property data from real estate listing pages",
   "permissions": ["activeTab", "scripting", "storage", "tabs"],
   "host_permissions": [
-    "<all_urls>"
+    "*://*.rightmove.co.uk/*",
+    "*://*.zoopla.co.uk/*",
+    "*://*.onthemarket.com/*",
+    "*://*.idealista.com/*",
+    "*://*.idealista.pt/*",
+    "*://*.fotocasa.es/*",
+    "*://*.pisos.com/*",
+    "*://*.daft.ie/*",
+    "*://*.realtor.com/*",
+    "*://*.realestateindia.com/*",
+    "*://*.forsalebyowner.com/*",
+    "*://*.jitty.com/*",
+    "*://*.immobilienscout24.de/*",
+    "*://*.seloger.com/*",
+    "*://*.leboncoin.fr/*",
+    "*://*.domain.com.au/*",
+    "*://*.realestate.com.au/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -20,7 +36,25 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": [
+        "*://*.rightmove.co.uk/*",
+        "*://*.zoopla.co.uk/*",
+        "*://*.onthemarket.com/*",
+        "*://*.idealista.com/*",
+        "*://*.idealista.pt/*",
+        "*://*.fotocasa.es/*",
+        "*://*.pisos.com/*",
+        "*://*.daft.ie/*",
+        "*://*.realtor.com/*",
+        "*://*.realestateindia.com/*",
+        "*://*.forsalebyowner.com/*",
+        "*://*.jitty.com/*",
+        "*://*.immobilienscout24.de/*",
+        "*://*.seloger.com/*",
+        "*://*.leboncoin.fr/*",
+        "*://*.domain.com.au/*",
+        "*://*.realestate.com.au/*"
+      ],
       "js": ["content-script.js"],
       "run_at": "document_idle"
     }

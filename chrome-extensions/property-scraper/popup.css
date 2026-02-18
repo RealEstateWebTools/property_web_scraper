@@ -57,28 +57,6 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* ─── WebSocket Status ─────────────────────────────────────────── */
-
-.ws-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  font-size: 11px;
-  color: #888;
-}
-
-.ws-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ccc;
-}
-
-.ws-connected .ws-dot { background: #22c55e; }
-.ws-connected { color: #22c55e; }
-.ws-disconnected .ws-dot { background: #ccc; }
-
 /* ─── States ───────────────────────────────────────────────────── */
 
 .state {

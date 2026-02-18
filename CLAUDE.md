@@ -27,7 +27,8 @@ property_web_scraper/
 │   ├── scripts/            # CLI utilities (capture-fixture)
 │   └── docs/               # Maintenance guides
 ├── chrome-extensions/       # Chrome extensions
-│   └── property-scraper/   # Main extension (WebSocket bridge to MCP server)
+│   ├── property-scraper/   # Public extension (one-click extraction popup)
+│   └── mcp-bridge/         # Dev extension (WebSocket bridge to MCP server)
 ├── config/scraper_mappings/ # JSON mapping files (shared by both)
 ├── spec/                   # Rails RSpec tests
 ├── DESIGN.md               # Architecture and API reference
@@ -85,10 +86,10 @@ See `astro-app/docs/scraper-maintenance-guide.md` for the full diagnosis workflo
 
 ### Capture a fixture via MCP bridge
 
-With the Chrome extension installed and the MCP server running
-(`npx tsx astro-app/mcp-server.ts`), use the `capture_page` MCP tool to grab
-rendered HTML from the browser's active tab. Call `extension_status` first to
-confirm the extension is connected.
+With the **mcp-bridge** extension (`chrome-extensions/mcp-bridge/`) loaded and
+the MCP server running (`npx tsx astro-app/mcp-server.ts`), use the
+`capture_page` MCP tool to grab rendered HTML from the browser's active tab.
+Call `extension_status` first to confirm the extension is connected.
 
 ### Capture a test fixture
 
