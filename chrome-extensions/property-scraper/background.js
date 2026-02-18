@@ -70,7 +70,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
 async function handleExtraction({ url, html }) {
   const config = await chrome.storage.sync.get(['apiUrl', 'apiKey']);
-  const apiUrl = config.apiUrl || 'https://property-web-scraper.pages.dev';
+  const apiUrl = (config.apiUrl || 'https://property-web-scraper.pages.dev').replace(/\/+$/, '');
   const apiKey = config.apiKey || '';
 
   const headers = { 'Content-Type': 'application/json' };
