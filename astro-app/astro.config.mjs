@@ -8,6 +8,28 @@ export default defineConfig({
   vite: {
     plugins: [
       tailwindcss(),
+      // Dev-only: allow chrome-extension:// origins to hit API routes
+      {
+        name: 'chrome-ext-cors',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            const origin = req.headers.origin;
+            if (origin?.startsWith('chrome-extension://')) {
+              res.setHeader('Access-Control-Allow-Origin', origin);
+              res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+              res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Api-Key');
+              res.setHeader('Vary', 'Origin');
+              if (req.method === 'OPTIONS') {
+                console.log(`[CORS] Preflight OK for ${origin} → ${req.url}`);
+                res.statusCode = 204;
+                res.end();
+                return;
+              }
+            }
+            next();
+          });
+        },
+      },
       // Fix: Cloudflare Workers with nodejs_compat sets process to a real
       // Node.js-like object, causing Astro's isNode detection to be true.
       // This makes Astro use renderToAsyncIterable (Node path) instead of
