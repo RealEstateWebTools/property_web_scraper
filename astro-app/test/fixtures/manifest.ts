@@ -363,22 +363,6 @@ export const fixtures: FixtureEntry[] = [
     },
   },
   {
-    scraper: 'fr_seloger',
-    fixture: null, // TODO: capture fixture with: npx tsx scripts/capture-fixture.ts <url>
-    sourceUrl: 'https://www.seloger.com/TODO-listing-url',
-    expected: {
-      title: 'TODO',
-    },
-  },
-  {
-    scraper: 'fr_leboncoin',
-    fixture: null, // TODO: capture fixture with: npx tsx scripts/capture-fixture.ts <url>
-    sourceUrl: 'https://www.leboncoin.fr/TODO-listing-url',
-    expected: {
-      title: 'TODO',
-    },
-  },
-  {
     scraper: 'au_domain',
     fixture: null, // TODO: capture fixture with: npx tsx scripts/capture-fixture.ts <url>
     sourceUrl: 'https://www.domain.com.au/TODO-listing-url',
