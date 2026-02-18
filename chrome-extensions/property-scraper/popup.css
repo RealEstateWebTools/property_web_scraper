@@ -140,24 +140,9 @@ body {
   background: #e2e8f0;
 }
 
-/* ─── Result Image ─────────────────────────────────────────────── */
+/* ─── Result Summary ──────────────────────────────────────────── */
 
-.result-image-wrap {
-  width: 100%;
-  height: 160px;
-  overflow: hidden;
-  background: #e2e8f0;
-}
-
-.result-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* ─── Result Body ──────────────────────────────────────────────── */
-
-.result-body {
+.result-summary {
   padding: 14px 16px;
 }
 
@@ -202,99 +187,17 @@ body {
   letter-spacing: -0.3px;
 }
 
-.result-address {
+.extraction-rate {
   font-size: 12px;
   color: #64748b;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-/* ─── Stats Row ────────────────────────────────────────────────── */
-
-.stats-row {
-  display: flex;
-  gap: 16px;
-  padding: 10px 0;
-  border-top: 1px solid #f1f5f9;
-  border-bottom: 1px solid #f1f5f9;
-  margin-bottom: 12px;
-}
-
-.stat {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.btn-view-results {
+  width: 100%;
+  justify-content: center;
+  padding: 10px 16px;
   font-size: 13px;
-  color: #475569;
-}
-
-.stat-icon {
-  font-size: 15px;
-}
-
-.stat-value {
-  font-weight: 600;
-  color: #0f172a;
-}
-
-/* ─── Details Grid ─────────────────────────────────────────────── */
-
-.details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px 12px;
-  margin-bottom: 12px;
-}
-
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-}
-
-.detail-label {
-  font-size: 11px;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.detail-value {
-  font-size: 12px;
-  font-weight: 500;
-  color: #334155;
-  text-align: right;
-}
-
-/* ─── Features ─────────────────────────────────────────────────── */
-
-.features-wrap {
-  margin-top: 8px;
-  padding-top: 10px;
-  border-top: 1px solid #f1f5f9;
-}
-
-.section-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-
-.features-list {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.features-list li {
-  font-size: 11px;
-  color: #475569;
-  background: #f1f5f9;
-  padding: 3px 8px;
-  border-radius: 4px;
 }
 
 /* ─── Actions ──────────────────────────────────────────────────── */

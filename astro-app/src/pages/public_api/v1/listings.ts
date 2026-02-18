@@ -22,6 +22,7 @@ import { normalizePropertyType } from '@lib/extractor/property-type-normalizer.j
 import { detectListingType } from '@lib/extractor/listing-type-detector.js';
 import type { SplitSchema } from '@lib/extractor/schema-splitter.js';
 import type { PortalConfig } from '@lib/services/portal-registry.js';
+import { generateId, storeListing, storeDiagnostics, initKV } from '@lib/services/listing-store.js';
 
 function countAvailableFields(mapping: ScraperMapping): number {
   let count = 0;
@@ -413,11 +414,23 @@ export const POST: APIRoute = async ({ request }) => {
       const fieldsExtracted = countExtractedFields(result.properties[0]);
       const fieldsAvailable = countAvailableFields(scraperMapping);
 
+      // Store result in KV for the /extract/results page
+      const resultId = generateId();
+      try {
+        initKV(undefined); // use in-memory store; KV binding not available in API routes
+        await storeListing(resultId, listing);
+        if (result.diagnostics) {
+          await storeDiagnostics(resultId, result.diagnostics);
+        }
+      } catch { /* listing-store failure shouldn't affect API response */ }
+
       extraction = {
         fields_extracted: fieldsExtracted,
         fields_available: fieldsAvailable,
         scraper_used: importHost.scraper_name,
         diagnostics: result.diagnostics,
+        results_url: `/extract/results/${resultId}`,
+        result_id: resultId,
         ...(result.splitSchema ? { split_schema: result.splitSchema } : {}),
         _rawProps: result.properties[0],
       };
