@@ -8,8 +8,8 @@ import {
 
 describe('portal-registry', () => {
   describe('PORTAL_REGISTRY', () => {
-    it('contains all 17 portals', () => {
-      expect(Object.keys(PORTAL_REGISTRY)).toHaveLength(17);
+    it('contains all 15 portals', () => {
+      expect(Object.keys(PORTAL_REGISTRY)).toHaveLength(15);
     });
 
     it('each portal has required fields', () => {
@@ -106,7 +106,7 @@ describe('portal-registry', () => {
   describe('allPortalNames', () => {
     it('returns array of all portal names', () => {
       const names = allPortalNames();
-      expect(names).toHaveLength(17);
+      expect(names).toHaveLength(15);
       expect(names).toContain('uk_rightmove');
       expect(names).toContain('es_idealista');
     });
