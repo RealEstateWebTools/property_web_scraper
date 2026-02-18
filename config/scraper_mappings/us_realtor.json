@@ -24,45 +24,63 @@
   {
     "constructed_area":
     {
-      "cssLocator": "#ldp-property-meta > ul > li:nth-child(3) > span",
-      "stripPunct": "true"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.description.sqft"
+    },
+    "land_area":
+    {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.description.lot_sqft"
     },
     "price_float":
     {
-      "cssLocator": "#ldp-pricewrap > div > div > span",
-      "stripFirstChar": "true",
-      "stripPunct": "true"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.list_price"
     },
     "longitude":
     {
-      "cssLocator": "meta[property='place:location:longitude']",
-      "cssAttr": "content"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.location.address.coordinate.lon",
+      "fallbacks": [
+        {
+          "cssLocator": "meta[property='place:location:longitude']",
+          "cssAttr": "content"
+        }
+      ]
     },
     "latitude":
     {
-      "cssLocator": "meta[property='place:location:latitude']",
-      "cssAttr": "content"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.location.address.coordinate.lat",
+      "fallbacks": [
+        {
+          "cssLocator": "meta[property='place:location:latitude']",
+          "cssAttr": "content"
+        }
+      ]
     }
   },
   "intFields": {
     "count_bedrooms": {
-      "cssLocator": "#ldp-property-meta li[data-label='property-meta-beds']"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.description.beds"
     },
     "count_bathrooms": {
-      "cssLocator": "#ldp-property-meta li[data-label='property-meta-bath']"
-    } 
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.description.baths_consolidated"
+    }
   },
   "textFields":
   {
     "reference":
     {
-      // "xpath": "//div[@data-listingid]"
-      "cssLocator": ".js-tracking",
-      "cssAttr": "data-listingid"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.property_id"
     },
     "title":
     {
-      "cssLocator": "#ldp-address > h1 > span:nth-child(1)"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.location.address.line"
     },
     "description":
     {
@@ -71,53 +89,92 @@
     },
     "price_string":
     {
-      "cssLocator": "#ldp-pricewrap > div > div > span"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.list_price"
     },
     "postal_code":
     {
-      "cssLocator": "meta[property='og:postal-code']",
-      "cssAttr": "content"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.location.address.postal_code",
+      "fallbacks": [
+        {
+          "cssLocator": "meta[property='og:postal-code']",
+          "cssAttr": "content"
+        }
+      ]
     },
     "city":
     {
-      "cssLocator": "meta[property='og:locality']",
-      "cssAttr": "content"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.location.address.city",
+      "fallbacks": [
+        {
+          "cssLocator": "meta[property='og:locality']",
+          "cssAttr": "content"
+        }
+      ]
     },
     "region":
     {
-      "cssLocator": "meta[property='og:region']",
-      "cssAttr": "content"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.location.address.state_code",
+      "fallbacks": [
+        {
+          "cssLocator": "meta[property='og:region']",
+          "cssAttr": "content"
+        }
+      ]
     },
     "address_string":
     {
-      "cssLocator": "meta[property='og:street-address']",
-      "cssAttr": "content"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.location.address.line",
+      "fallbacks": [
+        {
+          "cssLocator": "meta[property='og:street-address']",
+          "cssAttr": "content"
+        }
+      ]
     },
     "main_image_url":
     {
-      "cssLocator": "meta[property='og:image']",
-      "cssAttr": "content"
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.primary_photo.href",
+      "fallbacks": [
+        {
+          "cssLocator": "meta[property='og:image']",
+          "cssAttr": "content"
+        }
+      ]
+    },
+    "property_type":
+    {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.description.sub_type"
     }
   },
   "booleanFields":
   {
     "for_rent_long_term":
     {
-      "cssLocator": "span[data-label='property-meta-status']",
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.status",
       "evaluator": "include?",
       "caseInsensitive": true,
       "evaluatorParam": "rent"
     },
     "for_rent":
     {
-      "cssLocator": "span[data-label='property-meta-status']",
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.status",
       "evaluator": "include?",
       "caseInsensitive": true,
       "evaluatorParam": "rent"
     },
     "for_sale":
     {
-      "cssLocator": "span[data-label='property-meta-status']",
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.status",
       "evaluator": "include?",
       "caseInsensitive": true,
       "evaluatorParam": "sale"
@@ -125,8 +182,9 @@
   },
   "images": [
   {
-    "cssLocator": "#ldpPhotoGallery img",
-    "xmlAttr": "data-src"
+    "scriptJsonVar": "__NEXT_DATA__",
+    "scriptJsonPath": "props.pageProps.initialReduxState.propertyDetails.augmented_gallery.0.photos",
+    "xmlAttr": "href"
   }]
 
 }]

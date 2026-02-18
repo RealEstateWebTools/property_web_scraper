@@ -218,9 +218,9 @@ describe('HtmlExtractor', () => {
 
   describe('realtor extraction from raw HTML', () => {
     it('extracts property data from raw HTML', () => {
-      const html = loadFixture('realtor');
+      const html = loadFixture('us_realtor');
       const sourceUrl =
-        'http://www.realtor.com/realestateandhomes-detail/5804-Cedar-Glen-Ln_Bakersfield_CA_93313_M12147-18296';
+        'https://www.realtor.com/realestateandhomes-detail/2200-Pacific-Ave-B1_San-Francisco_CA_94115_M20341-51800';
 
       const result = extractFromHtml({
         html,
