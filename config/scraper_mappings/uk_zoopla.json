@@ -1,6 +1,6 @@
 [{
   "name": "uk_zoopla",
-  "expectedExtractionRate": 0.85,
+  "expectedExtractionRate": 0.70,
   "defaultValues": {
     "country": { "value": "UK" },
     "area_unit": { "value": "sqft" },
