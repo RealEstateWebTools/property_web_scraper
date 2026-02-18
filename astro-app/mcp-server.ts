@@ -11,8 +11,9 @@
  * Run: npx tsx astro-app/mcp-server.ts
  */
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
+import { WebSocketServer, WebSocket } from 'ws';
 import { fileURLToPath } from 'node:url';
 import JSON5 from 'json5';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -126,6 +127,109 @@ for (const config of Object.values(MERGED_REGISTRY)) {
   for (const host of config.hosts) {
     HOST_INDEX.set(host, config);
   }
+}
+
+// ---------------------------------------------------------------------------
+// WebSocket bridge to Chrome extension
+// ---------------------------------------------------------------------------
+
+const CAPTURE_PORT = parseInt(process.env.PWS_CAPTURE_PORT || '17824', 10);
+
+interface ExtensionState {
+  socket: WebSocket | null;
+  tabUrl: string | null;
+  tabTitle: string | null;
+}
+
+const extension: ExtensionState = { socket: null, tabUrl: null, tabTitle: null };
+
+interface PendingCapture {
+  resolve: (value: { html: string; url: string; title: string }) => void;
+  reject: (error: Error) => void;
+  timer: NodeJS.Timeout;
+}
+
+let pendingCapture: PendingCapture | null = null;
+
+const wss = new WebSocketServer({ port: CAPTURE_PORT });
+
+wss.on('listening', () => {
+  console.error(`[PWS] WebSocket server listening on port ${CAPTURE_PORT}`);
+});
+
+wss.on('connection', (ws: WebSocket) => {
+  console.error('[PWS] Chrome extension connected');
+  extension.socket = ws;
+
+  ws.on('message', (raw: Buffer) => {
+    try {
+      const msg = JSON.parse(raw.toString());
+
+      if (msg.type === 'tab_update') {
+        extension.tabUrl = msg.url || null;
+        extension.tabTitle = msg.title || null;
+      }
+
+      if (msg.type === 'capture_response' && pendingCapture) {
+        clearTimeout(pendingCapture.timer);
+        if (msg.error) {
+          pendingCapture.reject(new Error(msg.error));
+        } else {
+          pendingCapture.resolve({
+            html: msg.html,
+            url: msg.url,
+            title: msg.title,
+          });
+        }
+        pendingCapture = null;
+      }
+    } catch (err) {
+      console.error('[PWS] Invalid message from extension:', err);
+    }
+  });
+
+  ws.on('close', () => {
+    console.error('[PWS] Chrome extension disconnected');
+    if (extension.socket === ws) {
+      extension.socket = null;
+      extension.tabUrl = null;
+      extension.tabTitle = null;
+    }
+    if (pendingCapture) {
+      clearTimeout(pendingCapture.timer);
+      pendingCapture.reject(new Error('Extension disconnected'));
+      pendingCapture = null;
+    }
+  });
+});
+
+function requestCapture(timeoutMs = 15000): Promise<{ html: string; url: string; title: string }> {
+  return new Promise((resolve, reject) => {
+    if (!extension.socket || extension.socket.readyState !== WebSocket.OPEN) {
+      reject(new Error(
+        'Chrome extension not connected. Make sure the Property Web Scraper extension is installed and the page is loaded.'
+      ));
+      return;
+    }
+
+    if (pendingCapture) {
+      reject(new Error('A capture is already in progress'));
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      pendingCapture = null;
+      reject(new Error('Capture timed out after ' + (timeoutMs / 1000) + 's. Is a page loaded in Chrome?'));
+    }, timeoutMs);
+
+    pendingCapture = { resolve, reject, timer };
+    extension.socket.send(JSON.stringify({ type: 'capture_request' }));
+  });
+}
+
+function detectScraperFromHostname(hostname: string): string | undefined {
+  const portal = HOST_INDEX.get(hostname) || HOST_INDEX.get('www.' + hostname);
+  return portal?.scraperName;
 }
 
 // ---------------------------------------------------------------------------
@@ -570,6 +674,124 @@ server.tool(
       }],
     };
   },
+);
+
+// Tool 5: extension_status
+server.tool(
+  'extension_status',
+  'Check if the Chrome extension is connected and what page the user is viewing',
+  {},
+  async () => {
+    const connected = extension.socket?.readyState === WebSocket.OPEN;
+    return {
+      content: [{
+        type: 'text' as const,
+        text: JSON.stringify({
+          connected,
+          tabUrl: extension.tabUrl,
+          tabTitle: extension.tabTitle,
+          capturePort: CAPTURE_PORT,
+        }, null, 2),
+      }],
+    };
+  }
+);
+
+// Tool 6: capture_page
+server.tool(
+  'capture_page',
+  'Capture rendered HTML from the Chrome browser\'s active tab and save as a test fixture. '
+  + 'The user must have the Property Web Scraper extension installed and be viewing a property listing page.',
+  {
+    save_as: z.string().optional().describe(
+      'Fixture filename (without .html extension). Auto-detected from URL hostname if omitted.'
+    ),
+    force: z.boolean().optional().default(false).describe(
+      'Overwrite existing fixture file if it already exists'
+    ),
+  },
+  async ({ save_as, force }) => {
+    try {
+      const capture = await requestCapture();
+
+      const hostname = new URL(capture.url).hostname;
+      const scraperName = detectScraperFromHostname(hostname);
+
+      const fixtureName = save_as || scraperName || hostname.replace(/^www\./, '').replace(/\./g, '_');
+      const fixturePath = resolve(__dirname, 'test', 'fixtures', `${fixtureName}.html`);
+
+      if (existsSync(fixturePath) && !force) {
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Fixture already exists: ${fixturePath}\nUse force=true to overwrite.`,
+          }],
+        };
+      }
+
+      writeFileSync(fixturePath, capture.html, 'utf-8');
+
+      const mapping = scraperName ? ALL_MAPPINGS[scraperName] : undefined;
+      let extractionSummary = 'No scraper mapping found for this site.';
+
+      if (mapping) {
+        const result = runExtraction(capture.html, capture.url, mapping);
+        const diag = result.diagnostics!;
+        extractionSummary = [
+          `Grade: ${diag.qualityGrade} (${diag.qualityLabel})`,
+          `Extraction rate: ${(diag.extractionRate * 100).toFixed(0)}% (${diag.populatedExtractableFields}/${diag.extractableFields})`,
+          `Populated fields: ${diag.populatedFields}/${diag.totalFields}`,
+          diag.criticalFieldsMissing?.length
+            ? `Critical missing: ${diag.criticalFieldsMissing.join(', ')}`
+            : 'No critical fields missing',
+          '',
+          'Populated field values:',
+          ...Object.entries(result.properties[0]).map(([k, v]) =>
+            `  ${k}: ${JSON.stringify(v)}`
+          ),
+        ].join('\n');
+      }
+
+      const manifestStub = [
+        `  {`,
+        `    scraper: '${scraperName || 'UNKNOWN'}',`,
+        `    fixture: '${fixtureName}',`,
+        `    sourceUrl: '${capture.url}',`,
+        `    expected: {`,
+        `      // TODO: fill in expected values from extraction above`,
+        `    },`,
+        `  },`,
+      ].join('\n');
+
+      return {
+        content: [{
+          type: 'text' as const,
+          text: [
+            `Fixture captured successfully!`,
+            ``,
+            `URL: ${capture.url}`,
+            `Scraper: ${scraperName || 'unknown (new site)'}`,
+            `File: ${fixturePath}`,
+            `Size: ${(capture.html.length / 1024).toFixed(0)} KB`,
+            ``,
+            `--- Extraction Results ---`,
+            extractionSummary,
+            ``,
+            `--- Manifest Entry ---`,
+            manifestStub,
+          ].join('\n'),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{
+          type: 'text' as const,
+          text: `Capture failed: ${err instanceof Error ? err.message : String(err)}`,
+        }],
+        isError: true,
+      };
+    }
+  }
 );
 
 // ---------------------------------------------------------------------------
