@@ -124,6 +124,10 @@ PropertyWebScraper is part of the [PropertyWebBuilder](https://github.com/etewia
 
 This project was originally a Ruby on Rails engine. The Rails code in `app/` and `spec/` is kept for legacy purposes but is no longer under active development. See [RAILS_README.md](RAILS_README.md) for details on the Rails integration.
 
+## Maps Dependency
+
+The active Astro app no longer depends on Google Maps JS SDK at runtime. Location UX is provided via external map links for coordinate-enabled listings. See [docs/maps-dependency-migration.md](docs/maps-dependency-migration.md) for migration details and legacy cleanup guidance.
+
 ## Contributing
 
 The easiest way to contribute is to **add a scraper for a property portal in your country**. We have a step-by-step guide in [CONTRIBUTING.md](CONTRIBUTING.md) that walks you through the process — no deep knowledge of the codebase required.
