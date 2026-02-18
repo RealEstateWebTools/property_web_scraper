@@ -1,6 +1,25 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fetchHtml } from '../../src/lib/services/html-fetcher.js';
 
+/** Helper: build a minimal mock Response with headers support */
+function mockResponse(overrides: {
+  ok: boolean;
+  status: number;
+  statusText: string;
+  text?: string;
+  contentType?: string;
+}) {
+  const headers = new Headers();
+  if (overrides.contentType) headers.set('content-type', overrides.contentType);
+  return {
+    ok: overrides.ok,
+    status: overrides.status,
+    statusText: overrides.statusText,
+    headers,
+    text: () => Promise.resolve(overrides.text ?? ''),
+  };
+}
+
 describe('fetchHtml', () => {
   const originalFetch = globalThis.fetch;
 
@@ -11,28 +30,23 @@ describe('fetchHtml', () => {
 
   it('returns HTML on successful fetch', async () => {
     const mockHtml = '<html><body>Hello</body></html>';
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      statusText: 'OK',
-      text: () => Promise.resolve(mockHtml),
-    });
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      mockResponse({ ok: true, status: 200, statusText: 'OK', text: mockHtml, contentType: 'text/html' }),
+    );
 
     const result = await fetchHtml('https://www.example.com/page');
 
     expect(result.success).toBe(true);
     expect(result.html).toBe(mockHtml);
     expect(result.error).toBeUndefined();
+    expect(result.responseContentType).toBe('text/html');
     expect(globalThis.fetch).toHaveBeenCalledOnce();
   });
 
   it('sends realistic browser headers', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      statusText: 'OK',
-      text: () => Promise.resolve('<html></html>'),
-    });
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      mockResponse({ ok: true, status: 200, statusText: 'OK', text: '<html></html>' }),
+    );
 
     await fetchHtml('https://www.example.com/page');
 
@@ -44,12 +58,9 @@ describe('fetchHtml', () => {
   });
 
   it('returns error on HTTP 404', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 404,
-      statusText: 'Not Found',
-      text: () => Promise.resolve(''),
-    });
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      mockResponse({ ok: false, status: 404, statusText: 'Not Found' }),
+    );
 
     const result = await fetchHtml('https://www.example.com/missing');
 
@@ -59,12 +70,9 @@ describe('fetchHtml', () => {
   });
 
   it('returns error on HTTP 500', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 500,
-      statusText: 'Internal Server Error',
-      text: () => Promise.resolve(''),
-    });
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      mockResponse({ ok: false, status: 500, statusText: 'Internal Server Error' }),
+    );
 
     const result = await fetchHtml('https://www.example.com/error');
 
