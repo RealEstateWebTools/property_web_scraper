@@ -6,6 +6,9 @@
 import { JSONExporter } from './json-exporter.js';
 import { CSVExporter } from './csv-exporter.js';
 import { GeoJSONExporter } from './geojson-exporter.js';
+import { XMLExporter } from './xml-exporter.js';
+import { SchemaOrgExporter } from './schema-org-exporter.js';
+import { ICalExporter } from './ical-exporter.js';
 import { BaseExporter, type ExportOptions } from './base-exporter.js';
 
 export type ExportFormat = 'json' | 'csv' | 'geojson' | 'xml' | 'schema-org' | 'icalendar';
@@ -59,8 +62,8 @@ export const EXPORTER_REGISTRY: Record<ExportFormat, ExporterConfig> = {
     description: 'XML format compatible with RETS (US MLS)',
     fileExtension: '.xml',
     mimeType: 'application/xml',
-    isAvailable: false, // Not yet implemented
-    isProduction: false,
+    isAvailable: true,
+    isProduction: true,
   },
   'schema-org': {
     format: 'schema-org',
@@ -68,8 +71,8 @@ export const EXPORTER_REGISTRY: Record<ExportFormat, ExporterConfig> = {
     description: 'JSON-LD format for SEO and semantic web integration',
     fileExtension: '.jsonld',
     mimeType: 'application/ld+json',
-    isAvailable: false, // Not yet implemented
-    isProduction: false,
+    isAvailable: true,
+    isProduction: true,
   },
   icalendar: {
     format: 'icalendar',
@@ -77,8 +80,8 @@ export const EXPORTER_REGISTRY: Record<ExportFormat, ExporterConfig> = {
     description: 'iCalendar format for availability and calendar sync',
     fileExtension: '.ics',
     mimeType: 'text/calendar',
-    isAvailable: false, // Not yet implemented
-    isProduction: false,
+    isAvailable: true,
+    isProduction: true,
   },
 };
 
@@ -99,11 +102,14 @@ export function createExporter(
     case 'geojson':
       return new GeoJSONExporter(options);
 
-    // Placeholder for future formats
     case 'xml':
+      return new XMLExporter(options);
+
     case 'schema-org':
+      return new SchemaOrgExporter(options);
+
     case 'icalendar':
-      throw new Error(`Exporter for format '${format}' not yet implemented`);
+      return new ICalExporter(options);
 
     default:
       throw new Error(`Unknown export format: ${format}`);

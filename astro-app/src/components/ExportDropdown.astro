@@ -1,0 +1,49 @@
+---
+interface Props {
+  listingId: string;
+  buttonClass?: string;
+}
+const { listingId, buttonClass = 'border border-gray-300 text-gray-600 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1' } = Astro.props;
+const baseUrl = `/public_api/v1/listings/${listingId}/export`;
+---
+<div class="pws-export-dropdown relative inline-block">
+  <button
+    type="button"
+    class={`${buttonClass} cursor-pointer`}
+    data-export-toggle
+  >
+    <i class="bi bi-download"></i> Download <i class="bi bi-chevron-down text-[0.6rem] ml-0.5"></i>
+  </button>
+  <div class="hidden absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20" data-export-menu>
+    <a href={`${baseUrl}?format=json`} class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+      <i class="bi bi-braces text-blue-600"></i> JSON
+    </a>
+    <a href={`${baseUrl}?format=csv`} class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+      <i class="bi bi-file-earmark-spreadsheet text-green-600"></i> CSV
+    </a>
+    <a href={`${baseUrl}?format=geojson`} class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+      <i class="bi bi-geo-alt text-orange-600"></i> GeoJSON
+    </a>
+  </div>
+</div>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pws-export-dropdown').forEach(dropdown => {
+    const btn = dropdown.querySelector('[data-export-toggle]');
+    const menu = dropdown.querySelector('[data-export-menu]');
+    if (!btn || !menu) return;
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('hidden');
+    });
+  });
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('[data-export-menu]').forEach(menu => {
+      menu.classList.add('hidden');
+    });
+  });
+});
+</script>

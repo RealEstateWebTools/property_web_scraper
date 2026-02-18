@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ExportDropdown from '../../../components/ExportDropdown.astro';
 import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
 import { initScrapeMetadataKV, getLatestScrapeForListing } from '@lib/services/scrape-metadata.js';
 
@@ -160,9 +161,7 @@ const attrs = [
                 <a href={`/listings/${id}`} class="bg-blue-600 text-white text-sm px-3 py-1.5 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
                   <i class="bi bi-eye"></i> View Full Details
                 </a>
-                <a href={`/listings/${id}.json`} class="border border-gray-300 text-gray-600 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
-                  <i class="bi bi-braces"></i> Get JSON
-                </a>
+                <ExportDropdown listingId={id!} />
               </div>
 
               <button class="pws-details-toggle text-sm text-blue-600 cursor-pointer inline-flex items-center gap-1.5 border-0 bg-transparent p-0 mt-2 hover:underline" type="button">
