@@ -401,7 +401,7 @@ server.tool(
   'Extract structured property data from HTML. Returns fields (title, price, coordinates, images, etc.), quality diagnostics, and schema split.',
   {
     html: z.string().describe('Raw HTML content of the property listing page'),
-    source_url: z.string().url().describe('The URL the HTML was fetched from'),
+    source_url: z.url().describe('The URL the HTML was fetched from'),
     scraper_name: z.string().optional().describe('Override auto-detection of scraper mapping name'),
   },
   async ({ html, source_url, scraper_name }) => {
