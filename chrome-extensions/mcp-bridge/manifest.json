@@ -3,7 +3,7 @@
   "name": "Property Scraper — MCP Bridge",
   "version": "1.0.0",
   "description": "WebSocket bridge between Chrome and the MCP server for fixture capture",
-  "permissions": ["activeTab", "scripting", "tabs"],
+  "permissions": ["activeTab", "scripting", "tabs", "alarms"],
   "host_permissions": [
     "<all_urls>"
   ],

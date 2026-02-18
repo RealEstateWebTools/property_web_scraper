@@ -165,6 +165,11 @@ wss.on('connection', (ws: WebSocket) => {
     try {
       const msg = JSON.parse(raw.toString());
 
+      if (msg.type === 'ping') {
+        // Keep-alive from extension service worker; no response needed.
+        return;
+      }
+
       if (msg.type === 'tab_update') {
         extension.tabUrl = msg.url || null;
         extension.tabTitle = msg.title || null;
