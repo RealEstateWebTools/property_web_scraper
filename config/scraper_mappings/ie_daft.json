@@ -87,7 +87,7 @@
   "images": [{
     "scriptJsonVar": "__NEXT_DATA__",
     "scriptJsonPath": "props.pageProps.listing.media.images",
-    "cssAttr": "size720x480"
+    "cssAttr": "size1440x960"
   }],
   "booleanFields": {
     "for_sale": {

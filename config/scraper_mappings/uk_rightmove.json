@@ -128,21 +128,21 @@
   "booleanFields": {
     "for_sale": {
       "scriptJsonVar": "PAGE_MODEL",
-      "scriptJsonPath": "analyticsInfo.analyticsProperty.activityType",
+      "scriptJsonPath": "propertyData.channel",
       "evaluator": "include?",
-      "evaluatorParam": "forSale"
+      "evaluatorParam": "BUY"
     },
     "for_rent": {
       "scriptJsonVar": "PAGE_MODEL",
-      "scriptJsonPath": "analyticsInfo.analyticsProperty.activityType",
+      "scriptJsonPath": "propertyData.channel",
       "evaluator": "include?",
-      "evaluatorParam": "toLet"
+      "evaluatorParam": "LET"
     },
     "for_rent_long_term": {
       "scriptJsonVar": "PAGE_MODEL",
-      "scriptJsonPath": "analyticsInfo.analyticsProperty.activityType",
+      "scriptJsonPath": "propertyData.channel",
       "evaluator": "include?",
-      "evaluatorParam": "toLet"
+      "evaluatorParam": "LET"
     }
   }
 
