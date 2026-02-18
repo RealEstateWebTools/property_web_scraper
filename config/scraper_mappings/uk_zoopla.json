@@ -1,6 +1,6 @@
 [{
   "name": "uk_zoopla",
-  "expectedExtractionRate": 0.70,
+  "expectedExtractionRate": 0.85,
   "defaultValues": {
     "country": { "value": "UK" },
     "area_unit": { "value": "sqft" },
@@ -24,10 +24,10 @@
       "scriptJsonPath": "price_actual"
     },
     "latitude": {
-      "flightDataPath": "coordinates.latitude"
+      "scriptRegEx": "(?<=\\\\\"latitude\\\\\":)[\\d.]+"
     },
     "longitude": {
-      "flightDataPath": "coordinates.longitude"
+      "scriptRegEx": "(?<=\\\\\"longitude\\\\\":)[\\d.]+"
     }
   },
   "textFields": {
@@ -51,11 +51,10 @@
       ]
     },
     "price_string": {
-      "jsonLdPath": "name",
-      "jsonLdType": "RealEstateListing"
+      "scriptRegEx": "£[\\d,]+"
     },
     "postal_code": {
-      "flightDataPath": "postcode"
+      "scriptRegEx": "(?<=\\\\\"postalCode\\\\\":\\\\\")\\\w+ \\\w+"
     },
     "address_string": {
       "scriptJsonVar": "__ZAD_TARGETING__",
@@ -74,8 +73,8 @@
     }
   },
   "images": [{
-    "cssLocator": "meta[property='og:image']",
-    "cssAttr": "content"
+    "cssLocator": "img[src*='lid.zoocdn.com']",
+    "cssAttr": "src"
   }],
   "booleanFields": {
     "for_sale": {
