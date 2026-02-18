@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { extractFromHtml } from '../../src/lib/extractor/html-extractor.js';
 import { findByName } from '../../src/lib/extractor/mapping-loader.js';
-import { fixtures, getTestableFixtures, getMissingFixtures, getCoverageSummary } from '../fixtures/manifest.js';
+import { fixtures, getTestableFixtures, getMissingFixtures, getCoverageSummary, getFixtureSource } from '../fixtures/manifest.js';
 
 function loadFixture(name: string): string {
   const path = resolve(__dirname, '..', 'fixtures', `${name}.html`);
@@ -45,7 +45,10 @@ describe('Scraper validation coverage', () => {
 
 describe('Scraper validation', () => {
   for (const entry of fixtures) {
-    describe(`${entry.scraper} scraper`, () => {
+    const source = getFixtureSource(entry);
+    const sourceLabel = source === 'browser' ? '' : ` [${source}]`;
+
+    describe(`${entry.scraper} scraper${sourceLabel}`, () => {
       if (!entry.fixture) {
         it.skip(`no fixture HTML yet for ${entry.scraper}`, () => {});
         return;
@@ -84,20 +87,33 @@ describe('Scraper validation', () => {
         });
       }
 
-      it('meets expected extraction rate', () => {
-        const diag = result.diagnostics!;
-        expect(diag).toBeDefined();
-        const mapping = findByName(entry.scraper);
-        if (mapping?.expectedExtractionRate != null) {
-          expect(diag.extractionRate).toBeGreaterThanOrEqual(mapping.expectedExtractionRate);
-        }
-      });
+      if (source === 'server-fetched') {
+        it('documents degraded extraction', () => {
+          const diag = result.diagnostics;
+          const rate = diag?.extractionRate ?? 0;
+          console.log(
+            `  ℹ️  ${entry.scraper} [server-fetched] extraction rate: ${(rate * 100).toFixed(1)}% ` +
+            `(${diag?.populatedFields ?? 0}/${diag?.totalFields ?? 0} fields)`
+          );
+          // Informational — not a failure
+          expect(true).toBe(true);
+        });
+      } else {
+        it('meets expected extraction rate', () => {
+          const diag = result.diagnostics!;
+          expect(diag).toBeDefined();
+          const mapping = findByName(entry.scraper);
+          if (mapping?.expectedExtractionRate != null) {
+            expect(diag.extractionRate).toBeGreaterThanOrEqual(mapping.expectedExtractionRate);
+          }
+        });
 
-      it('meets expected quality grade', () => {
-        const diag = result.diagnostics!;
-        expect(diag).toBeDefined();
-        expect(diag.meetsExpectation).toBe(true);
-      });
+        it('meets expected quality grade', () => {
+          const diag = result.diagnostics!;
+          expect(diag).toBeDefined();
+          expect(diag.meetsExpectation).toBe(true);
+        });
+      }
     });
   }
 });
@@ -112,9 +128,9 @@ describe('Manifest ↔ mapping consistency', () => {
     });
   }
 
-  it('all fixtures reference unique scrapers', () => {
-    const scrapers = fixtures.map(f => f.scraper);
-    const dupes = scrapers.filter((s, i) => scrapers.indexOf(s) !== i);
+  it('all fixtures reference unique scraper:source pairs', () => {
+    const keys = fixtures.map(f => `${f.scraper}:${getFixtureSource(f)}`);
+    const dupes = keys.filter((k, i) => keys.indexOf(k) !== i);
     expect(dupes).toEqual([]);
   });
 

@@ -10,52 +10,41 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { extractFromHtml } from '../../src/lib/extractor/html-extractor.js';
+import { fixtures, getFixtureSource } from '../fixtures/manifest.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const FIXTURES_DIR = resolve(__dirname, '..', 'fixtures');
 const SNAPSHOT_PATH = resolve(FIXTURES_DIR, 'quality-snapshot.json');
 
-const FIXTURE_MAP: Record<string, string> = {
-  us_realtor: 'realtor',
-  uk_rightmove: 'rightmove_v2',
-  uk_zoopla: 'zoopla_v2',
-  es_idealista: 'idealista_v2',
-  es_fotocasa: 'fotocasa',
-  es_pisos: 'pisos_dot_com',
-  in_realestateindia: 'realestateindia',
-  us_mlslistings: 'mlslistings',
-  us_wyomingmls: 'wyomingmls',
-  us_forsalebyowner: 'forsalebyowner',
-  uk_jitty: 'uk_jitty',
-  uk_onthemarket: 'onthemarket',
-  ie_daft: 'daft',
-};
-
 describe('stale-snapshot', () => {
   it('generates quality snapshot for all fixtures', () => {
     const entries: Array<{
       scraper: string;
+      source: 'browser' | 'server-fetched';
       grade: string;
       extractionRate: number;
       populatedFields: number;
       totalFields: number;
     }> = [];
 
-    for (const [scraper, fixtureName] of Object.entries(FIXTURE_MAP)) {
-      const fixturePath = resolve(FIXTURES_DIR, `${fixtureName}.html`);
+    for (const entry of fixtures) {
+      if (!entry.fixture) continue;
+
+      const fixturePath = resolve(FIXTURES_DIR, `${entry.fixture}.html`);
       if (!existsSync(fixturePath)) continue;
 
       const html = readFileSync(fixturePath, 'utf-8');
       const result = extractFromHtml({
         html,
-        sourceUrl: `https://fixture.test/${scraper}`,
-        scraperMappingName: scraper,
+        sourceUrl: entry.sourceUrl,
+        scraperMappingName: entry.scraper,
       });
 
       const diag = result.diagnostics;
       entries.push({
-        scraper,
+        scraper: entry.scraper,
+        source: getFixtureSource(entry),
         grade: diag?.qualityGrade || 'F',
         extractionRate: diag?.extractionRate || 0,
         populatedFields: diag?.populatedFields || 0,
