@@ -66,22 +66,43 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     return false;
   }
 
+  if (msg.type === 'CREATE_HAUL') {
+    handleCreateHaul().then(sendResponse).catch(err => {
+      sendResponse({ success: false, error: { message: err.message } });
+    });
+    return true;
+  }
+
 });
 
 async function handleExtraction({ url, html }) {
-  const config = await chrome.storage.sync.get(['apiUrl', 'apiKey']);
+  const config = await chrome.storage.sync.get(['apiUrl', 'haulId']);
   const apiUrl = (config.apiUrl || 'https://property-web-scraper.pages.dev').replace(/\/+$/, '');
-  const apiKey = config.apiKey || '';
+  const haulId = config.haulId || '';
 
-  const headers = { 'Content-Type': 'application/json' };
-  if (apiKey) headers['X-Api-Key'] = apiKey;
+  if (!haulId) {
+    throw new Error('No Haul ID configured. Open Settings to create or enter one.');
+  }
 
-  const response = await fetch(`${apiUrl}/public_api/v1/listings`, {
+  const response = await fetch(`${apiUrl}/ext/v1/hauls/${haulId}/scrapes`, {
     method: 'POST',
-    headers,
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url, html }),
   });
 
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+async function handleCreateHaul() {
+  const config = await chrome.storage.sync.get(['apiUrl']);
+  const apiUrl = (config.apiUrl || 'https://property-web-scraper.pages.dev').replace(/\/+$/, '');
+
+  const response = await fetch(`${apiUrl}/ext/v1/hauls`, { method: 'POST' });
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     throw new Error(err.error?.message || `API error: ${response.status}`);

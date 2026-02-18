@@ -3,26 +3,34 @@
  */
 
 const $ = (sel) => document.querySelector(sel);
-const apiKeyInput = $('#api-key');
+const haulIdInput = $('#haul-id');
 const apiUrlInput = $('#api-url');
 const saveBtn = $('#save-btn');
+const createBtn = $('#create-btn');
 const statusEl = $('#status');
+const haulLinkEl = $('#haul-link');
 
 const DEFAULT_URL = 'https://property-web-scraper.pages.dev';
 
 // Load saved settings
-chrome.storage.sync.get(['apiKey', 'apiUrl'], (config) => {
-  apiKeyInput.value = config.apiKey || '';
+chrome.storage.sync.get(['haulId', 'apiUrl'], (config) => {
+  haulIdInput.value = config.haulId || '';
   apiUrlInput.value = config.apiUrl || DEFAULT_URL;
+  if (config.haulId) showHaulLink(config.haulId, config.apiUrl);
 });
 
 // Save
 saveBtn.addEventListener('click', () => {
-  const apiKey = apiKeyInput.value.trim();
+  const haulId = haulIdInput.value.trim();
   const apiUrl = apiUrlInput.value.trim() || DEFAULT_URL;
 
-  if (!apiKey) {
-    showStatus('API key is required', 'error');
+  if (!haulId) {
+    showStatus('Haul ID is required', 'error');
+    return;
+  }
+
+  if (!/^[a-z]+-[a-z]+-\d{2,3}$/.test(haulId)) {
+    showStatus('Invalid haul ID format', 'error');
     return;
   }
 
@@ -34,10 +42,45 @@ saveBtn.addEventListener('click', () => {
     return;
   }
 
-  chrome.storage.sync.set({ apiKey, apiUrl }, () => {
-    showStatus('Settings saved ✓', 'success');
+  chrome.storage.sync.set({ haulId, apiUrl }, () => {
+    showStatus('Settings saved', 'success');
+    showHaulLink(haulId, apiUrl);
   });
 });
+
+// Create New haul
+createBtn.addEventListener('click', async () => {
+  createBtn.disabled = true;
+  createBtn.textContent = 'Creating...';
+
+  try {
+    const apiUrl = (apiUrlInput.value.trim() || DEFAULT_URL).replace(/\/+$/, '');
+    const response = await fetch(`${apiUrl}/ext/v1/hauls`, { method: 'POST' });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Error: ${response.status}`);
+    }
+    const data = await response.json();
+    haulIdInput.value = data.haul_id;
+
+    // Auto-save
+    chrome.storage.sync.set({ haulId: data.haul_id, apiUrl: apiUrl || DEFAULT_URL }, () => {
+      showStatus('Haul created and saved', 'success');
+      showHaulLink(data.haul_id, apiUrl);
+    });
+  } catch (err) {
+    showStatus(err.message || 'Failed to create haul', 'error');
+  }
+
+  createBtn.disabled = false;
+  createBtn.textContent = 'Create New';
+});
+
+function showHaulLink(haulId, apiUrl) {
+  const base = (apiUrl || DEFAULT_URL).replace(/\/+$/, '');
+  haulLinkEl.innerHTML = `<a href="${base}/haul/${haulId}" target="_blank">View haul page →</a>`;
+  haulLinkEl.style.display = 'block';
+}
 
 function showStatus(msg, type) {
   statusEl.textContent = msg;

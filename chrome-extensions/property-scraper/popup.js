@@ -1,6 +1,6 @@
 /**
  * popup.js — Main popup logic.
- * Captures HTML → sends to API → displays results.
+ * Captures HTML → sends to haul API → displays results.
  */
 
 const $ = (sel) => document.querySelector(sel);
@@ -14,7 +14,7 @@ const states = {
 };
 
 let extractedData = null;
-let resultsUrl = null;
+let haulUrl = null;
 
 // ─── State management ────────────────────────────────────────────
 
@@ -29,9 +29,9 @@ function showState(name) {
 async function init() {
   showState('loading');
 
-  // Check API key
-  const config = await chrome.storage.sync.get(['apiUrl', 'apiKey']);
-  if (!config.apiKey) {
+  // Check haul ID
+  const config = await chrome.storage.sync.get(['apiUrl', 'haulId']);
+  if (!config.haulId) {
     showState('noKey');
     return;
   }
@@ -107,33 +107,29 @@ $('#retry-btn').addEventListener('click', init);
 // ─── Render results ──────────────────────────────────────────────
 
 function renderResults(data) {
-  const props = data.listings?.[0] || {};
-  const diag = data.extraction?.diagnostics || {};
+  const scrape = data.scrape || {};
 
   // Title
-  const title = props.title || 'Property Listing';
+  const title = scrape.title || 'Property Listing';
   $('#result-title').textContent = title.length > 60 ? title.slice(0, 57) + '…' : title;
 
   // Grade badge
-  const grade = diag.qualityGrade || '?';
+  const grade = scrape.grade || '?';
   const badge = $('#result-grade');
   badge.textContent = grade;
   badge.className = `grade-badge grade-${grade}`;
 
   // Price
-  const priceStr = props.price_string || (props.price_float ? formatPrice(props.price_float, props.currency) : '');
-  $('#result-price').textContent = priceStr || 'Price not available';
+  $('#result-price').textContent = scrape.price || 'Price not available';
 
   // Extraction rate
-  const extracted = data.extraction?.fields_extracted || 0;
-  const available = data.extraction?.fields_available || 0;
+  const extracted = scrape.fields_extracted || 0;
+  const available = scrape.fields_available || 0;
   const ratePercent = available > 0 ? Math.round((extracted / available) * 100) : 0;
   $('#result-rate').textContent = `${extracted}/${available} fields extracted (${ratePercent}%)`;
 
-  // Store results URL for the view button
-  resultsUrl = data.extraction?.results_url || null;
-  const viewBtn = $('#view-results-btn');
-  viewBtn.classList.toggle('hidden', !resultsUrl);
+  // Store haul URL for the view button
+  haulUrl = data.haul_url || null;
 
   showState('results');
 }
@@ -168,11 +164,11 @@ $('#copy-link-btn').addEventListener('click', async () => {
   }
 });
 
-$('#view-results-btn').addEventListener('click', async () => {
-  if (!resultsUrl) return;
+$('#view-haul-btn').addEventListener('click', async () => {
+  if (!haulUrl) return;
   const config = await chrome.storage.sync.get(['apiUrl']);
   const apiUrl = (config.apiUrl || 'https://property-web-scraper.pages.dev').replace(/\/+$/, '');
-  chrome.tabs.create({ url: apiUrl + resultsUrl });
+  chrome.tabs.create({ url: apiUrl + haulUrl });
 });
 
 // ─── Start ───────────────────────────────────────────────────────
