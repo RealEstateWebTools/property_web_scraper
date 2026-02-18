@@ -89,12 +89,13 @@
       margin-top: 4px;
     }
 
-    .card-footer {
-      padding: 16px 24px;
-      border-top: 1px solid #f1f5f9;
+    .input-row {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .input-row input {
+      flex: 1;
     }
 
     .btn {
@@ -107,6 +108,16 @@
       transition: all 0.15s;
     }
 
+    .btn-create {
+      background: #f1f5f9;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    .btn-create:hover {
+      background: #e2e8f0;
+    }
+
     .btn-save {
       background: #3b82f6;
       color: #fff;
@@ -114,6 +125,14 @@
 
     .btn-save:hover {
       background: #2563eb;
+    }
+
+    .card-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .status {
@@ -129,6 +148,20 @@
 
     .status.success { color: #16a34a; }
     .status.error { color: #dc2626; }
+
+    .haul-link {
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .haul-link a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+
+    .haul-link a:hover {
+      text-decoration: underline;
+    }
 
     .portals-section {
       padding: 20px 24px;
@@ -163,14 +196,18 @@
   <div class="card">
     <div class="card-header">
       <h1>⚙️ Settings</h1>
-      <p>Configure your Property Web Scraper connection</p>
+      <p>Configure your scrape collection</p>
     </div>
 
     <div class="card-body">
       <div class="field">
-        <label for="api-key">API Key</label>
-        <input type="password" id="api-key" placeholder="Enter your API key" />
-        <p class="hint">Your Property Web Scraper API key. Get one at your dashboard.</p>
+        <label for="haul-id">Haul ID</label>
+        <div class="input-row">
+          <input type="text" id="haul-id" placeholder="e.g. swift-fox-42" />
+          <button id="create-btn" class="btn btn-create">Create New</button>
+        </div>
+        <p class="hint">A haul collects up to 20 scrapes. Create one or paste an existing ID.</p>
+        <div id="haul-link" class="haul-link" style="display:none"></div>
       </div>
 
       <div class="field">

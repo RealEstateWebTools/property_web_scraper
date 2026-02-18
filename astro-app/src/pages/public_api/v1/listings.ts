@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { authenticateApiKey, validateUrlLength, MAX_HTML_SIZE } from '@lib/services/auth.js';
 import { validateUrl } from '@lib/services/url-validator.js';
-import { extractFromHtml } from '@lib/extractor/html-extractor.js';
 import { findByName } from '@lib/extractor/mapping-loader.js';
 import { Listing } from '@lib/models/listing.js';
 import { WhereChain } from '@lib/firestore/base-model.js';
@@ -11,9 +10,7 @@ import {
   ApiErrorCode, mapValidatorError,
 } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
-import type { ScraperMapping } from '@lib/extractor/mapping-loader.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
-import { normalizePrice } from '@lib/extractor/price-normalizer.js';
 import { fireWebhooks } from '@lib/services/webhook-service.js';
 import { recordSnapshot } from '@lib/services/price-history.js';
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
@@ -22,28 +19,7 @@ import { normalizePropertyType } from '@lib/extractor/property-type-normalizer.j
 import { detectListingType } from '@lib/extractor/listing-type-detector.js';
 import type { SplitSchema } from '@lib/extractor/schema-splitter.js';
 import type { PortalConfig } from '@lib/services/portal-registry.js';
-import { generateId, storeListing, storeDiagnostics, initKV } from '@lib/services/listing-store.js';
-
-function countAvailableFields(mapping: ScraperMapping): number {
-  let count = 0;
-  if (mapping.textFields) count += Object.keys(mapping.textFields).length;
-  if (mapping.intFields) count += Object.keys(mapping.intFields).length;
-  if (mapping.floatFields) count += Object.keys(mapping.floatFields).length;
-  if (mapping.booleanFields) count += Object.keys(mapping.booleanFields).length;
-  if (mapping.images) count += mapping.images.length;
-  if (mapping.features) count += mapping.features.length;
-  return count;
-}
-
-function countExtractedFields(props: Record<string, unknown>): number {
-  let count = 0;
-  for (const [, value] of Object.entries(props)) {
-    if (value === null || value === undefined || value === '' || value === 0 || value === false) continue;
-    if (Array.isArray(value) && value.length === 0) continue;
-    count++;
-  }
-  return count;
-}
+import { runExtraction, countAvailableFields, countExtractedFields } from '@lib/services/extraction-runner.js';
 
 /**
  * Build PWB-formatted response from extraction result.
@@ -385,54 +361,28 @@ export const POST: APIRoute = async ({ request }) => {
   let extraction: Record<string, unknown> | undefined;
 
   if (html) {
-    const result = extractFromHtml({
-      html,
-      sourceUrl: url,
-      scraperMapping,
-    });
+    const extractionResult = await runExtraction({ html, url, scraperMapping, importHost });
 
-    if (result.success && result.properties.length > 0) {
+    if (extractionResult) {
+      const { listing: extractedListing, resultId, resultsUrl, fieldsExtracted, fieldsAvailable, diagnostics, rawProps, splitSchema } = extractionResult;
+
+      // Update the Firestore-backed listing with extracted data
       listing.import_host_slug = importHost.slug;
       listing.last_retrieved_at = new Date();
-      Listing.updateFromHash(listing, result.properties[0]);
-
-      // Price normalization using portal's default currency
-      try {
-        const parsedUrl = new URL(url);
-        const portal = findPortalByHost(parsedUrl.hostname);
-        const normalized = normalizePrice(
-          listing.price_string || '',
-          listing.price_float || 0,
-          portal?.currency,
-        );
-        listing.price_cents = normalized.priceCents;
-        listing.price_currency = normalized.currency;
-      } catch { /* URL parse failed, skip price normalization */ }
-
+      Listing.updateFromHash(listing, rawProps);
+      listing.price_cents = extractedListing.price_cents;
+      listing.price_currency = extractedListing.price_currency;
       try { await listing.save(); } catch { /* Firestore unavailable */ }
-
-      const fieldsExtracted = countExtractedFields(result.properties[0]);
-      const fieldsAvailable = countAvailableFields(scraperMapping);
-
-      // Store result in KV for the /extract/results page
-      const resultId = generateId();
-      try {
-        initKV(undefined); // use in-memory store; KV binding not available in API routes
-        await storeListing(resultId, listing);
-        if (result.diagnostics) {
-          await storeDiagnostics(resultId, result.diagnostics);
-        }
-      } catch { /* listing-store failure shouldn't affect API response */ }
 
       extraction = {
         fields_extracted: fieldsExtracted,
         fields_available: fieldsAvailable,
         scraper_used: importHost.scraper_name,
-        diagnostics: result.diagnostics,
-        results_url: `/extract/results/${resultId}`,
+        diagnostics,
+        results_url: resultsUrl,
         result_id: resultId,
-        ...(result.splitSchema ? { split_schema: result.splitSchema } : {}),
-        _rawProps: result.properties[0],
+        ...(splitSchema ? { split_schema: splitSchema } : {}),
+        _rawProps: rawProps,
       };
 
       if (fieldsExtracted === 0) {
@@ -461,23 +411,22 @@ export const POST: APIRoute = async ({ request }) => {
       fireWebhooks('extraction.completed', {
         listing_url: url,
         scraper: importHost.scraper_name,
-        quality_grade: result.diagnostics?.qualityGrade || 'F',
-        extraction_rate: result.diagnostics?.extractionRate || 0,
+        quality_grade: diagnostics?.qualityGrade || 'F',
+        extraction_rate: diagnostics?.extractionRate || 0,
         fields_extracted: fieldsExtracted,
         fields_available: fieldsAvailable,
-        properties: result.properties[0],
+        properties: rawProps,
       }).catch(() => { /* webhook delivery failure shouldn't affect API response */ });
 
       // Record price snapshot for historical tracking (fire-and-forget)
-      const props = result.properties[0] || {};
       recordSnapshot({
         url,
         scraper: importHost.scraper_name,
-        price_float: props.price_float,
-        price_string: props.price_string,
-        price_currency: props.price_currency || props.currency,
-        quality_grade: result.diagnostics?.qualityGrade,
-        title: props.title,
+        price_float: rawProps.price_float,
+        price_string: rawProps.price_string,
+        price_currency: rawProps.price_currency || rawProps.currency,
+        quality_grade: diagnostics?.qualityGrade,
+        title: rawProps.title,
       }).catch(() => { /* price history failure shouldn't affect API response */ });
 
       // Record scrape metadata (fire-and-forget)
@@ -489,7 +438,7 @@ export const POST: APIRoute = async ({ request }) => {
         portalSlug: importHost.slug,
         requestContentType: contentType,
         clientUserAgent: request.headers.get('user-agent'),
-        diagnostics: result.diagnostics,
+        diagnostics,
       }).catch(() => { /* scrape metadata failure shouldn't affect API response */ });
 
       // Record usage for billing/quota (fire-and-forget)

@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getHaul, initHaulKV } from '@lib/services/haul-store.js';
+import { isValidHaulId } from '@lib/services/haul-id.js';
+
+initHaulKV((Astro.locals as any).runtime?.env?.RESULTS);
+
+const { id } = Astro.params;
+const validId = id && isValidHaulId(id);
+const haul = validId ? await getHaul(id) : undefined;
+
+const gradeColors: Record<string, { bg: string; text: string }> = {
+  A: { bg: 'bg-green-100', text: 'text-green-800' },
+  B: { bg: 'bg-blue-100', text: 'text-blue-800' },
+  C: { bg: 'bg-amber-100', text: 'text-amber-800' },
+  F: { bg: 'bg-red-100', text: 'text-red-800' },
+};
+---
+<BaseLayout title={haul ? `Haul ${id}` : 'Haul Not Found'}>
+
+<section class="max-w-4xl mx-auto px-4 py-8">
+
+  {!haul ? (
+    <div class="bg-amber-50 rounded-2xl p-8 text-center">
+      <div class="text-4xl mb-3">📦</div>
+      <h2 class="font-semibold text-amber-900 text-lg mb-2">Haul not found</h2>
+      <p class="text-amber-800 text-sm">This haul may have expired or the ID is invalid.</p>
+    </div>
+  ) : (
+    <>
+      {/* Header */}
+      <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              📦 <span class="font-mono">{haul.id}</span>
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">
+              {haul.scrapes.length}/20 scrapes · Expires {new Date(haul.expiresAt).toLocaleDateString()}
+            </p>
+          </div>
+          <button
+            id="copy-haul-url"
+            type="button"
+            class="inline-flex items-center gap-1.5 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer border-0"
+          >
+            <i class="bi bi-link-45deg"></i> Copy Haul URL
+          </button>
+        </div>
+
+        {/* Capacity bar */}
+        <div class="mt-4">
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div
+              class="bg-blue-600 h-2 rounded-full transition-all"
+              style={`width: ${Math.round((haul.scrapes.length / 20) * 100)}%`}
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Empty state */}
+      {haul.scrapes.length === 0 ? (
+        <div class="bg-gray-50 rounded-2xl p-8 text-center">
+          <div class="text-4xl mb-3">🏠</div>
+          <h3 class="font-semibold text-gray-700 mb-2">No scrapes yet</h3>
+          <p class="text-gray-500 text-sm">Use the Chrome extension to add property listings to this haul.</p>
+        </div>
+      ) : (
+        <div class="grid gap-4 sm:grid-cols-2">
+          {haul.scrapes.map((scrape) => {
+            const colors = gradeColors[scrape.grade] || gradeColors.F;
+            const ratePercent = Math.round(scrape.extractionRate * 100);
+            return (
+              <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between gap-2 mb-3">
+                  <h3 class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">
+                    {scrape.title}
+                  </h3>
+                  <span class={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shrink-0 ${colors.bg} ${colors.text}`}>
+                    {scrape.grade}
+                  </span>
+                </div>
+
+                {scrape.price && (
+                  <p class="text-blue-600 font-semibold text-sm mb-2">{scrape.price}</p>
+                )}
+
+                <p class="text-gray-500 text-xs mb-3">
+                  {ratePercent}% extraction rate
+                </p>
+
+                <div class="flex items-center gap-2 text-xs">
+                  <a
+                    href={`/extract/results/${scrape.resultId}`}
+                    class="text-blue-600 hover:underline inline-flex items-center gap-1"
+                  >
+                    <i class="bi bi-eye"></i> View details
+                  </a>
+                  <span class="text-gray-300">·</span>
+                  <a
+                    href={scrape.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-gray-400 hover:text-gray-600 inline-flex items-center gap-1"
+                  >
+                    <i class="bi bi-box-arrow-up-right"></i> Source
+                  </a>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </>
+  )}
+
+</section>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', () => {
+  const copyBtn = document.getElementById('copy-haul-url');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(window.location.href);
+      copyBtn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+      setTimeout(() => {
+        copyBtn.innerHTML = '<i class="bi bi-link-45deg"></i> Copy Haul URL';
+      }, 2000);
+    });
+  }
+});
+</script>
+
+</BaseLayout>
