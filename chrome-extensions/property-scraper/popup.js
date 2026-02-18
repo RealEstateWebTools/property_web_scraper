@@ -14,6 +14,7 @@ const states = {
 };
 
 let extractedData = null;
+let resultsUrl = null;
 
 // ─── State management ────────────────────────────────────────────
 
@@ -106,8 +107,8 @@ $('#retry-btn').addEventListener('click', init);
 // ─── Render results ──────────────────────────────────────────────
 
 function renderResults(data) {
-  const props = data.properties?.[0] || {};
-  const diag = data.diagnostics || {};
+  const props = data.listings?.[0] || {};
+  const diag = data.extraction?.diagnostics || {};
 
   // Title
   const title = props.title || 'Property Listing';
@@ -123,59 +124,16 @@ function renderResults(data) {
   const priceStr = props.price_string || (props.price_float ? formatPrice(props.price_float, props.currency) : '');
   $('#result-price').textContent = priceStr || 'Price not available';
 
-  // Address
-  const address = props.address_string || [props.city, props.region, props.postal_code].filter(Boolean).join(', ');
-  $('#result-address').textContent = address || '';
-  $('#result-address').classList.toggle('hidden', !address);
+  // Extraction rate
+  const extracted = data.extraction?.fields_extracted || 0;
+  const available = data.extraction?.fields_available || 0;
+  const ratePercent = available > 0 ? Math.round((extracted / available) * 100) : 0;
+  $('#result-rate').textContent = `${extracted}/${available} fields extracted (${ratePercent}%)`;
 
-  // Image
-  const img = props.main_image_url;
-  const imgWrap = $('#result-image-wrap');
-  if (img) {
-    $('#result-image').src = img;
-    imgWrap.classList.remove('hidden');
-  } else {
-    imgWrap.classList.add('hidden');
-  }
-
-  // Stats row
-  const statsRow = $('#result-stats');
-  const stats = [];
-  if (props.count_bedrooms) stats.push({ icon: '🛏️', value: props.count_bedrooms, label: 'bed' });
-  if (props.count_bathrooms) stats.push({ icon: '🛁', value: props.count_bathrooms, label: 'bath' });
-  if (props.constructed_area) stats.push({ icon: '📐', value: formatArea(props.constructed_area, props.area_unit), label: '' });
-  statsRow.innerHTML = stats.map(s =>
-    `<div class="stat"><span class="stat-icon">${s.icon}</span> <span class="stat-value">${s.value}</span> ${s.label}</div>`
-  ).join('');
-  statsRow.classList.toggle('hidden', stats.length === 0);
-
-  // Details grid
-  const detailsGrid = $('#result-details');
-  const details = [];
-  if (props.property_type) details.push(['Type', props.property_type]);
-  if (props.tenure) details.push(['Tenure', props.tenure]);
-  if (props.for_sale) details.push(['Status', 'For Sale']);
-  else if (props.for_rent) details.push(['Status', 'For Rent']);
-  if (props.plot_area) details.push(['Plot', formatArea(props.plot_area, props.area_unit)]);
-  if (props.year_construction) details.push(['Built', props.year_construction]);
-  if (props.reference) details.push(['Ref', props.reference]);
-
-  detailsGrid.innerHTML = details.map(([label, value]) =>
-    `<div class="detail-item"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`
-  ).join('');
-  detailsGrid.classList.toggle('hidden', details.length === 0);
-
-  // Features
-  const features = props.features || [];
-  const featWrap = $('#result-features-wrap');
-  if (features.length > 0) {
-    $('#result-features').innerHTML = features.slice(0, 12).map(f =>
-      `<li>${typeof f === 'string' ? f : f.name || f}</li>`
-    ).join('');
-    featWrap.classList.remove('hidden');
-  } else {
-    featWrap.classList.add('hidden');
-  }
+  // Store results URL for the view button
+  resultsUrl = data.extraction?.results_url || null;
+  const viewBtn = $('#view-results-btn');
+  viewBtn.classList.toggle('hidden', !resultsUrl);
 
   showState('results');
 }
@@ -188,11 +146,6 @@ function formatPrice(amount, currency) {
   } catch {
     return `${currency || ''} ${amount.toLocaleString()}`;
   }
-}
-
-function formatArea(area, unit) {
-  const u = unit === 'sqmt' ? 'm²' : unit === 'sqft' ? 'ft²' : unit || '';
-  return `${Number(area).toLocaleString()} ${u}`;
 }
 
 // ─── Actions ─────────────────────────────────────────────────────
@@ -213,6 +166,13 @@ $('#copy-link-btn').addEventListener('click', async () => {
     btn.innerHTML = '✓ Copied';
     setTimeout(() => { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Copy Link'; }, 2000);
   }
+});
+
+$('#view-results-btn').addEventListener('click', async () => {
+  if (!resultsUrl) return;
+  const config = await chrome.storage.sync.get(['apiUrl']);
+  const apiUrl = (config.apiUrl || 'https://property-web-scraper.pages.dev').replace(/\/+$/, '');
+  chrome.tabs.create({ url: apiUrl + resultsUrl });
 });
 
 // ─── Start ───────────────────────────────────────────────────────
