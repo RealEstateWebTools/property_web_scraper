@@ -5,8 +5,6 @@ describe('schema-splitter', () => {
   describe('splitPropertyHash', () => {
     it('puts asset fields into assetData', () => {
       const hash = {
-        title: 'Nice flat',
-        description: 'A lovely property',
         count_bedrooms: 3,
         count_bathrooms: 2,
         latitude: 51.5,
@@ -16,6 +14,18 @@ describe('schema-splitter', () => {
       const result = splitPropertyHash(hash);
       expect(result.assetData).toEqual(hash);
       expect(Object.keys(result.listingData)).toHaveLength(0);
+      expect(Object.keys(result.unmapped)).toHaveLength(0);
+    });
+
+    it('puts title and description into listingData', () => {
+      const hash = {
+        title: 'Nice flat',
+        description: 'A lovely property',
+      };
+
+      const result = splitPropertyHash(hash);
+      expect(result.listingData).toEqual(hash);
+      expect(Object.keys(result.assetData)).toHaveLength(0);
       expect(Object.keys(result.unmapped)).toHaveLength(0);
     });
 
@@ -67,12 +77,12 @@ describe('schema-splitter', () => {
 
       const result = splitPropertyHash(hash);
 
-      expect(result.assetData.title).toBe('House');
       expect(result.assetData.reference).toBe('REF-123');
       expect(result.assetData.latitude).toBe(40.4);
       expect(result.assetData.count_bedrooms).toBe(4);
       expect(result.assetData.image_urls).toEqual(['img1.jpg', 'img2.jpg']);
 
+      expect(result.listingData.title).toBe('House');
       expect(result.listingData.price_string).toBe('€500.000');
       expect(result.listingData.price_float).toBe(500000);
       expect(result.listingData.price_cents).toBe(50000000);
