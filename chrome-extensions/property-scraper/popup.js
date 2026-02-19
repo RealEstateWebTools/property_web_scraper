@@ -9,6 +9,7 @@ const states = {
   loading: $('#state-loading'),
   unsupported: $('#state-unsupported'),
   noKey: $('#state-no-key'),
+  haulExpired: $('#state-haul-expired'),
   error: $('#state-error'),
   results: $('#state-results'),
 };
@@ -85,7 +86,12 @@ async function init() {
     });
 
     if (!result?.success) {
-      showError(result?.error?.message || 'Extraction failed');
+      const msg = result?.error?.message || 'Extraction failed';
+      if (isHaulExpiredError(msg)) {
+        showState('haulExpired');
+      } else {
+        showError(msg);
+      }
       return;
     }
 
@@ -105,6 +111,33 @@ function showError(msg) {
 
 $('#retry-btn').addEventListener('click', init);
 $('#try-anyway-btn').addEventListener('click', init);
+
+function isHaulExpiredError(msg) {
+  const lower = msg.toLowerCase();
+  return lower.includes('not found') || lower.includes('expired');
+}
+
+$('#new-haul-btn').addEventListener('click', async () => {
+  const btn = $('#new-haul-btn');
+  const status = $('#new-haul-status');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  status.classList.add('hidden');
+
+  try {
+    const result = await chrome.runtime.sendMessage({ type: 'CREATE_HAUL' });
+    if (!result?.haul_id) throw new Error('Failed to create haul');
+
+    await chrome.storage.sync.set({ haulId: result.haul_id });
+    btn.textContent = 'Created! Retrying…';
+    init();
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Create New Haul';
+    status.textContent = err.message || 'Could not create haul';
+    status.classList.remove('hidden');
+  }
+});
 
 // ─── Render results ──────────────────────────────────────────────
 

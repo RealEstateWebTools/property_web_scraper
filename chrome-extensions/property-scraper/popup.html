@@ -39,6 +39,14 @@
     <a href="options.html" target="_blank" class="btn btn-primary">Open Settings</a>
   </div>
 
+  <div id="state-haul-expired" class="state hidden">
+    <div class="state-icon">📦</div>
+    <p class="state-text">Your haul has expired</p>
+    <p class="state-sub">Hauls last 30 days. Create a new one to keep scraping.</p>
+    <button id="new-haul-btn" class="btn btn-primary">Create New Haul</button>
+    <p id="new-haul-status" class="state-sub hidden"></p>
+  </div>
+
   <div id="state-error" class="state hidden">
     <div class="state-icon">⚠️</div>
     <p id="error-message" class="state-text">Something went wrong</p>
