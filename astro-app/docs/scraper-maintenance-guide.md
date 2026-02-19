@@ -29,9 +29,15 @@ a result wins:
 
 | Strategy | Dispatches to | What it does |
 |---|---|---|
+| `flightDataPath` | `getTextFromFlightData()` | Dot-path into parsed Next.js RSC flight data |
+| `jsonLdPath` | `searchJsonLd()` | Dot-path into `<script type="application/ld+json">` (with optional `jsonLdType` filter) |
+| `scriptJsonVar` + `scriptJsonPath` | `getOrParseScriptJson()` | Extract from named JSON variable in `<script>` tags (cached per document) |
 | `scriptRegEx` | regex on `$('script').text()` | Regex match against concatenated script tag text |
 | `urlPathPart` | `getTextFromUrl()` | Extract a segment from the URL path |
 | `cssLocator` | `getTextFromCss()` | CSS selector via Cheerio |
+| `fallbacks` | recursive `retrieveTargetText()` | Array of alternative FieldMappings tried in order if primary returns empty |
+
+See [DESIGN.md](../../DESIGN.md) for the complete mapping schema and strategy decision tree.
 
 ### CSS Selector Behaviour (`getTextFromCss`)
 

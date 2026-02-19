@@ -19,27 +19,34 @@ Built with [Astro](https://astro.build/) (SSR mode), TypeScript, and [Cheerio](h
 | 🇺🇸 USA | Realtor.com, ForSaleByOwner, MLSListings, WyomingMLS |
 | 🇮🇳 India | RealEstateIndia |
 | 🇩🇪 Germany | ImmobilienScout24 |
-| 🇫🇷 France | SeLoger, Leboncoin |
 | 🇦🇺 Australia | Domain, RealEstate.com.au |
+
+Portal count is derived from the `PORTAL_REGISTRY` in `astro-app/src/lib/services/portal-registry.ts` (single source of truth).
 
 ## Chrome Extension
 
 The project includes a **Manifest V3 Chrome extension** that makes extraction available with one click on any supported listing page.
 
-- 🟢 **Badge indicator** — green ✓ on supported sites
-- 📊 **Property card popup** — image, price, stats, quality grade
-- 📋 **Copy to clipboard** — JSON or listing URL
-- ⚙️ **Configurable** — API key and endpoint settings
+- **Badge indicator** — green check on supported sites
+- **Haul collections** — browse multiple listings, then view them all on a single results page
+- **Property card popup** — image, price, stats, quality grade
+- **Copy to clipboard** — JSON or listing URL
+- **No API key required** — uses anonymous haul collections
 
 **Install (dev mode):** Open `chrome://extensions/` → enable Developer mode → Load unpacked → select `chrome-extensions/property-scraper/` folder.
 
-See the full [Chrome Extension documentation](chrome-extensions/property-scraper/README.md) for architecture details, screenshots, and configuration.
+See the full [Chrome Extension documentation](chrome-extensions/property-scraper/README.md) for architecture details and configuration.
 
 ## How It Works
 
-The extraction engine takes fully-rendered HTML and a source URL, then applies configurable JSON mappings (CSS selectors, script JSON paths, regex patterns) to extract structured property data. No browser automation or JS rendering happens inside the engine itself — the caller provides the HTML.
+The extraction engine takes fully-rendered HTML and a source URL, then applies configurable JSON mappings (CSS selectors, script JSON paths, regex patterns, JSON-LD, flight data paths) to extract structured property data. No browser automation or JS rendering happens inside the engine itself — the caller provides the HTML.
 
-This makes it easy to integrate with Chrome extensions, Puppeteer scripts, or any tool that can capture a rendered page.
+### Haul workflow (Chrome extension)
+
+1. User browses supported listing pages — extension badge turns green
+2. Click the extension icon to extract the current listing
+3. Results are collected into an anonymous **haul** — no login required
+4. A shareable results page shows all collected listings with comparison data
 
 ## Quick Start
 
@@ -77,6 +84,24 @@ url=https://www.rightmove.co.uk/properties/168908774&html=<html>...</html>
 GET /public_api/v1/listings?url=https://www.rightmove.co.uk/properties/168908774
 GET /public_api/v1/supported_sites
 GET /public_api/v1/health
+```
+
+### Chrome Extension (Haul) API
+
+```
+POST /ext/v1/hauls                    # Create anonymous haul
+GET  /ext/v1/hauls/:id                # Get haul summary
+POST /ext/v1/hauls/:id/scrapes        # Add extraction to haul
+```
+
+See [DESIGN.md](DESIGN.md) for the full API endpoint reference and architecture details.
+
+## MCP Server
+
+An MCP server (`astro-app/mcp-server.ts`) enables Claude Code to capture rendered HTML directly from Chrome via the [MCP Bridge extension](chrome-extensions/mcp-bridge/README.md). Start it with:
+
+```bash
+npx tsx astro-app/mcp-server.ts
 ```
 
 ## Running Tests
@@ -120,15 +145,11 @@ PropertyWebScraper is part of the [PropertyWebBuilder](https://github.com/etewia
 | [SinglePropertyPages](https://singlepropertypages.com/) | SaaS for dedicated property microsites with lead capture, analytics, and WYSIWYG editor | Astro, TypeScript |
 | [PropertySquares](https://propertysquares.com/) | 48-step first-time buyer journey across multiple markets | Astro, TypeScript |
 
-**Building a real estate project?** PropertyWebScraper gives you structured listing data from 17 portals in 6 countries via a simple API. [Open an issue](https://github.com/RealEstateWebTools/property_web_scraper/issues) to get your project listed here.
+**Building a real estate project?** PropertyWebScraper gives you structured listing data from 17 portals in 8 countries via a simple API. [Open an issue](https://github.com/RealEstateWebTools/property_web_scraper/issues) to get your project listed here.
 
 ## Legacy Rails Engine
 
-This project was originally a Ruby on Rails engine. The Rails code in `app/` and `spec/` is kept for legacy purposes but is no longer under active development. See [RAILS_README.md](RAILS_README.md) for details on the Rails integration.
-
-## Maps Dependency
-
-The active Astro app no longer depends on Google Maps JS SDK at runtime. Location UX is provided via external map links for coordinate-enabled listings. See [docs/maps-dependency-migration.md](docs/maps-dependency-migration.md) for migration details and legacy cleanup guidance.
+This project was originally a Ruby on Rails engine. The Rails code in `app/` is kept for legacy purposes but is no longer under active development. See [RAILS_README.md](RAILS_README.md) for details.
 
 ## Contributing
 

@@ -71,6 +71,7 @@ All messages are JSON-serialized over `ws://localhost:17824`.
 - **Reconnect**: 5-second flat retry on disconnect or error (no backoff)
 - **Guard**: skips connection attempt if already CONNECTING or OPEN
 - **On connect**: immediately sends a `tab_update` with current tab info
+- **Keep-alive**: A `chrome.alarms` alarm fires every 25 seconds to prevent the Manifest V3 service worker from being terminated by Chrome's 30-second idle timeout. This ensures the WebSocket connection stays alive while the extension is loaded.
 
 ## Installation
 
@@ -104,8 +105,19 @@ Capture rendered HTML from the browser's active tab and save as a test fixture.
 | `capture_page` returns "No Chrome extension connected" | Reload the extension at `chrome://extensions/` |
 | `capture_page` times out (15s) | Ensure the active tab has finished loading |
 
+## End-to-End Smoke Test
+
+1. Load the extension at `chrome://extensions/`
+2. Start the MCP server: `npx tsx astro-app/mcp-server.ts`
+3. Verify the popup shows "Connected to Claude Code"
+4. Navigate to a supported listing page (e.g. rightmove.co.uk)
+5. In Claude Code, call `extension_status` — should return `connected: true` with the tab URL
+6. Call `capture_page` — should save an HTML fixture and return extraction results
+7. Verify the fixture exists at `astro-app/test/fixtures/<name>.html`
+
 ## Development Notes
 
 - **WebSocket port**: `17824` (configurable server-side via `PWS_CAPTURE_PORT` env var)
 - **Reconnect interval**: 5 seconds (flat, no backoff)
+- **Keep-alive alarm**: fires every 25 seconds to prevent service worker termination
 - **MCP transport**: stdio between Claude Code and the MCP server; WebSocket is a side-channel for the extension bridge only

@@ -1,9 +1,9 @@
 # PropertyWebScraper — Roadmap
 
-**Last updated:** February 2026  
-**Current state:** 13 portals, 5 countries, 710 tests passing
+**Last updated:** 2026-02-18
+**Current state:** 17 portals, 8 countries, Astro 5 SSR on Cloudflare Pages
 
-This roadmap consolidates ideas from `AUDIT_SUMMARY.md`, `CRITICAL_FIXES.md`, `QUICK_WINS_CHECKLIST.md`, `TODO-pwb-pro-learnings.md`, and `pasarela-inspired-improvements.md` into a single prioritized plan.
+Historical planning documents that informed this roadmap have been archived to `docs/archive/`.
 
 ---
 
@@ -103,27 +103,27 @@ Capture `forsalebyowner` fixture. Use browser-based capture if direct fetch is b
 
 ## Phase 4: Architecture & Data Quality
 
-### 4.1 URL Canonicalization & Dedup
-**File:** [NEW] `url-canonicalizer.ts`  
-Normalize URLs (strip tracking params, trailing slashes, lowercase host). Prevent duplicate listings in the store.  
-**Effort:** 4 hours
+### 4.1 ✅ URL Canonicalization & Dedup
+**File:** `url-canonicalizer.ts`
+Normalizes URLs, strips tracking params, prevents duplicate listings in the store.
 
-### 4.2 Asset/Listing Schema Split
-**File:** [NEW] `schema-splitter.ts`  
-Split flat property hash into `assetData` (physical: coords, rooms) and `listingData` (sale-specific: price, status). Useful for downstream consumers that only care about price changes.  
-**Effort:** 3 hours
+### 4.2 ✅ Asset/Listing Schema Split
+**File:** `schema-splitter.ts`
+Splits flat property hash into `assetData` (physical) and `listingData` (commercial).
 
-### 4.3 Portal Configuration Registry Consolidation
-**File:** `portal-registry.ts` (already partially implemented)  
-Enrich with `contentSource`, `requiresJsRendering`, `stripTrailingSlash`. Make it the single source of truth for all portal metadata.  
-**Effort:** 4 hours
+### 4.3 ✅ Portal Configuration Registry Consolidation
+**File:** `portal-registry.ts`
+Single source of truth for all 17 portal configurations with `contentSource`, `requiresJsRendering`, `stripTrailingSlash`.
 
-### 4.4 Comprehensive Strategy Documentation
-**File:** `.claude/skills/add-scraper/reference.md`  
-Document all strategies with decision tree: HTML→`cssLocator`, `window.VAR`→`scriptJsonVar`, Next.js→`__NEXT_DATA__`, RSC→`flightDataPath`, Schema.org→`jsonLdPath`.  
-**Effort:** 2 hours
+### 4.4 ✅ Comprehensive Strategy Documentation
+**File:** `DESIGN.md`, `.claude/skills/add-scraper/reference.md`
+All 9 extraction strategies documented with decision tree.
 
-**Phase 4 total: ~2 days**
+### 4.5 ✅ Anonymous Haul Collections
+**Files:** `haul-store.ts`, `haul-id.ts`, `/ext/v1/hauls` endpoints
+KV-backed anonymous collections for Chrome extension. No login required. 30-day expiry, max 20 scrapes per haul.
+
+**Phase 4 total: ✅ Complete**
 
 ---
 
@@ -150,7 +150,7 @@ Periodic fixture re-extraction to detect when sites change their structure. Aler
 | **1** | Security & Ops | 1 day | 🔴 Critical — production readiness |
 | **2** | Extraction Engine | 3-4 days | 🟡 High — data quality + new strategies |
 | **3** | New Scrapers | 3 days | 🟡 High — expand portal coverage |
-| **4** | Architecture | 2 days | 🟢 Medium — maintainability + dedup |
+| **4** | Architecture | ✅ Complete | 🟢 Medium — maintainability + dedup |
 | **5** | Observability | ~2 weeks | 🟢 Medium — operational maturity |
 
 **Total phases 1-4:** ~10 working days  

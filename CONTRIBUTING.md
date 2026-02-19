@@ -114,22 +114,34 @@ The engine processes fields in this order (later sections overwrite earlier ones
 6. **`textFields`** — trimmed text strings
 7. **`booleanFields`** — true/false via evaluator functions
 
-### CSS Selector Options
+### Extraction Strategies
 
-Each field supports these options:
+Each field selects a text retrieval strategy. The engine tries strategies in order; use the one that best fits the site's data format.
+
+| Strategy | Description |
+|----------|-------------|
+| `cssLocator` | CSS selector (Cheerio/jQuery syntax). Most common. |
+| `scriptJsonVar` + `scriptJsonPath` | Extract from a named JSON variable in a `<script>` tag (e.g. `PAGE_MODEL`, `__NEXT_DATA__`, `__INITIAL_STATE__`) |
+| `flightDataPath` | Dot-path into Next.js RSC flight data (`self.__next_f.push`) |
+| `jsonLdPath` | Dot-path into `<script type="application/ld+json">` structured data |
+| `jsonLdType` | Filter JSON-LD by `@type` before path lookup (used with `jsonLdPath`) |
+| `scriptRegEx` | Regex on concatenated `<script>` tag text. First capture group is returned. |
+| `urlPathPart` | Extract a URL path segment by index (1-based) |
+| `fallbacks` | Array of alternative FieldMapping objects tried in order if the primary returns empty |
+
+### Post-processing Options
 
 | Option | Description |
 |--------|-------------|
-| `cssLocator` | CSS selector (Cheerio/jQuery syntax) |
 | `cssCountId` | Pick element at index (without this, all matches concatenate) |
-| `cssAttr` | Extract an attribute value instead of text content |
+| `cssAttr` / `xmlAttr` | Extract an attribute value instead of text content |
 | `stripFirstChar` | Remove leading character (useful for currency symbols like `$`) |
 | `stripPunct` | Remove `.` and `,` characters (for parsing prices) |
 | `stripString` | Remove a specific substring |
 | `splitTextCharacter` | Split text by this character |
 | `splitTextArrayId` | Pick element at index after splitting |
-| `scriptRegEx` | Extract value from `<script>` tag content via regex |
-| `urlPathPart` | Extract a URL path segment by index |
+
+See [DESIGN.md](DESIGN.md) for the complete mapping schema and strategy decision tree.
 
 ### Step 3: Add a Manifest Entry
 
@@ -155,7 +167,10 @@ Edit `astro-app/test/fixtures/manifest.ts` and add an entry for your fixture. On
 
 ### Step 4: Register the Hostname
 
-Add your portal's hostname(s) to `astro-app/scripts/capture-fixture.ts` in the `HOSTNAME_MAP`:
+Add your portal's hostname(s) to both:
+
+1. `astro-app/src/lib/services/url-validator.ts` in `LOCAL_HOST_MAP`
+2. `astro-app/scripts/capture-fixture.ts` in `HOSTNAME_MAP`
 
 ```typescript
 'www.immobilienscout24.de': 'de_immoscout',
@@ -199,10 +214,24 @@ Push your branch and open a PR. Your PR should include:
 | Page requires JavaScript to render | Save the rendered page from your browser and use `--file` with `capture-fixture` |
 | Field appears in both `intFields` and `textFields` | Last section wins — `textFields` would override `intFields` |
 
+**Alternative**: If you have Claude Code, you can use the `/add-scraper` skill which automates the entire workflow.
+
+## Fixing a Broken Scraper
+
+Portals change their HTML structure regularly. When a test fails:
+
+1. Run `npx vitest run test/lib/scraper-validation.test.ts -t "<scraper_name>"` to see what's broken
+2. Open the HTML fixture in a browser or editor to inspect the actual DOM
+3. Update CSS selectors in `config/scraper_mappings/<name>.json`
+4. If the fixture is outdated, capture a fresh one with `npm run capture-fixture`
+5. Update expected values in `astro-app/test/fixtures/manifest.ts`
+6. Run `npx vitest run` to verify no regressions
+
+See `astro-app/docs/scraper-maintenance-guide.md` for detailed diagnosis steps and common pitfalls.
+
 ## Other Ways to Contribute
 
-- **Fix a broken scraper** — Portals change their HTML structure regularly. If a test fails, update the CSS selectors in the mapping file and capture a fresh fixture.
-- **Improve extraction quality** — Add missing fields to existing mappings, or add `scriptRegEx` fallbacks for fields that rely on fragile CSS selectors.
+- **Improve extraction quality** — Add missing fields to existing mappings, or add `fallbacks` for fields that rely on fragile CSS selectors.
 - **Report issues** — If you find a portal that doesn't extract correctly, [open an issue](https://github.com/RealEstateWebTools/property_web_scraper/issues) with the listing URL and we'll investigate.
 - **Documentation** — Improve these docs, add examples, or translate into other languages.
 

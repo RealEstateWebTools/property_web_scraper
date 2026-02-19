@@ -1,5 +1,7 @@
 # Public API Improvements — Design Notes
 
+> **Status: Historical** — All items in this document have been implemented (marked with ✅). This document is kept for reference on design decisions. See [DESIGN.md](../../DESIGN.md) for the current architecture reference.
+
 ## Current State (as of Feb 2026)
 
 ### Endpoints
@@ -15,7 +17,7 @@
 - 16 scrapers (idealista, rightmove, zoopla, realtor, fotocasa, pisos, etc.)
 - 69 listing fields (pricing, dimensions, features, images, GPS, multi-language descriptions)
 - 4 extraction strategies: CSS selector, XPath, script regex, URL path
-- Cheerio + JSDOM for HTML parsing
+- Cheerio for HTML parsing
 - Post-processing: split, strip, type coercion, HTML sanitization
 
 ### Persistence

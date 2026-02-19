@@ -108,6 +108,19 @@ Extracts data from `<script type="application/ld+json">` tags containing Schema.
 
 Available evaluators: `include?`, `start_with?`, `end_with?`, `present?`, `to_i_gt_0`, `==`
 
+### Fallbacks
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `fallbacks` | FieldMapping[] | Array of alternative field mappings tried in order if the primary strategy returns empty text. Each fallback is a full FieldMapping object. |
+
+### API-based extraction
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `apiEndpoint` | string | URL of the API endpoint to fetch. `{id}` placeholder is replaced with the property ID. |
+| `apiJsonPath` | string | Dot-notation path to navigate the JSON API response. |
+
 ### Image-specific
 
 | Property | Type | Description |

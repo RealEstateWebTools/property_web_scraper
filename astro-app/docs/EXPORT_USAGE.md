@@ -1,11 +1,6 @@
-/**
- * Usage Examples for Export Functionality
- * 
- * This file demonstrates how to use the export service
- * Place in: astro-app/docs/EXPORT_USAGE.md
- */
-
 # Export Functionality - Usage Guide
+
+> **Status**: The export service (`export-service.ts`) and endpoints (`/public_api/v1/export`, `/public_api/v1/listings/:id/export`) are implemented. The batch streaming endpoint (`/api/export/batch`) referenced below is planned but not yet available.
 
 This guide shows how to use the PropertyWebScraper export functionality to download listings in multiple formats.
 
