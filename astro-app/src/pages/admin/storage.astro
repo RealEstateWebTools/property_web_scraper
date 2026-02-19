@@ -1,0 +1,385 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import StatusBadge from '../../components/StatusBadge.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+import { getStorageStatus, getCollectionPrefix, getClient } from '@lib/firestore/client.js';
+import { RestFirestoreClient } from '@lib/firestore/rest-client.js';
+import { Listing } from '@lib/models/listing.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+
+let successMessage = '';
+let errorMessage = '';
+
+interface ProbeResult {
+  name: string;
+  passed: boolean;
+  durationMs: number;
+  detail: string;
+}
+
+let probeResult: ProbeResult | null = null;
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const action = formData.get('action') as string;
+
+  try {
+    switch (action) {
+      case 'health_check': {
+        const start = Date.now();
+        const client = await getClient();
+        if ('healthCheck' in client && typeof (client as any).healthCheck === 'function') {
+          const result = await (client as any).healthCheck();
+          probeResult = {
+            name: 'Health Check',
+            passed: result.ok,
+            durationMs: Date.now() - start,
+            detail: result.ok ? 'Auth and connectivity OK' : `Failed: ${result.error}`,
+          };
+        } else {
+          probeResult = {
+            name: 'Health Check',
+            passed: true,
+            durationMs: Date.now() - start,
+            detail: 'In-memory backend — no remote health check needed',
+          };
+        }
+        break;
+      }
+      case 'write_test': {
+        const start = Date.now();
+        const testTitle = `DIAG_TEST_${Date.now()}`;
+        const listing = await Listing.create({ title: testTitle });
+        probeResult = {
+          name: 'Write Test',
+          passed: true,
+          durationMs: Date.now() - start,
+          detail: `Created doc: ${listing.id} (title: ${testTitle})`,
+        };
+        break;
+      }
+      case 'readback_test': {
+        const testDocId = formData.get('testDocId') as string;
+        if (!testDocId) {
+          probeResult = {
+            name: 'Read-back Test',
+            passed: false,
+            durationMs: 0,
+            detail: 'No test doc ID provided — run Write Test first',
+          };
+          break;
+        }
+        const start = Date.now();
+        const doc = await Listing.find(testDocId);
+        probeResult = {
+          name: 'Read-back Test',
+          passed: true,
+          durationMs: Date.now() - start,
+          detail: `Read doc: ${doc.id} — title: "${doc.title}"`,
+        };
+        break;
+      }
+      case 'list_documents': {
+        const start = Date.now();
+        const col = await Listing.collectionRef();
+        const snapshot = await col.get();
+        const count = snapshot.docs.length;
+        const ids = snapshot.docs.slice(0, 20).map((d) => d.id);
+        probeResult = {
+          name: 'List Documents',
+          passed: true,
+          durationMs: Date.now() - start,
+          detail: count === 0
+            ? '0 documents in collection'
+            : `${count} document(s). First ${Math.min(count, 20)} IDs: ${ids.join(', ')}`,
+        };
+        break;
+      }
+      case 'cleanup': {
+        const start = Date.now();
+        const col = await Listing.collectionRef();
+        const snapshot = await col.get();
+        let deleted = 0;
+        for (const doc of snapshot.docs) {
+          const data = doc.data();
+          if (data && typeof data.title === 'string' && data.title.startsWith('DIAG_TEST_')) {
+            await col.doc(doc.id).delete();
+            deleted++;
+          }
+        }
+        probeResult = {
+          name: 'Cleanup',
+          passed: true,
+          durationMs: Date.now() - start,
+          detail: deleted === 0 ? 'No DIAG_TEST_* documents found' : `Deleted ${deleted} test document(s)`,
+        };
+        break;
+      }
+      default:
+        errorMessage = `Unknown action: ${action}`;
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (probeResult) {
+      // Probe was partially constructed before error
+      probeResult.passed = false;
+      probeResult.detail = msg;
+    } else {
+      probeResult = {
+        name: action.replace(/_/g, ' '),
+        passed: false,
+        durationMs: 0,
+        detail: msg,
+      };
+    }
+  }
+}
+
+// --- Page-load data ---
+
+const status = getStorageStatus();
+const prefix = getCollectionPrefix();
+const collectionName = `${prefix}listings`;
+const storageHealthStatus = status.error ? 'error' : status.connected ? 'healthy' : 'degraded';
+const backendLabel = status.backend === 'firestore_rest' ? 'Firestore REST' : 'In-Memory';
+
+// Collection browser
+interface BrowseDoc {
+  id: string;
+  title: string;
+  scraper_name: string;
+  quality_grade: string;
+  last_retrieved_at: string;
+}
+
+let browseDocs: BrowseDoc[] = [];
+let browseError = '';
+let browseTotal = 0;
+
+try {
+  const col = await Listing.collectionRef();
+  const snapshot = await col.get();
+  browseTotal = snapshot.docs.length;
+  browseDocs = snapshot.docs.slice(0, 20).map((doc) => {
+    const d = doc.data() || {};
+    return {
+      id: doc.id,
+      title: typeof d.title === 'string' ? d.title : '',
+      scraper_name: typeof d.scraper_name === 'string' ? d.scraper_name : '',
+      quality_grade: typeof d.quality_grade === 'string' ? d.quality_grade : '',
+      last_retrieved_at: d.last_retrieved_at ? String(d.last_retrieved_at) : '',
+    };
+  });
+} catch (err: unknown) {
+  browseError = err instanceof Error ? err.message : String(err);
+}
+
+// Keep track of last written doc ID for read-back
+const lastWrittenId = probeResult?.name === 'Write Test' && probeResult.passed
+  ? probeResult.detail.match(/Created doc: (\S+)/)?.[1] || ''
+  : '';
+---
+<AdminLayout title="Storage Diagnostics — Admin" activePage="storage">
+  <h1 class="text-2xl font-bold mb-6">Storage Diagnostics</h1>
+
+  {successMessage && (
+    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4 text-sm">
+      {successMessage}
+    </div>
+  )}
+  {errorMessage && (
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+      {errorMessage}
+    </div>
+  )}
+
+  {/* Probe Result Banner */}
+  {probeResult && (
+    <div class={`border px-4 py-3 rounded mb-4 text-sm flex items-center gap-3 ${probeResult.passed ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+      <StatusBadge status={probeResult.passed ? 'healthy' : 'error'} label={probeResult.passed ? 'PASS' : 'FAIL'} size="sm" />
+      <div>
+        <strong>{probeResult.name}</strong>
+        <span class="text-gray-500 ml-2">({probeResult.durationMs}ms)</span>
+        <span class="ml-2">{probeResult.detail}</span>
+      </div>
+    </div>
+  )}
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    {/* Connection Status */}
+    <div class="bg-white rounded-lg shadow lg:col-span-2">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold flex items-center gap-2">
+          <i class="bi bi-plug"></i> Connection Status
+        </h2>
+      </div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-4">
+          <StatusBadge status={storageHealthStatus} label={backendLabel} size="md" />
+          {status.projectId && (
+            <span class="text-sm text-gray-500">Project: <strong>{status.projectId}</strong></span>
+          )}
+        </div>
+        {status.error && (
+          <div class="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm mb-4">
+            {status.error}
+          </div>
+        )}
+        <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+          <div>
+            <dt class="text-gray-500">Backend Type</dt>
+            <dd class="font-medium">{backendLabel}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Connection</dt>
+            <dd class="font-medium">{status.connected ? 'Connected' : 'Disconnected'}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Collection Prefix</dt>
+            <dd class="font-medium font-mono">{prefix || '(none)'}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Collection Name</dt>
+            <dd class="font-medium font-mono">{collectionName}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    {/* Diagnostic Probes */}
+    <div class="bg-white rounded-lg shadow lg:col-span-2">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold flex items-center gap-2">
+          <i class="bi bi-wrench"></i> Diagnostic Probes
+        </h2>
+      </div>
+      <div class="p-5">
+        <p class="text-sm text-gray-500 mb-4">
+          Run real Firestore operations to diagnose where the pipeline breaks: auth, write, read, or query.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {/* Health Check */}
+          <form method="POST">
+            <input type="hidden" name="action" value="health_check" />
+            <button type="submit" class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+              <div class="font-medium text-sm flex items-center gap-2">
+                <i class="bi bi-heart-pulse text-blue-500"></i> Health Check
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Tests auth + connectivity</p>
+            </button>
+          </form>
+
+          {/* Write Test */}
+          <form method="POST">
+            <input type="hidden" name="action" value="write_test" />
+            <button type="submit" class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+              <div class="font-medium text-sm flex items-center gap-2">
+                <i class="bi bi-pencil text-green-500"></i> Write Test
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Creates a test document via Listing.create()</p>
+            </button>
+          </form>
+
+          {/* Read-back Test */}
+          <form method="POST">
+            <input type="hidden" name="action" value="readback_test" />
+            <input type="hidden" name="testDocId" value={lastWrittenId} />
+            <button type="submit" class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+              <div class="font-medium text-sm flex items-center gap-2">
+                <i class="bi bi-eye text-purple-500"></i> Read-back Test
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Reads the last test doc via Listing.find()</p>
+            </button>
+          </form>
+
+          {/* List Documents */}
+          <form method="POST">
+            <input type="hidden" name="action" value="list_documents" />
+            <button type="submit" class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+              <div class="font-medium text-sm flex items-center gap-2">
+                <i class="bi bi-list-ul text-amber-500"></i> List Documents
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Queries collection, shows count + doc IDs</p>
+            </button>
+          </form>
+
+          {/* Cleanup */}
+          <form method="POST">
+            <input type="hidden" name="action" value="cleanup" />
+            <button type="submit" class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+              <div class="font-medium text-sm flex items-center gap-2">
+                <i class="bi bi-trash3 text-red-500"></i> Cleanup
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Deletes all DIAG_TEST_* documents</p>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {/* Collection Browser */}
+    <div class="bg-white rounded-lg shadow lg:col-span-2">
+      <div class="px-5 py-4 border-b border-gray-200">
+        <h2 class="font-semibold flex items-center gap-2">
+          <i class="bi bi-table"></i> Collection Browser
+          <span class="text-sm font-normal text-gray-500">
+            — <code class="bg-gray-100 px-1 rounded">{collectionName}</code>
+          </span>
+        </h2>
+      </div>
+      <div class="p-5">
+        {browseError ? (
+          <div class="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+            {browseError}
+          </div>
+        ) : browseTotal === 0 ? (
+          <div class="text-center py-8">
+            <i class="bi bi-inbox text-3xl text-gray-300"></i>
+            <p class="text-gray-500 mt-2">0 documents in <code class="bg-gray-100 px-1 rounded">{collectionName}</code></p>
+            <p class="text-xs text-gray-400 mt-1">If you expected documents, writes may not be reaching Firestore. Run the Write Test probe above.</p>
+          </div>
+        ) : (
+          <div>
+            <p class="text-sm text-gray-500 mb-3">
+              Showing {Math.min(browseTotal, 20)} of {browseTotal} document(s)
+            </p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-200 text-left">
+                    <th class="py-2 pr-3 font-medium text-gray-500">Doc ID</th>
+                    <th class="py-2 pr-3 font-medium text-gray-500">Title</th>
+                    <th class="py-2 pr-3 font-medium text-gray-500">Scraper</th>
+                    <th class="py-2 pr-3 font-medium text-gray-500">Grade</th>
+                    <th class="py-2 font-medium text-gray-500">Last Retrieved</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {browseDocs.map((doc) => (
+                    <tr class="border-b border-gray-100">
+                      <td class="py-2 pr-3 font-mono text-xs">{doc.id}</td>
+                      <td class="py-2 pr-3 max-w-xs truncate">{doc.title || '—'}</td>
+                      <td class="py-2 pr-3">{doc.scraper_name || '—'}</td>
+                      <td class="py-2 pr-3">
+                        {doc.quality_grade ? (
+                          <StatusBadge
+                            status={doc.quality_grade === 'A' || doc.quality_grade === 'B' ? 'healthy' : doc.quality_grade === 'C' ? 'degraded' : 'error'}
+                            label={doc.quality_grade}
+                            size="sm"
+                          />
+                        ) : '—'}
+                      </td>
+                      <td class="py-2 text-xs text-gray-500">{doc.last_retrieved_at || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</AdminLayout>
