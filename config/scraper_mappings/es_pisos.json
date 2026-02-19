@@ -19,6 +19,10 @@
     }
   },
   "floatFields": {
+    "price_float": {
+      "cssLocator": "meta[itemprop='price']",
+      "cssAttr": "content"
+    }
   },
   "textFields": {
     "reference": {
@@ -28,15 +32,39 @@
       "cssLocator": "title"
     },
     "description": {
+      "cssLocator": "meta[name='description']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" }
+      ]
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
     },
     "price_string": {
       "cssLocator": ".jsPrecioH1",
+      "cssCountId": "0"
+    },
+    "address_string": {
+      "cssLocator": "h2.position",
       "cssCountId": "0"
     }
   },
   "images": [
   ],
   "booleanFields": {
-
+    "for_sale": {
+      "cssLocator": "title",
+      "evaluator": "include?",
+      "evaluatorParam": "en venta",
+      "caseInsensitive": true
+    },
+    "for_rent": {
+      "cssLocator": "title",
+      "evaluator": "include?",
+      "evaluatorParam": "en alquiler",
+      "caseInsensitive": true
+    }
   }
 }]

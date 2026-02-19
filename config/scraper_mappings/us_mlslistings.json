@@ -15,6 +15,12 @@
       "value": "USD"
     }
   },
+  "intFields": {
+    "year_construction": {
+      "scriptJsonVar": "PropertyDetailsByMLSNumber",
+      "scriptJsonPath": "propertyDetailResults.yearBuilt"
+    }
+  },
   "floatFields": {
     "constructed_area": {
       "cssLocator": "#quickDetails > div > div:nth-child(3) > p:nth-child(1) > span",
@@ -64,6 +70,10 @@
     "main_image_url": {
       "cssLocator": "meta[property='og:image']",
       "cssAttr": "content"
+    },
+    "property_type": {
+      "scriptJsonVar": "PropertyDetailsByMLSNumber",
+      "scriptJsonPath": "propertyDetailResults.subClass"
     }
   },
   "booleanFields": {
