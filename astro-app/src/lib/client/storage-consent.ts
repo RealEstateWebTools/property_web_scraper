@@ -49,6 +49,7 @@ const ALLOWED_KEY_PATTERNS: RegExp[] = [
   /^functional:recent-urls$/,
   /^functional:haul-cache:[a-zA-Z0-9_-]+$/,
   /^functional:result-cache:[a-zA-Z0-9_-]+$/,
+  /^functional:my-hauls$/,
 ];
 
 /** Default TTLs in milliseconds, keyed by short-key prefix. */
@@ -59,6 +60,7 @@ const DEFAULT_TTLS: Record<string, number> = {
   'functional:recent-urls':           7 * 24 * 60 * 60 * 1000,
   'functional:haul-cache':           30 * 24 * 60 * 60 * 1000,
   'functional:result-cache':               1 * 60 * 60 * 1000,
+  'functional:my-hauls':                  30 * 24 * 60 * 60 * 1000,
 };
 
 // ---------------------------------------------------------------------------

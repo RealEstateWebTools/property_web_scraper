@@ -90,7 +90,7 @@ function resolveAllowOrigin(request?: Request): { allowOrigin: string | null; us
 function buildCorsHeaders(request?: Request): Record<string, string> {
   const { allowOrigin, usingAllowlist } = resolveAllowOrigin(request);
   const headers: Record<string, string> = {
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Api-Key',
 };
   if (allowOrigin) {

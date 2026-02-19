@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { isValidHaulId } from '@lib/services/haul-id.js';
-import { getHaul, initHaulKV } from '@lib/services/haul-store.js';
+import { getHaul, updateHaulMeta, initHaulKV } from '@lib/services/haul-store.js';
 import { resolveKV } from '@lib/services/kv-resolver.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 
@@ -29,5 +29,49 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
     scrape_count: haul.scrapes.length,
     scrape_capacity: 20,
     scrapes: haul.scrapes,
+    name: haul.name || null,
+    notes: haul.notes || null,
   }, request);
+};
+
+/**
+ * PATCH /ext/v1/hauls/{id} — Update haul name/notes.
+ */
+export const PATCH: APIRoute = async ({ params, request, locals }) => {
+  const { id } = params;
+  if (!id || !isValidHaulId(id)) {
+    return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Invalid haul ID format', request);
+  }
+
+  const contentType = request.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    return errorResponse(ApiErrorCode.UNSUPPORTED_CONTENT_TYPE, 'Content-Type must be application/json', request);
+  }
+
+  let name: string | undefined;
+  let notes: string | undefined;
+  try {
+    const body = await request.json();
+    name = typeof body.name === 'string' ? body.name : undefined;
+    notes = typeof body.notes === 'string' ? body.notes : undefined;
+  } catch {
+    return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Invalid JSON body', request);
+  }
+
+  if (name === undefined && notes === undefined) {
+    return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Provide name and/or notes', request);
+  }
+
+  initHaulKV(resolveKV(locals));
+
+  try {
+    const haul = await updateHaulMeta(id, { name, notes });
+    return successResponse({
+      haul_id: haul.id,
+      name: haul.name || null,
+      notes: haul.notes || null,
+    }, request);
+  } catch {
+    return errorResponse(ApiErrorCode.NOT_FOUND, 'Haul not found or expired', request);
+  }
 };
