@@ -139,6 +139,59 @@ $('#new-haul-btn').addEventListener('click', async () => {
   }
 });
 
+// ─── Use existing haul ──────────────────────────────────────────
+
+async function useExistingHaul(inputEl, statusEl) {
+  const haulId = (inputEl.value || '').trim();
+  if (!haulId) {
+    statusEl.textContent = 'Please enter a haul ID';
+    statusEl.classList.remove('hidden');
+    return;
+  }
+  await chrome.storage.sync.set({ haulId });
+  statusEl.classList.add('hidden');
+  init();
+}
+
+$('#use-haul-btn').addEventListener('click', () => {
+  useExistingHaul($('#use-haul-input'), $('#new-haul-status'));
+});
+
+$('#use-haul-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') useExistingHaul($('#use-haul-input'), $('#new-haul-status'));
+});
+
+// No-key state: create new haul
+$('#new-haul-btn-nokey').addEventListener('click', async () => {
+  const btn = $('#new-haul-btn-nokey');
+  const status = $('#nokey-status');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  status.classList.add('hidden');
+
+  try {
+    const result = await chrome.runtime.sendMessage({ type: 'CREATE_HAUL' });
+    if (!result?.haul_id) throw new Error('Failed to create haul');
+
+    await chrome.storage.sync.set({ haulId: result.haul_id });
+    btn.textContent = 'Created! Retrying…';
+    init();
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Create New Haul';
+    status.textContent = err.message || 'Could not create haul';
+    status.classList.remove('hidden');
+  }
+});
+
+$('#use-haul-btn-nokey').addEventListener('click', () => {
+  useExistingHaul($('#use-haul-input-nokey'), $('#nokey-status'));
+});
+
+$('#use-haul-input-nokey').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') useExistingHaul($('#use-haul-input-nokey'), $('#nokey-status'));
+});
+
 // ─── Render results ──────────────────────────────────────────────
 
 function renderResults(data) {
@@ -219,10 +272,14 @@ async function renderHistory(haulId) {
     const count = $('#history-count');
 
     count.textContent = total;
-    list.innerHTML = scrapes.slice(0, 5).map(s => `
+    list.innerHTML = scrapes.slice(0, 5).map(s => {
+      const displayUrl = s.sourceUrl
+        ? escapeHtml(s.sourceUrl.replace(/^https?:\/\/(www\.)?/, ''))
+        : escapeHtml(s.hostname || 'Unknown');
+      return `
       <li class="history-item">
         <div class="history-item-top">
-          <span class="history-item-title">${escapeHtml(s.title || 'Untitled')}</span>
+          <span class="history-item-url" title="${escapeHtml(s.sourceUrl || s.hostname)}">${displayUrl}</span>
           <span class="grade-badge-sm grade-${escapeHtml(s.grade)}">${escapeHtml(s.grade)}</span>
         </div>
         <div class="history-item-meta">
@@ -230,7 +287,8 @@ async function renderHistory(haulId) {
           <span>${formatTimeAgo(s.scrapedAt)}</span>
         </div>
       </li>
-    `).join('');
+    `;
+    }).join('');
 
     section.classList.remove('hidden');
   } catch { /* non-critical */ }

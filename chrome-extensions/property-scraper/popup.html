@@ -35,15 +35,24 @@
 
   <div id="state-no-key" class="state hidden">
     <div class="state-icon">📦</div>
-    <p class="state-text">Haul ID not configured</p>
-    <a href="options.html" target="_blank" class="btn btn-primary">Open Settings</a>
+    <p class="state-text">No haul configured</p>
+    <button id="new-haul-btn-nokey" class="btn btn-primary">Create New Haul</button>
+    <div class="haul-id-input-group">
+      <input id="use-haul-input-nokey" type="text" class="haul-id-input" placeholder="or enter haul ID" />
+      <button id="use-haul-btn-nokey" class="btn btn-secondary">Use</button>
+    </div>
+    <p id="nokey-status" class="state-sub hidden"></p>
   </div>
 
   <div id="state-haul-expired" class="state hidden">
     <div class="state-icon">📦</div>
     <p class="state-text">Your haul has expired</p>
-    <p class="state-sub">Hauls last 30 days. Create a new one to keep scraping.</p>
+    <p class="state-sub">Hauls last 30 days. Create a new one or enter an existing ID.</p>
     <button id="new-haul-btn" class="btn btn-primary">Create New Haul</button>
+    <div class="haul-id-input-group">
+      <input id="use-haul-input" type="text" class="haul-id-input" placeholder="e.g. swift-fox-42" />
+      <button id="use-haul-btn" class="btn btn-secondary">Use</button>
+    </div>
     <p id="new-haul-status" class="state-sub hidden"></p>
   </div>
 

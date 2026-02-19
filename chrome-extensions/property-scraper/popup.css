@@ -288,6 +288,42 @@ body {
   flex-shrink: 0;
 }
 
+/* ─── Haul ID input ───────────────────────────────────────────── */
+
+.haul-id-input-group {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  width: 100%;
+  max-width: 260px;
+}
+
+.haul-id-input {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  outline: none;
+  font-family: 'Segoe UI Mono', 'SF Mono', monospace;
+}
+
+.haul-id-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* ─── History URL ─────────────────────────────────────────────── */
+
+.history-item-url {
+  font-size: 11px;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
 /* ─── Scrollbar ────────────────────────────────────────────────── */
 
 body::-webkit-scrollbar {

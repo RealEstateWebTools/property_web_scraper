@@ -113,7 +113,12 @@ async function handleExtraction({ url, html }) {
     const available = scrape.fields_available || 0;
     const rate = available > 0 ? Math.round((extracted / available) * 100) : 0;
     let hostname = '';
-    try { hostname = new URL(url).hostname.replace(/^www\./, ''); } catch {}
+    let sourceUrl = '';
+    try {
+      const parsed = new URL(url);
+      hostname = parsed.hostname.replace(/^www\./, '');
+      sourceUrl = parsed.origin + parsed.pathname;
+    } catch {}
     await HaulHistory.saveScrape(haulId, {
       resultId: data.result_id || scrape.result_id || '',
       title: scrape.title || '',
@@ -121,6 +126,7 @@ async function handleExtraction({ url, html }) {
       price: scrape.price || '',
       rate,
       hostname,
+      sourceUrl,
     });
   } catch { /* non-critical */ }
 
