@@ -21,6 +21,7 @@ export interface ExtractionSummary {
   priceString: string;
   visibility: string;
   confidenceScore: number;
+  manualOverride: boolean;
 }
 
 export interface ScraperStats {
@@ -79,6 +80,7 @@ export async function getRecentExtractions(limit = 100): Promise<ExtractionSumma
       priceString: (listing as any).price_string || '',
       visibility: (listing as any).visibility || diag.visibility || 'published',
       confidenceScore: (listing as any).confidence_score ?? diag.confidenceScore ?? 1.0,
+      manualOverride: (listing as any).manual_override || false,
     });
   }
 

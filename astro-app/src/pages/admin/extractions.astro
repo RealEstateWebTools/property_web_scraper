@@ -173,6 +173,9 @@ function truncate(str: string, len: number): string {
                   }`}>
                     {ext.visibility}
                   </span>
+                  {ext.manualOverride && (
+                    <i class="bi bi-shield-lock text-[10px] text-blue-500 ml-1" title="Manually managed"></i>
+                  )}
                 </td>
                 <td class="py-2 px-4 text-xs">{Math.round(ext.extractionRate * 100)}%</td>
                 <td class="py-2 px-4 text-xs">{ext.populatedExtractableFields}/{ext.extractableFields}</td>

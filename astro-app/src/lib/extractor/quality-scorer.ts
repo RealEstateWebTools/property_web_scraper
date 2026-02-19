@@ -83,6 +83,8 @@ export function assessQuality(rate: number, expectedRate?: number): QualityAsses
     meetsExpectation: expectation.meetsExpectation,
     expectationGap: expectation.expectationGap,
     expectationStatus: expectation.expectationStatus,
+    confidenceScore: rate, // Use flat rate as simple confidence for non-weighted assessment
+    visibility: rate > 0.7 ? 'published' : rate > 0.4 ? 'pending' : 'spam',
   };
 }
 

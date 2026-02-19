@@ -168,6 +168,11 @@ export const GET: APIRoute = async ({ request }) => {
     listing.assignAttributes({ import_url: url! });
   }
 
+  const visibility = (listing as any).visibility || 'published';
+  if (visibility !== 'published' && visibility !== 'pending') {
+    return errorResponse(ApiErrorCode.INVALID_URL, 'Listing is not available', request);
+  }
+
   logActivity({
     level: 'info',
     category: 'api_request',

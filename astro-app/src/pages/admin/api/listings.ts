@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
-import { initKV, deleteListing, updateListingVisibility } from '@lib/services/listing-store.ts';
+import { initKV, deleteListing, updateListingVisibility } from '@lib/services/listing-store.js';
 
 export const POST: APIRoute = async ({ request }) => {
   const auth = authenticateAdmin(request);

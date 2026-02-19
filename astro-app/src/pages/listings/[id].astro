@@ -12,6 +12,15 @@ const h2cUrl = getRuntimeConfig().homesToCompareUrl;
 const { id } = Astro.params;
 const listing = id ? await getListing(id) : undefined;
 
+if (listing) {
+  const visibility = (listing as any).visibility || 'published';
+  // If not published, and not an admin (though we don't have secondary auth check here yet, 
+  // we'll at least hide from public direct hits)
+  if (visibility !== 'published' && visibility !== 'pending') {
+    return Astro.redirect('/listings?error=not_found');
+  }
+}
+
 let mainImageUrl = 'https://placehold.co/500x250?text=No+Image';
 let osmDirectionsUrl = '';
 let googleDirectionsUrl = '';
