@@ -62,6 +62,9 @@ export async function retrieveListing(
             listing.confidence_score = diagnostics.confidenceScore;
             listing.visibility = diagnostics.visibility;
           }
+          if (diagnostics) {
+            Listing.applyDiagnostics(listing, diagnostics);
+          }
           return { success: true, retrievedListing: listing, diagnostics };
         }
         return { success: true, retrievedListing: new Listing(), diagnostics };
@@ -194,6 +197,11 @@ export async function retrieveListing(
           fieldsFound,
           diagnostics,
         });
+
+        // Persist diagnostic summary fields onto listing for admin queries
+        if (diagnostics) {
+          Listing.applyDiagnostics(listing, diagnostics);
+        }
 
         try {
           await listing.save();
