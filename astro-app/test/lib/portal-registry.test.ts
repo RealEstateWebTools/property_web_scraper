@@ -29,6 +29,31 @@ describe('portal-registry', () => {
       }
     });
 
+    it('each portal has a valid supportTier', () => {
+      for (const [name, config] of Object.entries(PORTAL_REGISTRY)) {
+        expect(
+          ['core', 'experimental', 'manual-only'],
+          `${name}.supportTier should be valid`,
+        ).toContain(config.supportTier);
+      }
+    });
+
+    it('each portal has expectedExtractionRate set', () => {
+      for (const [name, config] of Object.entries(PORTAL_REGISTRY)) {
+        expect(config.expectedExtractionRate, `${name}.expectedExtractionRate`).toBeTypeOf('number');
+        expect(config.expectedExtractionRate!, `${name}.expectedExtractionRate range`).toBeGreaterThan(0);
+        expect(config.expectedExtractionRate!, `${name}.expectedExtractionRate range`).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('manual-only portals have requiresJsRendering true', () => {
+      for (const [name, config] of Object.entries(PORTAL_REGISTRY)) {
+        if (config.supportTier === 'manual-only') {
+          expect(config.requiresJsRendering, `${name} should require JS rendering`).toBe(true);
+        }
+      }
+    });
+
     it('has expected portals', () => {
       const names = Object.keys(PORTAL_REGISTRY);
       expect(names).toContain('uk_rightmove');

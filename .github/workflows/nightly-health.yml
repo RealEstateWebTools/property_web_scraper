@@ -1,0 +1,47 @@
+name: Nightly Fixture Health
+on:
+  schedule:
+    - cron: '0 4 * * *' # Daily at 04:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  fixture-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: astro-app/package-lock.json
+      - run: npm ci
+        working-directory: astro-app
+      - name: Run fixture health tests
+        working-directory: astro-app
+        run: npx vitest run test/lib/scraper-validation.test.ts test/lib/stale-snapshot.test.ts --reporter=json --outputFile=health-results.json
+      - name: Check for quality regressions
+        working-directory: astro-app
+        run: |
+          if git diff --name-only | grep -q 'quality-snapshot.json'; then
+            echo "::warning::Quality snapshot has changed — possible regression"
+            git diff test/fixtures/quality-snapshot.json
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fixture-health-results
+          path: astro-app/health-results.json
+          retention-days: 30
+      - name: Create issue on failure
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Nightly Health] Fixture tests failing`,
+              body: `The nightly fixture health check failed. Check the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.\n\nRun locally: \`cd astro-app && npx vitest run test/lib/scraper-validation.test.ts\``,
+              labels: ['scraper-health'],
+            });

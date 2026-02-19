@@ -3,6 +3,7 @@ import { authenticateAdmin } from '@lib/services/admin-auth.js';
 import { extractFromHtml } from '@lib/extractor/html-extractor.js';
 import { allMappingNames, findByName } from '@lib/extractor/mapping-loader.js';
 import { findPortalByName } from '@lib/services/portal-registry.js';
+import { getPortalProfile } from '@lib/services/scrape-metadata.js';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,6 +33,10 @@ interface ScraperHealthResult {
   name: string;
   country: string;
   hasFixture: boolean;
+  supportTier?: string;
+  expectedExtractionRate?: number;
+  meetsExpectation?: boolean;
+  consecutiveBelowThreshold?: number;
   grade?: string;
   label?: string;
   extractionRate?: number;
@@ -57,17 +62,33 @@ export const GET: APIRoute = async ({ request }) => {
 
   for (const name of scraperNames) {
     const portal = findPortalByName(name);
+    const portalProfile = await getPortalProfile(name);
     const fixtureName = FIXTURE_MAP[name];
     const country = portal?.country || '??';
+    const consecutiveBelow = portalProfile?.consecutive_below_threshold;
 
     if (!fixtureName) {
-      results.push({ name, country, hasFixture: false });
+      results.push({
+        name,
+        country,
+        hasFixture: false,
+        supportTier: portal?.supportTier,
+        expectedExtractionRate: portal?.expectedExtractionRate,
+        consecutiveBelowThreshold: consecutiveBelow,
+      });
       continue;
     }
 
     const fixturePath = resolve(FIXTURES_DIR, `${fixtureName}.html`);
     if (!existsSync(fixturePath)) {
-      results.push({ name, country, hasFixture: false });
+      results.push({
+        name,
+        country,
+        hasFixture: false,
+        supportTier: portal?.supportTier,
+        expectedExtractionRate: portal?.expectedExtractionRate,
+        consecutiveBelowThreshold: consecutiveBelow,
+      });
       continue;
     }
 
@@ -80,10 +101,19 @@ export const GET: APIRoute = async ({ request }) => {
       });
 
       const diag = result.diagnostics;
+      const expected = portal?.expectedExtractionRate;
+      const rate = diag?.extractionRate;
+      const meets = (typeof rate === 'number' && typeof expected === 'number')
+        ? rate >= expected
+        : undefined;
       results.push({
         name,
         country,
         hasFixture: true,
+        supportTier: portal?.supportTier,
+        expectedExtractionRate: expected,
+        meetsExpectation: meets,
+        consecutiveBelowThreshold: consecutiveBelow,
         grade: diag?.qualityGrade,
         label: diag?.qualityLabel,
         extractionRate: diag?.extractionRate,
@@ -98,6 +128,9 @@ export const GET: APIRoute = async ({ request }) => {
         name,
         country,
         hasFixture: true,
+        supportTier: portal?.supportTier,
+        expectedExtractionRate: portal?.expectedExtractionRate,
+        consecutiveBelowThreshold: consecutiveBelow,
         error: err instanceof Error ? err.message : String(err),
       });
     }

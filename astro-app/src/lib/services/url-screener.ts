@@ -1,7 +1,9 @@
 import { findPortalByHost } from './portal-registry.js';
+import type { SupportTier } from './portal-registry.js';
 
 export type ScreeningVerdict =
   | 'allowed'
+  | 'manual_only'
   | 'unknown_real_estate'
   | 'search_results'
   | 'not_real_estate'
@@ -11,6 +13,7 @@ export interface ScreeningResult {
   verdict: ScreeningVerdict;
   hostname?: string;
   url?: URL;
+  portalTier?: SupportTier;
 }
 
 /**
@@ -166,10 +169,13 @@ export function screenUrl(rawUrl: string): ScreeningResult {
     const pathAndQuery = url.pathname + url.search;
     for (const pattern of SEARCH_PAGE_PATTERNS) {
       if (pattern.test(pathAndQuery)) {
-        return { verdict: 'search_results', hostname, url };
+        return { verdict: 'search_results', hostname, url, portalTier: portal.supportTier };
       }
     }
-    return { verdict: 'allowed', hostname, url };
+    if (portal.supportTier === 'manual-only') {
+      return { verdict: 'manual_only', hostname, url, portalTier: portal.supportTier };
+    }
+    return { verdict: 'allowed', hostname, url, portalTier: portal.supportTier };
   }
 
   // 2. Blocked non-real-estate domains

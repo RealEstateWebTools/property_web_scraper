@@ -45,6 +45,10 @@ if (Astro.request.method === 'POST') {
     if (screening.verdict === 'unknown_real_estate') {
       return Astro.redirect(`/extract/error?reason=unknown_real_estate&url=${encodeURIComponent(importUrl)}`);
     }
+    if (screening.verdict === 'manual_only') {
+      const portalName = screening.hostname || '';
+      return Astro.redirect(`/extract/error?reason=fetch_blocked&url=${encodeURIComponent(importUrl)}&portal=${encodeURIComponent(portalName)}`);
+    }
   }
 
   // Check if this portal blocks server-side fetching

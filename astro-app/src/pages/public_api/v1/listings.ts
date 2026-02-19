@@ -106,7 +106,7 @@ export const GET: APIRoute = async ({ request }) => {
   const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
+  const rateCheck = checkRateLimit(request, auth.tier, auth.userId, 'api');
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   const url = new URL(request.url).searchParams.get('url');
@@ -197,9 +197,6 @@ export const POST: APIRoute = async ({ request }) => {
   const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
-  if (!rateCheck.allowed) return rateCheck.errorResponse!;
-
   const contentType = request.headers.get('content-type') || '';
 
   if (!contentType.includes('multipart/form-data') && !contentType.includes('application/json')) {
@@ -260,6 +257,11 @@ export const POST: APIRoute = async ({ request }) => {
     });
     return errorResponse(ApiErrorCode.PAYLOAD_TOO_LARGE, 'HTML payload exceeds 10MB limit', request);
   }
+
+  // Rate limit with endpoint-specific multipliers (after body parsing)
+  const endpointClass = html ? 'html_extract' as const : 'url_extract' as const;
+  const rateCheck = checkRateLimit(request, auth.tier, auth.userId, endpointClass);
+  if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   if (!url) {
     logActivity({

@@ -3,6 +3,17 @@ import { getRuntimeConfig } from './runtime-config.js';
 import { logActivity } from './activity-logger.js';
 import type { SubscriptionTier } from './api-key-service.js';
 
+// ─── Endpoint classes & multipliers ─────────────────────────────
+
+export type EndpointClass = 'url_extract' | 'html_extract' | 'api' | 'default';
+
+const ENDPOINT_MULTIPLIERS: Record<EndpointClass, { perMinute: number; perDay: number }> = {
+  url_extract:  { perMinute: 1, perDay: 1 },
+  html_extract: { perMinute: 2, perDay: 2 },
+  api:          { perMinute: 1, perDay: 1 },
+  default:      { perMinute: 1, perDay: 1 },
+};
+
 // ─── Tier-based rate limits ─────────────────────────────────────
 
 export interface TierLimits {
@@ -84,14 +95,21 @@ export interface RateLimitResult {
  * @param request - The incoming request
  * @param tier - Subscription tier (from auth). Defaults to 'free'.
  * @param userId - User ID (from auth). Used as rate limit key.
+ * @param endpoint - Endpoint class for per-endpoint multipliers.
  */
 export function checkRateLimit(
   request: Request,
   tier?: string,
   userId?: string,
+  endpoint?: EndpointClass,
 ): RateLimitResult {
   const key = getClientKey(request, userId);
-  const limits = getLimitsForTier(tier);
+  const baseLimits = getLimitsForTier(tier);
+  const mult = ENDPOINT_MULTIPLIERS[endpoint || 'default'];
+  const limits: TierLimits = {
+    perMinute: baseLimits.perMinute * mult.perMinute,
+    perDay: baseLimits.perDay === Infinity ? Infinity : baseLimits.perDay * mult.perDay,
+  };
   const now = Date.now();
 
   // 1. Per-minute sliding window
