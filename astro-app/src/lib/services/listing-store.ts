@@ -94,7 +94,14 @@ export async function getListing(id: string): Promise<Listing | undefined> {
       return listing;
     }
   }
-  return undefined;
+  // Fall back to Firestore if available
+  try {
+    const listing = await Listing.find(id);
+    store.set(id, listing);
+    return listing;
+  } catch {
+    return undefined;
+  }
 }
 
 export async function storeDiagnostics(id: string, diagnostics: ExtractionDiagnostics): Promise<void> {
@@ -113,6 +120,33 @@ export async function getDiagnostics(id: string): Promise<ExtractionDiagnostics 
       diagnosticsStore.set(id, data);
       return data;
     }
+  }
+  // Reconstruct from Firestore listing's embedded diagnostic fields
+  try {
+    const listing = await Listing.find(id);
+    if (listing.scraper_name) {
+      const diag = {
+        scraperName: listing.scraper_name,
+        qualityGrade: listing.quality_grade,
+        qualityLabel: listing.quality_label,
+        extractionRate: listing.extraction_rate,
+        weightedExtractionRate: listing.weighted_extraction_rate,
+        extractableFields: listing.extractable_fields,
+        populatedExtractableFields: listing.populated_extractable_fields,
+        meetsExpectation: listing.meets_expectation,
+        criticalFieldsMissing: listing.critical_fields_missing,
+        fieldTraces: [],
+        totalFields: 0,
+        populatedFields: listing.populated_extractable_fields,
+        emptyFields: listing.critical_fields_missing,
+        successClassification: listing.quality_grade === 'A' || listing.quality_grade === 'B' ? 'good' : 'partial',
+        confidenceScore: listing.confidence_score,
+      } as ExtractionDiagnostics;
+      diagnosticsStore.set(id, diag);
+      return diag;
+    }
+  } catch {
+    // Listing not in Firestore either
   }
   return undefined;
 }
