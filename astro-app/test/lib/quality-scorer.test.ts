@@ -3,6 +3,7 @@ import {
   computeQualityGrade,
   assessQuality,
   assessQualityWeighted,
+  compareAgainstExpectation,
   getFieldImportance,
   getFieldWeight,
   FIELD_WEIGHTS,
@@ -67,6 +68,24 @@ describe('quality-scorer', () => {
     it('meets expectation when rate exactly equals expectedRate', () => {
       const result = assessQuality(0.50, 0.50);
       expect(result.meetsExpectation).toBe(true);
+      expect(result.expectationStatus).toBe('meets');
+      expect(result.expectedGrade).toBe('B');
+    });
+  });
+
+  describe('compareAgainstExpectation', () => {
+    it('returns unknown when expected rate is missing', () => {
+      const result = compareAgainstExpectation(0.7);
+      expect(result.expectationStatus).toBe('unknown');
+      expect(result.meetsExpectation).toBe(true);
+      expect(result.expectationGap).toBeUndefined();
+    });
+
+    it('classifies above, meets, below and well_below correctly', () => {
+      expect(compareAgainstExpectation(0.9, 0.7).expectationStatus).toBe('above');
+      expect(compareAgainstExpectation(0.71, 0.7).expectationStatus).toBe('meets');
+      expect(compareAgainstExpectation(0.6, 0.7).expectationStatus).toBe('below');
+      expect(compareAgainstExpectation(0.5, 0.7).expectationStatus).toBe('well_below');
     });
   });
 
@@ -220,6 +239,8 @@ describe('quality-scorer', () => {
       const result = assessQualityWeighted(fields, 0.80);
       // flat rate = 1/2 = 0.5 < 0.80
       expect(result.meetsExpectation).toBe(false);
+      expect(result.expectationGap).toBe(-0.3);
+      expect(result.expectationStatus).toBe('well_below');
     });
 
     it('meets expectation when no expectedRate provided', () => {

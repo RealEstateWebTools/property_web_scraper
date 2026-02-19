@@ -40,6 +40,12 @@ const ratePercent = diagnostics ? Math.round(diagnostics.extractionRate * 100) :
 const weightedPercent = diagnostics?.weightedExtractionRate != null
   ? Math.round(diagnostics.weightedExtractionRate * 100)
   : null;
+const expectedPercent = diagnostics?.expectedExtractionRate != null
+  ? Math.round(diagnostics.expectedExtractionRate * 100)
+  : null;
+const expectationGapPercent = diagnostics?.expectationGap != null
+  ? Math.round(diagnostics.expectationGap * 100)
+  : null;
 const criticalMissing = diagnostics?.criticalFieldsMissing || [];
 const contentAnalysis = diagnostics?.contentAnalysis;
 
@@ -79,6 +85,23 @@ const attrs = [
                 <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2 rounded-lg mb-2 text-sm">
                   <i class="bi bi-exclamation-octagon"></i>
                   Critical fields missing: {criticalMissing.join(', ')}
+                </div>
+              )}
+              {expectedPercent != null && diagnostics.expectationStatus && (
+                <div class={`flex items-center gap-2 px-4 py-2 rounded-lg mb-2 text-sm ${
+                  diagnostics.expectationStatus === 'above' || diagnostics.expectationStatus === 'meets'
+                    ? 'bg-green-50 border border-green-200 text-green-800'
+                    : diagnostics.expectationStatus === 'below'
+                      ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                      : diagnostics.expectationStatus === 'well_below'
+                        ? 'bg-red-50 border border-red-200 text-red-800'
+                        : 'bg-gray-50 border border-gray-200 text-gray-700'
+                }`}>
+                  <i class="bi bi-speedometer2"></i>
+                  Baseline: expected {expectedPercent}% for {diagnostics.scraperName}; actual {ratePercent}%
+                  {expectationGapPercent != null && (
+                    <span> ({expectationGapPercent >= 0 ? '+' : ''}{expectationGapPercent} pts, {diagnostics.expectationStatus.replace('_', ' ')})</span>
+                  )}
                 </div>
               )}
               {!diagnostics.meetsExpectation && diagnostics.expectedExtractionRate != null && (

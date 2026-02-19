@@ -81,9 +81,14 @@ describe('scrape-metadata', () => {
           extractableFields: 20,
           qualityGrade: 'B',
           qualityLabel: 'Good',
+          successClassification: 'good',
+          expectedExtractionRate: 0.7,
+          expectedQualityGrade: 'B',
           populatedFields: 15,
           totalFields: 30,
           meetsExpectation: true,
+          expectationGap: 0.05,
+          expectationStatus: 'above',
           criticalFieldsMissing: [],
           emptyFields: [],
           fieldTraces: [],
@@ -94,6 +99,12 @@ describe('scrape-metadata', () => {
       expect(scrape.extractable_fields).toBe(20);
       expect(scrape.extraction_rate).toBe(0.75);
       expect(scrape.quality_grade).toBe('B');
+      expect(scrape.expected_extraction_rate).toBe(0.7);
+      expect(scrape.expected_quality_grade).toBe('B');
+      expect(scrape.success_classification).toBe('good');
+      expect(scrape.meets_expectation).toBe(true);
+      expect(scrape.expectation_status).toBe('above');
+      expect(scrape.expectation_gap).toBe(0.05);
     });
   });
 
@@ -171,6 +182,57 @@ describe('scrape-metadata', () => {
       expect(profile2!.avg_html_size_bytes).toBe((html1.length + html2.length) / 2);
       expect(profile2!.min_html_size_bytes).toBe(html1.length);
       expect(profile2!.max_html_size_bytes).toBe(html2.length);
+    });
+
+    it('tracks expectation hit-rate when diagnostics include baseline comparison', async () => {
+      await recordScrapeAndUpdatePortal(makeInput({
+        diagnostics: {
+          scraperName: 'uk_rightmove',
+          extractionRate: 0.8,
+          populatedExtractableFields: 8,
+          extractableFields: 10,
+          qualityGrade: 'B',
+          qualityLabel: 'Good',
+          successClassification: 'good',
+          expectedExtractionRate: 0.75,
+          expectedQualityGrade: 'B',
+          populatedFields: 10,
+          totalFields: 12,
+          meetsExpectation: true,
+          expectationGap: 0.05,
+          expectationStatus: 'above',
+          criticalFieldsMissing: [],
+          emptyFields: [],
+          fieldTraces: [],
+        },
+      }));
+
+      await recordScrapeAndUpdatePortal(makeInput({
+        diagnostics: {
+          scraperName: 'uk_rightmove',
+          extractionRate: 0.4,
+          populatedExtractableFields: 4,
+          extractableFields: 10,
+          qualityGrade: 'C',
+          qualityLabel: 'Partial',
+          successClassification: 'partial',
+          expectedExtractionRate: 0.75,
+          expectedQualityGrade: 'B',
+          populatedFields: 6,
+          totalFields: 12,
+          meetsExpectation: false,
+          expectationGap: -0.35,
+          expectationStatus: 'well_below',
+          criticalFieldsMissing: ['title'],
+          emptyFields: ['title'],
+          fieldTraces: [],
+        },
+      }));
+
+      const profile = await getPortalProfile('rightmove');
+      expect(profile).toBeDefined();
+      expect(profile!.expected_extraction_rate).toBe(0.75);
+      expect(profile!.expectation_hit_rate).toBe(0.5);
     });
   });
 
