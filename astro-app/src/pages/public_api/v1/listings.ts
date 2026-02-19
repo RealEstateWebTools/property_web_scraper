@@ -12,8 +12,6 @@ import {
 import { logActivity } from '@lib/services/activity-logger.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { fireWebhooks } from '@lib/services/webhook-service.js';
-import { recordSnapshot } from '@lib/services/price-history.js';
-import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import { recordUsage } from '@lib/services/usage-meter.js';
 import { normalizePropertyType } from '@lib/extractor/property-type-normalizer.js';
 import { detectListingType } from '@lib/extractor/listing-type-detector.js';
@@ -363,7 +361,8 @@ export const POST: APIRoute = async ({ request }) => {
   let extraction: Record<string, unknown> | undefined;
 
   if (html) {
-    const extractionResult = await runExtraction({ html, url, scraperMapping, importHost });
+    const apiSourceType = contentType.includes('multipart/form-data') ? 'api_multipart_html' as const : 'api_json_html' as const;
+    const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: apiSourceType });
 
     if (extractionResult) {
       const { listing: extractedListing, resultId, resultsUrl, fieldsExtracted, fieldsAvailable, diagnostics, rawProps, splitSchema } = extractionResult;
@@ -424,28 +423,7 @@ export const POST: APIRoute = async ({ request }) => {
         properties: rawProps,
       }).catch(() => { /* webhook delivery failure shouldn't affect API response */ });
 
-      // Record price snapshot for historical tracking (fire-and-forget)
-      recordSnapshot({
-        url,
-        scraper: importHost.scraper_name,
-        price_float: rawProps.price_float,
-        price_string: rawProps.price_string,
-        price_currency: rawProps.price_currency || rawProps.currency,
-        quality_grade: diagnostics?.qualityGrade,
-        title: rawProps.title,
-      }).catch(() => { /* price history failure shouldn't affect API response */ });
-
-      // Record scrape metadata (fire-and-forget)
-      recordScrapeAndUpdatePortal({
-        sourceUrl: url,
-        html: html!,
-        sourceType: contentType.includes('multipart/form-data') ? 'api_multipart_html' : 'api_json_html',
-        scraperName: importHost.scraper_name,
-        portalSlug: importHost.slug,
-        requestContentType: contentType,
-        clientUserAgent: request.headers.get('user-agent'),
-        diagnostics,
-      }).catch(() => { /* scrape metadata failure shouldn't affect API response */ });
+      // Price history and scrape metadata now handled by runExtraction
 
       // Record usage for billing/quota (fire-and-forget)
       if (auth.userId) {

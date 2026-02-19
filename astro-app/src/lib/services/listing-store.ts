@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { Listing } from '../models/listing.js';
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { deduplicationKey } from './url-canonicalizer.js';
@@ -23,6 +24,28 @@ export function initKV(kvNamespace: any): void {
 export function generateId(): string {
   counter++;
   return `${Date.now().toString(36)}-${counter.toString(36)}`;
+}
+
+export function generateStableId(url: string): string {
+  const key = deduplicationKey(url);
+  return createHash('sha256').update(key).digest('hex').slice(0, 12);
+}
+
+export async function getListingByUrl(url: string): Promise<{ id: string; listing: Listing } | undefined> {
+  let id = findListingByUrl(url);
+  if (!id && kv) {
+    const stableId = generateStableId(url);
+    const data = await kv.get(`listing:${stableId}`, 'json') as Record<string, unknown> | null;
+    if (data) {
+      const listing = rehydrateListing(data);
+      store.set(stableId, listing);
+      urlIndex.set(deduplicationKey(url), stableId);
+      id = stableId;
+    }
+  }
+  if (!id) return undefined;
+  const listing = await getListing(id);
+  return listing ? { id, listing } : undefined;
 }
 
 export async function storeListing(id: string, listing: Listing): Promise<void> {
