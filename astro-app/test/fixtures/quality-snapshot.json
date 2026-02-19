@@ -19,26 +19,26 @@
     {
       "scraper": "es_pisos",
       "source": "browser",
-      "grade": "B",
-      "extractionRate": 0.5,
-      "populatedFields": 7,
-      "totalFields": 9
+      "grade": "A",
+      "extractionRate": 0.7777777777777778,
+      "populatedFields": 12,
+      "totalFields": 14
     },
     {
       "scraper": "in_realestateindia",
       "source": "browser",
       "grade": "B",
-      "extractionRate": 0.625,
-      "populatedFields": 10,
-      "totalFields": 13
+      "extractionRate": 0.6666666666666666,
+      "populatedFields": 11,
+      "totalFields": 14
     },
     {
       "scraper": "us_mlslistings",
       "source": "browser",
       "grade": "A",
       "extractionRate": 1,
-      "populatedFields": 14,
-      "totalFields": 14
+      "populatedFields": 16,
+      "totalFields": 16
     },
     {
       "scraper": "us_wyomingmls",
@@ -121,5 +121,5 @@
       "totalFields": 24
     }
   ],
-  "savedAt": "2026-02-18T22:17:03.278Z"
+  "savedAt": "2026-02-19T10:26:43.973Z"
 }

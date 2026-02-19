@@ -36,6 +36,10 @@
       "cssLocator": "h1.xxxlarge",
       "cssCountId": "0"
     },
+    "description": {
+      "cssLocator": "meta[name='description']",
+      "cssAttr": "content"
+    },
     "price_string": {
       "cssLocator": "span.red",
       "cssCountId": "0"
