@@ -85,8 +85,22 @@ describe('Exporters', () => {
       expect(parsed.metadata).toBeUndefined();
     });
 
-    it('exports essential fields by default', async () => {
+    it('exports all fields by default', async () => {
       const exporter = new JSONExporter();
+      const result = await exporter.export([makeListing()]);
+      const parsed = JSON.parse(result);
+      const listing = parsed.listings[0];
+
+      expect(listing.reference).toBeDefined();
+      expect(listing.title).toBeDefined();
+      expect(listing.price_float).toBeDefined();
+      expect(listing.city).toBeDefined();
+      expect(listing.description).toBeDefined();
+      expect(listing.address_string).toBeDefined();
+    });
+
+    it('exports essential fields when requested', async () => {
+      const exporter = new JSONExporter({ fieldSelection: 'essential' });
       const result = await exporter.export([makeListing()]);
       const parsed = JSON.parse(result);
       const listing = parsed.listings[0];

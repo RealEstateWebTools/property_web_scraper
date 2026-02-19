@@ -33,7 +33,7 @@ export abstract class BaseExporter {
       pretty: false,
       includeMetadata: true,
       dateFormat: 'ISO8601',
-      fieldSelection: 'essential',
+      fieldSelection: 'all',
       ...options,
     };
   }
