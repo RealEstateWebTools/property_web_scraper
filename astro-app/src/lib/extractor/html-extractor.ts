@@ -340,6 +340,16 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
         : quality.grade === 'C' ? 'partial'
           : 'failed';
 
+  // Ensure main_image_url is present in image_urls
+  const mainImg = typeof propertyHash.main_image_url === 'string' ? propertyHash.main_image_url.trim() : '';
+  if (mainImg) {
+    const imgs = Array.isArray(propertyHash.image_urls) ? propertyHash.image_urls as { url: string }[] : [];
+    const alreadyPresent = imgs.some(i => i.url === mainImg);
+    if (!alreadyPresent) {
+      propertyHash.image_urls = [{ url: mainImg }, ...imgs];
+    }
+  }
+
   // Sanitize extracted data (strip HTML, validate URLs)
   const sanitizedHash = sanitizePropertyHash(propertyHash);
 
