@@ -71,6 +71,10 @@ const attrs = [
           </div>
           <h5 class="font-semibold text-amber-900 mb-2">Result not found</h5>
           <p class="text-amber-800 text-sm">This extraction result may have expired or the ID is invalid.</p>
+          <div id="cached-result-fallback" class="hidden bg-white/60 rounded-lg p-4 mt-4 text-left text-sm text-gray-700">
+            <p class="font-semibold text-gray-600 mb-2"><i class="bi bi-clock-history mr-1"></i> Last known result</p>
+            <div id="cached-result-content"></div>
+          </div>
           <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
             <a href="/extract/url" class="text-blue-600 hover:underline"><i class="bi bi-arrow-left mr-1"></i> Try a new extraction</a>
           </div>
@@ -441,6 +445,54 @@ document.addEventListener('DOMContentLoaded', () => {
       enrichBtn.textContent = 'Fetch Image Details';
       enrichBtn.disabled = false;
     });
+  }
+});
+</script>
+
+<script is:inline define:vars={{ id, listing: listing ? { title: listing.title, price_string: listing.price_string, import_url: (listing as any).import_url } : null, grade, ratePercent }}>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof window.PwsStorage === 'undefined') return;
+  var resultId = id;
+  if (!resultId) return;
+
+  if (listing) {
+    // Cache result summary (functional, 1hr TTL)
+    var hostname = '';
+    try { hostname = new URL(listing.import_url || '').hostname; } catch {}
+    var summary = {
+      id: resultId,
+      title: (listing.title || '').slice(0, 80),
+      grade: grade,
+      price: listing.price_string || '',
+      hostname: hostname,
+      rate: ratePercent,
+      timestamp: new Date().toISOString(),
+    };
+    window.PwsStorage.set('functional:result-cache:' + resultId, summary);
+
+    // Append to recent-extractions list (max 20, deduped)
+    var recent = window.PwsStorage.get('functional:recent-extractions') || [];
+    recent = recent.filter(function(r) { return r.id !== resultId; });
+    recent.unshift(summary);
+    if (recent.length > 20) recent = recent.slice(0, 20);
+    window.PwsStorage.set('functional:recent-extractions', recent);
+  } else {
+    // Not-found state: try showing cached data
+    var cached = window.PwsStorage.get('functional:result-cache:' + resultId);
+    if (cached) {
+      var fallback = document.getElementById('cached-result-fallback');
+      var content = document.getElementById('cached-result-content');
+      if (fallback && content) {
+        var parts = [];
+        if (cached.title) parts.push('<strong>' + cached.title + '</strong>');
+        if (cached.price) parts.push('Price: ' + cached.price);
+        if (cached.grade) parts.push('Grade: ' + cached.grade);
+        if (cached.rate != null) parts.push('Rate: ' + cached.rate + '%');
+        parts.push('<span class="text-xs text-gray-400">Cached ' + new Date(cached.timestamp).toLocaleString() + '</span>');
+        content.innerHTML = parts.join('<br>');
+        fallback.classList.remove('hidden');
+      }
+    }
   }
 });
 </script>

@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import NavBar from '../components/NavBar.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 interface Props {
   title?: string;
 }
@@ -32,8 +33,71 @@ const { title = 'Property Web Scraper' } = Astro.props;
           &middot;
           Open-source property data extraction by the
           <a href="https://github.com/etewiah/property_web_builder" target="_blank" class="text-primary hover:underline">PropertyWebBuilder</a> team.
+          &middot;
+          <a href="/privacy" class="text-text-secondary hover:text-primary transition no-underline">Privacy</a>
         </p>
       </div>
     </footer>
+
+    <ConsentBanner />
+
+    <script>
+      import {
+        pwsGet,
+        pwsSet,
+        pwsRemove,
+        pwsPurgeCategory,
+        pwsPurgeAll,
+        pwsPruneExpired,
+        pwsListKeys,
+        pwsExportAll,
+      } from '../lib/client/storage-consent.js';
+      import {
+        getConsentState,
+        setConsentState,
+        hasConsentFor,
+        resetConsent,
+      } from '../lib/client/consent-state.js';
+
+      // Expose on window so is:inline page scripts can use them
+      (window as any).PwsStorage = {
+        get: pwsGet,
+        set: pwsSet,
+        remove: pwsRemove,
+        purgeCategory: pwsPurgeCategory,
+        purgeAll: pwsPurgeAll,
+        pruneExpired: pwsPruneExpired,
+        listKeys: pwsListKeys,
+        exportAll: pwsExportAll,
+      };
+      (window as any).PwsConsent = {
+        getState: getConsentState,
+        setState: setConsentState,
+        hasConsentFor,
+        reset: resetConsent,
+      };
+
+      // Prune expired entries on every page load
+      pwsPruneExpired();
+
+      // Show/hide consent banner
+      const banner = document.getElementById('pws-consent-banner');
+      if (banner && !getConsentState()) {
+        banner.classList.remove('hidden');
+      }
+
+      const allowBtn = document.getElementById('pws-consent-allow');
+      const denyBtn = document.getElementById('pws-consent-deny');
+
+      allowBtn?.addEventListener('click', () => {
+        setConsentState('granted');
+        banner?.classList.add('hidden');
+      });
+
+      denyBtn?.addEventListener('click', () => {
+        setConsentState('denied');
+        banner?.classList.add('hidden');
+      });
+    </script>
   </body>
 </html>

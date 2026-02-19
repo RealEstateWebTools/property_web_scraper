@@ -22,6 +22,8 @@ export interface QualityAssessment extends GradeResult {
   expectedGrade?: QualityGrade;
   weightedRate?: number;
   criticalFieldsMissing?: string[];
+  confidenceScore: number;
+  visibility: 'published' | 'pending' | 'spam';
 }
 
 const gradeThresholds: { min: number; grade: QualityGrade; label: string }[] = [

@@ -1,0 +1,31 @@
+---
+// Consent banner — shown when no consent record exists.
+// Rendered hidden by default; the BaseLayout init script shows it when needed.
+---
+<div id="pws-consent-banner" class="hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
+  <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+    <div class="flex-1 text-sm text-gray-700">
+      <i class="bi bi-shield-check text-blue-600 mr-1"></i>
+      We use essential browser storage for core functionality. With your permission, we also store recent extraction shortcuts to speed up your workflow.
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <button
+        id="pws-consent-allow"
+        type="button"
+        class="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer border-0"
+      >
+        Allow functional storage
+      </button>
+      <button
+        id="pws-consent-deny"
+        type="button"
+        class="bg-gray-100 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-200 transition cursor-pointer border-0"
+      >
+        Essential only
+      </button>
+      <a href="/privacy" class="text-sm text-gray-500 hover:text-gray-700 no-underline ml-1">
+        Manage
+      </a>
+    </div>
+  </div>
+</div>
