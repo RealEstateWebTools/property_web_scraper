@@ -1,0 +1,141 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import InfoCallout from '../components/InfoCallout.astro';
+
+const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com', 'onthemarket.com', 'daft.ie', 'immobilienscout24.de', 'domain.com.au', 'realestate.com.au'];
+const GITHUB_EXT_URL = 'https://github.com/RealEstateWebTools/property_web_scraper/tree/master/chrome-extensions/property-scraper';
+const GITHUB_REPO_URL = 'https://github.com/RealEstateWebTools/property_web_scraper';
+---
+<BaseLayout title="Chrome Extension - Property Web Scraper">
+
+<!-- Hero -->
+<section class="bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] text-white py-16 text-center">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="inline-block bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
+      <i class="bi bi-puzzle"></i> Chrome Extension
+    </div>
+    <h1 class="text-4xl font-bold tracking-tight mb-3">Extract Property Data<br>With One Click</h1>
+    <p class="text-lg opacity-85 max-w-xl mx-auto mb-6">
+      The Chrome Extension captures the fully-rendered DOM directly from your browser,
+      so you get complete data from even the most JavaScript-heavy property portals.
+    </p>
+    <a href={GITHUB_EXT_URL} target="_blank" rel="noopener"
+       class="inline-block bg-blue-600 text-white rounded-lg px-6 py-3 hover:bg-blue-700 transition no-underline font-semibold">
+      <i class="bi bi-github mr-1"></i> Get the Extension on GitHub
+    </a>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-4 py-12">
+  <div class="flex justify-center">
+    <div class="w-full max-w-3xl space-y-8">
+
+      <!-- Why use the extension -->
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Why use the extension?</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white rounded-xl shadow-sm p-5 text-center">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 inline-flex items-center justify-center text-xl mb-3">
+              <i class="bi bi-lightning-charge"></i>
+            </div>
+            <h5 class="font-semibold text-sm mb-1">One-click extraction</h5>
+            <p class="text-xs text-gray-500 m-0">Navigate to any supported listing and click the extension icon.</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-5 text-center">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 inline-flex items-center justify-center text-xl mb-3">
+              <i class="bi bi-filetype-html"></i>
+            </div>
+            <h5 class="font-semibold text-sm mb-1">Full DOM capture</h5>
+            <p class="text-xs text-gray-500 m-0">Captures JavaScript-rendered content that URL fetching misses.</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-5 text-center">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 inline-flex items-center justify-center text-xl mb-3">
+              <i class="bi bi-collection"></i>
+            </div>
+            <h5 class="font-semibold text-sm mb-1">Batch hauls</h5>
+            <p class="text-xs text-gray-500 m-0">Collect multiple listings into a single haul for bulk export.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- How to install -->
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Installation</h3>
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <ol class="space-y-3 text-sm text-gray-700">
+            <li class="flex items-start gap-3">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">1</span>
+              <span>Clone or download the repository from <a href={GITHUB_REPO_URL} target="_blank" rel="noopener" class="text-blue-600 hover:underline">GitHub</a>.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">2</span>
+              <span>Open Chrome and go to <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">chrome://extensions</code>.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">3</span>
+              <span>Enable <strong>Developer mode</strong> (toggle in the top-right corner).</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">4</span>
+              <span>Click <strong>Load unpacked</strong> and select the <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">chrome-extensions/property-scraper</code> folder.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">5</span>
+              <span>Pin the extension to your toolbar for easy access.</span>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <div>
+        <h3 class="text-xl font-semibold mb-4">How it works</h3>
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="space-y-3 text-sm text-gray-700">
+            <div class="flex items-start gap-3">
+              <i class="bi bi-globe text-blue-600 text-lg shrink-0"></i>
+              <span><strong>Navigate</strong> to a property listing page on any supported site.</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <i class="bi bi-cursor-fill text-blue-600 text-lg shrink-0"></i>
+              <span><strong>Click</strong> the extension icon — it captures the fully-rendered DOM and sends it for extraction.</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <i class="bi bi-braces text-blue-600 text-lg shrink-0"></i>
+              <span><strong>View</strong> structured property data: title, price, images, coordinates, and more.</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <i class="bi bi-download text-blue-600 text-lg shrink-0"></i>
+              <span><strong>Export</strong> individual listings or entire hauls as JSON or CSV.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supported sites -->
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Supported sites</h3>
+        <div class="bg-white rounded-xl shadow-sm p-6 text-center">
+          <div class="flex flex-wrap justify-center gap-2 mb-4">
+            {supportedSites.map((site) => (
+              <span class="inline-block bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full text-sm">{site}</span>
+            ))}
+            <span class="inline-block bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full text-sm">+ more</span>
+          </div>
+          <a href="/sites" class="text-blue-600 hover:underline text-sm">
+            <i class="bi bi-arrow-right mr-1"></i>View all supported sites
+          </a>
+        </div>
+      </div>
+
+      <InfoCallout variant="info">
+        The extension is open-source and free to use. Contributions and bug reports are welcome on
+        <a href={GITHUB_REPO_URL} target="_blank" rel="noopener" class="text-blue-800 underline font-medium">GitHub</a>.
+      </InfoCallout>
+
+    </div>
+  </div>
+</section>
+
+</BaseLayout>

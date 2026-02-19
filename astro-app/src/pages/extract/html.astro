@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { retrieveListing } from '@lib/services/listing-retriever.js';
 import { initKV, generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
 import { initScrapeMetadataKV, recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
+import { screenUrl } from '@lib/services/url-screener.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
 initScrapeMetadataKV((Astro.locals as any).runtime?.env?.RESULTS);
@@ -16,6 +17,15 @@ if (Astro.request.method === 'POST') {
 
   if (!importUrl) {
     return Astro.redirect('/extract/error?reason=missing_url');
+  }
+
+  // Screen the URL before extraction
+  const screening = screenUrl(importUrl);
+  if (screening.verdict === 'not_real_estate') {
+    return Astro.redirect(`/extract/error?reason=not_real_estate&url=${encodeURIComponent(importUrl)}`);
+  }
+  if (screening.verdict === 'search_results') {
+    return Astro.redirect(`/extract/error?reason=search_results&url=${encodeURIComponent(importUrl)}`);
   }
 
   if (!html) {
@@ -100,6 +110,10 @@ if (Astro.request.method === 'POST') {
             Extract from HTML
           </button>
         </form>
+      </div>
+
+      <div class="mt-4 text-center text-xs text-gray-400">
+        <i class="bi bi-puzzle mr-1"></i> Want to skip the copy-paste? The <a href="/extension" class="text-blue-500 hover:underline">Chrome Extension</a> captures and extracts in one click.
       </div>
 
     </div>

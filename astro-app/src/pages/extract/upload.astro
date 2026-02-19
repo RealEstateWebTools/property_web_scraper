@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { retrieveListing } from '@lib/services/listing-retriever.js';
 import { initKV, generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
 import { initScrapeMetadataKV, recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
+import { screenUrl } from '@lib/services/url-screener.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
 initScrapeMetadataKV((Astro.locals as any).runtime?.env?.RESULTS);
@@ -16,6 +17,15 @@ if (Astro.request.method === 'POST') {
 
   if (!importUrl) {
     return Astro.redirect('/extract/error?reason=missing_url');
+  }
+
+  // Screen the URL before extraction
+  const screening = screenUrl(importUrl);
+  if (screening.verdict === 'not_real_estate') {
+    return Astro.redirect(`/extract/error?reason=not_real_estate&url=${encodeURIComponent(importUrl)}`);
+  }
+  if (screening.verdict === 'search_results') {
+    return Astro.redirect(`/extract/error?reason=search_results&url=${encodeURIComponent(importUrl)}`);
   }
 
   let html = '';

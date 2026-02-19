@@ -9,80 +9,43 @@ const portal = Astro.url.searchParams.get('portal') || '';
 const isUnsupported = reason === 'unsupported';
 const isMissingUrl = reason === 'missing_url';
 const isFetchBlocked = reason === 'fetch_blocked';
+const isNotRealEstate = reason === 'not_real_estate';
+const isSearchResults = reason === 'search_results';
+const isUnknownRealEstate = reason === 'unknown_real_estate';
 
 const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com'];
+const GITHUB_ISSUES_URL = 'https://github.com/RealEstateWebTools/property_web_scraper/issues';
 ---
 <BaseLayout title="Extraction Error - Property Web Scraper">
 
 <section class="max-w-6xl mx-auto px-4 py-12">
   <div class="flex justify-center">
     <div class="w-full max-w-lg">
-      <div class="bg-amber-50 rounded-2xl p-6">
-        <div class="text-3xl text-amber-600 mb-3">
-          <i class="bi bi-exclamation-triangle"></i>
-        </div>
 
-        {isFetchBlocked ? (
-          <>
-            <h5 class="font-semibold text-amber-900 mb-2">This site requires browser-rendered HTML</h5>
-            <p class="text-amber-800 text-sm">
-              {portal || 'This portal'} blocks server-side fetching, so we can't retrieve the page automatically.
-              You'll need to provide the HTML yourself.
-            </p>
-            {url && <p class="text-amber-700 text-xs mt-1 break-all">URL: {url}</p>}
-            <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
-              <i class="bi bi-info-circle text-blue-600 mr-1"></i> <strong>How to get the HTML:</strong>
-              <ol class="mt-2 ml-4 list-decimal space-y-1 text-gray-600">
-                <li>Open the property page in your browser</li>
-                <li>Right-click and select <strong>View Page Source</strong> (or press Ctrl+U / Cmd+U)</li>
-                <li>Copy all the HTML, or save the page as an HTML file</li>
-              </ol>
+      {isNotRealEstate ? (
+        <!-- Not a real estate site — red card -->
+        <div class="bg-red-50 rounded-2xl p-6">
+          <div class="text-3xl text-red-600 mb-3">
+            <i class="bi bi-x-octagon"></i>
+          </div>
+          <h5 class="font-semibold text-red-900 mb-2">This doesn't look like a real estate website</h5>
+          <p class="text-red-800 text-sm">
+            This tool is designed for extracting data from property listing pages. The URL you entered appears to be a non-real-estate website.
+          </p>
+          {url && <p class="text-red-700 text-xs mt-1 break-all">URL: {url}</p>}
+          <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+            <i class="bi bi-info-circle text-blue-600 mr-1"></i> <strong>Supported sites include:</strong>
+            <div class="mt-2">
+              {supportedSites.map((s) => (
+                <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">{s}</span>
+              ))}
+              <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">+ more</span>
             </div>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <a href={`/extract/html${url ? `?url=${encodeURIComponent(url)}` : ''}`}
-                 class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
-                <i class="bi bi-code-slash"></i> Paste HTML
-              </a>
-              <a href={`/extract/upload${url ? `?url=${encodeURIComponent(url)}` : ''}`}
-                 class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
-                <i class="bi bi-file-earmark-arrow-up"></i> Upload HTML File
-              </a>
-            </div>
-          </>
-        ) : isMissingUrl ? (
-          <>
-            <h5 class="font-semibold text-amber-900 mb-2">No URL provided</h5>
-            <p class="text-amber-800 text-sm">Please provide a property URL to extract data from.</p>
-          </>
-        ) : isUnsupported ? (
-          <>
-            <h5 class="font-semibold text-amber-900 mb-2">This website isn't supported yet</h5>
-            <p class="text-amber-800 text-sm">We don't have a scraper mapping configured for that host.</p>
-            {url && <p class="text-amber-700 text-xs mt-1 break-all">URL: {url}</p>}
-            <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
-              <i class="bi bi-info-circle text-blue-600 mr-1"></i> <strong>Supported sites:</strong>
-              <div class="mt-2">
-                {supportedSites.map((s) => (
-                  <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">{s}</span>
-                ))}
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <h5 class="font-semibold text-amber-900 mb-2">Something went wrong</h5>
-            <p class="text-amber-800 text-sm">{message || 'An unknown error occurred.'}</p>
-            {url && <p class="text-amber-700 text-xs mt-1 break-all">URL: {url}</p>}
-            <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
-              <i class="bi bi-lightbulb text-blue-600 mr-1"></i> <strong>Tips:</strong> Make sure the URL is a direct link to a single property page.
-              If the site uses JavaScript rendering, try using
-              <a href="/extract/html" class="text-blue-600 hover:underline">Paste HTML</a> or
-              <a href="/extract/upload" class="text-blue-600 hover:underline">Upload File</a> mode.
-            </div>
-          </>
-        )}
-
-        {!isFetchBlocked && (
+          </div>
+          <div class="bg-white/60 rounded-lg p-4 mt-3 text-sm text-gray-600">
+            <i class="bi bi-puzzle text-blue-600 mr-1"></i>
+            <strong>Tip:</strong> The <a href="/extension" class="text-blue-600 hover:underline font-medium">Chrome Extension</a> is the best way to extract property data — it captures the fully-rendered page from your browser.
+          </div>
           <div class="mt-4 flex flex-wrap gap-2">
             <a href="/extract/url" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
               <i class="bi bi-arrow-left"></i> Try Again
@@ -91,8 +54,157 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
               <i class="bi bi-globe"></i> View Supported Sites
             </a>
           </div>
-        )}
-      </div>
+        </div>
+      ) : isSearchResults ? (
+        <!-- Search results page — amber card -->
+        <div class="bg-amber-50 rounded-2xl p-6">
+          <div class="text-3xl text-amber-600 mb-3">
+            <i class="bi bi-search"></i>
+          </div>
+          <h5 class="font-semibold text-amber-900 mb-2">Search results pages aren't supported</h5>
+          <p class="text-amber-800 text-sm">
+            It looks like you entered a search or listing index page. We need a direct link to a <strong>single property listing</strong>, not a search results page.
+          </p>
+          {url && <p class="text-amber-700 text-xs mt-1 break-all">URL: {url}</p>}
+          <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+            <i class="bi bi-lightbulb text-blue-600 mr-1"></i> <strong>Example:</strong>
+            <div class="mt-2 space-y-1">
+              <div class="flex items-start gap-2">
+                <i class="bi bi-x-circle text-red-400 shrink-0 mt-0.5"></i>
+                <span class="text-xs break-all text-gray-500">rightmove.co.uk/property-for-sale/London.html</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <i class="bi bi-check-circle text-green-500 shrink-0 mt-0.5"></i>
+                <span class="text-xs break-all text-gray-700">rightmove.co.uk/properties/168908774</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="/extract/url" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-arrow-left"></i> Try Again
+            </a>
+            <a href="/sites" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-globe"></i> View Supported Sites
+            </a>
+          </div>
+        </div>
+      ) : isUnknownRealEstate || isUnsupported ? (
+        <!-- Unknown real estate site — blue/info card -->
+        <div class="bg-blue-50 rounded-2xl p-6">
+          <div class="text-3xl text-blue-600 mb-3">
+            <i class="bi bi-building-add"></i>
+          </div>
+          <h5 class="font-semibold text-blue-900 mb-2">We don't have a scraper for this site yet</h5>
+          <p class="text-blue-800 text-sm">
+            We don't have a mapping configured for this host, so extraction may be incomplete or fail. You can request support for this site on GitHub.
+          </p>
+          {url && <p class="text-blue-700 text-xs mt-1 break-all">URL: {url}</p>}
+          <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+            <i class="bi bi-github text-gray-800 mr-1"></i>
+            <a href={GITHUB_ISSUES_URL} target="_blank" rel="noopener" class="text-blue-600 hover:underline font-medium">Request support for this site</a>
+            — open an issue with the URL and we'll look into adding it.
+          </div>
+          <div class="bg-white/60 rounded-lg p-4 mt-3 text-sm text-gray-600">
+            <i class="bi bi-puzzle text-blue-600 mr-1"></i>
+            <strong>Tip:</strong> The <a href="/extension" class="text-blue-600 hover:underline font-medium">Chrome Extension</a> captures the fully-rendered page and may get better results on unsupported sites.
+          </div>
+          <div class="bg-white/60 rounded-lg p-4 mt-3 text-sm text-gray-600">
+            <i class="bi bi-info-circle text-blue-600 mr-1"></i> <strong>Currently supported:</strong>
+            <div class="mt-2">
+              {supportedSites.map((s) => (
+                <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">{s}</span>
+              ))}
+              <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">+ more</span>
+            </div>
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <form method="post" action="/extract/url" class="inline">
+              <input type="hidden" name="import_url" value={url} />
+              <input type="hidden" name="bypass_screen" value="1" />
+              <button type="submit" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 inline-flex items-center gap-1 cursor-pointer">
+                <i class="bi bi-play-fill"></i> Try Anyway
+              </button>
+            </form>
+            <a href="/extract/url" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <a href="/sites" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-globe"></i> Supported Sites
+            </a>
+          </div>
+        </div>
+      ) : isFetchBlocked ? (
+        <div class="bg-amber-50 rounded-2xl p-6">
+          <div class="text-3xl text-amber-600 mb-3">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h5 class="font-semibold text-amber-900 mb-2">This site requires browser-rendered HTML</h5>
+          <p class="text-amber-800 text-sm">
+            {portal || 'This portal'} blocks server-side fetching, so we can't retrieve the page automatically.
+            You'll need to provide the HTML yourself.
+          </p>
+          {url && <p class="text-amber-700 text-xs mt-1 break-all">URL: {url}</p>}
+          <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+            <i class="bi bi-info-circle text-blue-600 mr-1"></i> <strong>How to get the HTML:</strong>
+            <ol class="mt-2 ml-4 list-decimal space-y-1 text-gray-600">
+              <li>Open the property page in your browser</li>
+              <li>Right-click and select <strong>View Page Source</strong> (or press Ctrl+U / Cmd+U)</li>
+              <li>Copy all the HTML, or save the page as an HTML file</li>
+            </ol>
+          </div>
+          <div class="bg-white/60 rounded-lg p-4 mt-3 text-sm text-gray-600">
+            <i class="bi bi-puzzle text-blue-600 mr-1"></i>
+            <strong>Even easier:</strong> Use the <a href="/extension" class="text-blue-600 hover:underline font-medium">Chrome Extension</a> to extract with one click — it captures the fully-rendered DOM automatically.
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href={`/extract/html${url ? `?url=${encodeURIComponent(url)}` : ''}`}
+               class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-code-slash"></i> Paste HTML
+            </a>
+            <a href={`/extract/upload${url ? `?url=${encodeURIComponent(url)}` : ''}`}
+               class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-file-earmark-arrow-up"></i> Upload HTML File
+            </a>
+          </div>
+        </div>
+      ) : isMissingUrl ? (
+        <div class="bg-amber-50 rounded-2xl p-6">
+          <div class="text-3xl text-amber-600 mb-3">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h5 class="font-semibold text-amber-900 mb-2">No URL provided</h5>
+          <p class="text-amber-800 text-sm">Please provide a property URL to extract data from.</p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="/extract/url" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-arrow-left"></i> Try Again
+            </a>
+          </div>
+        </div>
+      ) : (
+        <div class="bg-amber-50 rounded-2xl p-6">
+          <div class="text-3xl text-amber-600 mb-3">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h5 class="font-semibold text-amber-900 mb-2">Something went wrong</h5>
+          <p class="text-amber-800 text-sm">{message || 'An unknown error occurred.'}</p>
+          {url && <p class="text-amber-700 text-xs mt-1 break-all">URL: {url}</p>}
+          <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+            <i class="bi bi-lightbulb text-blue-600 mr-1"></i> <strong>Tips:</strong> Make sure the URL is a direct link to a single property page.
+            If the site uses JavaScript rendering, try using
+            <a href="/extract/html" class="text-blue-600 hover:underline">Paste HTML</a> or
+            <a href="/extract/upload" class="text-blue-600 hover:underline">Upload File</a> mode.
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="/extract/url" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-arrow-left"></i> Try Again
+            </a>
+            <a href="/sites" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-globe"></i> View Supported Sites
+            </a>
+          </div>
+        </div>
+      )}
+
     </div>
   </div>
 </section>
