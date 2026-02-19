@@ -12,6 +12,7 @@ const listing = id ? await getListing(id) : undefined;
 const diagnostics = id ? await getDiagnostics(id) : undefined;
 const scrapeRecord = id ? await getLatestScrapeForListing(id) : undefined;
 const imageUrls = listing?.image_urls || [];
+const mainImage = imageUrls.length > 0 ? imageUrls[0].url : (listing?.main_image_url || '');
 
 // Quality grade color mapping: A=green, B=blue, C=amber, F=red
 const gradeColors: Record<string, { bg: string; text: string; icon: string }> = {
@@ -148,8 +149,8 @@ const attrs = [
           )}
 
           <div class="rounded-2xl shadow-md overflow-hidden mb-4">
-            {imageUrls.length > 0 && imageUrls[0] && (
-              <img src={imageUrls[0].url} alt="Property image" class="w-full h-[200px] object-cover bg-gray-200" />
+            {mainImage && (
+              <img src={mainImage} alt="Property image" class="w-full h-[200px] object-cover bg-gray-200" />
             )}
 
             <div class="p-6">
