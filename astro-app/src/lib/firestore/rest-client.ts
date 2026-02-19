@@ -50,7 +50,7 @@ async function importPrivateKey(pem: string): Promise<CryptoKey> {
   );
 }
 
-async function getAccessToken(creds: ServiceAccountCredentials): Promise<string> {
+export async function getAccessToken(creds: ServiceAccountCredentials): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
 
   if (cachedToken && cachedToken.expiry > now + 60) {
@@ -426,18 +426,42 @@ export class RestFirestoreClient implements FirestoreClient {
     return fn(this);
   }
 
-  /** Lightweight connectivity test — attempts to list root collections. */
+  /** Lightweight connectivity test — runs a minimal query via :runQuery. */
   async healthCheck(): Promise<{ ok: boolean; error?: string }> {
+    const url = `${this._baseUrl}:runQuery`;
     try {
       const token = await getAccessToken(this._creds);
-      const resp = await fetch(`${this._baseUrl}?pageSize=1`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          structuredQuery: {
+            from: [{ collectionId: 'diag_health_check' }],
+            limit: { value: 1 },
+          },
+        }),
       });
       if (resp.ok) return { ok: true };
+      const contentType = resp.headers.get('content-type') || '';
       const body = await resp.text();
-      return { ok: false, error: `HTTP ${resp.status}: ${body.slice(0, 200)}` };
+      let detail: string;
+      if (contentType.includes('application/json')) {
+        try {
+          const json = JSON.parse(body);
+          detail = json[0]?.error?.message || json.error?.message || json.error?.status || body.slice(0, 300);
+        } catch {
+          detail = body.slice(0, 300);
+        }
+      } else {
+        const titleMatch = body.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+        detail = titleMatch?.[1]?.trim() || `(HTML response, ${body.length} bytes)`;
+      }
+      return { ok: false, error: `HTTP ${resp.status}: ${detail} [POST ${url}]` };
     } catch (err) {
-      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+      return { ok: false, error: `${err instanceof Error ? err.message : String(err)} [POST ${url}]` };
     }
   }
 }

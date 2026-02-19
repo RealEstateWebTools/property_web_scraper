@@ -2,9 +2,19 @@
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import StatusBadge from '../../components/StatusBadge.astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
-import { getStorageStatus, getCollectionPrefix, getClient } from '@lib/firestore/client.js';
-import { RestFirestoreClient } from '@lib/firestore/rest-client.js';
+import { getStorageStatus, getCollectionPrefix, getClient, resetClient } from '@lib/firestore/client.js';
+import { RestFirestoreClient, parseServiceAccountJson, getAccessToken } from '@lib/firestore/rest-client.js';
 import { Listing } from '@lib/models/listing.js';
+
+/** Strip HTML tags, style/script blocks from error responses */
+function stripHtml(str: string): string {
+  return str
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 const auth = authenticateAdmin(Astro.request);
 if (!auth.authorized) return Astro.redirect('/admin/login');
@@ -24,26 +34,110 @@ let probeResult: ProbeResult | null = null;
 if (Astro.request.method === 'POST') {
   const formData = await Astro.request.formData();
   const action = formData.get('action') as string;
+  console.log(`[Storage Diag] Running probe: ${action}`);
 
   try {
     switch (action) {
       case 'health_check': {
         const start = Date.now();
-        const client = await getClient();
-        if ('healthCheck' in client && typeof (client as any).healthCheck === 'function') {
-          const result = await (client as any).healthCheck();
+        const projectId = import.meta.env.FIRESTORE_PROJECT_ID;
+        const serviceAccountJson = import.meta.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+        if (!projectId || !serviceAccountJson) {
           probeResult = {
             name: 'Health Check',
-            passed: result.ok,
+            passed: false,
             durationMs: Date.now() - start,
-            detail: result.ok ? 'Auth and connectivity OK' : `Failed: ${result.error}`,
+            detail: `Missing env vars: ${!projectId ? 'FIRESTORE_PROJECT_ID' : ''} ${!serviceAccountJson ? 'GOOGLE_SERVICE_ACCOUNT_JSON' : ''}`.trim(),
           };
-        } else {
+          break;
+        }
+        try {
+          const creds = parseServiceAccountJson(serviceAccountJson);
+          const freshClient = new RestFirestoreClient(creds);
+          const token = await getAccessToken(creds);
+
+          // Step 1: List databases to check API is enabled and get database type
+          const listDbUrl = `https://firestore.googleapis.com/v1/projects/${creds.project_id}/databases`;
+          console.log(`[Storage Diag] Step 1 — List databases → GET ${listDbUrl}`);
+          const listResp = await fetch(listDbUrl, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const listBody = await listResp.text();
+          console.log(`[Storage Diag] Step 1 — HTTP ${listResp.status}: ${listBody.substring(0, 500)}`);
+
+          if (!listResp.ok) {
+            const detail = listResp.status === 403
+              ? `API access denied (HTTP 403). The Cloud Firestore API may not be enabled, or the service account lacks permissions.`
+              : listResp.status === 404
+                ? `Project not found (HTTP 404). Verify project "${creds.project_id}" exists and has Cloud Firestore API enabled.`
+                : `HTTP ${listResp.status}: ${stripHtml(listBody).substring(0, 200)}`;
+            probeResult = {
+              name: 'Health Check',
+              passed: false,
+              durationMs: Date.now() - start,
+              detail: `${detail}\n\nDatabases URL: ${listDbUrl}\nProject: ${creds.project_id}\nService account: ${creds.client_email}`,
+            };
+            break;
+          }
+
+          // Parse database list with type info
+          interface DbInfo { name: string; type: string; locationId: string; }
+          let databases: DbInfo[] = [];
+          try {
+            const json = JSON.parse(listBody);
+            databases = (json.databases || []).map((db: any) => ({
+              name: db.name || 'unknown',
+              type: db.type || 'UNKNOWN',
+              locationId: db.locationId || '',
+            }));
+          } catch {}
+          for (const db of databases) {
+            console.log(`[Storage Diag] Step 1 — Database: ${db.name} (type: ${db.type}, location: ${db.locationId})`);
+          }
+
+          // Check for Datastore mode
+          const defaultDb = databases.find(db => db.name.endsWith('/(default)'));
+          if (defaultDb && defaultDb.type === 'DATASTORE_MODE') {
+            probeResult = {
+              name: 'Health Check',
+              passed: false,
+              durationMs: Date.now() - start,
+              detail: `Database is in DATASTORE_MODE — Firestore REST API requires FIRESTORE_NATIVE mode.\n\nThe database "${defaultDb.name}" was created in Datastore mode. Unfortunately, the mode cannot be changed after creation. You need to delete this database and recreate it in Native mode.\n\nFirebase Console → Firestore → Delete database, then recreate selecting "Native mode".\n\nLocation: ${defaultDb.locationId}\nProject: ${creds.project_id}`,
+            };
+            break;
+          }
+
+          // Step 2: Run :runQuery health check (same endpoint CRUD operations use)
+          console.log(`[Storage Diag] Step 2 — :runQuery health check`);
+          const result = await freshClient.healthCheck();
+          console.log(`[Storage Diag] Step 2 — ${result.ok ? '✓ OK' : `✗ Failed: ${result.error}`}`);
+
+          if (result.ok) {
+            console.log(`[Storage Diag] ✓ Health check passed — resetting cached client`);
+            resetClient();
+            probeResult = {
+              name: 'Health Check',
+              passed: true,
+              durationMs: Date.now() - start,
+              detail: `Auth and connectivity OK\nProject: ${creds.project_id}\nDatabase: ${defaultDb?.name || '(default)'} (${defaultDb?.type || 'unknown'}, ${defaultDb?.locationId || ''})`,
+            };
+          } else {
+            const dbSummary = databases.map(db => `${db.name} (${db.type})`).join(', ') || '(none)';
+            probeResult = {
+              name: 'Health Check',
+              passed: false,
+              durationMs: Date.now() - start,
+              detail: `Databases: ${dbSummary}\n:runQuery failed: ${result.error}\n\nProject: ${creds.project_id}\nService account: ${creds.client_email}`,
+            };
+          }
+        } catch (parseErr: unknown) {
+          const msg = parseErr instanceof Error ? parseErr.message : String(parseErr);
+          console.error(`[Storage Diag] ✗ Health check exception: ${msg}`);
           probeResult = {
             name: 'Health Check',
-            passed: true,
+            passed: false,
             durationMs: Date.now() - start,
-            detail: 'In-memory backend — no remote health check needed',
+            detail: `Error: ${msg}`,
           };
         }
         break;
@@ -122,8 +216,8 @@ if (Astro.request.method === 'POST') {
     }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
+    console.error(`[Storage Diag] Probe "${action}" threw: ${msg}`);
     if (probeResult) {
-      // Probe was partially constructed before error
       probeResult.passed = false;
       probeResult.detail = msg;
     } else {
@@ -135,6 +229,10 @@ if (Astro.request.method === 'POST') {
       };
     }
   }
+  if (probeResult) {
+    const icon = probeResult.passed ? '✓' : '✗';
+    console.log(`[Storage Diag] ${icon} ${probeResult.name} (${probeResult.durationMs}ms): ${probeResult.detail.split('\n')[0]}`);
+  }
 }
 
 // --- Page-load data ---
@@ -144,6 +242,7 @@ const prefix = getCollectionPrefix();
 const collectionName = `${prefix}listings`;
 const storageHealthStatus = status.error ? 'error' : status.connected ? 'healthy' : 'degraded';
 const backendLabel = status.backend === 'firestore_rest' ? 'Firestore REST' : 'In-Memory';
+console.log(`[Storage Diag] Page load — backend: ${backendLabel}, collection: ${collectionName}, status: ${storageHealthStatus}${status.error ? `, error: ${status.error.substring(0, 120)}` : ''}`);
 
 // Collection browser
 interface BrowseDoc {
@@ -162,6 +261,7 @@ try {
   const col = await Listing.collectionRef();
   const snapshot = await col.get();
   browseTotal = snapshot.docs.length;
+  console.log(`[Storage Diag] Collection browser: ${browseTotal} doc(s) in ${collectionName}`);
   browseDocs = snapshot.docs.slice(0, 20).map((doc) => {
     const d = doc.data() || {};
     return {
@@ -174,6 +274,7 @@ try {
   });
 } catch (err: unknown) {
   browseError = err instanceof Error ? err.message : String(err);
+  console.error(`[Storage Diag] Collection browser error: ${browseError}`);
 }
 
 // Keep track of last written doc ID for read-back
@@ -197,13 +298,13 @@ const lastWrittenId = probeResult?.name === 'Write Test' && probeResult.passed
 
   {/* Probe Result Banner */}
   {probeResult && (
-    <div class={`border px-4 py-3 rounded mb-4 text-sm flex items-center gap-3 ${probeResult.passed ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
-      <StatusBadge status={probeResult.passed ? 'healthy' : 'error'} label={probeResult.passed ? 'PASS' : 'FAIL'} size="sm" />
-      <div>
+    <div class={`border px-4 py-3 rounded mb-4 text-sm ${probeResult.passed ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+      <div class="flex items-center gap-3 mb-1">
+        <StatusBadge status={probeResult.passed ? 'healthy' : 'error'} label={probeResult.passed ? 'PASS' : 'FAIL'} size="sm" />
         <strong>{probeResult.name}</strong>
-        <span class="text-gray-500 ml-2">({probeResult.durationMs}ms)</span>
-        <span class="ml-2">{probeResult.detail}</span>
+        <span class="text-gray-500">({probeResult.durationMs}ms)</span>
       </div>
+      <pre class="whitespace-pre-wrap break-all text-xs mt-1 max-h-40 overflow-y-auto">{probeResult.detail}</pre>
     </div>
   )}
 
@@ -224,7 +325,8 @@ const lastWrittenId = probeResult?.name === 'Write Test' && probeResult.passed
         </div>
         {status.error && (
           <div class="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm mb-4">
-            {status.error}
+            <p class="font-medium mb-1">Error:</p>
+            <pre class="whitespace-pre-wrap break-all max-h-40 overflow-y-auto text-xs bg-red-100 p-2 rounded">{stripHtml(status.error)}</pre>
           </div>
         )}
         <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">

@@ -22,11 +22,16 @@ export async function getClient(): Promise<FirestoreClient> {
   const serviceAccountJson = import.meta.env.GOOGLE_SERVICE_ACCOUNT_JSON;
 
   if (projectId && serviceAccountJson) {
+    console.log(`[Storage] Firestore REST configured — project: ${projectId}`);
     try {
       const creds = parseServiceAccountJson(serviceAccountJson);
+      console.log(`[Storage] Service account: ${creds.client_email}`);
       const restClient = new RestFirestoreClient(creds);
+      const baseUrl = `https://firestore.googleapis.com/v1/projects/${creds.project_id}/databases/(default)/documents`;
+      console.log(`[Storage] Health check → ${baseUrl}?pageSize=1`);
       const health = await restClient.healthCheck();
       if (health.ok) {
+        console.log(`[Storage] ✓ Firestore REST connected (project: ${creds.project_id})`);
         client = restClient;
         storageStatus = {
           backend: 'firestore_rest',
@@ -37,6 +42,8 @@ export async function getClient(): Promise<FirestoreClient> {
         return client;
       }
       // Health check failed — fall back to in-memory
+      console.error(`[Storage] ✗ Health check failed — falling back to in-memory`);
+      console.error(`[Storage]   ${health.error?.substring(0, 200)}`);
       storageStatus = {
         backend: 'in_memory',
         connected: false,
@@ -44,13 +51,19 @@ export async function getClient(): Promise<FirestoreClient> {
         error: `REST health check failed: ${health.error}`,
       };
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[Storage] ✗ Client init error — falling back to in-memory`);
+      console.error(`[Storage]   ${msg}`);
       storageStatus = {
         backend: 'in_memory',
         connected: false,
         projectId: projectId || null,
-        error: err instanceof Error ? err.message : String(err),
+        error: msg,
       };
     }
+  } else {
+    const missing = [!projectId && 'FIRESTORE_PROJECT_ID', !serviceAccountJson && 'GOOGLE_SERVICE_ACCOUNT_JSON'].filter(Boolean);
+    console.log(`[Storage] No Firestore config (missing: ${missing.join(', ')}) — using in-memory`);
   }
 
   client = new InMemoryFirestoreClient();
@@ -59,6 +72,7 @@ export async function getClient(): Promise<FirestoreClient> {
     backend: storageStatus.error ? storageStatus.backend : 'in_memory',
     connected: storageStatus.backend === 'in_memory' ? true : storageStatus.connected,
   };
+  console.log(`[Storage] Active backend: ${storageStatus.backend}${storageStatus.error ? ' (with error)' : ''}`);
   return client;
 }
 
