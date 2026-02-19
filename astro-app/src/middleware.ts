@@ -12,7 +12,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   console.log(`[Middleware] ${method} ${url.pathname} (origin: ${origin || 'none'})`);
 
   // Handle CORS preflight for API routes
-  if (method === 'OPTIONS' && url.pathname.startsWith('/public_api/')) {
+  if (method === 'OPTIONS' && (url.pathname.startsWith('/public_api/') || url.pathname.startsWith('/ext/'))) {
     const preflightRes = corsPreflightResponse(context.request);
     console.log(`[Middleware] CORS preflight → ${preflightRes.status}`, Object.fromEntries(preflightRes.headers.entries()));
     return preflightRes;
