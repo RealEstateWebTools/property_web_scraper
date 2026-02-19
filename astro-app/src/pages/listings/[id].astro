@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ExportDropdown from '../../components/ExportDropdown.astro';
+import SocialShare from '../../components/SocialShare.astro';
 import { initKV, getListing } from '@lib/services/listing-store.js';
 import { getRuntimeConfig } from '@lib/services/runtime-config.js';
 
@@ -188,6 +189,12 @@ if (listing) {
               ))}
             </div>
           )}
+
+          <SocialShare
+            url={Astro.url.toString()}
+            title={listing.title || 'Property Listing'}
+            description={listing.description ? listing.description.replace(/<[^>]*>?/gm, '').substring(0, 200) : ''}
+          />
 
           <div class="mb-4">
             {listing.import_url && (
