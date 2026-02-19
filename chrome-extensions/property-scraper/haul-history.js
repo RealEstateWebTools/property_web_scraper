@@ -79,6 +79,7 @@
         rate: scrapeData.rate || 0,
         scrapedAt: new Date().toISOString(),
         hostname: scrapeData.hostname || '',
+        sourceUrl: (scrapeData.sourceUrl || '').slice(0, 200),
       });
       await saveHistory(history);
     },
