@@ -117,8 +117,10 @@ describe('HtmlExtractor', () => {
       expect(diag.extractionRate).toBeGreaterThan(0);
       expect(diag.extractionRate).toBeLessThanOrEqual(1);
       expect(['A', 'B', 'C', 'F']).toContain(diag.qualityGrade);
+      expect(['excellent', 'good', 'partial', 'failed']).toContain(diag.successClassification);
       expect(diag.qualityLabel).toBeTruthy();
       expect(typeof diag.meetsExpectation).toBe('boolean');
+      expect(['unknown', 'above', 'meets', 'below', 'well_below']).toContain(diag.expectationStatus);
     });
 
     it('excludes defaultValues from extractable field count', () => {
@@ -159,6 +161,10 @@ describe('HtmlExtractor', () => {
 
       const diag = result.diagnostics!;
       expect(diag.expectedExtractionRate).toBe(mapping!.expectedExtractionRate);
+      if (mapping?.expectedExtractionRate != null) {
+        expect(diag.expectedQualityGrade).toBeTruthy();
+        expect(typeof diag.expectationGap).toBe('number');
+      }
     });
   });
 

@@ -17,6 +17,9 @@ export interface QualityAssessment extends GradeResult {
   rate: number;
   expectedRate?: number;
   meetsExpectation: boolean;
+  expectationGap?: number;
+  expectationStatus?: 'unknown' | 'above' | 'meets' | 'below' | 'well_below';
+  expectedGrade?: QualityGrade;
   weightedRate?: number;
   criticalFieldsMissing?: string[];
 }
@@ -67,8 +70,51 @@ export function computeQualityGrade(rate: number): GradeResult {
 
 export function assessQuality(rate: number, expectedRate?: number): QualityAssessment {
   const { grade, label } = computeQualityGrade(rate);
-  const meetsExpectation = expectedRate != null ? rate >= expectedRate : true;
-  return { grade, label, rate, expectedRate, meetsExpectation };
+  const expectation = compareAgainstExpectation(rate, expectedRate);
+  const expectedGrade = expectedRate != null ? computeQualityGrade(expectedRate).grade : undefined;
+  return {
+    grade,
+    label,
+    rate,
+    expectedRate,
+    expectedGrade,
+    meetsExpectation: expectation.meetsExpectation,
+    expectationGap: expectation.expectationGap,
+    expectationStatus: expectation.expectationStatus,
+  };
+}
+
+export function compareAgainstExpectation(
+  rate: number,
+  expectedRate?: number,
+): Pick<QualityAssessment, 'meetsExpectation' | 'expectationGap' | 'expectationStatus'> {
+  if (expectedRate == null) {
+    return {
+      meetsExpectation: true,
+      expectationStatus: 'unknown',
+    };
+  }
+
+  const gap = rate - expectedRate;
+  const roundedGap = Math.round(gap * 1000) / 1000;
+  const tolerance = 0.03;
+
+  let expectationStatus: 'above' | 'meets' | 'below' | 'well_below';
+  if (roundedGap > tolerance) {
+    expectationStatus = 'above';
+  } else if (Math.abs(roundedGap) <= tolerance) {
+    expectationStatus = 'meets';
+  } else if (roundedGap <= -0.15) {
+    expectationStatus = 'well_below';
+  } else {
+    expectationStatus = 'below';
+  }
+
+  return {
+    meetsExpectation: roundedGap >= 0,
+    expectationGap: roundedGap,
+    expectationStatus,
+  };
 }
 
 export function assessQualityWeighted(
@@ -102,14 +148,18 @@ export function assessQualityWeighted(
     label = 'Partial';
   }
 
-  const meetsExpectation = expectedRate != null ? flatRate >= expectedRate : true;
+  const expectation = compareAgainstExpectation(flatRate, expectedRate);
+  const expectedGrade = expectedRate != null ? computeQualityGrade(expectedRate).grade : undefined;
 
   return {
     grade,
     label,
     rate: flatRate,
     expectedRate,
-    meetsExpectation,
+    expectedGrade,
+    meetsExpectation: expectation.meetsExpectation,
+    expectationGap: expectation.expectationGap,
+    expectationStatus: expectation.expectationStatus,
     weightedRate,
     criticalFieldsMissing,
   };

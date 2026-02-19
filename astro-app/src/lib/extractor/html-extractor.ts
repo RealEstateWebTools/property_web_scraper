@@ -45,8 +45,12 @@ export interface ExtractionDiagnostics {
   extractionRate: number;
   qualityGrade: QualityGrade;
   qualityLabel: string;
+  successClassification: 'excellent' | 'good' | 'partial' | 'failed';
   expectedExtractionRate?: number;
+  expectedQualityGrade?: QualityGrade;
   meetsExpectation: boolean;
+  expectationGap?: number;
+  expectationStatus?: 'unknown' | 'above' | 'meets' | 'below' | 'well_below';
   weightedExtractionRate?: number;
   criticalFieldsMissing?: string[];
   contentAnalysis?: ContentAnalysis;
@@ -330,6 +334,12 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
 
   const quality: QualityAssessment = assessQualityWeighted(fieldResults, mapping.expectedExtractionRate);
 
+  const successClassification: ExtractionDiagnostics['successClassification'] =
+    quality.grade === 'A' ? 'excellent'
+      : quality.grade === 'B' ? 'good'
+        : quality.grade === 'C' ? 'partial'
+          : 'failed';
+
   // Sanitize extracted data (strip HTML, validate URLs)
   const sanitizedHash = sanitizePropertyHash(propertyHash);
 
@@ -347,8 +357,12 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
     extractionRate,
     qualityGrade: quality.grade,
     qualityLabel: quality.label,
+    successClassification,
     expectedExtractionRate: mapping.expectedExtractionRate,
+    expectedQualityGrade: quality.expectedGrade,
     meetsExpectation: quality.meetsExpectation,
+    expectationGap: quality.expectationGap,
+    expectationStatus: quality.expectationStatus,
     weightedExtractionRate: quality.weightedRate,
     criticalFieldsMissing: quality.criticalFieldsMissing,
     contentAnalysis,

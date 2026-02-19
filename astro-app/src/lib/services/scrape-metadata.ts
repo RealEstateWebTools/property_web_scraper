@@ -38,7 +38,13 @@ export interface ScrapeRecord {
   extracted_fields?: number;
   extractable_fields?: number;
   extraction_rate?: number;
+  expected_extraction_rate?: number;
+  expected_quality_grade?: string;
   quality_grade?: string;
+  success_classification?: 'excellent' | 'good' | 'partial' | 'failed';
+  meets_expectation?: boolean;
+  expectation_gap?: number;
+  expectation_status?: 'unknown' | 'above' | 'meets' | 'below' | 'well_below';
   appears_js_only: boolean;
   appears_blocked: boolean;
   technology_stack: string[];
@@ -59,6 +65,8 @@ export interface PortalProfileCurrent {
   max_html_size_bytes: number;
   avg_fetch_duration_ms?: number;
   avg_extraction_rate?: number;
+  expected_extraction_rate?: number;
+  expectation_hit_rate?: number;
   js_only_rate: number;
   blocked_rate: number;
   render_mode: RenderMode;
@@ -175,7 +183,15 @@ export async function recordScrapeAndUpdatePortal(input: RecordScrapeInput): Pro
       ? { extractable_fields: diagnostics.extractableFields }
       : {}),
     ...(typeof extractionRate === 'number' ? { extraction_rate: extractionRate } : {}),
+    ...(typeof diagnostics?.expectedExtractionRate === 'number'
+      ? { expected_extraction_rate: diagnostics.expectedExtractionRate }
+      : {}),
+    ...(diagnostics?.expectedQualityGrade ? { expected_quality_grade: diagnostics.expectedQualityGrade } : {}),
     ...(diagnostics?.qualityGrade ? { quality_grade: diagnostics.qualityGrade } : {}),
+    ...(diagnostics?.successClassification ? { success_classification: diagnostics.successClassification } : {}),
+    ...(typeof diagnostics?.meetsExpectation === 'boolean' ? { meets_expectation: diagnostics.meetsExpectation } : {}),
+    ...(typeof diagnostics?.expectationGap === 'number' ? { expectation_gap: diagnostics.expectationGap } : {}),
+    ...(diagnostics?.expectationStatus ? { expectation_status: diagnostics.expectationStatus } : {}),
     appears_js_only: appearsJsOnly,
     appears_blocked: appearsBlocked,
     technology_stack: technologyStack,
@@ -296,6 +312,8 @@ async function updatePortalProfile(scrape: ScrapeRecord): Promise<void> {
       max_html_size_bytes: scrape.html_size_bytes,
       ...(typeof scrape.fetch_duration_ms === 'number' ? { avg_fetch_duration_ms: scrape.fetch_duration_ms } : {}),
       ...(typeof scrape.extraction_rate === 'number' ? { avg_extraction_rate: scrape.extraction_rate } : {}),
+      ...(typeof scrape.expected_extraction_rate === 'number' ? { expected_extraction_rate: scrape.expected_extraction_rate } : {}),
+      ...(typeof scrape.meets_expectation === 'boolean' ? { expectation_hit_rate: scrape.meets_expectation ? 1 : 0 } : {}),
       js_only_rate: scrape.appears_js_only ? 1 : 0,
       blocked_rate: scrape.appears_blocked ? 1 : 0,
       render_mode: scrape.render_mode,
@@ -322,6 +340,12 @@ async function updatePortalProfile(scrape: ScrapeRecord): Promise<void> {
   const nextAvgSize = rollingAverage(current.avg_html_size_bytes, current.total_samples, scrape.html_size_bytes);
   const nextAvgFetch = mergeOptionalAverage(current.avg_fetch_duration_ms, current.total_samples, scrape.fetch_duration_ms, total);
   const nextAvgExtraction = mergeOptionalAverage(current.avg_extraction_rate, current.total_samples, scrape.extraction_rate, total);
+  const nextExpectationHitRate = mergeOptionalAverage(
+    current.expectation_hit_rate,
+    current.total_samples,
+    typeof scrape.meets_expectation === 'boolean' ? (scrape.meets_expectation ? 1 : 0) : undefined,
+    total
+  );
 
   const updated: PortalProfileCurrent = {
     ...current,
@@ -333,6 +357,10 @@ async function updatePortalProfile(scrape: ScrapeRecord): Promise<void> {
     max_html_size_bytes: Math.max(current.max_html_size_bytes, scrape.html_size_bytes),
     ...(nextAvgFetch != null ? { avg_fetch_duration_ms: nextAvgFetch } : {}),
     ...(nextAvgExtraction != null ? { avg_extraction_rate: nextAvgExtraction } : {}),
+    ...(typeof scrape.expected_extraction_rate === 'number'
+      ? { expected_extraction_rate: scrape.expected_extraction_rate }
+      : (typeof current.expected_extraction_rate === 'number' ? { expected_extraction_rate: current.expected_extraction_rate } : {})),
+    ...(nextExpectationHitRate != null ? { expectation_hit_rate: nextExpectationHitRate } : {}),
     js_only_rate: rollingAverage(current.js_only_rate, current.total_samples, scrape.appears_js_only ? 1 : 0),
     blocked_rate: rollingAverage(current.blocked_rate, current.total_samples, scrape.appears_blocked ? 1 : 0),
     render_mode: scrape.render_mode,
