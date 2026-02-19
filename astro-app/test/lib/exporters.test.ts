@@ -6,6 +6,9 @@ import { GeoJSONExporter } from '../../src/lib/exporters/geojson-exporter.js';
 import { XMLExporter } from '../../src/lib/exporters/xml-exporter.js';
 import { SchemaOrgExporter } from '../../src/lib/exporters/schema-org-exporter.js';
 import { ICalExporter } from '../../src/lib/exporters/ical-exporter.js';
+import { BLMExporter } from '../../src/lib/exporters/blm-exporter.js';
+import { KyeroExporter } from '../../src/lib/exporters/kyero-exporter.js';
+import { RESOJsonExporter } from '../../src/lib/exporters/reso-json-exporter.js';
 import {
   createExporter,
   getAvailableExporters,
@@ -639,6 +642,281 @@ describe('Exporters', () => {
     });
   });
 
+  describe('BLMExporter', () => {
+    it('exports with 4-section structure', async () => {
+      const exporter = new BLMExporter();
+      const result = await exporter.export([makeListing()]);
+
+      expect(result).toContain('#HEADER#');
+      expect(result).toContain('#DEFINITION#');
+      expect(result).toContain('#DATA#');
+      expect(result).toContain('#END#');
+    });
+
+    it('uses ^ delimiter and ~ record terminator', async () => {
+      const exporter = new BLMExporter();
+      const result = await exporter.export([makeListing()]);
+      const lines = result.split('\n');
+
+      // Definition line should end with ^~
+      const defLine = lines.find(l => l.includes('AGENT_REF'));
+      expect(defLine).toBeDefined();
+      expect(defLine!.endsWith('^~')).toBe(true);
+
+      // Data lines should end with ^~
+      const dataStart = lines.indexOf('#DATA#');
+      const dataLine = lines[dataStart + 1];
+      expect(dataLine.endsWith('^~')).toBe(true);
+    });
+
+    it('splits UK postcodes', async () => {
+      const listing = makeListing({ postal_code: 'SW1A 1AA' });
+      const exporter = new BLMExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('SW1A');
+      expect(result).toContain('1AA');
+    });
+
+    it('flattens features into FEATURE1-FEATURE10', async () => {
+      const listing = makeListing();
+      listing.features = ['pool', 'garden', 'parking'];
+      const exporter = new BLMExporter();
+      const result = await exporter.export([listing]);
+      const lines = result.split('\n');
+      const defLine = lines.find(l => l.includes('FEATURE1'));
+      expect(defLine).toBeDefined();
+
+      // Data should contain the feature values
+      const dataStart = lines.indexOf('#DATA#');
+      const dataLine = lines[dataStart + 1];
+      expect(dataLine).toContain('pool');
+      expect(dataLine).toContain('garden');
+      expect(dataLine).toContain('parking');
+    });
+
+    it('flattens image_urls into MEDIA_IMAGE columns', async () => {
+      const listing = makeListing();
+      listing.image_urls = [
+        { url: 'https://example.com/1.jpg' },
+        { url: 'https://example.com/2.jpg' },
+      ] as any;
+      const exporter = new BLMExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('https://example.com/1.jpg');
+      expect(result).toContain('https://example.com/2.jpg');
+    });
+
+    it('escapes ^ and ~ characters in values', async () => {
+      const listing = makeListing({ title: 'Apartment^with~special' });
+      const exporter = new BLMExporter();
+      const result = await exporter.export([listing]);
+
+      // ^ and ~ should be stripped from values
+      expect(result).toContain('Apartmentwithspecial');
+    });
+
+    it('exports multiple listings', async () => {
+      const exporter = new BLMExporter();
+      const listings = makeListings(3);
+      const result = await exporter.export(listings);
+      const lines = result.split('\n');
+      const dataStart = lines.indexOf('#DATA#');
+      const endIndex = lines.indexOf('#END#');
+      const dataLines = lines.slice(dataStart + 1, endIndex);
+
+      expect(dataLines).toHaveLength(3);
+    });
+
+    it('throws on empty listings', async () => {
+      const exporter = new BLMExporter();
+      await expect(exporter.export([])).rejects.toThrow('Cannot export empty listing array');
+    });
+  });
+
+  describe('KyeroExporter', () => {
+    it('exports as XML with root and property elements', async () => {
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([makeListing()]);
+
+      expect(result).toContain('<?xml version="1.0" encoding="UTF-8"?>');
+      expect(result).toContain('<root>');
+      expect(result).toContain('<property>');
+      expect(result).toContain('</property>');
+      expect(result).toContain('</root>');
+    });
+
+    it('includes nested location element', async () => {
+      const listing = makeListing({ city: 'Madrid', country: 'Spain', postal_code: '28001' });
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<location>');
+      expect(result).toContain('<city>Madrid</city>');
+      expect(result).toContain('<country>Spain</country>');
+      expect(result).toContain('<zip>28001</zip>');
+      expect(result).toContain('</location>');
+    });
+
+    it('includes nested surface_area element', async () => {
+      const listing = makeListing({ constructed_area: 120, plot_area: 200 });
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<surface_area>');
+      expect(result).toContain('<built>120</built>');
+      expect(result).toContain('<plot>200</plot>');
+      expect(result).toContain('</surface_area>');
+    });
+
+    it('includes multilingual title and desc elements', async () => {
+      const listing = makeListing({
+        title: 'Modern Apartment',
+        title_es: 'Apartamento Moderno',
+        description: 'A great place',
+        description_fr: 'Un endroit formidable',
+      });
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<title>');
+      expect(result).toContain('<en>Modern Apartment</en>');
+      expect(result).toContain('<es>Apartamento Moderno</es>');
+      expect(result).toContain('</title>');
+      expect(result).toContain('<desc>');
+      expect(result).toContain('<en>A great place</en>');
+      expect(result).toContain('<fr>Un endroit formidable</fr>');
+      expect(result).toContain('</desc>');
+    });
+
+    it('normalizes property type', async () => {
+      const listing = makeListing();
+      listing.property_type = 'Detached';
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<type>house</type>');
+    });
+
+    it('defaults property type to other when empty', async () => {
+      const listing = makeListing();
+      listing.property_type = '';
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<type>other</type>');
+    });
+
+    it('includes energy rating element', async () => {
+      const listing = makeListing();
+      listing.energy_certificate_grade = 'B';
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<energy_rating>');
+      expect(result).toContain('<consumption>B</consumption>');
+      expect(result).toContain('</energy_rating>');
+    });
+
+    it('exports multiple properties', async () => {
+      const exporter = new KyeroExporter();
+      const listings = makeListings(3);
+      const result = await exporter.export(listings);
+
+      const matches = result.match(/<property>/g);
+      expect(matches).toHaveLength(3);
+    });
+
+    it('throws on empty listings', async () => {
+      const exporter = new KyeroExporter();
+      await expect(exporter.export([])).rejects.toThrow('Cannot export empty listing array');
+    });
+  });
+
+  describe('RESOJsonExporter', () => {
+    it('exports with OData envelope', async () => {
+      const exporter = new RESOJsonExporter();
+      const result = await exporter.export([makeListing()]);
+      const parsed = JSON.parse(result);
+
+      expect(parsed['@odata.context']).toBe('https://api.reso.org/Property');
+      expect(parsed['@odata.count']).toBe(1);
+      expect(parsed.value).toHaveLength(1);
+    });
+
+    it('maps fields to RESO names', async () => {
+      const exporter = new RESOJsonExporter();
+      const result = await exporter.export([makeListing()]);
+      const parsed = JSON.parse(result);
+      const listing = parsed.value[0];
+
+      expect(listing['ListingKey']).toBe('REF-001');
+      expect(listing['ListPrice']).toBe(250000);
+      expect(listing['BedroomsTotal']).toBe(3);
+      expect(listing['BathroomsTotalInteger']).toBe(2);
+      expect(listing['City']).toBe('Madrid');
+      expect(listing['Country']).toBe('Spain');
+    });
+
+    it('builds Media array from image_urls', async () => {
+      const listing = makeListing();
+      listing.image_urls = [
+        { url: 'https://example.com/1.jpg' },
+        { url: 'https://example.com/2.jpg' },
+      ] as any;
+      const exporter = new RESOJsonExporter();
+      const result = await exporter.export([listing]);
+      const parsed = JSON.parse(result);
+      const media = parsed.value[0].Media;
+
+      expect(media).toHaveLength(2);
+      expect(media[0].MediaURL).toBe('https://example.com/1.jpg');
+      expect(media[0].MediaCategory).toBe('Photo');
+      expect(media[0].Order).toBe(1);
+      expect(media[1].Order).toBe(2);
+    });
+
+    it('includes floor plan URLs in Media array', async () => {
+      const listing = makeListing();
+      listing.image_urls = [{ url: 'https://example.com/photo.jpg' }] as any;
+      listing.floor_plan_urls = ['https://example.com/floor.jpg'];
+      const exporter = new RESOJsonExporter();
+      const result = await exporter.export([listing]);
+      const parsed = JSON.parse(result);
+      const media = parsed.value[0].Media;
+
+      expect(media).toHaveLength(2);
+      expect(media[1].MediaCategory).toBe('FloorPlan');
+    });
+
+    it('omits zero/empty/false values', async () => {
+      const listing = makeListing({ count_toilets: 0, furnished: false });
+      const exporter = new RESOJsonExporter();
+      const result = await exporter.export([listing]);
+      const parsed = JSON.parse(result);
+      const value = parsed.value[0];
+
+      expect(value['BathroomHalf']).toBeUndefined();
+      expect(value['Furnished']).toBeUndefined();
+    });
+
+    it('exports multiple listings', async () => {
+      const exporter = new RESOJsonExporter();
+      const listings = makeListings(3);
+      const result = await exporter.export(listings);
+      const parsed = JSON.parse(result);
+
+      expect(parsed['@odata.count']).toBe(3);
+      expect(parsed.value).toHaveLength(3);
+    });
+
+    it('throws on empty listings', async () => {
+      const exporter = new RESOJsonExporter();
+      await expect(exporter.export([])).rejects.toThrow('Cannot export empty listing array');
+    });
+  });
+
   describe('ExporterRegistry', () => {
     it('creates JSON exporter', () => {
       const exporter = createExporter('json');
@@ -670,6 +948,21 @@ describe('Exporters', () => {
       expect(exporter).toBeInstanceOf(ICalExporter);
     });
 
+    it('creates BLM exporter', () => {
+      const exporter = createExporter('blm');
+      expect(exporter).toBeInstanceOf(BLMExporter);
+    });
+
+    it('creates Kyero exporter', () => {
+      const exporter = createExporter('kyero');
+      expect(exporter).toBeInstanceOf(KyeroExporter);
+    });
+
+    it('creates RESO JSON exporter', () => {
+      const exporter = createExporter('reso-json');
+      expect(exporter).toBeInstanceOf(RESOJsonExporter);
+    });
+
     it('throws for unknown format', () => {
       expect(() => createExporter('pdf' as any)).toThrow('Unknown export format');
     });
@@ -677,12 +970,12 @@ describe('Exporters', () => {
     it('returns all production-ready exporters', () => {
       const available = getAvailableExporters();
       expect(available.every(e => e.isAvailable && e.isProduction)).toBe(true);
-      expect(available.length).toBe(6);
+      expect(available.length).toBe(9);
     });
 
     it('returns all registered exporters including planned', () => {
       const all = getAllExporters();
-      expect(all.length).toBe(6);
+      expect(all.length).toBe(9);
     });
 
     it('returns correct config for format', () => {
@@ -705,6 +998,9 @@ describe('Exporters', () => {
       expect(getMimeType('xml')).toBe('application/xml');
       expect(getMimeType('schema-org')).toBe('application/ld+json');
       expect(getMimeType('icalendar')).toBe('text/calendar');
+      expect(getMimeType('blm')).toBe('text/plain');
+      expect(getMimeType('kyero')).toBe('application/xml');
+      expect(getMimeType('reso-json')).toBe('application/json');
     });
 
     it('returns correct file extensions', () => {
@@ -714,6 +1010,9 @@ describe('Exporters', () => {
       expect(getFileExtension('xml')).toBe('.xml');
       expect(getFileExtension('schema-org')).toBe('.jsonld');
       expect(getFileExtension('icalendar')).toBe('.ics');
+      expect(getFileExtension('blm')).toBe('.blm');
+      expect(getFileExtension('kyero')).toBe('.xml');
+      expect(getFileExtension('reso-json')).toBe('.json');
     });
   });
 

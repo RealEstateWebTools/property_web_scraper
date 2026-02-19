@@ -72,6 +72,7 @@ export abstract class BaseExporter {
       'latitude',
       'longitude',
       'main_image_url',
+      'property_type',
       'import_url',
       'last_retrieved_at',
     ];
@@ -96,6 +97,9 @@ export abstract class BaseExporter {
       'main_image_url', 'image_urls', 'related_urls', 'features',
       'last_retrieved_at', 'deleted_at', 'active_from',
       'available_to_rent_from', 'available_to_rent_till',
+      'property_type', 'property_subtype', 'tenure', 'listing_status',
+      'agent_name', 'agent_phone', 'agent_email', 'agent_logo_url',
+      'price_qualifier', 'floor_plan_urls', 'energy_certificate_grade',
     ];
   }
 

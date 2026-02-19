@@ -90,6 +90,18 @@ export class Listing extends BaseModel {
     populated_extractable_fields: { type: 'integer', default: 0 },
     meets_expectation: { type: 'boolean', default: false },
     critical_fields_missing: { type: 'array', default: [] },
+    // Interoperability fields
+    property_type: { type: 'string' },
+    property_subtype: { type: 'string' },
+    tenure: { type: 'string' },
+    listing_status: { type: 'string' },
+    agent_name: { type: 'string' },
+    agent_phone: { type: 'string' },
+    agent_email: { type: 'string' },
+    agent_logo_url: { type: 'string' },
+    price_qualifier: { type: 'string' },
+    floor_plan_urls: { type: 'array', default: [] },
+    energy_certificate_grade: { type: 'string' },
   };
 
   // All declared attribute properties
@@ -165,6 +177,18 @@ export class Listing extends BaseModel {
   populated_extractable_fields = 0;
   meets_expectation = false;
   critical_fields_missing: string[] = [];
+  // Interoperability fields
+  property_type = '';
+  property_subtype = '';
+  tenure = '';
+  listing_status = '';
+  agent_name = '';
+  agent_phone = '';
+  agent_email = '';
+  agent_logo_url = '';
+  price_qualifier = '';
+  floor_plan_urls: string[] = [];
+  energy_certificate_grade = '';
 
   /**
    * Returns a JSON-safe hash of public listing attributes.
@@ -183,6 +207,9 @@ export class Listing extends BaseModel {
       'for_sale', 'for_rent', 'main_image_url',
       'last_retrieved_at', 'image_urls', 'features', 'unknown_fields',
       'visibility', 'confidence_score', 'manual_override',
+      'property_type', 'property_subtype', 'tenure', 'listing_status',
+      'agent_name', 'agent_phone', 'agent_email', 'agent_logo_url',
+      'price_qualifier', 'floor_plan_urls', 'energy_certificate_grade',
     ]);
   }
 
@@ -206,6 +233,7 @@ export class Listing extends BaseModel {
       'for_rent_short_term', 'for_rent_long_term',
       'last_retrieved_at', 'deleted_at', 'active_from',
       'available_to_rent_from', 'available_to_rent_till',
+      'listing_status', 'price_qualifier',
     ]);
 
     const PREFER_RICHER: Set<string> = new Set([
@@ -214,7 +242,7 @@ export class Listing extends BaseModel {
     ]);
 
     const ARRAY_FIELDS: Set<string> = new Set([
-      'image_urls', 'features', 'related_urls',
+      'image_urls', 'features', 'related_urls', 'floor_plan_urls',
     ]);
 
     const NUMERIC_FIELDS: Set<string> = new Set([
@@ -398,6 +426,9 @@ export class Listing extends BaseModel {
       'for_rent_short_term', 'for_rent_long_term',
       'street_address', 'address_string', 'locale_code',
       'city', 'province', 'region', 'postal_code', 'features',
+      'property_type', 'property_subtype', 'tenure', 'listing_status',
+      'agent_name', 'agent_phone', 'agent_email', 'agent_logo_url',
+      'price_qualifier', 'floor_plan_urls', 'energy_certificate_grade',
     ];
 
     for (const attr of stdAttributes) {
