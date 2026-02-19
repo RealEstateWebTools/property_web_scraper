@@ -152,8 +152,32 @@ export async function getDiagnostics(id: string): Promise<ExtractionDiagnostics 
 }
 
 export async function getAllListings(): Promise<Array<{ id: string; listing: Listing }>> {
-  // In-memory listings only; KV list is not practical for browsing
-  return Array.from(store.entries()).map(([id, listing]) => ({ id, listing }));
+  const results: Array<{ id: string; listing: Listing }> = [];
+  const seenIds = new Set<string>();
+
+  // Try Firestore first (persists across Worker isolates)
+  try {
+    const col = await Listing.collectionRef();
+    const snapshot = await col.get();
+    for (const doc of snapshot.docs) {
+      const listing = Listing.buildFromSnapshot(doc);
+      results.push({ id: doc.id, listing });
+      seenIds.add(doc.id);
+      // Populate in-memory cache for subsequent getListing() calls
+      store.set(doc.id, listing);
+    }
+  } catch {
+    // Firestore unavailable — fall through to in-memory below
+  }
+
+  // Also include in-memory listings not yet in Firestore
+  for (const [id, listing] of store.entries()) {
+    if (!seenIds.has(id)) {
+      results.push({ id, listing });
+    }
+  }
+
+  return results;
 }
 
 export async function getAllDiagnostics(): Promise<Array<{ id: string; diagnostics: ExtractionDiagnostics }>> {

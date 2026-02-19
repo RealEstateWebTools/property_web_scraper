@@ -155,6 +155,90 @@ describe('listing-store', () => {
       expect(titles).toContain('House 1');
       expect(titles).toContain('House 2');
     });
+
+    it('returns Firestore listings when in-memory store is empty', async () => {
+      // Save listings directly to Firestore via ORM
+      const fs1 = await Listing.create({ title: 'Firestore House A', price_float: 100000 });
+      const fs2 = await Listing.create({ title: 'Firestore House B', price_float: 200000 });
+
+      // Clear in-memory store (does NOT clear InMemoryFirestoreClient)
+      clearListingStore();
+
+      const result = await getAllListings();
+      expect(result.length).toBeGreaterThanOrEqual(2);
+      const titles = result.map(r => r.listing.title);
+      expect(titles).toContain('Firestore House A');
+      expect(titles).toContain('Firestore House B');
+    });
+
+    it('merges Firestore and in-memory listings without duplicates', async () => {
+      // Create a listing in Firestore
+      const fsListing = await Listing.create({ title: 'Firestore Only', price_float: 150000 });
+      const firestoreId = fsListing.id;
+
+      // Clear in-memory then add a different listing to in-memory only
+      clearListingStore();
+      const memId = generateId();
+      const memListing = new Listing();
+      memListing.assignAttributes({ title: 'Memory Only', price_float: 250000 });
+      await storeListing(memId, memListing);
+
+      const result = await getAllListings();
+      const titles = result.map(r => r.listing.title);
+      expect(titles).toContain('Firestore Only');
+      expect(titles).toContain('Memory Only');
+
+      // Verify no duplicate IDs
+      const ids = result.map(r => r.id);
+      expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it('does not duplicate listings present in both Firestore and memory', async () => {
+      // Create a listing in Firestore
+      const fsListing = await Listing.create({ title: 'Shared Listing', price_float: 300000 });
+      const firestoreId = fsListing.id;
+
+      // Also put it in the in-memory store (simulates a listing that was just extracted)
+      const inMemListing = new Listing();
+      inMemListing.assignAttributes({ title: 'Shared Listing', price_float: 300000 });
+      await storeListing(firestoreId, inMemListing);
+
+      const result = await getAllListings();
+      const matchingEntries = result.filter(r => r.id === firestoreId);
+      expect(matchingEntries).toHaveLength(1);
+    });
+
+    it('populates in-memory cache from Firestore for subsequent getListing calls', async () => {
+      const fsListing = await Listing.create({ title: 'Cache Populate Test', price_float: 400000 });
+      const firestoreId = fsListing.id;
+
+      clearListingStore();
+
+      // getAllListings should populate the cache
+      await getAllListings();
+
+      // Now getListing should find it in-memory without hitting Firestore again
+      const retrieved = await getListing(firestoreId);
+      expect(retrieved).toBeDefined();
+      expect(retrieved!.title).toBe('Cache Populate Test');
+    });
+
+    it('returns proper Listing instances with asJson() from Firestore', async () => {
+      await Listing.create({ title: 'AsJson Test', price_float: 500000, city: 'London' });
+
+      clearListingStore();
+
+      const result = await getAllListings();
+      expect(result.length).toBeGreaterThanOrEqual(1);
+
+      const entry = result.find(r => r.listing.title === 'AsJson Test');
+      expect(entry).toBeDefined();
+      expect(typeof entry!.listing.asJson).toBe('function');
+
+      const json = entry!.listing.asJson();
+      expect(json.title).toBe('AsJson Test');
+      expect(json.price_float).toBe(500000);
+    });
   });
 
   describe('getStoreStats', () => {
@@ -236,6 +320,33 @@ describe('listing-store', () => {
   });
 
   describe('Firestore fallback', () => {
+    it('getAllListings falls back to Firestore when in-memory is empty', async () => {
+      const listing = await Listing.create({
+        title: 'Firestore Fallback List',
+        price_float: 350000,
+        visibility: 'published',
+      });
+
+      clearListingStore();
+
+      const result = await getAllListings();
+      const titles = result.map(r => r.listing.title);
+      expect(titles).toContain('Firestore Fallback List');
+    });
+
+    it('getAllListings survives Firestore errors and returns in-memory data', async () => {
+      // Store something in memory first
+      const id = generateId();
+      const memListing = new Listing();
+      memListing.assignAttributes({ title: 'In Memory Survivor' });
+      await storeListing(id, memListing);
+
+      // getAllListings should still return in-memory data even if Firestore has issues
+      const result = await getAllListings();
+      const titles = result.map(r => r.listing.title);
+      expect(titles).toContain('In Memory Survivor');
+    });
+
     it('getListing falls back to Firestore when not in memory', async () => {
       // Save a listing to Firestore via the ORM
       const listing = await Listing.create({
