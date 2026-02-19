@@ -30,3 +30,4 @@ firebase/creds.json
 
 # Project-specific
 astro-app/docs/fredy-learnings.md
+astro-app/test/fixtures/quality-snapshot.json
