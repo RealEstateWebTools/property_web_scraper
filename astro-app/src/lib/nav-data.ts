@@ -23,6 +23,7 @@ export const ADMIN_NAV_LINKS: NavLink[] = [
   { label: 'Logs', href: '/admin/logs', icon: 'bi-journal-text', activePage: 'logs' },
   { label: 'Extractions', href: '/admin/extractions', icon: 'bi-collection', activePage: 'extractions' },
   { label: 'Config', href: '/admin/config', icon: 'bi-sliders', activePage: 'config' },
+  { label: 'Storage', href: '/admin/storage', icon: 'bi-database', activePage: 'storage' },
   { label: 'Scrapers', href: '/admin/scrapers', icon: 'bi-cpu', activePage: 'scrapers' },
   { label: 'Health', href: '/admin/scraper-health', icon: 'bi-heart-pulse', activePage: 'scraper-health' },
   { label: 'Exports', href: '/admin/exports', icon: 'bi-download', activePage: 'exports' },
