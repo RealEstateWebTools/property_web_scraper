@@ -8,8 +8,8 @@ import {
 
 describe('portal-registry', () => {
   describe('PORTAL_REGISTRY', () => {
-    it('contains all 15 portals', () => {
-      expect(Object.keys(PORTAL_REGISTRY)).toHaveLength(15);
+    it('contains all 22 portals', () => {
+      expect(Object.keys(PORTAL_REGISTRY)).toHaveLength(22);
     });
 
     it('each portal has required fields', () => {
@@ -68,6 +68,13 @@ describe('portal-registry', () => {
       expect(names).toContain('uk_onthemarket');
       expect(names).toContain('ie_daft');
       expect(names).toContain('pt_idealista');
+      expect(names).toContain('us_redfin');
+      expect(names).toContain('us_zillow');
+      expect(names).toContain('us_trulia');
+      expect(names).toContain('nl_funda');
+      expect(names).toContain('se_hemnet');
+      expect(names).toContain('fr_seloger');
+      expect(names).toContain('it_immobiliare');
     });
   });
 
@@ -101,6 +108,28 @@ describe('portal-registry', () => {
       expect(portal!.country).toBe('IE');
     });
 
+    it('finds redfin with generic_real_estate scraper', () => {
+      const portal = findPortalByHost('www.redfin.com');
+      expect(portal).toBeDefined();
+      expect(portal!.scraperName).toBe('generic_real_estate');
+      expect(portal!.supportTier).toBe('experimental');
+      expect(portal!.country).toBe('US');
+    });
+
+    it('finds zillow with generic_real_estate scraper', () => {
+      const portal = findPortalByHost('www.zillow.com');
+      expect(portal).toBeDefined();
+      expect(portal!.scraperName).toBe('generic_real_estate');
+      expect(portal!.supportTier).toBe('experimental');
+    });
+
+    it('finds funda.nl with generic_real_estate scraper', () => {
+      const portal = findPortalByHost('www.funda.nl');
+      expect(portal).toBeDefined();
+      expect(portal!.scraperName).toBe('generic_real_estate');
+      expect(portal!.country).toBe('NL');
+    });
+
     it('returns undefined for unknown host', () => {
       expect(findPortalByHost('www.unknown-site.com')).toBeUndefined();
     });
@@ -131,7 +160,7 @@ describe('portal-registry', () => {
   describe('allPortalNames', () => {
     it('returns array of all portal names', () => {
       const names = allPortalNames();
-      expect(names).toHaveLength(15);
+      expect(names).toHaveLength(22);
       expect(names).toContain('uk_rightmove');
       expect(names).toContain('es_idealista');
     });

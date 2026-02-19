@@ -1,0 +1,82 @@
+[{
+  "name": "generic_real_estate",
+  "expectedExtractionRate": 0.30,
+  "defaultValues": {
+    "locale_code": {
+      "value": "en"
+    }
+  },
+  "textFields": {
+    "title": {
+      "jsonLdPath": "name",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
+        { "cssLocator": "h1" }
+      ]
+    },
+    "description": {
+      "jsonLdPath": "description",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" },
+        { "cssLocator": "meta[name='description']", "cssAttr": "content" }
+      ]
+    },
+    "price_string": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "jsonLdPath": "offers.priceCurrency" },
+        { "cssLocator": "[data-price]", "cssAttr": "data-price" },
+        { "cssLocator": ".price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "jsonLdPath": "address.name" },
+        { "cssLocator": "[itemprop='address']" }
+      ]
+    },
+    "main_image_url": {
+      "jsonLdPath": "image",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:image']", "cssAttr": "content" }
+      ]
+    }
+  },
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": "[data-price]", "cssAttr": "data-price" }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms"
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "jsonLdPath": "numberOfFullBathrooms" }
+      ]
+    }
+  },
+  "images": [
+    {
+      "jsonLdPath": "photo",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:image']", "cssAttr": "content" }
+      ]
+    }
+  ]
+}]

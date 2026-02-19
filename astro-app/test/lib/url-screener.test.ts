@@ -124,39 +124,53 @@ describe('url-screener', () => {
     });
   });
 
-  describe('unknown_real_estate — known RE sites without scrapers', () => {
-    it('identifies Zillow', () => {
+  describe('allowed — well-known RE sites with generic extraction', () => {
+    it('allows Zillow with experimental tier', () => {
       const r = screenUrl('https://www.zillow.com/homedetails/123-Main-St/12345_zpid/');
-      expect(r.verdict).toBe('unknown_real_estate');
+      expect(r.verdict).toBe('allowed');
+      expect(r.portalTier).toBe('experimental');
     });
 
-    it('identifies Redfin', () => {
+    it('allows Redfin with experimental tier', () => {
       const r = screenUrl('https://www.redfin.com/CA/San-Francisco/123-Main-St/home/12345');
-      expect(r.verdict).toBe('unknown_real_estate');
+      expect(r.verdict).toBe('allowed');
+      expect(r.portalTier).toBe('experimental');
     });
 
-    it('identifies Trulia', () => {
+    it('allows Trulia with experimental tier', () => {
       const r = screenUrl('https://www.trulia.com/home/123-main-st-city-st-12345');
-      expect(r.verdict).toBe('unknown_real_estate');
+      expect(r.verdict).toBe('allowed');
+      expect(r.portalTier).toBe('experimental');
     });
 
+    it('allows funda.nl with experimental tier', () => {
+      const r = screenUrl('https://www.funda.nl/koop/amsterdam/huis-12345/');
+      expect(r.verdict).toBe('allowed');
+      expect(r.portalTier).toBe('experimental');
+    });
+
+    it('allows hemnet.se with experimental tier', () => {
+      const r = screenUrl('https://www.hemnet.se/bostad/lagenhet-2rum-stockholm-12345');
+      expect(r.verdict).toBe('allowed');
+      expect(r.portalTier).toBe('experimental');
+    });
+
+    it('allows seloger.com with experimental tier', () => {
+      const r = screenUrl('https://www.seloger.com/detail/appartement/paris/12345.htm');
+      expect(r.verdict).toBe('allowed');
+      expect(r.portalTier).toBe('experimental');
+    });
+
+    it('allows immobiliare.it with experimental tier', () => {
+      const r = screenUrl('https://www.immobiliare.it/annunci/12345/');
+      expect(r.verdict).toBe('allowed');
+      expect(r.portalTier).toBe('experimental');
+    });
+  });
+
+  describe('unknown_real_estate — known RE sites without scrapers', () => {
     it('identifies immowelt.de', () => {
       const r = screenUrl('https://www.immowelt.de/expose/12345');
-      expect(r.verdict).toBe('unknown_real_estate');
-    });
-
-    it('identifies seloger.com', () => {
-      const r = screenUrl('https://www.seloger.com/annonces/achat/appartement/paris/12345.htm');
-      expect(r.verdict).toBe('unknown_real_estate');
-    });
-
-    it('identifies funda.nl', () => {
-      const r = screenUrl('https://www.funda.nl/koop/amsterdam/huis-12345/');
-      expect(r.verdict).toBe('unknown_real_estate');
-    });
-
-    it('identifies hemnet.se', () => {
-      const r = screenUrl('https://www.hemnet.se/bostad/lagenhet-2rum-stockholm-12345');
       expect(r.verdict).toBe('unknown_real_estate');
     });
   });
