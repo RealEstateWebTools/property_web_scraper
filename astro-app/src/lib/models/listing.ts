@@ -1,6 +1,7 @@
 import { BaseModel, type AttributeDefinition } from '../firestore/base-model.js';
 import { sanitizePropertyHash } from '../extractor/field-processors.js';
 import type { ImageInfo } from '../types/image-info.js';
+import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 
 export interface MergeDiff {
   fieldsChanged: string[];
@@ -79,6 +80,16 @@ export class Listing extends BaseModel {
     confidence_score: { type: 'float', default: 1.0 },
     manual_override: { type: 'boolean', default: false },
     import_history: { type: 'hash', default: {} },
+    // Diagnostic summary fields (persisted for admin queries)
+    scraper_name: { type: 'string' },
+    quality_grade: { type: 'string' },
+    quality_label: { type: 'string' },
+    extraction_rate: { type: 'float', default: 0 },
+    weighted_extraction_rate: { type: 'float', default: 0 },
+    extractable_fields: { type: 'integer', default: 0 },
+    populated_extractable_fields: { type: 'integer', default: 0 },
+    meets_expectation: { type: 'boolean', default: false },
+    critical_fields_missing: { type: 'array', default: [] },
   };
 
   // All declared attribute properties
@@ -144,6 +155,16 @@ export class Listing extends BaseModel {
   confidence_score = 1.0;
   manual_override = false;
   import_history: Record<string, unknown> = {};
+  // Diagnostic summary fields
+  scraper_name = '';
+  quality_grade = '';
+  quality_label = '';
+  extraction_rate = 0;
+  weighted_extraction_rate = 0;
+  extractable_fields = 0;
+  populated_extractable_fields = 0;
+  meets_expectation = false;
+  critical_fields_missing: string[] = [];
 
   /**
    * Returns a JSON-safe hash of public listing attributes.
@@ -406,5 +427,20 @@ export class Listing extends BaseModel {
     } else {
       listing.image_urls = [];
     }
+  }
+
+  /**
+   * Copy diagnostic summary fields onto a listing so they persist to Firestore.
+   */
+  static applyDiagnostics(listing: Listing, diag: ExtractionDiagnostics): void {
+    listing.scraper_name = diag.scraperName;
+    listing.quality_grade = diag.qualityGrade;
+    listing.quality_label = diag.qualityLabel;
+    listing.extraction_rate = diag.extractionRate;
+    listing.weighted_extraction_rate = diag.weightedExtractionRate ?? 0;
+    listing.extractable_fields = diag.extractableFields;
+    listing.populated_extractable_fields = diag.populatedExtractableFields;
+    listing.meets_expectation = diag.meetsExpectation;
+    listing.critical_fields_missing = diag.criticalFieldsMissing ?? [];
   }
 }

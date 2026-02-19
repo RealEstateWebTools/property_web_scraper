@@ -112,19 +112,29 @@ export async function runExtraction(opts: {
       resultId = generateStableId(url);
     }
 
+    if (result.diagnostics) {
+      Listing.applyDiagnostics(listing, result.diagnostics);
+    }
+    listing.id = resultId;
     await storeListing(resultId, listing);
     if (result.diagnostics) {
       await storeDiagnostics(resultId, result.diagnostics);
     }
+    try { await listing.save(); } catch { /* Firestore unavailable */ }
   } catch {
     // Fallback: use incoming as-is with stable ID
     listing = incoming;
     resultId = generateStableId(url);
+    if (result.diagnostics) {
+      Listing.applyDiagnostics(listing, result.diagnostics);
+    }
+    listing.id = resultId;
     try {
       await storeListing(resultId, listing);
       if (result.diagnostics) {
         await storeDiagnostics(resultId, result.diagnostics);
       }
+      try { await listing.save(); } catch { /* Firestore unavailable */ }
     } catch { /* listing-store failure shouldn't affect API response */ }
   }
 

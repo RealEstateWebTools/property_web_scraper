@@ -49,6 +49,9 @@ if (Astro.request.method === 'POST') {
   if (result.diagnostics) {
     await storeDiagnostics(id, result.diagnostics);
   }
+  // Persist to Firestore for admin queries
+  result.retrievedListing.id = id;
+  try { await result.retrievedListing.save(); } catch { /* Firestore unavailable */ }
 
   await recordScrapeAndUpdatePortal({
     listingId: id,

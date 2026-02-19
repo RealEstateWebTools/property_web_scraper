@@ -1,6 +1,7 @@
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import type { QualityGrade } from '../extractor/quality-scorer.js';
-import { getAllListings, getAllDiagnostics, getDiagnostics } from './listing-store.js';
+import { getAllListings, getAllDiagnostics } from './listing-store.js';
+import { Listing } from '../models/listing.js';
 import { allMappingNames, findByName } from '../extractor/mapping-loader.js';
 import { LOCAL_HOST_MAP } from './url-validator.js';
 
@@ -52,17 +53,67 @@ function emptyGradeDistribution(): Record<QualityGrade, number> {
   return { A: 0, B: 0, C: 0, F: 0 };
 }
 
+function listingToSummary(id: string, listing: Listing): ExtractionSummary | null {
+  // Skip listings without diagnostic data
+  if (!listing.scraper_name && !listing.quality_grade) return null;
+
+  return {
+    id,
+    timestamp: listing.last_retrieved_at?.getTime?.() || parseInt(id.split('-')[0], 36),
+    scraperName: listing.scraper_name,
+    sourceUrl: listing.import_url || '',
+    qualityGrade: (listing.quality_grade || 'F') as QualityGrade,
+    qualityLabel: listing.quality_label || '',
+    extractionRate: listing.extraction_rate,
+    weightedExtractionRate: listing.weighted_extraction_rate,
+    populatedExtractableFields: listing.populated_extractable_fields,
+    extractableFields: listing.extractable_fields,
+    meetsExpectation: listing.meets_expectation,
+    criticalFieldsMissing: listing.critical_fields_missing,
+    title: listing.title || '',
+    priceString: listing.price_string || '',
+    visibility: listing.visibility || 'published',
+    confidenceScore: listing.confidence_score ?? 1.0,
+    manualOverride: listing.manual_override || false,
+  };
+}
+
 export async function getRecentExtractions(limit = 100): Promise<ExtractionSummary[]> {
+  const summaries: ExtractionSummary[] = [];
+  const seenIds = new Set<string>();
+
+  // Try Firestore first (persists across Worker isolates)
+  try {
+    const col = await Listing.collectionRef();
+    const snapshot = await col.get();
+    for (const doc of snapshot.docs) {
+      const listing = Listing.buildFromSnapshot(doc);
+      const summary = listingToSummary(doc.id, listing);
+      if (summary) {
+        summaries.push(summary);
+        seenIds.add(doc.id);
+      }
+    }
+  } catch {
+    // Firestore unavailable — continue to in-memory fallback below
+  }
+
+  // Also check in-memory store for listings not yet in Firestore
   const listings = await getAllListings();
   const allDiags = await getAllDiagnostics();
   const diagMap = new Map(allDiags.map(d => [d.id, d.diagnostics]));
 
-  const summaries: ExtractionSummary[] = [];
-
   for (const { id, listing } of listings) {
+    if (seenIds.has(id)) continue;
+    // Try embedded diagnostic fields first
+    const summary = listingToSummary(id, listing as Listing);
+    if (summary) {
+      summaries.push(summary);
+      continue;
+    }
+    // Fall back to separate diagnostics store
     const diag = diagMap.get(id);
     if (!diag) continue;
-
     summaries.push({
       id,
       timestamp: (listing as any).last_retrieved_at?.getTime?.() || parseInt(id.split('-')[0], 36),
@@ -110,30 +161,58 @@ export async function getScraperStats(name: string): Promise<ScraperStats> {
   const hasFeatures = (mapping?.features ?? []).length > 0;
   const expectedExtractionRate = mapping?.expectedExtractionRate;
 
-  // Scan diagnostics for this scraper
-  const allDiags = await getAllDiagnostics();
-  const scraperDiags = allDiags.filter(d => d.diagnostics.scraperName === name);
-
   const gradeDistribution = emptyGradeDistribution();
   let rateSum = 0;
   let lastTime: number | null = null;
   let lastGrade: QualityGrade | null = null;
+  let extractionCount = 0;
+  const seenIds = new Set<string>();
 
-  // Field success tracking
+  // Try Firestore first
+  try {
+    const col = await Listing.collectionRef();
+    const snapshot = await col.where('scraper_name', '==', name).get();
+    for (const doc of snapshot.docs) {
+      const listing = Listing.buildFromSnapshot(doc);
+      if (!listing.quality_grade) continue;
+      const grade = listing.quality_grade as QualityGrade;
+      gradeDistribution[grade]++;
+      rateSum += listing.extraction_rate;
+      extractionCount++;
+      seenIds.add(doc.id);
+
+      const ts = listing.last_retrieved_at?.getTime?.() || parseInt(doc.id.split('-')[0], 36);
+      if (lastTime === null || ts > lastTime) {
+        lastTime = ts;
+        lastGrade = grade;
+      }
+    }
+  } catch {
+    // Firestore unavailable — continue to in-memory fallback below
+  }
+
+  // Also check in-memory diagnostics for entries not found in Firestore
+  const allDiags = await getAllDiagnostics();
+  const scraperDiags = allDiags.filter(d => d.diagnostics.scraperName === name);
+
+  // Field success tracking (only available from in-memory diagnostics with field traces)
   const fieldPopulated: Record<string, number> = {};
   const fieldTotal: Record<string, number> = {};
 
   for (const { id, diagnostics } of scraperDiags) {
-    gradeDistribution[diagnostics.qualityGrade]++;
-    rateSum += diagnostics.extractionRate;
+    if (!seenIds.has(id)) {
+      gradeDistribution[diagnostics.qualityGrade]++;
+      rateSum += diagnostics.extractionRate;
+      extractionCount++;
 
-    const ts = parseInt(id.split('-')[0], 36);
-    if (lastTime === null || ts > lastTime) {
-      lastTime = ts;
-      lastGrade = diagnostics.qualityGrade;
+      const ts = parseInt(id.split('-')[0], 36);
+      if (lastTime === null || ts > lastTime) {
+        lastTime = ts;
+        lastGrade = diagnostics.qualityGrade;
+      }
     }
 
-    // Track per-field success from field traces
+    // Track per-field success from field traces (always, for richer data)
     for (const trace of diagnostics.fieldTraces) {
       const fieldName = trace.field;
       fieldTotal[fieldName] = (fieldTotal[fieldName] || 0) + 1;
@@ -144,7 +223,6 @@ export async function getScraperStats(name: string): Promise<ScraperStats> {
     }
   }
 
-  const extractionCount = scraperDiags.length;
   const avgExtractionRate = extractionCount > 0 ? rateSum / extractionCount : 0;
 
   const fieldSuccessRates: Record<string, number> = {};
