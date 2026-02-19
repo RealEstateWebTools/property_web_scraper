@@ -20,9 +20,46 @@ const { title = 'Admin — Property Web Scraper', activePage = '' } = Astro.prop
 
     <AdminSidebar activePage={activePage} />
 
-    <!-- Main content -->
-    <main id="main-content" class="flex-1 p-6 overflow-auto">
-      <slot />
-    </main>
+    <div class="flex-1 flex flex-col min-w-0">
+      <!-- Mobile top bar -->
+      <div class="md:hidden flex items-center gap-3 bg-admin-bg text-white px-4 py-3">
+        <button
+          id="admin-sidebar-open"
+          type="button"
+          class="p-1 text-gray-300 hover:text-white"
+          aria-label="Open sidebar"
+        >
+          <i class="bi bi-list text-xl"></i>
+        </button>
+        <span class="font-semibold text-sm">Admin</span>
+      </div>
+
+      <!-- Main content -->
+      <main id="main-content" class="flex-1 p-4 md:p-6 overflow-auto">
+        <slot />
+      </main>
+    </div>
+
+    <script is:inline>
+      (function() {
+        var sidebar = document.getElementById('admin-sidebar');
+        var overlay = document.getElementById('admin-sidebar-overlay');
+        var openBtn = document.getElementById('admin-sidebar-open');
+        var closeBtn = document.getElementById('admin-sidebar-close');
+        if (!sidebar || !overlay || !openBtn || !closeBtn) return;
+
+        function open() {
+          sidebar.classList.remove('-translate-x-full');
+          overlay.classList.remove('hidden');
+        }
+        function close() {
+          sidebar.classList.add('-translate-x-full');
+          overlay.classList.add('hidden');
+        }
+        openBtn.addEventListener('click', open);
+        closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', close);
+      })();
+    </script>
   </body>
 </html>

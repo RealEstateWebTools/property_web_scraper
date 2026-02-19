@@ -12,14 +12,32 @@ function navClass(page?: string): string {
     : 'flex items-center gap-2 px-3 py-2 rounded text-sm text-admin-text hover:bg-admin-active hover:text-white no-underline transition';
 }
 ---
-<aside class="w-60 bg-admin-bg text-gray-100 flex flex-col min-h-screen shrink-0" aria-label="Admin navigation">
-  <div class="px-4 py-4 border-b border-gray-700">
-    <a href="/admin" class="font-bold text-lg text-white no-underline flex items-center gap-2">
-      <i class="bi bi-gear-fill"></i> Admin
-    </a>
-    <p class="text-xs text-text-muted mt-1">PropertyWebScraper</p>
+<!-- Overlay (mobile only) -->
+<div id="admin-sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+
+<!-- Sidebar -->
+<aside
+  id="admin-sidebar"
+  class="fixed inset-y-0 left-0 z-50 w-60 bg-admin-bg text-gray-100 flex flex-col shrink-0 transform -translate-x-full transition-transform duration-200 md:relative md:translate-x-0"
+  aria-label="Admin navigation"
+>
+  <div class="px-4 py-4 border-b border-gray-700 flex items-center justify-between">
+    <div>
+      <a href="/admin" class="font-bold text-lg text-white no-underline flex items-center gap-2">
+        <i class="bi bi-gear-fill"></i> Admin
+      </a>
+      <p class="text-xs text-text-muted mt-1">PropertyWebScraper</p>
+    </div>
+    <button
+      id="admin-sidebar-close"
+      type="button"
+      class="md:hidden p-1 text-gray-400 hover:text-white"
+      aria-label="Close sidebar"
+    >
+      <i class="bi bi-x-lg"></i>
+    </button>
   </div>
-  <nav class="flex-1 px-3 py-4 space-y-1">
+  <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
     {ADMIN_NAV_LINKS.map((link) => (
       <a href={link.href} class={navClass(link.activePage)}>
         {link.icon && <i class={`bi ${link.icon}`}></i>}
