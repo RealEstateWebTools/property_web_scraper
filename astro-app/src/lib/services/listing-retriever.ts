@@ -34,6 +34,35 @@ export async function retrieveListing(
 
   const validation = await validateUrl(importUrl);
   if (!validation.valid || !validation.importHost) {
+    // Fall back to generic_real_estate scraper for unsupported URLs with HTML
+    if (validation.errorCode === UNSUPPORTED && html) {
+      logActivity({
+        level: 'info',
+        category: 'extraction',
+        message: `No portal found — falling back to generic_real_estate`,
+        sourceUrl: importUrl,
+      });
+      const genericMapping = findByName('generic_real_estate');
+      if (genericMapping) {
+        // Build a synthetic importHost for the generic fallback
+        const syntheticHost = { slug: 'generic', scraper_name: 'generic_real_estate' };
+        const result = extractFromHtml({
+          html,
+          sourceUrl: importUrl,
+          scraperMappingName: 'generic_real_estate',
+        });
+        const diagnostics = result.diagnostics;
+        if (result.success && result.properties.length > 0) {
+          const listing = new Listing();
+          listing.assignAttributes({ import_url: importUrl });
+          listing.import_host_slug = syntheticHost.slug;
+          listing.last_retrieved_at = new Date();
+          Listing.updateFromHash(listing, result.properties[0]);
+          return { success: true, retrievedListing: listing, diagnostics };
+        }
+        return { success: true, retrievedListing: new Listing(), diagnostics };
+      }
+    }
     const errorMessage = validation.errorCode === UNSUPPORTED
       ? 'Unsupported Url'
       : 'Invalid Url';

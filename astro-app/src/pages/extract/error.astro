@@ -162,6 +162,10 @@ const GITHUB_ISSUES_URL = 'https://github.com/RealEstateWebTools/property_web_sc
                 <i class="bi bi-play-fill"></i> Try Anyway
               </button>
             </form>
+            <a href={`/extract/html${url ? `?url=${encodeURIComponent(url)}` : ''}`}
+               class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-code-slash"></i> Paste HTML Instead
+            </a>
             <a href="/extract/url" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
               <i class="bi bi-arrow-left"></i> Back
             </a>
