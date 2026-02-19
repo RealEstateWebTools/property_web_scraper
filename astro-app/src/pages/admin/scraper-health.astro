@@ -16,7 +16,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
   </div>
 
   <!-- Summary cards -->
-  <div id="summary" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+  <div id="summary" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
     <div class="bg-white rounded-lg shadow p-5">
       <p class="text-sm text-gray-500">Total Scrapers</p>
       <p class="text-2xl font-bold" id="total-count">—</p>
@@ -24,6 +24,10 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
     <div class="bg-white rounded-lg shadow p-5">
       <p class="text-sm text-gray-500">With Fixtures</p>
       <p class="text-2xl font-bold" id="fixture-count">—</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Tier Distribution</p>
+      <p class="text-sm font-semibold mt-1" id="tier-distribution">—</p>
     </div>
     <div class="bg-white rounded-lg shadow p-5">
       <p class="text-sm text-gray-500">Grade A</p>
@@ -56,8 +60,11 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
           <tr class="text-left text-gray-500 border-b border-gray-200">
             <th class="py-2 px-5 font-medium">Scraper</th>
             <th class="py-2 px-5 font-medium">Country</th>
+            <th class="py-2 px-5 font-medium">Tier</th>
             <th class="py-2 px-5 font-medium">Grade</th>
             <th class="py-2 px-5 font-medium">Rate</th>
+            <th class="py-2 px-5 font-medium">Expected</th>
+            <th class="py-2 px-5 font-medium">vs Expected</th>
             <th class="py-2 px-5 font-medium">Weighted</th>
             <th class="py-2 px-5 font-medium">Fields</th>
             <th class="py-2 px-5 font-medium">Critical Missing</th>
@@ -80,6 +87,12 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
       B: 'bg-blue-100 text-blue-700',
       C: 'bg-amber-100 text-amber-700',
       F: 'bg-red-100 text-red-700',
+    };
+
+    const tierColors: Record<string, string> = {
+      core: 'bg-green-100 text-green-700',
+      experimental: 'bg-blue-100 text-blue-700',
+      'manual-only': 'bg-gray-100 text-gray-600',
     };
 
     async function loadHealth() {
@@ -113,8 +126,16 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
         const gradeB = withFixtures.filter((r: any) => r.grade === 'B');
         const gradeCF = withFixtures.filter((r: any) => r.grade === 'C' || r.grade === 'F' || r.error);
 
+        const coreCount = results.filter((r: any) => r.supportTier === 'core').length;
+        const experimentalCount = results.filter((r: any) => r.supportTier === 'experimental').length;
+        const manualOnlyCount = results.filter((r: any) => r.supportTier === 'manual-only').length;
+
         document.getElementById('total-count')!.textContent = String(results.length);
         document.getElementById('fixture-count')!.textContent = String(withFixtures.length);
+        document.getElementById('tier-distribution')!.innerHTML =
+          `<span class="text-green-600">${coreCount} core</span>, ` +
+          `<span class="text-blue-600">${experimentalCount} experimental</span>, ` +
+          `<span class="text-gray-500">${manualOnlyCount} manual-only</span>`;
         document.getElementById('grade-a-count')!.textContent = String(gradeA.length);
         document.getElementById('grade-b-count')!.textContent = String(gradeB.length);
         document.getElementById('grade-cf-count')!.textContent = String(gradeCF.length);
@@ -133,6 +154,13 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
           link.className = 'font-mono text-sm text-blue-600 hover:underline no-underline';
           link.textContent = r.name;
           tdName.appendChild(link);
+          if (r.consecutiveBelowThreshold != null && r.consecutiveBelowThreshold >= 5) {
+            const warn = document.createElement('span');
+            warn.className = 'inline-block ml-1.5 px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700';
+            warn.title = `${r.consecutiveBelowThreshold} consecutive scrapes below quality threshold`;
+            warn.textContent = 'degraded';
+            tdName.appendChild(warn);
+          }
           tr.appendChild(tdName);
 
           // Country
@@ -141,11 +169,22 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
           tdCountry.textContent = r.country;
           tr.appendChild(tdCountry);
 
+          // Tier column (always shown)
+          const tdTier = document.createElement('td');
+          tdTier.className = 'py-2 px-5';
+          if (r.supportTier) {
+            const tierColor = tierColors[r.supportTier] || 'bg-gray-100 text-gray-500';
+            tdTier.innerHTML = `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium ${tierColor}">${r.supportTier}</span>`;
+          } else {
+            tdTier.innerHTML = '<span class="text-gray-400 text-xs">—</span>';
+          }
+          tr.appendChild(tdTier);
+
           if (!r.hasFixture) {
             // No fixture
             const tdGrade = document.createElement('td');
             tdGrade.className = 'py-2 px-5';
-            tdGrade.colSpan = 5;
+            tdGrade.colSpan = 7;
             tdGrade.innerHTML = '<span class="text-gray-400 text-xs">No fixture available</span>';
             tr.appendChild(tdGrade);
 
@@ -156,7 +195,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
           } else if (r.error) {
             const tdErr = document.createElement('td');
             tdErr.className = 'py-2 px-5';
-            tdErr.colSpan = 5;
+            tdErr.colSpan = 7;
             tdErr.innerHTML = `<span class="text-red-600 text-xs">${r.error}</span>`;
             tr.appendChild(tdErr);
 
@@ -177,6 +216,24 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
             tdRate.className = 'py-2 px-5 text-gray-600';
             tdRate.textContent = r.extractionRate != null ? `${Math.round(r.extractionRate * 100)}%` : '—';
             tr.appendChild(tdRate);
+
+            // Expected
+            const tdExpected = document.createElement('td');
+            tdExpected.className = 'py-2 px-5 text-gray-600';
+            tdExpected.textContent = r.expectedExtractionRate != null ? `${Math.round(r.expectedExtractionRate * 100)}%` : '—';
+            tr.appendChild(tdExpected);
+
+            // vs Expected
+            const tdVsExpected = document.createElement('td');
+            tdVsExpected.className = 'py-2 px-5';
+            if (r.meetsExpectation === true) {
+              tdVsExpected.innerHTML = '<span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">meets</span>';
+            } else if (r.meetsExpectation === false) {
+              tdVsExpected.innerHTML = '<span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">below</span>';
+            } else {
+              tdVsExpected.innerHTML = '<span class="text-gray-400 text-xs">—</span>';
+            }
+            tr.appendChild(tdVsExpected);
 
             // Weighted rate
             const tdWeighted = document.createElement('td');

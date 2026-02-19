@@ -585,6 +585,156 @@ describe('scrape-metadata', () => {
     });
   });
 
+  describe('consecutive_below_threshold counter', () => {
+    it('starts at 0 when meets_expectation is true', async () => {
+      await recordScrapeAndUpdatePortal(makeInput({
+        diagnostics: {
+          scraperName: 'uk_rightmove',
+          extractionRate: 0.9,
+          populatedExtractableFields: 18,
+          extractableFields: 20,
+          qualityGrade: 'A',
+          qualityLabel: 'Excellent',
+          successClassification: 'excellent',
+          expectedExtractionRate: 0.85,
+          expectedQualityGrade: 'A',
+          populatedFields: 18,
+          totalFields: 30,
+          meetsExpectation: true,
+          expectationGap: 0.05,
+          expectationStatus: 'above',
+          criticalFieldsMissing: [],
+          emptyFields: [],
+          fieldTraces: [],
+        },
+      }));
+      const profile = await getPortalProfile('rightmove');
+      expect(profile!.consecutive_below_threshold).toBe(0);
+    });
+
+    it('increments on consecutive failures', async () => {
+      const failInput = {
+        diagnostics: {
+          scraperName: 'uk_rightmove',
+          extractionRate: 0.3,
+          populatedExtractableFields: 3,
+          extractableFields: 10,
+          qualityGrade: 'F',
+          qualityLabel: 'Poor',
+          successClassification: 'failed' as const,
+          expectedExtractionRate: 0.85,
+          expectedQualityGrade: 'A',
+          populatedFields: 3,
+          totalFields: 30,
+          meetsExpectation: false,
+          expectationGap: -0.55,
+          expectationStatus: 'well_below' as const,
+          criticalFieldsMissing: ['title'],
+          emptyFields: ['title'],
+          fieldTraces: [],
+        },
+      };
+
+      await recordScrapeAndUpdatePortal(makeInput(failInput));
+      let profile = await getPortalProfile('rightmove');
+      expect(profile!.consecutive_below_threshold).toBe(1);
+
+      await recordScrapeAndUpdatePortal(makeInput(failInput));
+      profile = await getPortalProfile('rightmove');
+      expect(profile!.consecutive_below_threshold).toBe(2);
+
+      await recordScrapeAndUpdatePortal(makeInput(failInput));
+      profile = await getPortalProfile('rightmove');
+      expect(profile!.consecutive_below_threshold).toBe(3);
+    });
+
+    it('resets to 0 when a scrape meets expectation', async () => {
+      const failInput = {
+        diagnostics: {
+          scraperName: 'uk_rightmove',
+          extractionRate: 0.3,
+          populatedExtractableFields: 3,
+          extractableFields: 10,
+          qualityGrade: 'F',
+          qualityLabel: 'Poor',
+          successClassification: 'failed' as const,
+          expectedExtractionRate: 0.85,
+          expectedQualityGrade: 'A',
+          populatedFields: 3,
+          totalFields: 30,
+          meetsExpectation: false,
+          expectationGap: -0.55,
+          expectationStatus: 'well_below' as const,
+          criticalFieldsMissing: [],
+          emptyFields: [],
+          fieldTraces: [],
+        },
+      };
+      const passInput = {
+        diagnostics: {
+          scraperName: 'uk_rightmove',
+          extractionRate: 0.9,
+          populatedExtractableFields: 18,
+          extractableFields: 20,
+          qualityGrade: 'A',
+          qualityLabel: 'Excellent',
+          successClassification: 'excellent' as const,
+          expectedExtractionRate: 0.85,
+          expectedQualityGrade: 'A',
+          populatedFields: 18,
+          totalFields: 30,
+          meetsExpectation: true,
+          expectationGap: 0.05,
+          expectationStatus: 'above' as const,
+          criticalFieldsMissing: [],
+          emptyFields: [],
+          fieldTraces: [],
+        },
+      };
+
+      // 3 failures
+      await recordScrapeAndUpdatePortal(makeInput(failInput));
+      await recordScrapeAndUpdatePortal(makeInput(failInput));
+      await recordScrapeAndUpdatePortal(makeInput(failInput));
+      let profile = await getPortalProfile('rightmove');
+      expect(profile!.consecutive_below_threshold).toBe(3);
+
+      // 1 success resets
+      await recordScrapeAndUpdatePortal(makeInput(passInput));
+      profile = await getPortalProfile('rightmove');
+      expect(profile!.consecutive_below_threshold).toBe(0);
+    });
+
+    it('stays unchanged when meets_expectation is undefined', async () => {
+      // First scrape with failure
+      await recordScrapeAndUpdatePortal(makeInput({
+        diagnostics: {
+          scraperName: 'uk_rightmove',
+          extractionRate: 0.3,
+          populatedExtractableFields: 3,
+          extractableFields: 10,
+          qualityGrade: 'F',
+          qualityLabel: 'Poor',
+          successClassification: 'failed',
+          populatedFields: 3,
+          totalFields: 30,
+          meetsExpectation: false,
+          criticalFieldsMissing: [],
+          emptyFields: [],
+          fieldTraces: [],
+        },
+      }));
+      let profile = await getPortalProfile('rightmove');
+      expect(profile!.consecutive_below_threshold).toBe(1);
+
+      // Scrape without meets_expectation (no diagnostics)
+      await recordScrapeAndUpdatePortal(makeInput());
+      profile = await getPortalProfile('rightmove');
+      // Should stay at 1 since meets_expectation was undefined
+      expect(profile!.consecutive_below_threshold).toBe(1);
+    });
+  });
+
   describe('portal profile signature change', () => {
     it('archives when technology stack changes', async () => {
       // Plain HTML

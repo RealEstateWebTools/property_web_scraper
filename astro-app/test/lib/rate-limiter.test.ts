@@ -126,6 +126,55 @@ describe('rate-limiter', () => {
   });
 });
 
+describe('endpoint multipliers', () => {
+  beforeEach(() => {
+    resetRateLimiter();
+  });
+
+  it('html_extract allows 2x the base per-minute limit', () => {
+    // Free tier = 30/min. html_extract has 2x multiplier = 60/min
+    for (let i = 0; i < 50; i++) {
+      checkRateLimit(makeRequest(), 'free', 'user-html', 'html_extract');
+    }
+    // Should still be allowed (50 < 60)
+    const result = checkRateLimit(makeRequest(), 'free', 'user-html', 'html_extract');
+    expect(result.allowed).toBe(true);
+  });
+
+  it('html_extract blocks at 2x the base limit', () => {
+    for (let i = 0; i < 60; i++) {
+      checkRateLimit(makeRequest(), 'free', 'user-html2', 'html_extract');
+    }
+    const result = checkRateLimit(makeRequest(), 'free', 'user-html2', 'html_extract');
+    expect(result.allowed).toBe(false);
+  });
+
+  it('url_extract uses base limit (1x)', () => {
+    for (let i = 0; i < 30; i++) {
+      checkRateLimit(makeRequest(), 'free', 'user-url', 'url_extract');
+    }
+    const result = checkRateLimit(makeRequest(), 'free', 'user-url', 'url_extract');
+    expect(result.allowed).toBe(false);
+  });
+
+  it('default endpoint uses base limit', () => {
+    for (let i = 0; i < 30; i++) {
+      checkRateLimit(makeRequest(), 'free', 'user-def');
+    }
+    const result = checkRateLimit(makeRequest(), 'free', 'user-def');
+    expect(result.allowed).toBe(false);
+  });
+
+  it('endpoint multiplier works with different tiers', () => {
+    // Starter tier = 120/min. html_extract = 2x = 240/min
+    for (let i = 0; i < 200; i++) {
+      checkRateLimit(makeRequest(), 'starter', 'user-starter-html', 'html_extract');
+    }
+    const result = checkRateLimit(makeRequest(), 'starter', 'user-starter-html', 'html_extract');
+    expect(result.allowed).toBe(true);
+  });
+});
+
 describe('getTierLimits', () => {
   it('returns correct limits for each tier', () => {
     expect(getTierLimits('free').perMinute).toBe(30);

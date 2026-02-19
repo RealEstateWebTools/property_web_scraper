@@ -1,5 +1,7 @@
 import { allMappings } from '../extractor/mapping-loader.js';
 
+export type SupportTier = 'core' | 'experimental' | 'manual-only';
+
 export interface PortalConfig {
   scraperName: string;
   slug: string;
@@ -9,6 +11,7 @@ export interface PortalConfig {
   localeCode: string;
   areaUnit: string;
   contentSource: 'html' | 'script-json' | 'json-ld' | 'flight-data';
+  supportTier: SupportTier;
   expectedExtractionRate?: number;
   stripTrailingSlash: boolean;
   requiresJsRendering: boolean;
@@ -28,6 +31,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-GB',
     areaUnit: 'sqft',
     contentSource: 'script-json',
+    supportTier: 'core',
+    expectedExtractionRate: 0.85,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -40,6 +45,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'es-ES',
     areaUnit: 'sqmt',
     contentSource: 'html',
+    supportTier: 'manual-only',
+    expectedExtractionRate: 0.75,
     stripTrailingSlash: false,
     requiresJsRendering: true,
   },
@@ -52,6 +59,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-GB',
     areaUnit: 'sqft',
     contentSource: 'script-json',
+    supportTier: 'core',
+    expectedExtractionRate: 0.85,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -64,6 +73,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-US',
     areaUnit: 'sqft',
     contentSource: 'flight-data',
+    supportTier: 'core',
+    expectedExtractionRate: 0.85,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -76,6 +87,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'es-ES',
     areaUnit: 'sqmt',
     contentSource: 'html',
+    supportTier: 'core',
+    expectedExtractionRate: 0.70,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -88,6 +101,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'es-ES',
     areaUnit: 'sqmt',
     contentSource: 'html',
+    supportTier: 'core',
+    expectedExtractionRate: 0.45,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -100,6 +115,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-IN',
     areaUnit: 'sqft',
     contentSource: 'html',
+    supportTier: 'core',
+    expectedExtractionRate: 0.55,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -112,6 +129,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-US',
     areaUnit: 'sqft',
     contentSource: 'html',
+    supportTier: 'core',
+    expectedExtractionRate: 0.95,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -124,6 +143,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-GB',
     areaUnit: 'sqft',
     contentSource: 'html',
+    supportTier: 'core',
+    expectedExtractionRate: 0.85,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -136,6 +157,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-GB',
     areaUnit: 'sqft',
     contentSource: 'html',
+    supportTier: 'core',
+    expectedExtractionRate: 0.70,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -148,6 +171,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-IE',
     areaUnit: 'sqmt',
     contentSource: 'html',
+    supportTier: 'core',
+    expectedExtractionRate: 0.85,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -160,6 +185,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'pt',
     areaUnit: 'sqmt',
     contentSource: 'script-json',
+    supportTier: 'manual-only',
+    expectedExtractionRate: 0.90,
     stripTrailingSlash: false,
     requiresJsRendering: true,
   },
@@ -172,6 +199,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'de-DE',
     areaUnit: 'sqmt',
     contentSource: 'script-json',
+    supportTier: 'core',
+    expectedExtractionRate: 0.80,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -184,6 +213,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-AU',
     areaUnit: 'sqmt',
     contentSource: 'script-json',
+    supportTier: 'core',
+    expectedExtractionRate: 0.80,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -196,6 +227,8 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     localeCode: 'en-AU',
     areaUnit: 'sqmt',
     contentSource: 'script-json',
+    supportTier: 'core',
+    expectedExtractionRate: 0.80,
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
@@ -223,6 +256,10 @@ function buildAutoDiscoveredPortals(): Record<string, PortalConfig> {
         localeCode: mapping.portal.localeCode,
         areaUnit: mapping.portal.areaUnit,
         contentSource: mapping.portal.contentSource || 'html',
+        supportTier: 'experimental',
+        ...(mapping.expectedExtractionRate != null
+          ? { expectedExtractionRate: mapping.expectedExtractionRate }
+          : {}),
         stripTrailingSlash: mapping.portal.stripTrailingSlash || false,
         requiresJsRendering: mapping.portal.requiresJsRendering || false,
       };

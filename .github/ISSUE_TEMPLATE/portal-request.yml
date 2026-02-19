@@ -1,0 +1,79 @@
+name: Portal Request
+description: Request support for a new property listing portal
+title: "[Portal Request] "
+labels: ["portal-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for requesting a new portal! Please fill in the details below so we can evaluate feasibility and prioritize.
+
+  - type: input
+    id: portal-name
+    attributes:
+      label: Portal name
+      description: The name of the property listing website
+      placeholder: e.g. Zillow, Funda, SeLoger
+    validations:
+      required: true
+
+  - type: input
+    id: portal-url
+    attributes:
+      label: Example listing URL
+      description: A URL to a single property listing on this portal
+      placeholder: https://www.example.com/listing/12345
+    validations:
+      required: true
+
+  - type: input
+    id: country-region
+    attributes:
+      label: Country / Region
+      description: The country or region this portal serves
+      placeholder: e.g. United States, Netherlands, France
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: listing-types
+    attributes:
+      label: Listing types
+      description: What types of listings does this portal have?
+      options:
+        - label: Sale
+        - label: Rent
+        - label: Commercial
+
+  - type: dropdown
+    id: requires-js
+    attributes:
+      label: Does the page require JavaScript to render?
+      description: Open the listing page and check if it loads content without JS
+      options:
+        - Not sure
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: anti-bot
+    attributes:
+      label: Did you notice CAPTCHAs or Cloudflare challenges?
+      description: Some portals use bot protection that blocks server-side fetching
+      options:
+        - Not sure
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Any other information that might help (e.g. API availability, similar portals we already support)
+      placeholder: Optional
+    validations:
+      required: false

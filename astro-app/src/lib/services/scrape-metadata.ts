@@ -1,4 +1,6 @@
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
+import { logActivity } from './activity-logger.js';
+import { findPortalByName } from './portal-registry.js';
 
 export type ScrapeSourceType =
   | 'url_fetch'
@@ -67,6 +69,7 @@ export interface PortalProfileCurrent {
   avg_extraction_rate?: number;
   expected_extraction_rate?: number;
   expectation_hit_rate?: number;
+  consecutive_below_threshold: number;
   js_only_rate: number;
   blocked_rate: number;
   render_mode: RenderMode;
@@ -300,6 +303,7 @@ async function updatePortalProfile(scrape: ScrapeRecord): Promise<void> {
   const signature = computeSignature(scrape);
 
   if (!current) {
+    const belowThreshold = scrape.meets_expectation === false ? 1 : 0;
     const created: PortalProfileCurrent = {
       portal_slug: portalSlug,
       ...(scrape.scraper_name ? { scraper_name: scrape.scraper_name } : {}),
@@ -314,6 +318,7 @@ async function updatePortalProfile(scrape: ScrapeRecord): Promise<void> {
       ...(typeof scrape.extraction_rate === 'number' ? { avg_extraction_rate: scrape.extraction_rate } : {}),
       ...(typeof scrape.expected_extraction_rate === 'number' ? { expected_extraction_rate: scrape.expected_extraction_rate } : {}),
       ...(typeof scrape.meets_expectation === 'boolean' ? { expectation_hit_rate: scrape.meets_expectation ? 1 : 0 } : {}),
+      consecutive_below_threshold: belowThreshold,
       js_only_rate: scrape.appears_js_only ? 1 : 0,
       blocked_rate: scrape.appears_blocked ? 1 : 0,
       render_mode: scrape.render_mode,
@@ -347,6 +352,25 @@ async function updatePortalProfile(scrape: ScrapeRecord): Promise<void> {
     total
   );
 
+  // Track consecutive below-threshold scrapes
+  let consecutiveBelow = current.consecutive_below_threshold ?? 0;
+  if (scrape.meets_expectation === false) {
+    consecutiveBelow++;
+  } else if (scrape.meets_expectation === true) {
+    consecutiveBelow = 0;
+  }
+
+  // Emit warning when threshold is exceeded
+  if (consecutiveBelow >= 5 && scrape.meets_expectation === false) {
+    const portal = findPortalByName(portalSlug);
+    const currentTier = portal?.supportTier || 'unknown';
+    logActivity({
+      level: 'warn',
+      category: 'quality',
+      message: `Portal ${portalSlug} has failed quality threshold ${consecutiveBelow} consecutive times — consider downgrading from ${currentTier} to experimental`,
+    });
+  }
+
   const updated: PortalProfileCurrent = {
     ...current,
     updated_at: now,
@@ -361,6 +385,7 @@ async function updatePortalProfile(scrape: ScrapeRecord): Promise<void> {
       ? { expected_extraction_rate: scrape.expected_extraction_rate }
       : (typeof current.expected_extraction_rate === 'number' ? { expected_extraction_rate: current.expected_extraction_rate } : {})),
     ...(nextExpectationHitRate != null ? { expectation_hit_rate: nextExpectationHitRate } : {}),
+    consecutive_below_threshold: consecutiveBelow,
     js_only_rate: rollingAverage(current.js_only_rate, current.total_samples, scrape.appears_js_only ? 1 : 0),
     blocked_rate: rollingAverage(current.blocked_rate, current.total_samples, scrape.appears_blocked ? 1 : 0),
     render_mode: scrape.render_mode,

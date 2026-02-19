@@ -9,9 +9,9 @@ describe('url-screener', () => {
       expect(r.hostname).toBe('www.rightmove.co.uk');
     });
 
-    it('allows idealista property page', () => {
+    it('returns manual_only for idealista property page (JS rendering required)', () => {
       const r = screenUrl('https://www.idealista.com/inmueble/12345678/');
-      expect(r.verdict).toBe('allowed');
+      expect(r.verdict).toBe('manual_only');
     });
 
     it('allows zoopla property page', () => {
@@ -165,6 +165,45 @@ describe('url-screener', () => {
     it('defaults to unknown_real_estate for unfamiliar domains', () => {
       const r = screenUrl('https://www.somenichepropertysite.com/listing/42');
       expect(r.verdict).toBe('unknown_real_estate');
+    });
+  });
+
+  describe('manual_only — portals that require browser HTML', () => {
+    it('returns manual_only for idealista.com', () => {
+      const r = screenUrl('https://www.idealista.com/inmueble/12345678/');
+      expect(r.verdict).toBe('manual_only');
+      expect(r.portalTier).toBe('manual-only');
+    });
+
+    it('returns manual_only for idealista.pt', () => {
+      const r = screenUrl('https://www.idealista.pt/imovel/12345678/');
+      expect(r.verdict).toBe('manual_only');
+      expect(r.portalTier).toBe('manual-only');
+    });
+  });
+
+  describe('portalTier — tier info attached to results', () => {
+    it('includes portalTier core for rightmove', () => {
+      const r = screenUrl('https://www.rightmove.co.uk/properties/168908774');
+      expect(r.verdict).toBe('allowed');
+      expect(r.portalTier).toBe('core');
+    });
+
+    it('includes portalTier core for zoopla', () => {
+      const r = screenUrl('https://www.zoopla.co.uk/for-sale/details/12345678/');
+      expect(r.verdict).toBe('allowed');
+      expect(r.portalTier).toBe('core');
+    });
+
+    it('includes portalTier on search_results verdict', () => {
+      const r = screenUrl('https://www.rightmove.co.uk/property-for-sale/London.html');
+      expect(r.verdict).toBe('search_results');
+      expect(r.portalTier).toBe('core');
+    });
+
+    it('does not include portalTier for unknown domains', () => {
+      const r = screenUrl('https://www.somenichepropertysite.com/listing/42');
+      expect(r.portalTier).toBeUndefined();
     });
   });
 
