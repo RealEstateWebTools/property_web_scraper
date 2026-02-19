@@ -49,6 +49,9 @@ if (Astro.request.method === 'POST') {
       const portalName = screening.hostname || '';
       return Astro.redirect(`/extract/error?reason=fetch_blocked&url=${encodeURIComponent(importUrl)}&portal=${encodeURIComponent(portalName)}`);
     }
+    if (screening.verdict === 'allowed' && screening.portalTier === 'experimental') {
+      return Astro.redirect(`/extract/error?reason=experimental&url=${encodeURIComponent(importUrl)}`);
+    }
   }
 
   // Check if this portal blocks server-side fetching

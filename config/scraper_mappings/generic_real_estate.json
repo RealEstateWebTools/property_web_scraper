@@ -11,6 +11,7 @@
       "jsonLdPath": "name",
       "fallbacks": [
         { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
+        { "cssLocator": "meta[name='twitter:title']", "cssAttr": "content" },
         { "cssLocator": "h1" }
       ]
     },
@@ -18,14 +19,15 @@
       "jsonLdPath": "description",
       "fallbacks": [
         { "cssLocator": "meta[property='og:description']", "cssAttr": "content" },
+        { "cssLocator": "meta[name='twitter:description']", "cssAttr": "content" },
         { "cssLocator": "meta[name='description']", "cssAttr": "content" }
       ]
     },
     "price_string": {
       "jsonLdPath": "offers.price",
       "fallbacks": [
-        { "jsonLdPath": "offers.priceCurrency" },
         { "cssLocator": "[data-price]", "cssAttr": "data-price" },
+        { "cssLocator": "meta[itemprop='price']", "cssAttr": "content" },
         { "cssLocator": ".price" }
       ]
     },
@@ -33,13 +35,36 @@
       "jsonLdPath": "address.streetAddress",
       "fallbacks": [
         { "jsonLdPath": "address.name" },
+        { "cssLocator": "meta[property='og:street-address']", "cssAttr": "content" },
         { "cssLocator": "[itemprop='address']" }
       ]
     },
     "main_image_url": {
       "jsonLdPath": "image",
       "fallbacks": [
-        { "cssLocator": "meta[property='og:image']", "cssAttr": "content" }
+        { "cssLocator": "meta[property='og:image']", "cssAttr": "content" },
+        { "cssLocator": "meta[name='twitter:image']", "cssAttr": "content" }
+      ]
+    },
+    "postal_code": {
+      "cssLocator": "meta[property='og:postal-code']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "[itemprop='postalCode']" }
+      ]
+    },
+    "city": {
+      "cssLocator": "meta[property='og:locality']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "[itemprop='addressLocality']" }
+      ]
+    },
+    "region": {
+      "cssLocator": "meta[property='og:region']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "[itemprop='addressRegion']" }
       ]
     }
   },
@@ -51,10 +76,16 @@
       ]
     },
     "latitude": {
-      "jsonLdPath": "geo.latitude"
+      "jsonLdPath": "geo.latitude",
+      "fallbacks": [
+        { "cssLocator": "meta[property='place:location:latitude']", "cssAttr": "content" }
+      ]
     },
     "longitude": {
-      "jsonLdPath": "geo.longitude"
+      "jsonLdPath": "geo.longitude",
+      "fallbacks": [
+        { "cssLocator": "meta[property='place:location:longitude']", "cssAttr": "content" }
+      ]
     },
     "constructed_area": {
       "jsonLdPath": "floorSize.value"
@@ -75,7 +106,8 @@
     {
       "jsonLdPath": "photo",
       "fallbacks": [
-        { "cssLocator": "meta[property='og:image']", "cssAttr": "content" }
+        { "cssLocator": "meta[property='og:image']", "cssAttr": "content" },
+        { "cssLocator": "meta[name='twitter:image']", "cssAttr": "content" }
       ]
     }
   ]
