@@ -108,15 +108,15 @@ const BLOCKED_HOSTS = new Set([
  */
 const KNOWN_RE_DOMAINS = new Set([
   // US
-  'zillow.com', 'redfin.com', 'trulia.com', 'homes.com', 'apartments.com',
+  'homes.com', 'apartments.com',
   'compass.com', 'coldwellbanker.com', 'century21.com', 'kw.com',
 
   // UK
   'purplebricks.co.uk', 'primelocation.com', 'home.co.uk',
 
   // Europe
-  'immowelt.de', 'immoweb.be', 'seloger.com', 'leboncoin.fr',
-  'hemnet.se', 'funda.nl', 'casa.it', 'immobiliare.it',
+  'immowelt.de', 'immoweb.be', 'leboncoin.fr',
+  'casa.it',
   'otodom.pl', 'sreality.cz', 'willhaben.at', 'finn.no',
   'boliga.dk', 'etuovi.com',
 
