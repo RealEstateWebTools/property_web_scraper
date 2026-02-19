@@ -143,6 +143,7 @@ export async function updateListingVisibility(id: string, visibility: string): P
   const listing = await getListing(id);
   if (listing) {
     (listing as any).visibility = visibility;
+    (listing as any).manual_override = true;
     store.set(id, listing);
     if (kv) {
       await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 3600 });

@@ -58,7 +58,7 @@ export async function retrieveListing(
           listing.import_host_slug = syntheticHost.slug;
           listing.last_retrieved_at = new Date();
           Listing.updateFromHash(listing, result.properties[0]);
-          if (diagnostics) {
+          if (diagnostics && !(listing as any).manual_override) {
             listing.confidence_score = diagnostics.confidenceScore;
             listing.visibility = diagnostics.visibility;
           }
@@ -162,8 +162,8 @@ export async function retrieveListing(
           Listing.updateFromHash(listing, result.properties[0]);
         }
  
-        // Sync quality metadata from diagnostics
-        if (diagnostics) {
+        // Sync quality metadata from diagnostics (if not manually overridden)
+        if (diagnostics && !(listing as any).manual_override) {
           listing.confidence_score = diagnostics.confidenceScore;
           listing.visibility = diagnostics.visibility;
         }

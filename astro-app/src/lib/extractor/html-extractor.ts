@@ -54,6 +54,8 @@ export interface ExtractionDiagnostics {
   weightedExtractionRate?: number;
   criticalFieldsMissing?: string[];
   contentAnalysis?: ContentAnalysis;
+  confidenceScore: number;
+  visibility: 'published' | 'pending' | 'spam';
 }
 
 export type ExtractionStatus = 'full' | 'partial' | 'blocked' | 'failed';
@@ -376,6 +378,8 @@ export function extractFromHtml(params: ExtractParams): ExtractionResult {
     weightedExtractionRate: quality.weightedRate,
     criticalFieldsMissing: quality.criticalFieldsMissing,
     contentAnalysis,
+    confidenceScore: quality.confidenceScore,
+    visibility: quality.visibility,
   };
 
   // Collect warnings
