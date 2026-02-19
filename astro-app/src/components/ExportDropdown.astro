@@ -26,6 +26,17 @@ const baseUrl = `/public_api/v1/listings/${listingId}/export`;
       <i class="bi bi-geo-alt text-orange-600"></i> GeoJSON
     </a>
     <div class="border-t border-gray-100 my-1"></div>
+    <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Industry formats</div>
+    <a href={`${baseUrl}?format=blm`} class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+      <i class="bi bi-file-earmark-text text-red-600"></i> BLM (Rightmove)
+    </a>
+    <a href={`${baseUrl}?format=kyero`} class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+      <i class="bi bi-file-earmark-code text-yellow-600"></i> Kyero XML
+    </a>
+    <a href={`${baseUrl}?format=reso-json`} class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+      <i class="bi bi-file-earmark-binary text-indigo-600"></i> RESO JSON
+    </a>
+    <div class="border-t border-gray-100 my-1"></div>
     <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">View in browser</div>
     <a href={`${baseUrl}?format=json&inline=1`} target="_blank" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
       <i class="bi bi-eye text-blue-600"></i> JSON

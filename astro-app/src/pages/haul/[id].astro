@@ -88,15 +88,27 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
               >
                 <i class="bi bi-download"></i> Export <i class="bi bi-chevron-down text-xs"></i>
               </button>
-              <div id="export-menu" class="hidden absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 min-w-[140px]">
+              <div id="export-menu" class="hidden absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 min-w-[180px]">
+                <div class="px-4 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">Standard</div>
                 <a href={`/ext/v1/hauls/${id}/export?format=csv`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
-                  <i class="bi bi-filetype-csv mr-1.5"></i> CSV
+                  <i class="bi bi-file-earmark-spreadsheet text-green-600 mr-1.5"></i> CSV
                 </a>
                 <a href={`/ext/v1/hauls/${id}/export?format=json`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
-                  <i class="bi bi-filetype-json mr-1.5"></i> JSON
+                  <i class="bi bi-braces text-blue-600 mr-1.5"></i> JSON
                 </a>
                 <a href={`/ext/v1/hauls/${id}/export?format=geojson`} class={`block px-4 py-2 text-sm no-underline ${summary && summary.scrapesWithGeo > 0 ? 'text-gray-700 hover:bg-gray-50' : 'text-gray-300 pointer-events-none'}`}>
-                  <i class="bi bi-geo-alt mr-1.5"></i> GeoJSON
+                  <i class="bi bi-geo-alt text-orange-600 mr-1.5"></i> GeoJSON
+                </a>
+                <div class="border-t border-gray-100 my-1"></div>
+                <div class="px-4 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">Industry</div>
+                <a href={`/ext/v1/hauls/${id}/export?format=blm`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                  <i class="bi bi-file-earmark-text text-red-600 mr-1.5"></i> BLM (Rightmove)
+                </a>
+                <a href={`/ext/v1/hauls/${id}/export?format=kyero`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                  <i class="bi bi-file-earmark-code text-yellow-600 mr-1.5"></i> Kyero XML
+                </a>
+                <a href={`/ext/v1/hauls/${id}/export?format=reso-json`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                  <i class="bi bi-file-earmark-binary text-indigo-600 mr-1.5"></i> RESO JSON
                 </a>
               </div>
             </div>
