@@ -36,6 +36,9 @@ async function init() {
     return;
   }
 
+  // Show history immediately (fire-and-forget)
+  renderHistory(config.haulId);
+
   // Get current tab
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.url) {
@@ -169,6 +172,53 @@ $('#view-haul-btn').addEventListener('click', async () => {
   const apiUrl = (config.apiUrl || 'https://property-web-scraper.pages.dev').replace(/\/+$/, '');
   chrome.tabs.create({ url: apiUrl + haulUrl });
 });
+
+// ─── History ─────────────────────────────────────────────────────
+
+async function renderHistory(haulId) {
+  try {
+    const scrapes = await HaulHistory.getHaulScrapes(haulId);
+    const total = await HaulHistory.getTotalScrapeCount();
+    if (scrapes.length === 0) return;
+
+    const section = $('#history-section');
+    const list = $('#history-list');
+    const count = $('#history-count');
+
+    count.textContent = total;
+    list.innerHTML = scrapes.slice(0, 5).map(s => `
+      <li class="history-item">
+        <div class="history-item-top">
+          <span class="history-item-title">${escapeHtml(s.title || 'Untitled')}</span>
+          <span class="grade-badge-sm grade-${escapeHtml(s.grade)}">${escapeHtml(s.grade)}</span>
+        </div>
+        <div class="history-item-meta">
+          <span>${escapeHtml(s.hostname)}</span>
+          <span>${formatTimeAgo(s.scrapedAt)}</span>
+        </div>
+      </li>
+    `).join('');
+
+    section.classList.remove('hidden');
+  } catch { /* non-critical */ }
+}
+
+function formatTimeAgo(dateStr) {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
 
 // ─── Start ───────────────────────────────────────────────────────
 

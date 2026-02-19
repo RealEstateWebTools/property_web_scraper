@@ -9,6 +9,8 @@ const saveBtn = $('#save-btn');
 const createBtn = $('#create-btn');
 const statusEl = $('#status');
 const haulLinkEl = $('#haul-link');
+const clearHistoryBtn = $('#clear-history-btn');
+const scrapeCountEl = $('#scrape-count');
 
 const DEFAULT_URL = 'https://property-web-scraper.pages.dev';
 
@@ -63,6 +65,9 @@ createBtn.addEventListener('click', async () => {
     const data = await response.json();
     haulIdInput.value = data.haul_id;
 
+    // Persist haul to local history
+    HaulHistory.saveHaul(data.haul_id).then(updateScrapeCount).catch(() => {});
+
     // Auto-save
     chrome.storage.sync.set({ haulId: data.haul_id, apiUrl: apiUrl || DEFAULT_URL }, () => {
       showStatus('Haul created and saved', 'success');
@@ -89,3 +94,18 @@ function showStatus(msg, type) {
     statusEl.classList.remove('show');
   }, 3000);
 }
+
+// ─── History / Privacy ──────────────────────────────────────────
+
+async function updateScrapeCount() {
+  const count = await HaulHistory.getTotalScrapeCount();
+  scrapeCountEl.textContent = `${count} scrape${count !== 1 ? 's' : ''} stored`;
+}
+
+clearHistoryBtn.addEventListener('click', async () => {
+  await HaulHistory.clearAllHistory();
+  updateScrapeCount();
+  showStatus('History cleared', 'success');
+});
+
+updateScrapeCount();

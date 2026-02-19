@@ -3,6 +3,8 @@
  * Handles API communication and badge logic.
  */
 
+importScripts('./haul-history.js');
+
 const SUPPORTED_HOSTS = [
   'rightmove.co.uk', 'zoopla.co.uk', 'onthemarket.com',
   'idealista.com', 'idealista.pt', 'fotocasa.es', 'pisos.com',
@@ -102,7 +104,27 @@ async function handleExtraction({ url, html }) {
     throw new Error(err.error?.message || `API error: ${response.status}`);
   }
 
-  return response.json();
+  const data = await response.json();
+
+  // Persist scrape summary to local history
+  try {
+    const scrape = data.scrape || {};
+    const extracted = scrape.fields_extracted || 0;
+    const available = scrape.fields_available || 0;
+    const rate = available > 0 ? Math.round((extracted / available) * 100) : 0;
+    let hostname = '';
+    try { hostname = new URL(url).hostname.replace(/^www\./, ''); } catch {}
+    await HaulHistory.saveScrape(haulId, {
+      resultId: data.result_id || scrape.result_id || '',
+      title: scrape.title || '',
+      grade: scrape.grade || '?',
+      price: scrape.price || '',
+      rate,
+      hostname,
+    });
+  } catch { /* non-critical */ }
+
+  return data;
 }
 
 async function handleCreateHaul() {
@@ -115,5 +137,16 @@ async function handleCreateHaul() {
     throw new Error(err.error?.message || `API error: ${response.status}`);
   }
 
-  return response.json();
+  const data = await response.json();
+
+  // Persist haul to local history
+  try {
+    await HaulHistory.saveHaul(data.haul_id);
+  } catch { /* non-critical */ }
+
+  return data;
 }
+
+// ─── Startup ───────────────────────────────────────────────────
+
+HaulHistory.pruneExpired();
