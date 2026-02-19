@@ -73,6 +73,9 @@ function truncate(str: string, len: number): string {
                     entry.format === 'xml' ? 'bg-purple-100 text-purple-700' :
                     entry.format === 'schema-org' ? 'bg-teal-100 text-teal-700' :
                     entry.format === 'icalendar' ? 'bg-pink-100 text-pink-700' :
+                    entry.format === 'blm' ? 'bg-red-100 text-red-700' :
+                    entry.format === 'kyero' ? 'bg-yellow-100 text-yellow-700' :
+                    entry.format === 'reso-json' ? 'bg-indigo-100 text-indigo-700' :
                     'bg-gray-100 text-gray-700'
                   }`}>
                     {entry.format.toUpperCase()}
