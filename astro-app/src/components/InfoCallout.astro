@@ -1,0 +1,62 @@
+---
+interface Props {
+  variant: 'success' | 'warning' | 'error' | 'info';
+  icon?: string;
+  dismissible?: boolean;
+}
+
+const { variant, icon, dismissible = false } = Astro.props;
+
+const variantMap = {
+  success: {
+    bg: 'bg-success-50',
+    border: 'border-success-border',
+    text: 'text-green-800',
+    iconClass: icon || 'bi-check-circle-fill',
+    iconColor: 'text-green-500',
+    role: 'status' as const,
+  },
+  warning: {
+    bg: 'bg-warning-50',
+    border: 'border-warning-border',
+    text: 'text-amber-800',
+    iconClass: icon || 'bi-exclamation-triangle-fill',
+    iconColor: 'text-amber-500',
+    role: 'status' as const,
+  },
+  error: {
+    bg: 'bg-error-50',
+    border: 'border-error-border',
+    text: 'text-red-800',
+    iconClass: icon || 'bi-exclamation-octagon-fill',
+    iconColor: 'text-red-500',
+    role: 'alert' as const,
+  },
+  info: {
+    bg: 'bg-info-50',
+    border: 'border-info-border',
+    text: 'text-blue-800',
+    iconClass: icon || 'bi-info-circle-fill',
+    iconColor: 'text-blue-500',
+    role: 'status' as const,
+  },
+};
+
+const v = variantMap[variant];
+---
+<div class={`${v.bg} border ${v.border} rounded-xl p-4 mb-6 flex items-start gap-3`} role={v.role}>
+  <i class={`bi ${v.iconClass} ${v.iconColor} text-lg shrink-0 mt-0.5`}></i>
+  <div class={`text-sm ${v.text} flex-1`}>
+    <slot />
+  </div>
+  {dismissible && (
+    <button
+      type="button"
+      class={`${v.text} opacity-60 hover:opacity-100 shrink-0`}
+      aria-label="Dismiss"
+      onclick="this.closest('[role]').remove()"
+    >
+      <i class="bi bi-x-lg"></i>
+    </button>
+  )}
+</div>

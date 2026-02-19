@@ -1,0 +1,56 @@
+---
+import { PUBLIC_NAV_LINKS } from '@lib/nav-data.js';
+---
+<nav class="bg-surface border-b border-border">
+  <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
+    <a class="font-bold text-lg text-text no-underline flex items-center gap-1" href="/">
+      <i class="bi bi-building"></i> PropertyWebScraper
+    </a>
+    <button
+      id="navToggle"
+      type="button"
+      class="md:hidden p-2 text-text-secondary hover:text-text"
+      aria-label="Toggle navigation"
+      aria-expanded="false"
+      aria-controls="mobileMenu"
+    >
+      <i class="bi bi-list text-xl"></i>
+    </button>
+    <div id="navMenu" class="hidden md:flex items-center gap-6">
+      {PUBLIC_NAV_LINKS.map((link) => (
+        <a
+          class="text-sm text-text-secondary hover:text-primary no-underline transition flex items-center gap-1"
+          href={link.href}
+          {...(link.external ? { target: '_blank' } : {})}
+        >
+          {link.icon && <i class={`bi ${link.icon}`}></i>}
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </div>
+  <!-- Mobile menu -->
+  <div id="mobileMenu" class="hidden md:hidden border-t border-border-light px-4 pb-3">
+    {PUBLIC_NAV_LINKS.map((link) => (
+      <a
+        class="block py-2 text-sm text-text-secondary hover:text-primary no-underline flex items-center gap-1"
+        href={link.href}
+        {...(link.external ? { target: '_blank' } : {})}
+      >
+        {link.icon && <i class={`bi ${link.icon}`}></i>}
+        {link.label}
+      </a>
+    ))}
+  </div>
+</nav>
+
+<script is:inline>
+  const toggle = document.getElementById('navToggle');
+  const menu = document.getElementById('mobileMenu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', () => {
+      const expanded = menu.classList.toggle('hidden');
+      toggle.setAttribute('aria-expanded', String(!expanded));
+    });
+  }
+</script>

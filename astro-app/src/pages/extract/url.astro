@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import InfoCallout from '../../components/InfoCallout.astro';
 import { retrieveListing } from '@lib/services/listing-retriever.js';
 import { fetchHtml } from '@lib/services/html-fetcher.js';
 import { initKV, generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
@@ -98,14 +99,11 @@ if (Astro.request.method === 'POST') {
       </div>
 
       <!-- URL-only warning -->
-      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
-        <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg shrink-0 mt-0.5"></i>
-        <div class="text-sm text-amber-800">
-          <strong>URL-only mode fetches the raw server HTML.</strong> On JavaScript-heavy sites (most modern portals), this may return an empty shell with missing data.
-          For the best results, use <a href="/extract/html" class="text-amber-900 underline font-medium">Paste HTML</a> or <a href="/extract/upload" class="text-amber-900 underline font-medium">Upload File</a> instead.
-          <a href="/docs/get-html" class="text-amber-900 underline font-medium">Learn how to get the full page HTML &rarr;</a>
-        </div>
-      </div>
+      <InfoCallout variant="warning">
+        <strong>URL-only mode fetches the raw server HTML.</strong> On JavaScript-heavy sites (most modern portals), this may return an empty shell with missing data.
+        For the best results, use <a href="/extract/html" class="text-amber-900 underline font-medium">Paste HTML</a> or <a href="/extract/upload" class="text-amber-900 underline font-medium">Upload File</a> instead.
+        <a href="/docs/get-html" class="text-amber-900 underline font-medium">Learn how to get the full page HTML &rarr;</a>
+      </InfoCallout>
 
       <div class="bg-white rounded-2xl shadow-lg p-8">
         <h4 class="mb-2 font-semibold text-lg">Extract from URL</h4>
