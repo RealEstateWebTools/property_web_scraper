@@ -12,6 +12,7 @@ export const PUBLIC_NAV_LINKS: NavLink[] = [
   { label: 'Listings', href: '/listings' },
   { label: 'Sites', href: '/sites' },
   { label: 'API', href: '/docs/api' },
+  { label: 'Extension', href: '/extension', icon: 'bi-puzzle' },
   { label: 'Admin', href: '/admin', icon: 'bi-gear' },
   { label: 'GitHub', href: 'https://github.com/RealEstateWebTools/property_web_scraper', icon: 'bi-github', external: true },
 ];

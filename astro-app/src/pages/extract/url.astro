@@ -6,6 +6,7 @@ import { fetchHtml } from '@lib/services/html-fetcher.js';
 import { initKV, generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
 import { initScrapeMetadataKV, recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
+import { screenUrl } from '@lib/services/url-screener.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
 initScrapeMetadataKV((Astro.locals as any).runtime?.env?.RESULTS);
@@ -15,18 +16,35 @@ const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'rea
 if (Astro.request.method === 'POST') {
   const contentType = Astro.request.headers.get('content-type') || '';
   let importUrl = '';
+  let bypassScreen = false;
 
   if (contentType.includes('multipart/form-data')) {
     const formData = await Astro.request.formData();
     importUrl = (formData.get('import_url') as string || '').trim();
+    bypassScreen = formData.get('bypass_screen') === '1';
   } else {
     const body = await Astro.request.text();
     const params = new URLSearchParams(body);
     importUrl = (params.get('import_url') || '').trim();
+    bypassScreen = params.get('bypass_screen') === '1';
   }
 
   if (!importUrl) {
     return Astro.redirect('/extract/error?reason=missing_url');
+  }
+
+  // Screen the URL before extraction (unless bypassed)
+  if (!bypassScreen) {
+    const screening = screenUrl(importUrl);
+    if (screening.verdict === 'not_real_estate') {
+      return Astro.redirect(`/extract/error?reason=not_real_estate&url=${encodeURIComponent(importUrl)}`);
+    }
+    if (screening.verdict === 'search_results') {
+      return Astro.redirect(`/extract/error?reason=search_results&url=${encodeURIComponent(importUrl)}`);
+    }
+    if (screening.verdict === 'unknown_real_estate') {
+      return Astro.redirect(`/extract/error?reason=unknown_real_estate&url=${encodeURIComponent(importUrl)}`);
+    }
   }
 
   // Check if this portal blocks server-side fetching
@@ -133,6 +151,10 @@ if (Astro.request.method === 'POST') {
           <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">+ more</span>
         </div>
       </div>
+
+      <InfoCallout variant="info" icon="bi-puzzle">
+        <strong>Prefer one-click extraction?</strong> The <a href="/extension" class="text-blue-800 underline font-medium">Chrome Extension</a> captures the fully-rendered page directly from your browser &mdash; no URL limitations.
+      </InfoCallout>
 
     </div>
   </div>
