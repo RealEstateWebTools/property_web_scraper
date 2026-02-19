@@ -17,20 +17,21 @@ Both share the same scraper mapping JSON files in `config/scraper_mappings/`.
 
 ```
 property_web_scraper/
-├── app/                    # Rails engine (models, controllers, services)
+├── app/                    # Rails engine (legacy, not actively developed)
 ├── astro-app/              # Astro 5 SSR rewrite (active development)
 │   ├── src/lib/extractor/  # Core extraction pipeline
-│   ├── src/lib/services/   # URL validation, auth, rate limiting
+│   ├── src/lib/services/   # URL validation, auth, rate limiting, haul store
 │   ├── src/pages/          # Astro pages and API endpoints
 │   ├── test/fixtures/      # HTML fixtures + manifest.ts
 │   ├── test/lib/           # Vitest unit tests
 │   ├── scripts/            # CLI utilities (capture-fixture)
 │   └── docs/               # Maintenance guides
 ├── chrome-extensions/       # Chrome extensions
-│   ├── property-scraper/   # Public extension (one-click extraction popup)
+│   ├── property-scraper/   # Public extension (haul-based extraction)
 │   └── mcp-bridge/         # Dev extension (WebSocket bridge to MCP server)
 ├── config/scraper_mappings/ # JSON mapping files (shared by both)
-├── spec/                   # Rails RSpec tests
+├── .claude/skills/         # Claude Code skills (add-scraper, fix-scraper, etc.)
+├── spec-archive/           # Archived Rails RSpec tests (not run in CI)
 ├── DESIGN.md               # Architecture and API reference
 └── CHANGELOG.md            # Version history
 ```
@@ -76,9 +77,24 @@ Use the `/add-scraper` skill or follow the manual workflow:
 
 1. Capture HTML fixture: `cd astro-app && npm run capture-fixture -- <url>`
 2. Create mapping: `config/scraper_mappings/<name>.json`
-3. Add hostname to `url-validator.ts` and `capture-fixture.ts`
+3. Add hostname to `url-validator.ts` (LOCAL_HOST_MAP) and `capture-fixture.ts` (HOSTNAME_MAP)
 4. Add manifest entry: `astro-app/test/fixtures/manifest.ts`
 5. Run tests: `cd astro-app && npx vitest run`
+
+### Test haul endpoints
+
+```bash
+# Create a haul
+curl -X POST http://localhost:4321/ext/v1/hauls
+
+# Add a scrape to a haul
+curl -X POST http://localhost:4321/ext/v1/hauls/<id>/scrapes \
+  -H 'Content-Type: application/json' \
+  -d '{"url":"https://www.rightmove.co.uk/properties/168908774","html":"<html>...</html>"}'
+
+# Get haul summary
+curl http://localhost:4321/ext/v1/hauls/<id>
+```
 
 ### Fix a broken scraper
 

@@ -28,6 +28,8 @@ Copy `.env.example` to `.env` and fill in the values you need:
 | `GOOGLE_APPLICATION_CREDENTIALS` | No | Path to Firebase service account JSON |
 | `FIRESTORE_COLLECTION_PREFIX` | No | Optional prefix for Firestore collection names |
 | `PWS_API_KEY` | No | API key protecting `/retriever/as_json` and `/api/v1/listings`. When empty, auth is skipped |
+| `PWS_ALLOWED_ORIGINS` | No | Comma-separated list of allowed CORS origins (default: `*`) |
+| `PWS_ADMIN_KEY` | No | Admin key for `/admin/*` endpoints |
 
 Note: the Astro app does not require a Google Maps API key. The listing page uses external map links rather than embedding a provider SDK.
 
@@ -76,27 +78,32 @@ astro-app/
 | `GET` | `/` | None | Home page with URL / HTML / file upload form |
 | `POST` | `/scrapers/submit` | None | Form submission — returns HTML partial |
 | `GET` | `/single_property_view?url=...` | None | Property detail page |
-| `GET` | `/retriever/as_json?url=...` | API key | JSON extraction |
-| `POST` | `/retriever/as_json` | API key | JSON extraction with HTML body |
-| `GET` | `/api/v1/listings?url=...` | API key | Listing metadata |
-| `POST` | `/api/v1/listings` | API key | Extract and save listing |
+| `GET/POST` | `/public_api/v1/listings?url=...` | API key | Extract listing from URL |
+| `GET` | `/public_api/v1/listings/:id` | API key | Retrieve stored listing |
+| `GET` | `/public_api/v1/supported_sites` | None | List supported portals |
+| `GET` | `/public_api/v1/health` | None | Health check |
+| `POST` | `/ext/v1/hauls` | None | Create anonymous haul collection |
+| `GET` | `/ext/v1/hauls/:id` | None | Get haul summary |
+| `POST` | `/ext/v1/hauls/:id/scrapes` | None | Add scrape to haul |
 
-API key can be passed as `?api_key=...` query param or `X-Api-Key` header.
+API key can be passed as `?api_key=...` query param or `X-Api-Key` header. Haul endpoints require no authentication. See [DESIGN.md](../DESIGN.md) for the full endpoint reference.
 
 ## Supported Sites
 
-The local fallback host map includes:
+17 portals across 8 countries:
 
-- idealista.com
-- rightmove.co.uk
-- zoopla.co.uk
-- realtor.com
-- fotocasa.es
-- pisos.com
-- realestateindia.com
-- forsalebyowner.com
+| Country | Portals |
+|---------|---------|
+| UK | Rightmove, Zoopla, OnTheMarket, Jitty |
+| Spain | Idealista, Fotocasa, Pisos.com |
+| Portugal | Idealista PT |
+| Ireland | Daft.ie |
+| USA | Realtor.com, ForSaleByOwner, MLSListings, WyomingMLS |
+| India | RealEstateIndia |
+| Germany | ImmobilienScout24 |
+| Australia | Domain, RealEstate.com.au |
 
-Additional sites can be configured via Firestore `import_hosts` collection and corresponding scraper mapping JSON files in `config/scraper_mappings/`.
+Portal list is derived from the `PORTAL_REGISTRY` in `src/lib/services/portal-registry.ts`. Additional sites can be configured via Firestore `import_hosts` collection and corresponding scraper mapping JSON files in `config/scraper_mappings/`.
 
 ### Adding a New Scraper
 
@@ -117,7 +124,7 @@ The utility saves the HTML to `test/fixtures/`, runs the extraction pipeline, an
 
 ## Architecture Notes
 
-- **Astro 5 SSR** with `@astrojs/node` adapter (standalone mode)
+- **Astro 5 SSR** with Cloudflare Pages adapter
 - **Tailwind CSS v4** via `@tailwindcss/vite` plugin
 - **Firestore lazy-loading** — the Firestore client initialises on first use; if credentials are missing the app switches to an in-memory backend transparently
 - **Local host map fallback** — URL validation works without Firestore by using a hardcoded map of supported hostnames

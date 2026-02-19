@@ -6,15 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- Anonymous haul collections for Chrome extension — browse multiple listings, collect them into a shareable results page without login or API key
+- `POST /ext/v1/hauls`, `GET /ext/v1/hauls/:id`, `POST /ext/v1/hauls/:id/scrapes` endpoints
+- KV-backed haul store with in-memory fallback (`haul-store.ts`)
+- Keep-alive alarm in MCP bridge to prevent service worker termination
+
 ### Changed
-- Split Chrome extension into two: `chrome-extensions/property-scraper/` (public, one-click extraction) and `chrome-extensions/mcp-bridge/` (dev-only WebSocket bridge to MCP server) — cleaner separation of concerns and no `<all_urls>` permission needed for the public extension
+- Chrome extension simplified to summary + results page link (haul-based workflow)
+
+## [1.0.0] — 2026-02-15
+
+Astro 5 SSR rewrite of the extraction engine, replacing the Rails implementation. All Phase 1-2 roadmap items complete.
 
 ### Added
+- **Astro 5 SSR application** (`astro-app/`) with Cloudflare Pages deployment
+- Split Chrome extension into two: `chrome-extensions/property-scraper/` (public, one-click extraction) and `chrome-extensions/mcp-bridge/` (dev-only WebSocket bridge to MCP server)
 - WebSocket bridge between Chrome extension and MCP server — `capture_page` and `extension_status` tools let Claude Code capture rendered HTML from the browser's active tab and save it as a test fixture
 - Connection status indicator in extension popup — green/grey dot shows whether the MCP server bridge is active
-- `<all_urls>` host permissions for the Chrome extension, enabling HTML capture from any property portal
-- Directory restructure: `chrome-extension/` → `chrome-extensions/property-scraper/`
-- Portal configuration registry (`portal-registry.ts`) — centralized config for all 11 supported portals with country, currency, locale, content source, and JS rendering requirements
+- Portal configuration registry (`portal-registry.ts`) — centralized config for all 17 supported portals with country, currency, locale, content source, and JS rendering requirements
 - Weighted quality scoring — fields classified as critical/important/optional with 3/2/1 weights; grade capped at C when critical fields (title, price) are missing
 - Fallback strategy chains — `FieldMapping.fallbacks` array allows multiple extraction strategies per field, tried in order until one succeeds
 - URL canonicalization and deduplication (`url-canonicalizer.ts`) — strips tracking params (utm_*, fbclid, gclid), normalizes protocol/host; listing store indexes by canonical URL to prevent duplicates
@@ -24,30 +34,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Schema splitting (`schema-splitter.ts`) — separates extraction output into asset data (physical property) and listing data (commercial/pricing) for downstream integration
 - Admin UI: portal metadata badges on scraper detail page, weighted rate display, critical fields warnings, content analysis card, fallback indicators in field traces
 - `HtmlExtractor` service — pure-function HTML extraction with zero network I/O; accepts raw HTML + source URL and returns structured property data
-- HTML-first input across all endpoints — `html` (string) and `html_file` (upload) parameters on `/scrapers/submit`, `/retriever/as_json`, `/api/v1/listings`, and `/single_property_view`
-- `POST /api/v1/listings` route for submitting HTML via API
-- Redesigned landing page with dark gradient hero, tabbed input form (URL / Paste HTML / Upload File), inline AJAX results, and "How It Works" walkthrough
-- Stimulus `scraper-form` controller — handles tab switching and fetch-based form submission with loading spinner
-- Styled result cards for both success (property card with stat pills, expandable fields, image thumbnails) and error (unsupported-site list, tips for JS-rendered sites)
-- `DESIGN.md` documenting architecture, API reference, mapping schema, and migration guide
-- `UrlValidator` service — single entry point for URL validation across all controllers
-- `ScrapedContentSanitizer` service — strips HTML tags, blocks dangerous URI schemes (`javascript:`, `data:`), and normalises protocol-relative URLs before persistence
-- API key authentication via `authenticate_api_key!` in `ApplicationController`; supports `X-Api-Key` header and `api_key` query parameter
-- `Listing#import_host` association method with memoisation and cache-clearing on slug change
-- `Rails.logger` calls for scraping attempts, results, and failures
-- Error-path specs for network timeouts, malformed HTML, missing fields, and unsupported URLs
-- `.env.development` template with Firestore emulator defaults
+- HTML-first input across all endpoints — `html` (string) and `html_file` (upload) parameters
+- Public API endpoints: `/public_api/v1/listings`, `/public_api/v1/supported_sites`, `/public_api/v1/health`
+- Structured error responses with error codes (`MISSING_URL`, `INVALID_URL`, `UNSUPPORTED_HOST`, `UNAUTHORIZED`, `RATE_LIMITED`, etc.)
+- Input validation (size limits, Content-Type enforcement)
+- In-memory rate limiting (60 req/min default, configurable)
+- CORS headers on all API responses
+- Content sanitization — strips HTML tags, blocks dangerous URI schemes
+- API key authentication via `X-Api-Key` header or `api_key` query parameter
+- Redesigned landing page with dark gradient hero, tabbed input form, inline AJAX results
+- `DESIGN.md` documenting architecture, API reference, mapping schema
+- 17 scraper mappings across 8 countries
+- Vitest unit tests and Playwright E2E tests
+- `capture-fixture` CLI utility for creating HTML test fixtures
 
 ### Changed
-- `Scraper` refactored to thin orchestration layer delegating extraction to `HtmlExtractor`; direct HTTP fetch now logs a deprecation warning
-- `ListingRetriever` accepts `html:` keyword parameter, passed through to `Scraper`
-- Landing page layout uses full-width hero; stash and error views wrap content in their own containers
-- `Listing.update_from_hash` now calls `ScrapedContentSanitizer.call` before persisting data
-- All controllers delegate URL parsing to `UrlValidator` instead of inline `URI.parse` calls
+- Full rewrite from Ruby/Rails/Nokogiri to TypeScript/Astro/Cheerio
+- Extraction pipeline processes 7 strategy types: cssLocator, scriptJsonVar, scriptJsonPath, flightDataPath, jsonLdPath, scriptRegEx, urlPathPart
+- Scraper mappings extended with `portal` metadata block, `expectedExtractionRate`, `fallbacks`
 
-### Fixed
-- `Listing` super call for `FirestoreModel` compatibility (3096316f)
-- CI emulator startup reliability (3096316f)
+### Removed
+- Stale scrapers: cerdfw, carusoimmobiliare, weebrix, inmo1, pwb
 
 ## [0.2.0] — 2026-02-01
 

@@ -96,6 +96,6 @@ The user will provide `$ARGUMENTS` which should be a URL of a sample listing pag
 
 ## Existing scrapers for reference
 
-These scrapers are already configured: idealista, rightmove, zoopla, realtor, fotocasa, pisos, realestateindia, forsalebyowner, mlslistings, wyomingmls, inmo1, pwb, carusoimmobiliare, cerdfw, weebrix.
+These scrapers are already configured: uk_rightmove, uk_zoopla, uk_onthemarket, uk_jitty, es_idealista, es_fotocasa, es_pisos, pt_idealista, ie_daft, us_realtor, us_forsalebyowner, us_mlslistings, us_wyomingmls, in_realestateindia, de_immoscout, au_domain, au_realestate.
 
 See `config/scraper_mappings/` for their mapping files and `astro-app/test/fixtures/manifest.ts` for expected values.

@@ -55,7 +55,7 @@ Out of scope (legacy/history):
   - Removed `GOOGLE_MAPS_API_KEY`
 - `astro-app/README.md`
   - Removed map key from environment table
-- `docs/QUICK_WINS_CHECKLIST.md`
+- `docs/archive/QUICK_WINS_CHECKLIST.md` (archived)
   - Removed env-validator example warning about missing maps key
 
 ## Rollout plan

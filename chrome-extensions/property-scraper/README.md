@@ -41,19 +41,20 @@ User clicks extension icon
         │
         │  EXTRACT { url, html }
         ▼
-   ┌──────────────┐    POST /public_api/v1/listings    ┌──────────┐
-   │ Background   │ ─────────────────────────────────▶  │ PWS API  │
-   │ Service Worker│ ◀─────────────────────────────────  │          │
-   └──────────────┘   { properties, diagnostics }       └──────────┘
+   ┌──────────────┐    POST /ext/v1/hauls/:id/scrapes   ┌──────────┐
+   │ Background   │ ──────────────────────────────────▶  │ PWS API  │
+   │ Service Worker│ ◀──────────────────────────────────  │          │
+   └──────────────┘   { properties, diagnostics }        └──────────┘
         │
         ▼
-   Render property card in popup
+   Render summary + link to results page
 ```
 
-1. **Popup opens** → checks API key in `chrome.storage.sync`
+1. **Popup opens** → creates or retrieves an anonymous haul via `POST /ext/v1/hauls`
 2. **Content script** captures `document.documentElement.outerHTML`
-3. **Background service worker** forwards to the PWS API with API key
-4. **Popup** renders the property card with extracted data
+3. **Background service worker** sends HTML + URL to `POST /ext/v1/hauls/:id/scrapes`
+4. **Popup** shows extraction summary and a link to the haul results page
+5. User can keep browsing — each supported page adds to the same haul
 
 ## Installation (Development)
 
@@ -69,10 +70,9 @@ Open the extension settings (gear icon) to configure:
 
 | Setting | Description | Default |
 |---------|-------------|---------|
-| **API Key** | Your PropertyWebScraper API key (required) | — |
 | **API URL** | API endpoint URL | `https://property-web-scraper.pages.dev` |
 
-Settings are stored in `chrome.storage.sync` and synced across Chrome instances.
+No API key is required — the extension uses anonymous haul collections. Settings are stored in `chrome.storage.sync` and synced across Chrome instances.
 
 ## Supported Portals
 
@@ -84,11 +84,9 @@ The extension uses portal-specific host permissions. The green badge activates o
 | Spain | Idealista, Fotocasa, Pisos.com |
 | Portugal | Idealista PT |
 | Ireland | Daft.ie |
-| USA | Realtor.com, ForSaleByOwner |
+| USA | Realtor.com, ForSaleByOwner, MLSListings, WyomingMLS |
 | India | RealEstateIndia |
-| Netherlands | Jitty |
 | Germany | ImmobilienScout24 |
-| France | SeLoger, Leboncoin |
 | Australia | Domain, RealEstate.com.au |
 
 ## Popup UI States
@@ -125,6 +123,9 @@ The API server (`api-response.ts`) was updated to allow `chrome-extension://` or
 | Problem | Solution |
 |---------|----------|
 | Badge does not appear on supported sites | Check that the extension has host permissions granted |
+| "Error extracting" after clicking | Verify the API URL in settings points to a running PWS instance |
+| Popup shows empty or partial data | The page may require JS rendering — wait for full page load before clicking |
+| Haul results page shows no listings | Check browser console for CORS errors; verify `PWS_ALLOWED_ORIGINS` includes the extension origin |
 
 ## Publishing to Chrome Web Store
 

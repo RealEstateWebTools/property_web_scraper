@@ -1,167 +1,121 @@
-# PropertyWebScraper Design Document
+# PropertyWebScraper — Architecture Reference
 
-## Architecture Overview
+## Overview
 
-PropertyWebScraper uses an **HTML-first extraction** architecture with
-**fetch-as-fallback**. The core extraction logic lives in `HtmlExtractor`, a
-pure-function service that takes raw HTML and returns structured property data.
-No network I/O happens inside the extractor.
+PropertyWebScraper is an HTML-first extraction engine built with **Astro 5 SSR** and deployed on **Cloudflare Pages**. Given fully-rendered HTML and a source URL, it applies configurable JSON mappings to extract structured property data — title, price, coordinates, images, and 70+ fields across 17 portals.
+
+No browser automation or JS rendering happens inside the engine. Callers (Chrome extension, Puppeteer, curl) provide the HTML.
 
 ```
   External caller (Chrome extension, headless browser, curl)
        |
        | provides rendered HTML + source URL
        v
-  +-----------------+        +------------------+
-  |  Controllers    | -----> |  Scraper         |
-  | (API / Web UI)  |        | (orchestration)  |
-  +-----------------+        +------------------+
-                                   |
-                    +--------------+--------------+
-                    |                             |
-              html: provided?               html: nil?
-                    |                             |
-                    v                             v
-           +----------------+          open-uri HTTP fetch
-           | HtmlExtractor  |          (fallback, static sites)
-           | (pure function)|                 |
-           +----------------+                 v
-                    |                  +----------------+
-                    |                  | HtmlExtractor  |
-                    v                  +----------------+
-           { properties: [...] }              |
-                                              v
-                                     { properties: [...] }
+  +-----------------+        +--------------------+
+  |  API Endpoints  | -----> | Extraction Runner  |
+  | (Astro pages)   |        | (orchestration)    |
+  +-----------------+        +--------------------+
+                                    |
+                     +--------------+--------------+
+                     |                             |
+               html: provided?               html: nil?
+                     |                             |
+                     v                             v
+            +----------------+          resilient-fetch HTTP
+            | HtmlExtractor  |          (fallback, static sites)
+            | (pure function)|                 |
+            +----------------+                 v
+                     |                  +----------------+
+                     |                  | HtmlExtractor  |
+                     v                  +----------------+
+            { properties: [...] }              |
+                                               v
+                                      { properties: [...] }
 ```
 
-## Why This Change
+## Extraction Pipeline
 
-Most modern real estate websites use client-side rendering (React, Vue, etc.).
-The original `open-uri` + Nokogiri pipeline cannot execute JavaScript, so live
-scraping silently returns empty or incorrect data on these sites.
+The extraction engine (`astro-app/src/lib/extractor/html-extractor.ts`) processes field sections in a strict, fixed order. Each section overwrites prior values for the same key:
 
-By pushing the responsibility for obtaining fully-rendered HTML to the caller,
-the engine focuses on what it does well: extracting structured property data
-from HTML using configurable mappings. A Chrome extension, Puppeteer script, or
-any other tool can handle JS rendering, cookies, and anti-bot measures, then
-pass the result to this engine.
+| Step | Section | Output type | Coercion |
+|------|---------|-------------|----------|
+| 1 | `defaultValues` | string | `fieldMapping.value` (static) |
+| 2 | `images` | string[] | Image URL arrays |
+| 3 | `features` | string[] | Feature string arrays |
+| 4 | `intFields` | number | `parseInt(text, 10) \|\| 0` |
+| 5 | `floatFields` | number | `parseFloat(text) \|\| 0` (with optional `stripPunct`, `stripFirstChar`) |
+| 6 | `textFields` | string | `text.trim()` |
+| 7 | `booleanFields` | boolean | Evaluator function (true/false) |
 
-Direct HTTP fetching remains available as a fallback for static sites, with a
-deprecation warning logged on each use.
+**Key rule**: if a field appears in multiple sections, the last one wins. For example, `count_bedrooms` in both `intFields` and `textFields` becomes a string.
 
-## Component Reference
+## Extraction Strategies
 
-### `HtmlExtractor` (new)
+Each field mapping selects a text retrieval strategy. The engine tries strategies in order; the last one that produces a result wins.
 
-Location: `app/services/property_web_scraper/html_extractor.rb`
+### Strategy reference
 
-Pure-function service. Zero network I/O.
+| Strategy | Properties | Description |
+|----------|-----------|-------------|
+| `cssLocator` | `cssLocator`, optional `cssAttr`/`xmlAttr`, `cssCountId` | CSS selector via Cheerio. Most common strategy. Without `cssCountId`, concatenates all matched elements. |
+| `scriptJsonVar` + `scriptJsonPath` | `scriptJsonVar`, `scriptJsonPath` | Named JSON variable in `<script>` tags. Handles `window.VAR = {...}` and `<script id="VAR">` patterns. Cached per document. |
+| `flightDataPath` | `flightDataPath` | Dot-path into Next.js RSC flight data (`self.__next_f.push`). Parses all chunks, resolves `$N` back-references. |
+| `jsonLdPath` | `jsonLdPath`, optional `jsonLdType` | Dot-path into `<script type="application/ld+json">` structured data. `jsonLdType` filters by `@type`. |
+| `scriptRegEx` | `scriptRegEx` | Regex pattern on concatenated `<script>` tag text. First capture group is returned. |
+| `urlPathPart` | `urlPathPart` | Extract URL path segment by index (1-based). |
+| `value` | `value` | Static default string (used in `defaultValues`). |
+| `apiEndpoint` + `apiJsonPath` | `apiEndpoint`, `apiJsonPath` | Fetch JSON from an API endpoint and navigate via dot-path. `{id}` placeholder in URL is replaced with the property ID. |
+| `fallbacks` | `fallbacks` (array of FieldMapping) | Array of alternative mappings tried in order when the primary strategy returns empty. |
 
-```ruby
-HtmlExtractor.call(
-  html: "<html>...</html>",             # required
-  source_url: "https://example.com/...", # required
-  scraper_mapping_name: "idealista",     # optional (auto-detects from URL host)
-  scraper_mapping: mapping_object        # optional (takes precedence)
-)
-# => { success: true, properties: [{ "title" => "...", ... }] }
-```
+### Post-processing options
 
-**Mapping resolution order:**
-1. `scraper_mapping:` parameter (pre-loaded object)
-2. `scraper_mapping_name:` parameter (looked up via `ScraperMapping.find_by_name`)
-3. Auto-detect from `source_url` host via `ImportHost`
+Applied after text retrieval, before type coercion:
 
-### `Scraper` (refactored)
+| Property | Description |
+|----------|-------------|
+| `cssAttr` / `xmlAttr` | Extract an HTML attribute instead of text content |
+| `cssCountId` | Pick element at index (0-based). Without this, Cheerio concatenates all matches. |
+| `splitTextCharacter` | Split extracted text by this character |
+| `splitTextArrayId` | Pick element at index after splitting (0-based) |
+| `stripString` | Remove first occurrence of this exact substring (runs after split) |
+| `stripPunct` | Remove `.` and `,` characters (for number parsing) |
+| `stripFirstChar` | Trim whitespace then remove first character (for currency symbols) |
+| `imagePathPrefix` | Prefix for relative image paths |
+| `modifiers` | Composable normalization pipeline |
+| `caseInsensitive` | Lowercase before boolean evaluation |
 
-Location: `app/services/property_web_scraper/scraper.rb`
+### Strategy decision tree
 
-Thin orchestration layer. Delegates extraction to `HtmlExtractor`.
-
-```ruby
-scraper = Scraper.new('idealista')
-
-# With pre-rendered HTML (no HTTP fetch):
-listing = scraper.process_url(url, import_host, html: rendered_html)
-
-# Without HTML (legacy fallback, fetches via open-uri):
-listing = scraper.process_url(url, import_host)
-```
-
-Key methods:
-- `process_url(url, import_host, html: nil)` - main entry point
-- `retrieve_and_save(listing, slug, html: nil)` - extract + persist
-- `retrieve_from_webpage(url)` - legacy method, fetches then extracts
-
-### `ListingRetriever` (updated)
-
-Location: `app/services/property_web_scraper/listing_retriever.rb`
-
-```ruby
-# With HTML:
-result = ListingRetriever.new(url, html: rendered_html).retrieve
-
-# Without HTML (legacy):
-result = ListingRetriever.new(url).retrieve
-```
-
-## API Reference
-
-All endpoints that accept `url` now also accept optional `html` (as a POST
-body parameter) or `html_file` (as a multipart file upload). When either is
-present, no HTTP fetch occurs.
-
-### `POST /retriever/as_json`
-
-Retrieves a property listing and returns JSON.
-
-| Parameter   | Type   | Required | Description                              |
-|-------------|--------|----------|------------------------------------------|
-| `url`       | string | yes      | Property page URL                        |
-| `html`      | string | no       | Pre-rendered HTML string                 |
-| `html_file` | file   | no       | Uploaded HTML file (takes precedence)    |
-| `client_id` | string | no       | Client identifier                        |
-
-### `POST /scrapers/submit`
-
-AJAX form submission handler.
-
-| Parameter    | Type   | Required | Description                              |
-|--------------|--------|----------|------------------------------------------|
-| `import_url` | string | yes      | Property page URL                        |
-| `html`       | string | no       | Pre-rendered HTML string                 |
-| `html_file`  | file   | no       | Uploaded HTML file                       |
-
-### `GET|POST /api/v1/listings`
-
-REST API endpoint returning PwbListing-formatted JSON.
-
-| Parameter   | Type   | Required | Description                              |
-|-------------|--------|----------|------------------------------------------|
-| `url`       | string | yes      | Property page URL                        |
-| `html`      | string | no       | Pre-rendered HTML string                 |
-| `html_file` | file   | no       | Uploaded HTML file                       |
-
-### `GET /single_property_view`
-
-Renders a single property page.
-
-| Parameter   | Type   | Required | Description                              |
-|-------------|--------|----------|------------------------------------------|
-| `url`       | string | yes      | Property page URL                        |
-| `html`      | string | no       | Pre-rendered HTML string                 |
-| `html_file` | file   | no       | Uploaded HTML file                       |
+| Site pattern | Strategy | Examples |
+|---|---|---|
+| Server-rendered HTML | `cssLocator` | Pisos.com, Fotocasa, ForSaleByOwner |
+| `window.VAR = {...}` in script | `scriptJsonVar` + `scriptJsonPath` | Rightmove (`PAGE_MODEL`), Idealista (`__INITIAL_STATE__`) |
+| Next.js `<script id="__NEXT_DATA__">` | `scriptJsonVar: "__NEXT_DATA__"` + `scriptJsonPath` | OnTheMarket, Daft.ie |
+| Next.js RSC `self.__next_f.push` | `flightDataPath` | Realtor.com |
+| Schema.org JSON-LD | `jsonLdPath` + optional `jsonLdType` | Zoopla, Domain, RealEstate.com.au |
+| Inline JS variables | `scriptRegEx` | Legacy scrapers |
+| Data in URL path | `urlPathPart` | Reference from URL slug |
 
 ## Scraper Mapping Schema
 
-Mappings are JSON files in `config/scraper_mappings/`. Each file defines how to
-extract property fields from HTML for a specific website.
+Mappings are JSON files in `config/scraper_mappings/<cc>_<portal>.json` (parsed with JSON5, so comments are allowed).
 
 ### Top-level structure
 
 ```json
 [{
-  "name": "site_name",
+  "name": "uk_rightmove",
+  "expectedExtractionRate": 0.85,
+  "portal": {
+    "hosts": ["www.rightmove.co.uk", "rightmove.co.uk"],
+    "country": "GB",
+    "currency": "GBP",
+    "localeCode": "en-GB",
+    "areaUnit": "sqft",
+    "contentSource": "script-json",
+    "stripTrailingSlash": false,
+    "requiresJsRendering": false
+  },
   "defaultValues": { ... },
   "textFields": { ... },
   "intFields": { ... },
@@ -172,344 +126,182 @@ extract property fields from HTML for a specific website.
 }]
 ```
 
-### Field types
+### FieldMapping interface
 
-**`defaultValues`** - Static values, no extraction needed:
-```json
-{ "country": { "value": "Spain" }, "currency": { "value": "EUR" } }
-```
+```typescript
+interface FieldMapping {
+  // Strategy (pick one)
+  cssLocator?: string;
+  scriptRegEx?: string;
+  flightDataPath?: string;
+  scriptJsonPath?: string;
+  scriptJsonVar?: string;
+  jsonLdPath?: string;
+  jsonLdType?: string;
+  urlPathPart?: string;
+  value?: string;
+  apiEndpoint?: string;
+  apiJsonPath?: string;
 
-**`textFields`** - Extracted as strings:
-```json
-{ "title": { "cssLocator": "title" } }
-```
+  // CSS modifiers
+  cssAttr?: string;
+  xmlAttr?: string;
+  cssCountId?: string;
 
-**`intFields`** - Extracted as integers (`.to_i`):
-```json
-{ "count_bedrooms": { "cssLocator": ".bedrooms span" } }
-```
+  // Post-processing
+  splitTextCharacter?: string;
+  splitTextArrayId?: string;
+  stripString?: string;
+  stripPunct?: string;
+  stripFirstChar?: string;
+  imagePathPrefix?: string;
+  modifiers?: string[];
 
-**`floatFields`** - Extracted as floats (`.to_f`):
-```json
-{ "price_float": { "cssLocator": ".price", "stripPunct": "true" } }
-```
+  // Boolean evaluation
+  evaluator?: string;
+  evaluatorParam?: string;
+  caseInsensitive?: boolean;
 
-**`booleanFields`** - Extracted via evaluator method:
-```json
-{
-  "for_sale": {
-    "cssLocator": ".sale-indicator",
-    "evaluator": "include?",
-    "evaluatorParam": "for sale"
-  }
+  // Fallbacks
+  fallbacks?: FieldMapping[];
 }
 ```
 
-**`images`** - Array extraction:
-```json
-[{ "cssLocator": "img.gallery", "xmlAttr": "data-src" }]
-```
+### Boolean evaluators
 
-**`features`** - Array extraction:
-```json
-[{ "cssLocator": ".feature-list li" }]
-```
+`include?`, `start_with?`, `end_with?`, `present?`, `to_i_gt_0`, `==`
 
-### Extraction strategies
+## API Endpoints
 
-Each field mapping can use one or more of these strategies:
+### Public API (`/public_api/v1/`)
 
-| Key              | Description                                         |
-|------------------|-----------------------------------------------------|
-| `cssLocator`     | CSS selector (Nokogiri/Cheerio)                     |
-| `xpath`          | XPath expression (deprecated — use CSS)             |
-| `scriptRegEx`    | Regex applied to all `<script>` tag text            |
-| `urlPathPart`    | Extract from URL path segments (1-indexed)          |
-| `flightDataPath` | Dot-path into Next.js RSC flight data               |
-| `scriptJsonPath` | Dot-path into a parsed script JSON variable         |
-| `scriptJsonVar`  | Variable name for scriptJsonPath (e.g. PAGE_MODEL)  |
-| `jsonLdPath`     | Dot-path into JSON-LD structured data               |
-| `jsonLdType`     | Filter JSON-LD by `@type` before path lookup        |
-| `fallbacks`      | Array of alternative FieldMapping objects tried in order if the primary strategy returns empty |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/public_api/v1/health` | None | Health check |
+| GET | `/public_api/v1/supported_sites` | None | List supported portals |
+| GET/POST | `/public_api/v1/listings?url=...` | API key | Extract listing from URL |
+| GET | `/public_api/v1/listings/:id` | API key | Retrieve stored listing |
+| GET | `/public_api/v1/listings/:id/scrapes` | API key | Scrape history for listing |
+| POST | `/public_api/v1/listings/:id/enrich-images` | API key | Enrich listing images |
+| GET/POST | `/public_api/v1/listings/:id/export` | API key | Export single listing |
+| GET | `/public_api/v1/listings/history` | API key | Listing history |
+| GET/POST | `/public_api/v1/export` | API key | Bulk export (JSON/CSV/GeoJSON) |
+| POST | `/public_api/v1/webhooks` | API key | Register webhook |
+| GET | `/public_api/v1/usage` | API key | API usage stats |
+| POST | `/public_api/v1/auth/keys` | API key | Manage API keys |
+| POST | `/public_api/v1/billing/checkout` | API key | Create Stripe checkout session |
+| POST | `/public_api/v1/billing/portal` | API key | Stripe billing portal |
+| POST | `/public_api/v1/stripe-webhook` | Stripe sig | Stripe webhook handler |
 
-### Post-processing options
+### Chrome Extension API (`/ext/v1/`)
 
-| Key                  | Description                                       |
-|----------------------|---------------------------------------------------|
-| `cssAttr`            | Extract an HTML attribute instead of text content  |
-| `xmlAttr`            | Extract an XML-style attribute                     |
-| `cssCountId`         | Select Nth element from matched set (0-indexed)    |
-| `splitTextCharacter` | Split extracted text by this character              |
-| `splitTextArrayId`   | Select Nth element from split result (0-indexed)   |
-| `stripString`        | Remove first occurrence of this substring          |
-| `stripPunct`         | Remove dots and commas (for number parsing)        |
-| `stripFirstChar`     | Remove first character (e.g., currency symbol)     |
-| `imagePathPrefix`    | Prefix for relative image paths                    |
-| `caseInsensitive`    | Downcase before boolean evaluation                 |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/ext/v1/hauls` | None | Create anonymous haul collection |
+| GET | `/ext/v1/hauls/:id` | None | Get haul summary |
+| POST | `/ext/v1/hauls/:id/scrapes` | None | Add scrape to haul |
 
-## Usage Examples
+### Extract Pages
 
-### Chrome extension
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/` | None | Home page with extraction form |
+| POST | `/scrapers/submit` | None | Form submission (returns HTML partial) |
+| GET | `/single_property_view?url=...` | None | Property detail page |
+| GET | `/extract/results/:id/update-html` | None | Update extraction HTML |
+| GET | `/listings/:id.json` | None | Listing as JSON |
+| GET | `/health` | None | Simple health check |
 
-```javascript
-// Content script captures rendered HTML
-const html = document.documentElement.outerHTML;
-const url = window.location.href;
+### Admin API (`/admin/`)
 
-fetch('https://your-app.com/retriever/as_json', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  body: `url=${encodeURIComponent(url)}&html=${encodeURIComponent(html)}`
-});
-```
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/admin/logout` | Admin key | Logout |
+| GET | `/admin/api/logs` | Admin key | Activity logs |
+| GET | `/admin/api/config` | Admin key | Runtime config |
+| POST | `/admin/api/actions` | Admin key | Admin actions |
+| GET | `/admin/api/stats` | Admin key | System stats |
+| GET | `/admin/api/scraper-health` | Admin key | Scraper health dashboard |
+| POST | `/admin/api/ai-map` | Admin key | AI mapping suggestions |
+| POST | `/admin/api/ai-map-save` | Admin key | Save AI mapping |
+| GET | `/admin/api/extractions` | Admin key | Extraction history |
+| GET | `/admin/api/extractions/:id` | Admin key | Extraction detail |
+| GET | `/admin/api/scrapers/:name` | Admin key | Scraper detail |
+| GET | `/admin/scrapers/list` | Admin key | Scraper list page |
+| GET | `/admin/scrapers/test` | Admin key | Scraper test page |
 
-### Headless browser (Puppeteer/Playwright)
+API key is passed via `X-Api-Key` header or `api_key` query parameter.
 
-```javascript
-const page = await browser.newPage();
-await page.goto(url, { waitUntil: 'networkidle0' });
-const html = await page.content();
-
-const response = await fetch('https://your-app.com/api/v1/listings', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ url, html })
-});
-```
-
-### curl with HTML file
-
-```bash
-curl -X POST https://your-app.com/retriever/as_json \
-  -F "url=https://www.idealista.com/inmueble/123/" \
-  -F "html_file=@saved_page.html"
-```
-
-### curl with inline HTML
-
-```bash
-curl -X POST https://your-app.com/retriever/as_json \
-  -d "url=https://www.idealista.com/inmueble/123/" \
-  -d "html=$(cat saved_page.html)"
-```
-
-### Ruby (direct service call)
-
-```ruby
-result = PropertyWebScraper::HtmlExtractor.call(
-  html: File.read('saved_page.html'),
-  source_url: 'https://www.idealista.com/inmueble/123/',
-  scraper_mapping_name: 'idealista'
-)
-puts result[:properties].first['title']
-```
-
-## Migration Guide
-
-### For existing callers (no changes needed)
-
-All existing endpoints and method signatures remain backward compatible.
-When `html` is not provided, the system falls back to direct HTTP fetching
-exactly as before. A deprecation warning is logged on each direct fetch.
-
-### For new callers (recommended path)
-
-1. Obtain fully-rendered HTML from your source (Chrome extension, headless
-   browser, saved file, etc.)
-2. POST to any endpoint with both `url` and `html` (or `html_file`) parameters
-3. The `url` parameter is still required for:
-   - Host/mapping auto-detection
-   - Relative URL resolution in extracted data
-   - URL-path-based field extraction
-
-### For Ruby callers
-
-Use `HtmlExtractor.call` directly for extraction without persistence:
-
-```ruby
-result = PropertyWebScraper::HtmlExtractor.call(
-  html: html_string,
-  source_url: url
-)
-```
-
-Or use `Scraper` with the `html:` keyword for the full extract-and-persist flow:
-
-```ruby
-scraper = PropertyWebScraper::Scraper.new('idealista')
-listing = scraper.process_url(url, import_host, html: html_string)
-```
-
-## Astro App Pipeline Enhancements
-
-The Astro app (`astro-app/`) extends the core extraction pipeline with several
-services for production-grade data quality:
+## Services
 
 ### Portal Registry (`portal-registry.ts`)
 
-Centralized configuration for all supported property portals. Each entry
-defines the portal's country, default currency, locale, area unit, content
-source type (html/script-json/json-ld/flight-data), and whether JS rendering
-is required. The URL validator derives its host map from this registry.
+Centralized config for all 17 supported portals. Each entry defines country, currency, locale, area unit, content source type (html/script-json/json-ld/flight-data), and JS rendering requirements. The URL validator derives its host map from this registry.
 
-### Weighted Quality Scoring (`quality-scorer.ts`)
+### Quality Scoring (`quality-scorer.ts`)
 
 Fields are classified by importance:
 - **Critical** (weight 3): title, price_string, price_float
 - **Important** (weight 2): lat/lng, address, bedrooms, bathrooms, description, images, reference
 - **Optional** (weight 1): all other fields
 
-`assessQualityWeighted()` computes a weighted extraction rate and caps the
-quality grade at C if any critical field is missing.
-
-### Fallback Strategy Chains (`strategies.ts`)
-
-Field mappings can define a `fallbacks` array of alternative mappings. When the
-primary strategy returns empty text, fallbacks are tried in order. The
-`RetrievalResult` records which strategy (primary or fallback N) produced the
-value.
-
-### URL Canonicalization (`url-canonicalizer.ts`)
-
-Normalizes URLs by lowercasing hosts, upgrading to HTTPS, removing tracking
-parameters (utm_*, fbclid, gclid, ref, source, channel), and stripping
-fragments. `deduplicationKey()` extracts hostname + pathname for duplicate
-detection in the listing store.
+Grade is capped at C if any critical field is missing.
 
 ### Price Normalization (`price-normalizer.ts`)
 
-Locale-aware price parsing supporting EU format (1.250.000,50) and US format
-(1,250,000.50). Detects currency from symbols ($, £, €, ₹) with portal
-fallback. Outputs `NormalizedPrice` with integer cents and ISO 4217 currency
-code.
+Locale-aware parsing supporting EU format (1.250.000,50) and US format (1,250,000.50). Detects currency from symbols ($, £, €, ₹) with portal fallback. Outputs `NormalizedPrice` with integer cents and ISO 4217 currency code.
 
-### Content Provenance Tracking (`html-extractor.ts`)
+### URL Canonicalization (`url-canonicalizer.ts`)
 
-`analyzeContent()` inspects the HTML to detect:
-- Known script variables (PAGE_MODEL, __NEXT_DATA__, __INITIAL_STATE__, dataLayer)
-- JSON-LD block count
-- Bot-blocked pages (short body + captcha/verify keywords)
-- JS-only shell pages (short body text + many scripts + few divs)
+Normalizes URLs: lowercase hosts, HTTPS upgrade, strips tracking params (utm_*, fbclid, gclid, ref, source, channel), removes fragments. `deduplicationKey()` extracts hostname + pathname for duplicate detection.
 
-Results are included in `ExtractionDiagnostics.contentAnalysis`.
+### Haul Store (`haul-store.ts`)
 
-### Schema Splitting (`schema-splitter.ts`)
+KV-backed persistence for anonymous haul collections created by the Chrome extension. Hauls hold up to 20 scrapes and expire after 30 days. Falls back to in-memory Map when KV is unavailable.
 
-Separates the extraction property hash into three categories:
-- **Asset data**: physical property attributes (title, address, rooms, coordinates, images)
-- **Listing data**: commercial attributes (price, currency, sale/rent flags, furnished)
-- **Unmapped**: fields not in either set
+### Rate Limiter (`rate-limiter.ts`)
 
-## Chrome Extension ↔ MCP Server Bridge
+In-memory sliding window per API key or IP. 60 requests/minute default (configurable via `PWS_RATE_LIMIT`).
 
-The **MCP Bridge** extension (`chrome-extensions/mcp-bridge/`) connects to the
-MCP server over WebSocket, enabling Claude Code to capture fully-rendered HTML
-directly from the user's browser. This is separate from the public
-**Property Scraper** extension (`chrome-extensions/property-scraper/`), which
-handles one-click extraction via the popup UI.
+### Content Sanitizer (`content-sanitizer.ts`)
 
-### Architecture
+Strips HTML tags from text fields, rejects `javascript:` and `data:` URI schemes, normalizes protocol-relative URLs.
 
-```
-  ┌────────────┐                         ┌──────────────────┐
-  │ Claude Code │  stdio (MCP protocol)  │   MCP Server     │
-  │   (client)  │ ◀────────────────────▶ │ (mcp-server.ts)  │
-  └────────────┘                         └──────────────────┘
-                                                │
-                                         WebSocket :17824
-                                                │
-                                         ┌──────────────────┐
-                                         │  MCP Bridge Ext   │
-                                         │  background.js    │
-                                         │  (service worker) │
-                                         └──────────────────┘
-                                                │
-                                         chrome.tabs API
-                                                │
-                                         ┌──────────────────┐
-                                         │  Content Script   │
-                                         │  (active tab)     │
-                                         └──────────────────┘
-```
+### Activity Logger (`activity-logger.ts`)
 
-The MCP protocol runs over **stdio** between Claude Code and the MCP server.
-The WebSocket on port 17824 is a separate side-channel used exclusively for
-the MCP Bridge extension. This avoids Native Messaging complexity (separate
-native host binary, per-browser manifest registration) while still allowing
-real-time bidirectional communication.
+Structured JSON logging of extraction events (error/warn/info levels).
 
-### WebSocket Message Protocol
+## Chrome Extensions
 
-All messages are JSON-serialized over `ws://localhost:17824`.
+### Property Scraper (`chrome-extensions/property-scraper/`)
 
-| Direction | `type` | Fields | Description |
-|-----------|--------|--------|-------------|
-| ext → server | `tab_update` | `url`, `title` | Current tab info; sent on connect and tab changes |
-| ext → server | `capture_response` | `html`, `url`, `title` | Page HTML in response to `capture_request` |
-| ext → server | `capture_response` | `error` | Error message if capture failed |
-| server → ext | `capture_request` | _(none)_ | Asks the extension to capture the active tab |
+Public Manifest V3 extension for one-click extraction. Workflow:
 
-### MCP Tools
+1. User navigates to a supported listing page (green badge appears)
+2. Clicks extension icon — popup opens
+3. Content script captures `document.documentElement.outerHTML`
+4. Background service worker creates a haul (if needed) via `POST /ext/v1/hauls`
+5. Sends HTML + URL to `POST /ext/v1/hauls/:id/scrapes`
+6. Popup renders property card with results
+7. User can continue browsing and adding more listings to the same haul
+8. Results page link shows all collected listings
 
-#### `extension_status`
+### MCP Bridge (`chrome-extensions/mcp-bridge/`)
 
-Check if the Chrome extension is connected and what page the user is viewing.
+Dev-only extension that bridges Chrome to the MCP server via WebSocket (port 17824), enabling Claude Code to capture rendered HTML from the browser's active tab for fixture creation.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| _(none)_  | —    | —        | —           |
-
-Returns:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `connected` | boolean | Whether the extension WebSocket is open |
-| `tabUrl` | string \| null | URL of the user's active tab |
-| `tabTitle` | string \| null | Title of the user's active tab |
-| `capturePort` | number | WebSocket port (default 17824) |
-
-#### `capture_page`
-
-Capture rendered HTML from the browser's active tab and save as a test fixture.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `save_as` | string | no | Fixture filename (without `.html`); auto-detected from URL hostname if omitted |
-| `force` | boolean | no | Overwrite existing fixture file (default `false`) |
-
-Returns the saved file path, size, extraction results summary, and a manifest
-entry stub for `astro-app/test/fixtures/manifest.ts`. Timeout: 15 seconds.
-
-### Capture Workflow
-
-1. User navigates to a property listing in Chrome
-2. Claude Code calls `extension_status` to confirm the extension is connected
-3. Claude Code calls `capture_page` (optionally with `save_as`)
-4. MCP server sends `capture_request` over WebSocket
-5. Extension injects content script into the active tab
-6. Content script returns `{ html, url, title }` to the service worker
-7. Service worker sends `capture_response` back over WebSocket
-8. MCP server saves the HTML to `astro-app/test/fixtures/` and runs extraction
-9. Claude Code receives the result with file path, extraction summary, and manifest stub
+Protocol: JSON messages over `ws://localhost:17824`
+- `tab_update` (ext → server): current tab URL/title
+- `capture_request` (server → ext): request HTML capture
+- `capture_response` (ext → server): captured HTML or error
 
 ## Known Limitations
 
-1. **Boolean field evaluation uses `send`** - The `evaluator` field in boolean
-   mappings calls arbitrary string methods via `send`. This is safe for the
-   built-in mappings (which use `include?`) but should be validated if
-   user-supplied mappings are supported in the future.
+1. **Single property per page** — Multi-property pages (search results) are not supported.
+2. **Stale mappings** — When a site changes its HTML, the mapping must be manually updated.
+3. **Boolean evaluators** — `evaluator` calls string methods by name. Safe for built-in mappings but should be validated for user-supplied mappings.
+4. **No JS execution** — The extractor parses static HTML with Cheerio. Callers must provide fully-rendered HTML for JS-heavy sites.
 
-2. **Stale mappings** - Scraper mappings are loaded from static JSON files.
-   When a target site changes its HTML structure, the mapping must be manually
-   updated.
+## Legacy Rails Engine
 
-3. **No retry/resilience** - The direct HTTP fetch path has basic redirect
-   handling (3 attempts) but no retry logic for transient failures.
-
-4. **Single property per page** - The extraction always returns a
-   single-element array. Multi-property pages (e.g., search results) are not
-   supported.
-
-5. **No JavaScript execution** - `HtmlExtractor` parses static HTML with
-   Nokogiri. It cannot execute JavaScript. Callers must provide fully-rendered
-   HTML for JS-heavy sites.
+The original Ruby/Nokogiri implementation lives in `app/` and `lib/`. It is no longer under active development. See [RAILS_README.md](RAILS_README.md) for details.
