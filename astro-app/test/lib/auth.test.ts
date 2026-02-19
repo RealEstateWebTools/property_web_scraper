@@ -16,6 +16,7 @@ import { validateApiKey as mockValidateApiKey } from '../../src/lib/services/api
 describe('authenticateApiKey', () => {
   afterEach(() => {
     import.meta.env.PWS_API_KEY = '';
+    import.meta.env.PWS_LOCKED_ENDPOINTS = '';
     vi.mocked(mockValidateApiKey).mockReset().mockResolvedValue(null);
   });
 
@@ -73,17 +74,52 @@ describe('authenticateApiKey', () => {
     expect(result.errorResponse).toBeInstanceOf(Response);
   });
 
-  it('rejects when no key is provided but one is expected', async () => {
+  it('allows anonymous access at free tier even when master key is configured', async () => {
     import.meta.env.PWS_API_KEY = 'secret-key-123';
     const request = new Request('http://localhost/api/test');
     const result = await authenticateApiKey(request);
+    expect(result.authorized).toBe(true);
+    expect(result.userId).toBe('anonymous');
+    expect(result.tier).toBe('free');
+  });
+
+  it('rejects anonymous request to locked endpoint', async () => {
+    import.meta.env.PWS_API_KEY = 'secret-key-123';
+    import.meta.env.PWS_LOCKED_ENDPOINTS = '/public_api/v1/export,/public_api/v1/billing';
+    const request = new Request('http://localhost/public_api/v1/export?format=json');
+    const result = await authenticateApiKey(request);
     expect(result.authorized).toBe(false);
     expect(result.errorResponse).toBeInstanceOf(Response);
+    expect(result.errorResponse!.status).toBe(401);
+  });
+
+  it('allows anonymous request to non-locked endpoint when others are locked', async () => {
+    import.meta.env.PWS_API_KEY = 'secret-key-123';
+    import.meta.env.PWS_LOCKED_ENDPOINTS = '/public_api/v1/export';
+    const request = new Request('http://localhost/public_api/v1/listings');
+    const result = await authenticateApiKey(request);
+    expect(result.authorized).toBe(true);
+    expect(result.userId).toBe('anonymous');
+    expect(result.tier).toBe('free');
+  });
+
+  it('allows keyed request to locked endpoint', async () => {
+    import.meta.env.PWS_API_KEY = 'secret-key-123';
+    import.meta.env.PWS_LOCKED_ENDPOINTS = '/public_api/v1/export';
+    const request = new Request('http://localhost/public_api/v1/export?format=json', {
+      headers: { 'X-Api-Key': 'secret-key-123' },
+    });
+    const result = await authenticateApiKey(request);
+    expect(result.authorized).toBe(true);
+    expect(result.userId).toBe('master');
+    expect(result.tier).toBe('enterprise');
   });
 
   it('error response has 401 status', async () => {
     import.meta.env.PWS_API_KEY = 'secret-key-123';
-    const request = new Request('http://localhost/api/test');
+    const request = new Request('http://localhost/api/test', {
+      headers: { 'X-Api-Key': 'wrong-key' },
+    });
     const result = await authenticateApiKey(request);
     expect(result.errorResponse!.status).toBe(401);
     const body = await result.errorResponse!.json();

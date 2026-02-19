@@ -20,7 +20,8 @@ export interface AuthResult {
  * Authentication priority:
  * 1. Master key (`PWS_API_KEY` env var) → enterprise tier, userId="master"
  * 2. Per-user key (`pws_live_...`) → validated via api-key-service (KV lookup)
- * 3. No key when none configured → auth skipped (backwards compatible dev mode)
+ * 3. No key → anonymous access at free tier (rate-limited by IP)
+ * 4. Locked endpoints (`PWS_LOCKED_ENDPOINTS`) → require auth even for anonymous
  */
 export async function authenticateApiKey(request: Request): Promise<AuthResult> {
   const masterKey = import.meta.env.PWS_API_KEY || '';
@@ -32,12 +33,18 @@ export async function authenticateApiKey(request: Request): Promise<AuthResult> 
 
   // No key provided
   if (!providedKey) {
-    if (!masterKey) {
-      // No master key configured = auth skipped (dev mode)
-      return { authorized: true, userId: 'anonymous', tier: 'free' };
+    // Check if this endpoint is locked down
+    const lockedEndpoints = (import.meta.env.PWS_LOCKED_ENDPOINTS || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+    const requestPath = new URL(request.url).pathname;
+    const isLocked = lockedEndpoints.some((prefix: string) => requestPath.startsWith(prefix));
+
+    if (isLocked && masterKey) {
+      logAuthFailure('no key provided (locked endpoint)', request);
+      return { authorized: false, errorResponse: errorResponse(ApiErrorCode.UNAUTHORIZED, 'Unauthorized', request) };
     }
-    logAuthFailure('no key provided', request);
-    return { authorized: false, errorResponse: errorResponse(ApiErrorCode.UNAUTHORIZED, 'Unauthorized', request) };
+
+    // Anonymous access at free tier
+    return { authorized: true, userId: 'anonymous', tier: 'free' };
   }
 
   // Check master key first (constant-time comparison)
