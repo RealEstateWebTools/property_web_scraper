@@ -3,4 +3,54 @@
 
 @theme {
   --font-sans: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #dbeafe;
+  --color-primary-50: #eff6ff;
+
+  /* Status — success */
+  --color-success: #16a34a;
+  --color-success-light: #dcfce7;
+  --color-success-50: #f0fdf4;
+  --color-success-border: #bbf7d0;
+
+  /* Status — warning */
+  --color-warning: #d97706;
+  --color-warning-light: #fef3c7;
+  --color-warning-50: #fffbeb;
+  --color-warning-border: #fde68a;
+
+  /* Status — error */
+  --color-error: #dc2626;
+  --color-error-light: #fee2e2;
+  --color-error-50: #fef2f2;
+  --color-error-border: #fecaca;
+
+  /* Status — info */
+  --color-info: #2563eb;
+  --color-info-light: #dbeafe;
+  --color-info-50: #eff6ff;
+  --color-info-border: #bfdbfe;
+
+  /* Neutral surfaces */
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f9fafb;
+  --color-surface-tertiary: #f3f4f6;
+
+  /* Borders */
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+
+  /* Text */
+  --color-text: #111827;
+  --color-text-body: #374151;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+
+  /* Admin sidebar */
+  --color-admin-bg: #111827;
+  --color-admin-active: #374151;
+  --color-admin-text: #d1d5db;
 }

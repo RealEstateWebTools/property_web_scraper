@@ -1,16 +1,11 @@
 ---
 import '../styles/global.css';
+import AdminSidebar from '../components/AdminSidebar.astro';
 interface Props {
   title?: string;
   activePage?: string;
 }
 const { title = 'Admin — Property Web Scraper', activePage = '' } = Astro.props;
-
-function navClass(page: string): string {
-  return page === activePage
-    ? 'flex items-center gap-2 px-3 py-2 rounded text-sm font-medium bg-gray-700 text-white no-underline'
-    : 'flex items-center gap-2 px-3 py-2 rounded text-sm text-gray-300 hover:bg-gray-700 hover:text-white no-underline transition';
-}
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -20,53 +15,13 @@ function navClass(page: string): string {
     <title>{title}</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
   </head>
-  <body class="min-h-screen flex bg-gray-100 text-gray-800 font-sans">
-    <!-- Sidebar -->
-    <aside class="w-60 bg-gray-900 text-gray-100 flex flex-col min-h-screen shrink-0">
-      <div class="px-4 py-4 border-b border-gray-700">
-        <a href="/admin" class="font-bold text-lg text-white no-underline flex items-center gap-2">
-          <i class="bi bi-gear-fill"></i> Admin
-        </a>
-        <p class="text-xs text-gray-400 mt-1">PropertyWebScraper</p>
-      </div>
-      <nav class="flex-1 px-3 py-4 space-y-1">
-        <a href="/admin" class={navClass('dashboard')}>
-          <i class="bi bi-speedometer2"></i> Dashboard
-        </a>
-        <a href="/admin/logs" class={navClass('logs')}>
-          <i class="bi bi-journal-text"></i> Logs
-        </a>
-        <a href="/admin/extractions" class={navClass('extractions')}>
-          <i class="bi bi-collection"></i> Extractions
-        </a>
-        <a href="/admin/config" class={navClass('config')}>
-          <i class="bi bi-sliders"></i> Config
-        </a>
-        <a href="/admin/scrapers" class={navClass('scrapers')}>
-          <i class="bi bi-cpu"></i> Scrapers
-        </a>
-        <a href="/admin/scraper-health" class={navClass('scraper-health')}>
-          <i class="bi bi-heart-pulse"></i> Health
-        </a>
-        <a href="/admin/exports" class={navClass('exports')}>
-          <i class="bi bi-download"></i> Exports
-        </a>
-        <a href="/admin/ai-map" class={navClass('ai-map')}>
-          <i class="bi bi-magic"></i> AI Map
-        </a>
-      </nav>
-      <div class="px-3 py-4 border-t border-gray-700 space-y-1">
-        <a href="/" class="flex items-center gap-2 px-3 py-2 rounded text-sm text-gray-300 hover:bg-gray-700 hover:text-white no-underline transition">
-          <i class="bi bi-arrow-left"></i> Back to Site
-        </a>
-        <a href="/admin/logout" class="flex items-center gap-2 px-3 py-2 rounded text-sm text-gray-300 hover:bg-gray-700 hover:text-white no-underline transition">
-          <i class="bi bi-box-arrow-right"></i> Logout
-        </a>
-      </div>
-    </aside>
+  <body class="min-h-screen flex bg-surface-tertiary text-text-body font-sans">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white">Skip to content</a>
+
+    <AdminSidebar activePage={activePage} />
 
     <!-- Main content -->
-    <main class="flex-1 p-6 overflow-auto">
+    <main id="main-content" class="flex-1 p-6 overflow-auto">
       <slot />
     </main>
   </body>

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import NavBar from '../components/NavBar.astro';
 interface Props {
   title?: string;
 }
@@ -13,66 +14,26 @@ const { title = 'Property Web Scraper' } = Astro.props;
     <title>{title}</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
   </head>
-  <body class="min-h-screen flex flex-col bg-white text-gray-800 font-sans">
-    <nav class="bg-white border-b border-gray-200">
-      <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
-        <a class="font-bold text-lg text-gray-900 no-underline flex items-center gap-1" href="/">
-          <i class="bi bi-building"></i> PropertyWebScraper
-        </a>
-        <button id="navToggle" type="button" class="md:hidden p-2 text-gray-600 hover:text-gray-900" aria-label="Toggle navigation">
-          <i class="bi bi-list text-xl"></i>
-        </button>
-        <div id="navMenu" class="hidden md:flex items-center gap-6">
-          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/extract/url">Extract</a>
-          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/docs/get-html">Guides</a>
-          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/listings">Listings</a>
-          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/sites">Sites</a>
-          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition" href="/docs/api">API</a>
-          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition flex items-center gap-1" href="/admin">
-            <i class="bi bi-gear"></i> Admin
-          </a>
-          <a class="text-sm text-gray-600 hover:text-blue-600 no-underline transition flex items-center gap-1" href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank">
-            <i class="bi bi-github"></i> GitHub
-          </a>
-        </div>
-      </div>
-      <!-- Mobile menu -->
-      <div id="mobileMenu" class="hidden md:hidden border-t border-gray-100 px-4 pb-3">
-        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/extract/url">Extract</a>
-        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/docs/get-html">Guides</a>
-        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/listings">Listings</a>
-        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/sites">Sites</a>
-        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline" href="/docs/api">API</a>
-        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline flex items-center gap-1" href="/admin">
-          <i class="bi bi-gear"></i> Admin
-        </a>
-        <a class="block py-2 text-sm text-gray-600 hover:text-blue-600 no-underline flex items-center gap-1" href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank">
-          <i class="bi bi-github"></i> GitHub
-        </a>
-      </div>
-    </nav>
+  <body class="min-h-screen flex flex-col bg-surface text-text-body font-sans">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white">Skip to content</a>
 
-    <main class="flex-1">
+    <NavBar />
+
+    <main id="main-content" class="flex-1">
       <slot />
     </main>
 
-    <footer class="bg-gray-50 text-gray-500 py-4 mt-5 border-t border-gray-200">
+    <footer class="bg-surface-secondary text-text-secondary py-4 mt-5 border-t border-border">
       <div class="max-w-6xl mx-auto px-4 text-center">
         <p class="mb-1 text-sm">
-          <a href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank" class="text-gray-500 no-underline hover:text-blue-600 transition">
+          <a href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank" class="text-text-secondary no-underline hover:text-primary transition">
             <i class="bi bi-github mr-1"></i> PropertyWebScraper
           </a>
           &middot;
           Open-source property data extraction by the
-          <a href="https://github.com/etewiah/property_web_builder" target="_blank" class="text-blue-600 hover:underline">PropertyWebBuilder</a> team.
+          <a href="https://github.com/etewiah/property_web_builder" target="_blank" class="text-primary hover:underline">PropertyWebBuilder</a> team.
         </p>
       </div>
     </footer>
-
-    <script is:inline>
-      document.getElementById('navToggle')?.addEventListener('click', () => {
-        document.getElementById('mobileMenu')?.classList.toggle('hidden');
-      });
-    </script>
   </body>
 </html>

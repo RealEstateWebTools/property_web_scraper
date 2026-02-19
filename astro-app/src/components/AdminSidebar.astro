@@ -1,0 +1,38 @@
+---
+import { ADMIN_NAV_LINKS, ADMIN_FOOTER_LINKS } from '@lib/nav-data.js';
+
+interface Props {
+  activePage?: string;
+}
+const { activePage = '' } = Astro.props;
+
+function navClass(page?: string): string {
+  return page === activePage
+    ? 'flex items-center gap-2 px-3 py-2 rounded text-sm font-medium bg-admin-active text-white no-underline'
+    : 'flex items-center gap-2 px-3 py-2 rounded text-sm text-admin-text hover:bg-admin-active hover:text-white no-underline transition';
+}
+---
+<aside class="w-60 bg-admin-bg text-gray-100 flex flex-col min-h-screen shrink-0" aria-label="Admin navigation">
+  <div class="px-4 py-4 border-b border-gray-700">
+    <a href="/admin" class="font-bold text-lg text-white no-underline flex items-center gap-2">
+      <i class="bi bi-gear-fill"></i> Admin
+    </a>
+    <p class="text-xs text-text-muted mt-1">PropertyWebScraper</p>
+  </div>
+  <nav class="flex-1 px-3 py-4 space-y-1">
+    {ADMIN_NAV_LINKS.map((link) => (
+      <a href={link.href} class={navClass(link.activePage)}>
+        {link.icon && <i class={`bi ${link.icon}`}></i>}
+        {link.label}
+      </a>
+    ))}
+  </nav>
+  <div class="px-3 py-4 border-t border-gray-700 space-y-1">
+    {ADMIN_FOOTER_LINKS.map((link) => (
+      <a href={link.href} class={navClass()}>
+        {link.icon && <i class={`bi ${link.icon}`}></i>}
+        {link.label}
+      </a>
+    ))}
+  </div>
+</aside>
