@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getHaul, initHaulKV } from '@lib/services/haul-store.js';
 import { isValidHaulId } from '@lib/services/haul-id.js';
 import { getRuntimeConfig } from '@lib/services/runtime-config.js';
+import { computeHaulSummary } from '@lib/services/haul-summary.js';
 
 initHaulKV((Astro.locals as any).runtime?.env?.RESULTS);
 
@@ -11,6 +12,7 @@ const h2cUrl = getRuntimeConfig().homesToCompareUrl;
 const { id } = Astro.params;
 const validId = id && isValidHaulId(id);
 const haul = validId ? await getHaul(id) : undefined;
+const summary = haul ? computeHaulSummary(haul.scrapes) : null;
 
 const gradeColors: Record<string, { bg: string; text: string }> = {
   A: { bg: 'bg-green-100', text: 'text-green-800' },
@@ -18,10 +20,12 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
   C: { bg: 'bg-amber-100', text: 'text-amber-800' },
   F: { bg: 'bg-red-100', text: 'text-red-800' },
 };
----
-<BaseLayout title={haul ? `Haul ${id}` : 'Haul Not Found'}>
 
-<section class="max-w-4xl mx-auto px-4 py-8">
+const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedrooms || s.city);
+---
+<BaseLayout title={haul ? `Haul ${haul.name || id}` : 'Haul Not Found'}>
+
+<section class="max-w-5xl mx-auto px-4 py-8">
 
   {!haul ? (
     <div class="bg-amber-50 rounded-2xl p-8 text-center">
@@ -38,21 +42,93 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
       {/* Header */}
       <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
         <div class="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              📦 <span class="font-mono">{haul.id}</span>
-            </h1>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h1 id="haul-title" class="text-2xl font-bold text-gray-900 truncate">
+                {haul.name || `📦 ${haul.id}`}
+              </h1>
+              <button
+                id="edit-name-btn"
+                type="button"
+                class="text-gray-400 hover:text-blue-600 transition cursor-pointer border-0 bg-transparent p-1"
+                title="Edit haul name"
+              >
+                <i class="bi bi-pencil text-sm"></i>
+              </button>
+            </div>
+            <div id="edit-name-form" class="hidden mb-2">
+              <div class="flex items-center gap-2">
+                <input
+                  id="edit-name-input"
+                  type="text"
+                  value={haul.name || ''}
+                  placeholder="Name this haul..."
+                  maxlength="100"
+                  class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button id="save-name-btn" type="button" class="text-green-600 hover:text-green-700 cursor-pointer border-0 bg-transparent p-1">
+                  <i class="bi bi-check-lg text-lg"></i>
+                </button>
+                <button id="cancel-name-btn" type="button" class="text-gray-400 hover:text-gray-600 cursor-pointer border-0 bg-transparent p-1">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </div>
             <p class="text-sm text-gray-500 mt-1">
-              {haul.scrapes.length}/20 scrapes · Expires {new Date(haul.expiresAt).toLocaleDateString()}
+              <span class="font-mono text-xs text-gray-400">{haul.id}</span> · {haul.scrapes.length}/20 scrapes · Expires {new Date(haul.expiresAt).toLocaleDateString()}
             </p>
           </div>
-          <button
-            id="copy-haul-url"
-            type="button"
-            class="inline-flex items-center gap-1.5 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer border-0"
-          >
-            <i class="bi bi-link-45deg"></i> Copy Haul URL
+          <div class="flex items-center gap-2">
+            {/* Export dropdown */}
+            <div class="relative" id="export-dropdown-container">
+              <button
+                id="export-btn"
+                type="button"
+                class="inline-flex items-center gap-1.5 bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-green-700 cursor-pointer border-0"
+              >
+                <i class="bi bi-download"></i> Export <i class="bi bi-chevron-down text-xs"></i>
+              </button>
+              <div id="export-menu" class="hidden absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 min-w-[140px]">
+                <a href={`/ext/v1/hauls/${id}/export?format=csv`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                  <i class="bi bi-filetype-csv mr-1.5"></i> CSV
+                </a>
+                <a href={`/ext/v1/hauls/${id}/export?format=json`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                  <i class="bi bi-filetype-json mr-1.5"></i> JSON
+                </a>
+                <a href={`/ext/v1/hauls/${id}/export?format=geojson`} class={`block px-4 py-2 text-sm no-underline ${summary && summary.scrapesWithGeo > 0 ? 'text-gray-700 hover:bg-gray-50' : 'text-gray-300 pointer-events-none'}`}>
+                  <i class="bi bi-geo-alt mr-1.5"></i> GeoJSON
+                </a>
+              </div>
+            </div>
+            <button
+              id="copy-haul-url"
+              type="button"
+              class="inline-flex items-center gap-1.5 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer border-0"
+            >
+              <i class="bi bi-link-45deg"></i> Copy URL
+            </button>
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div class="mt-3">
+          <button id="toggle-notes-btn" type="button" class="text-xs text-gray-400 hover:text-blue-600 cursor-pointer border-0 bg-transparent">
+            <i class="bi bi-sticky mr-1"></i> {haul.notes ? 'Edit notes' : 'Add notes'}
           </button>
+          <div id="notes-section" class={haul.notes ? '' : 'hidden'}>
+            <textarea
+              id="notes-textarea"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+              rows="2"
+              maxlength="500"
+              placeholder="Add notes about this haul..."
+            >{haul.notes || ''}</textarea>
+            <div class="flex justify-end mt-1">
+              <button id="save-notes-btn" type="button" class="text-xs text-blue-600 hover:text-blue-700 cursor-pointer border-0 bg-transparent">
+                Save notes
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Capacity bar */}
@@ -65,6 +141,106 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
           </div>
         </div>
       </div>
+
+      {/* Summary card */}
+      {summary && haul.scrapes.length >= 2 && (
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            {/* Price Range */}
+            <div>
+              <p class="text-gray-500 text-xs mb-1">Price Range</p>
+              {summary.priceRange ? (
+                <p class="font-semibold text-gray-900">
+                  {summary.priceRange.currency}{summary.priceRange.min.toLocaleString()} — {summary.priceRange.currency}{summary.priceRange.max.toLocaleString()}
+                </p>
+              ) : (
+                <p class="text-gray-400">—</p>
+              )}
+            </div>
+            {/* Average Price */}
+            <div>
+              <p class="text-gray-500 text-xs mb-1">Avg Price</p>
+              {summary.avgPrice ? (
+                <p class="font-semibold text-gray-900">
+                  {summary.priceRange?.currency}{summary.avgPrice.toLocaleString()}
+                </p>
+              ) : (
+                <p class="text-gray-400">—</p>
+              )}
+            </div>
+            {/* Grades */}
+            <div>
+              <p class="text-gray-500 text-xs mb-1">Grades</p>
+              <div class="flex gap-1 flex-wrap">
+                {Object.entries(summary.gradeDistribution).sort().map(([grade, count]) => {
+                  const colors = gradeColors[grade] || gradeColors.F;
+                  return (
+                    <span class={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${colors.bg} ${colors.text}`}>
+                      {grade}: {count}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Portals */}
+            <div>
+              <p class="text-gray-500 text-xs mb-1">Sources</p>
+              {Object.keys(summary.portalCounts).length > 0 ? (
+                <div class="flex gap-1 flex-wrap">
+                  {Object.entries(summary.portalCounts).map(([slug, count]) => (
+                    <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                      {slug}: {count}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p class="text-gray-400">—</p>
+              )}
+            </div>
+          </div>
+          {/* Secondary row */}
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mt-3 pt-3 border-t border-gray-100">
+            <div>
+              <p class="text-gray-500 text-xs mb-1">Bedrooms</p>
+              {summary.bedroomRange ? (
+                <p class="font-semibold text-gray-900">
+                  {summary.bedroomRange.min === summary.bedroomRange.max
+                    ? summary.bedroomRange.min
+                    : `${summary.bedroomRange.min}–${summary.bedroomRange.max}`}
+                </p>
+              ) : (
+                <p class="text-gray-400">—</p>
+              )}
+            </div>
+            <div>
+              <p class="text-gray-500 text-xs mb-1">Cities</p>
+              {Object.keys(summary.cityDistribution).length > 0 ? (
+                <p class="font-semibold text-gray-900 truncate">
+                  {Object.keys(summary.cityDistribution).join(', ')}
+                </p>
+              ) : (
+                <p class="text-gray-400">—</p>
+              )}
+            </div>
+            <div>
+              <p class="text-gray-500 text-xs mb-1">Median Price</p>
+              {summary.medianPrice ? (
+                <p class="font-semibold text-gray-900">
+                  {summary.priceRange?.currency}{summary.medianPrice.toLocaleString()}
+                </p>
+              ) : (
+                <p class="text-gray-400">—</p>
+              )}
+            </div>
+            <div>
+              <p class="text-gray-500 text-xs mb-1">With Location</p>
+              <p class="font-semibold text-gray-900">
+                {summary.scrapesWithGeo}/{summary.totalScrapes}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Compare on HomesToCompare */}
       {haul.scrapes.length >= 2 && (
@@ -119,96 +295,407 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
           <p class="text-gray-500 text-sm">Use the Chrome extension to add property listings to this haul.</p>
         </div>
       ) : (
-        <div class="grid gap-4 sm:grid-cols-2">
-          {haul.scrapes.map((scrape) => {
-            const colors = gradeColors[scrape.grade] || gradeColors.F;
-            const ratePercent = Math.round(scrape.extractionRate * 100);
-            return (
-              <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-                <div class="flex items-start justify-between gap-2 mb-3">
-                  <h3 class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">
-                    {scrape.title}
-                  </h3>
-                  <span class={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shrink-0 ${colors.bg} ${colors.text}`}>
-                    {scrape.grade}
-                  </span>
-                </div>
+        <>
+          {/* View toggle */}
+          <div class="flex items-center gap-1 mb-4 bg-gray-100 rounded-lg p-1 w-fit">
+            <button type="button" data-view="grid" class="view-toggle-btn px-3 py-1.5 text-sm rounded-md cursor-pointer border-0 bg-white shadow-sm font-medium text-gray-900">
+              <i class="bi bi-grid-3x2-gap mr-1"></i> Grid
+            </button>
+            <button type="button" data-view="table" class="view-toggle-btn px-3 py-1.5 text-sm rounded-md cursor-pointer border-0 bg-transparent text-gray-500 hover:text-gray-700">
+              <i class="bi bi-table mr-1"></i> Table
+            </button>
+            <button type="button" data-view="map" class={`view-toggle-btn px-3 py-1.5 text-sm rounded-md cursor-pointer border-0 bg-transparent ${summary && summary.scrapesWithGeo > 0 ? 'text-gray-500 hover:text-gray-700' : 'text-gray-300 cursor-not-allowed'}`} disabled={!summary || summary.scrapesWithGeo === 0}>
+              <i class="bi bi-map mr-1"></i> Map
+            </button>
+          </div>
 
-                {scrape.price && (
-                  <p class="text-blue-600 font-semibold text-sm mb-2">{scrape.price}</p>
-                )}
-
-                <p class="text-gray-500 text-xs mb-3">
-                  {ratePercent}% extraction rate
-                </p>
-
-                <div class="flex items-center gap-2 text-xs">
-                  <a
-                    href={`/extract/results/${scrape.resultId}`}
-                    class="text-blue-600 hover:underline inline-flex items-center gap-1"
+          {/* Grid view */}
+          <div id="view-grid" class="grid gap-4 sm:grid-cols-2">
+            {haul.scrapes.map((scrape) => {
+              const colors = gradeColors[scrape.grade] || gradeColors.F;
+              const ratePercent = Math.round(scrape.extractionRate * 100);
+              return (
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative" data-scrape-card={scrape.resultId}>
+                  {/* Remove button */}
+                  <button
+                    type="button"
+                    class="remove-scrape-btn absolute top-2 right-2 text-gray-300 hover:text-red-500 cursor-pointer border-0 bg-transparent p-1 transition"
+                    data-result-id={scrape.resultId}
+                    title="Remove scrape"
                   >
-                    <i class="bi bi-eye"></i> View details
-                  </a>
-                  <span class="text-gray-300">·</span>
-                  <a
-                    href={scrape.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-gray-400 hover:text-gray-600 inline-flex items-center gap-1"
-                  >
-                    <i class="bi bi-box-arrow-up-right"></i> Source
-                  </a>
+                    <i class="bi bi-trash text-xs"></i>
+                  </button>
+
+                  <div class="flex items-start justify-between gap-2 mb-3 pr-6">
+                    <h3 class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">
+                      {scrape.title}
+                    </h3>
+                    <span class={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shrink-0 ${colors.bg} ${colors.text}`}>
+                      {scrape.grade}
+                    </span>
+                  </div>
+
+                  {scrape.price && (
+                    <p class="text-blue-600 font-semibold text-sm mb-2">{scrape.price}</p>
+                  )}
+
+                  {/* Enriched data chips */}
+                  {(scrape.count_bedrooms || scrape.count_bathrooms || scrape.city) && (
+                    <div class="flex flex-wrap gap-1.5 mb-2">
+                      {scrape.count_bedrooms && (
+                        <span class="inline-flex items-center gap-0.5 text-xs text-gray-600 bg-gray-50 px-2 py-0.5 rounded">
+                          <i class="bi bi-door-open"></i> {scrape.count_bedrooms} bed
+                        </span>
+                      )}
+                      {scrape.count_bathrooms && (
+                        <span class="inline-flex items-center gap-0.5 text-xs text-gray-600 bg-gray-50 px-2 py-0.5 rounded">
+                          <i class="bi bi-droplet"></i> {scrape.count_bathrooms} bath
+                        </span>
+                      )}
+                      {scrape.city && (
+                        <span class="inline-flex items-center gap-0.5 text-xs text-gray-600 bg-gray-50 px-2 py-0.5 rounded">
+                          <i class="bi bi-geo-alt"></i> {scrape.city}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  <p class="text-gray-500 text-xs mb-3">
+                    {ratePercent}% extraction rate
+                  </p>
+
+                  <div class="flex items-center gap-2 text-xs">
+                    <a
+                      href={`/extract/results/${scrape.resultId}`}
+                      class="text-blue-600 hover:underline inline-flex items-center gap-1"
+                    >
+                      <i class="bi bi-eye"></i> View details
+                    </a>
+                    <span class="text-gray-300">·</span>
+                    <a
+                      href={scrape.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-gray-400 hover:text-gray-600 inline-flex items-center gap-1"
+                    >
+                      <i class="bi bi-box-arrow-up-right"></i> Source
+                    </a>
+                  </div>
                 </div>
+              );
+            })}
+          </div>
+
+          {/* Table view */}
+          <div id="view-table" class="hidden">
+            {!hasEnrichedData && (
+              <div class="bg-blue-50 rounded-lg p-3 mb-3 text-xs text-blue-700">
+                <i class="bi bi-info-circle mr-1"></i> This haul was created before enriched data was available. Some columns may show "—".
               </div>
-            );
-          })}
-        </div>
+            )}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-200 bg-gray-50">
+                    <th class="text-left px-4 py-3 font-medium text-gray-600 whitespace-nowrap">Property</th>
+                    <th class="text-right px-4 py-3 font-medium text-gray-600 whitespace-nowrap">Price</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600 whitespace-nowrap">Beds</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600 whitespace-nowrap">Baths</th>
+                    <th class="text-right px-4 py-3 font-medium text-gray-600 whitespace-nowrap">Area</th>
+                    <th class="text-left px-4 py-3 font-medium text-gray-600 whitespace-nowrap">City</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600 whitespace-nowrap">Grade</th>
+                    <th class="text-left px-4 py-3 font-medium text-gray-600 whitespace-nowrap">Source</th>
+                    <th class="px-2 py-3"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {haul.scrapes.map((scrape) => {
+                    const colors = gradeColors[scrape.grade] || gradeColors.F;
+                    return (
+                      <tr class="border-b border-gray-100 hover:bg-gray-50" data-scrape-row={scrape.resultId}>
+                        <td class="px-4 py-3 max-w-[200px]">
+                          <a href={`/extract/results/${scrape.resultId}`} class="text-blue-600 hover:underline text-sm font-medium line-clamp-1">
+                            {scrape.title}
+                          </a>
+                        </td>
+                        <td class="px-4 py-3 text-right whitespace-nowrap font-medium">{scrape.price || '—'}</td>
+                        <td class="px-4 py-3 text-center">{scrape.count_bedrooms || '—'}</td>
+                        <td class="px-4 py-3 text-center">{scrape.count_bathrooms || '—'}</td>
+                        <td class="px-4 py-3 text-right whitespace-nowrap">
+                          {scrape.constructed_area ? `${scrape.constructed_area} ${scrape.area_unit || 'sqmt'}` : '—'}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">{scrape.city || '—'}</td>
+                        <td class="px-4 py-3 text-center">
+                          <span class={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${colors.bg} ${colors.text}`}>
+                            {scrape.grade}
+                          </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-400">{scrape.import_host_slug || '—'}</td>
+                        <td class="px-2 py-3">
+                          <button
+                            type="button"
+                            class="remove-scrape-btn text-gray-300 hover:text-red-500 cursor-pointer border-0 bg-transparent p-1 transition"
+                            data-result-id={scrape.resultId}
+                            title="Remove"
+                          >
+                            <i class="bi bi-trash text-xs"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Map view */}
+          <div id="view-map" class="hidden">
+            {summary && summary.scrapesWithGeo > 0 ? (
+              <div id="haul-map" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" style="height: 450px;"></div>
+            ) : (
+              <div class="bg-gray-50 rounded-xl p-8 text-center">
+                <i class="bi bi-geo-alt text-3xl text-gray-300 mb-2"></i>
+                <p class="text-gray-500 text-sm">No scrapes in this haul have location data.</p>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </>
   )}
 
 </section>
 
-<script is:inline define:vars={{ h2cUrl }}>
-document.addEventListener('DOMContentLoaded', () => {
-  const copyBtn = document.getElementById('copy-haul-url');
+<script is:inline define:vars={{ h2cUrl, id, haul: haul ? { id: haul.id, name: haul.name, scrapes: haul.scrapes.map((s: any) => ({ resultId: s.resultId, title: s.title, grade: s.grade, price: s.price, extractionRate: s.extractionRate, latitude: s.latitude, longitude: s.longitude, city: s.city })), expiresAt: haul.expiresAt } : null }}>
+document.addEventListener('DOMContentLoaded', function() {
+  // --- Copy URL ---
+  var copyBtn = document.getElementById('copy-haul-url');
   if (copyBtn) {
-    copyBtn.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(window.location.href);
+    copyBtn.addEventListener('click', function() {
+      navigator.clipboard.writeText(window.location.href);
       copyBtn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
-      setTimeout(() => {
-        copyBtn.innerHTML = '<i class="bi bi-link-45deg"></i> Copy Haul URL';
+      setTimeout(function() {
+        copyBtn.innerHTML = '<i class="bi bi-link-45deg"></i> Copy URL';
       }, 2000);
     });
   }
 
-  // Multi-select compare
-  const checkboxes = document.querySelectorAll('.h2c-scrape-checkbox');
-  const compareBtn = document.getElementById('h2c-compare-btn');
+  // --- Export dropdown ---
+  var exportBtn = document.getElementById('export-btn');
+  var exportMenu = document.getElementById('export-menu');
+  if (exportBtn && exportMenu) {
+    exportBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      exportMenu.classList.toggle('hidden');
+    });
+    document.addEventListener('click', function() {
+      exportMenu.classList.add('hidden');
+    });
+  }
+
+  // --- Edit name ---
+  var editNameBtn = document.getElementById('edit-name-btn');
+  var editNameForm = document.getElementById('edit-name-form');
+  var editNameInput = document.getElementById('edit-name-input');
+  var saveNameBtn = document.getElementById('save-name-btn');
+  var cancelNameBtn = document.getElementById('cancel-name-btn');
+  var haulTitle = document.getElementById('haul-title');
+
+  function showNameForm() {
+    if (editNameForm) editNameForm.classList.remove('hidden');
+    if (editNameBtn) editNameBtn.classList.add('hidden');
+    if (haulTitle) haulTitle.classList.add('hidden');
+    if (editNameInput) editNameInput.focus();
+  }
+  function hideNameForm() {
+    if (editNameForm) editNameForm.classList.add('hidden');
+    if (editNameBtn) editNameBtn.classList.remove('hidden');
+    if (haulTitle) haulTitle.classList.remove('hidden');
+  }
+
+  if (editNameBtn) editNameBtn.addEventListener('click', showNameForm);
+  if (cancelNameBtn) cancelNameBtn.addEventListener('click', hideNameForm);
+  if (saveNameBtn) {
+    saveNameBtn.addEventListener('click', function() {
+      var name = editNameInput ? editNameInput.value.trim() : '';
+      fetch('/ext/v1/hauls/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name }),
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        if (data.success && haulTitle) {
+          haulTitle.textContent = name || '📦 ' + id;
+          hideNameForm();
+        }
+      });
+    });
+  }
+  if (editNameInput) {
+    editNameInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); saveNameBtn && saveNameBtn.click(); }
+      if (e.key === 'Escape') { hideNameForm(); }
+    });
+  }
+
+  // --- Notes ---
+  var toggleNotesBtn = document.getElementById('toggle-notes-btn');
+  var notesSection = document.getElementById('notes-section');
+  var notesTextarea = document.getElementById('notes-textarea');
+  var saveNotesBtn = document.getElementById('save-notes-btn');
+
+  if (toggleNotesBtn && notesSection) {
+    toggleNotesBtn.addEventListener('click', function() {
+      notesSection.classList.toggle('hidden');
+      if (!notesSection.classList.contains('hidden') && notesTextarea) {
+        notesTextarea.focus();
+      }
+    });
+  }
+  if (saveNotesBtn && notesTextarea) {
+    saveNotesBtn.addEventListener('click', function() {
+      fetch('/ext/v1/hauls/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: notesTextarea.value }),
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        if (data.success) {
+          saveNotesBtn.textContent = 'Saved!';
+          setTimeout(function() { saveNotesBtn.textContent = 'Save notes'; }, 2000);
+        }
+      });
+    });
+  }
+
+  // --- Remove scrape ---
+  document.querySelectorAll('.remove-scrape-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var resultId = btn.dataset.resultId;
+      if (btn.dataset.confirming) {
+        fetch('/ext/v1/hauls/' + id + '/scrapes/' + resultId, { method: 'DELETE' })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.success) {
+              // Remove card and row
+              var card = document.querySelector('[data-scrape-card="' + resultId + '"]');
+              if (card) card.remove();
+              var row = document.querySelector('[data-scrape-row="' + resultId + '"]');
+              if (row) row.remove();
+            }
+          });
+      } else {
+        btn.dataset.confirming = 'true';
+        btn.innerHTML = '<span class="text-red-500 text-xs font-medium">Remove?</span>';
+        setTimeout(function() {
+          if (btn.dataset.confirming) {
+            delete btn.dataset.confirming;
+            btn.innerHTML = '<i class="bi bi-trash text-xs"></i>';
+          }
+        }, 3000);
+      }
+    });
+  });
+
+  // --- View toggle ---
+  var viewBtns = document.querySelectorAll('.view-toggle-btn');
+  var viewGrid = document.getElementById('view-grid');
+  var viewTable = document.getElementById('view-table');
+  var viewMap = document.getElementById('view-map');
+  var mapInitialized = false;
+
+  viewBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var view = btn.dataset.view;
+      if (btn.disabled) return;
+
+      // Update button styles
+      viewBtns.forEach(function(b) {
+        b.classList.remove('bg-white', 'shadow-sm', 'font-medium', 'text-gray-900');
+        b.classList.add('bg-transparent', 'text-gray-500');
+      });
+      btn.classList.add('bg-white', 'shadow-sm', 'font-medium', 'text-gray-900');
+      btn.classList.remove('bg-transparent', 'text-gray-500');
+
+      // Show/hide views
+      if (viewGrid) viewGrid.classList.toggle('hidden', view !== 'grid');
+      if (viewTable) viewTable.classList.toggle('hidden', view !== 'table');
+      if (viewMap) viewMap.classList.toggle('hidden', view !== 'map');
+
+      // Initialize map on first click
+      if (view === 'map' && !mapInitialized) {
+        mapInitialized = true;
+        initMap();
+      }
+    });
+  });
+
+  // --- Map initialization (Leaflet CDN) ---
+  function initMap() {
+    if (!haul || !haul.scrapes) return;
+    var geoScrapes = haul.scrapes.filter(function(s) { return s.latitude && s.longitude; });
+    if (geoScrapes.length === 0) return;
+
+    var mapContainer = document.getElementById('haul-map');
+    if (!mapContainer) return;
+
+    // Load Leaflet CSS
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+
+    // Load Leaflet JS
+    var script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = function() {
+      var map = L.map('haul-map');
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18,
+      }).addTo(map);
+
+      var bounds = [];
+      geoScrapes.forEach(function(s) {
+        var latLng = [s.latitude, s.longitude];
+        bounds.push(latLng);
+        var popupHtml = '<div style="min-width:150px">'
+          + '<strong>' + (s.title || 'Untitled') + '</strong>'
+          + (s.price ? '<br>' + s.price : '')
+          + (s.grade ? '<br>Grade: <strong>' + s.grade + '</strong>' : '')
+          + '<br><a href="/extract/results/' + s.resultId + '">View details</a>'
+          + '</div>';
+        L.marker(latLng).addTo(map).bindPopup(popupHtml);
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [30, 30] });
+      }
+    };
+    document.head.appendChild(script);
+  }
+
+  // --- Multi-select compare ---
+  var checkboxes = document.querySelectorAll('.h2c-scrape-checkbox');
+  var compareBtn = document.getElementById('h2c-compare-btn');
   if (checkboxes.length > 0 && compareBtn) {
-    checkboxes.forEach((cb) => {
-      cb.addEventListener('change', () => {
-        const checked = document.querySelectorAll('.h2c-scrape-checkbox:checked');
+    checkboxes.forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        var checked = document.querySelectorAll('.h2c-scrape-checkbox:checked');
         compareBtn.disabled = checked.length !== 2;
       });
     });
-
-    compareBtn.addEventListener('click', () => {
-      const checked = document.querySelectorAll('.h2c-scrape-checkbox:checked');
+    compareBtn.addEventListener('click', function() {
+      var checked = document.querySelectorAll('.h2c-scrape-checkbox:checked');
       if (checked.length !== 2) return;
-      const urls = Array.from(checked).map((cb) => cb.dataset.url);
-      const compareUrl = h2cUrl + '/new?left_url=' + encodeURIComponent(urls[0]) + '&right_url=' + encodeURIComponent(urls[1]) + '&source=scraper';
+      var urls = Array.from(checked).map(function(cb) { return cb.dataset.url; });
+      var compareUrl = h2cUrl + '/new?left_url=' + encodeURIComponent(urls[0]) + '&right_url=' + encodeURIComponent(urls[1]) + '&source=scraper';
       window.open(compareUrl, '_blank');
     });
   }
-});
-</script>
 
-<script is:inline define:vars={{ id, haul: haul ? { id: haul.id, scrapes: haul.scrapes.map((s: any) => ({ resultId: s.resultId, title: s.title, grade: s.grade, price: s.price, extractionRate: s.extractionRate })), expiresAt: haul.expiresAt } : null }}>
-document.addEventListener('DOMContentLoaded', () => {
+  // --- Cache to localStorage + My Hauls list ---
   if (typeof window.PwsStorage === 'undefined') return;
-  var haulId = id;
-  if (!haulId) return;
+  if (!id) return;
 
   if (haul) {
     // Cache haul summary (functional, 30d TTL)
@@ -216,6 +703,7 @@ document.addEventListener('DOMContentLoaded', () => {
       id: haul.id,
       scrapeCount: haul.scrapes.length,
       expiresAt: haul.expiresAt,
+      name: haul.name || null,
       scrapes: haul.scrapes.map(function(s) {
         return {
           resultId: s.resultId,
@@ -226,10 +714,30 @@ document.addEventListener('DOMContentLoaded', () => {
         };
       }),
     };
-    window.PwsStorage.set('functional:haul-cache:' + haulId, cacheSummary);
+    window.PwsStorage.set('functional:haul-cache:' + id, cacheSummary);
+
+    // Update my-hauls list
+    var myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+    var entry = {
+      id: haul.id,
+      name: haul.name || null,
+      scrapeCount: haul.scrapes.length,
+      lastVisited: new Date().toISOString(),
+      expiresAt: haul.expiresAt,
+    };
+    // Upsert
+    var existingIdx = myHauls.findIndex(function(h) { return h.id === haul.id; });
+    if (existingIdx !== -1) {
+      myHauls[existingIdx] = entry;
+    } else {
+      myHauls.unshift(entry);
+    }
+    // Cap at 20
+    if (myHauls.length > 20) myHauls = myHauls.slice(0, 20);
+    window.PwsStorage.set('functional:my-hauls', myHauls);
   } else {
     // Not-found state: try showing cached data
-    var cached = window.PwsStorage.get('functional:haul-cache:' + haulId);
+    var cached = window.PwsStorage.get('functional:haul-cache:' + id);
     if (cached) {
       var fallback = document.getElementById('cached-haul-fallback');
       var content = document.getElementById('cached-haul-content');

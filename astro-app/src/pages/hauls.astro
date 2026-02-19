@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="My Hauls">
+
+<section class="max-w-4xl mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">📦 My Hauls</h1>
+      <p class="text-sm text-gray-500 mt-1">Hauls you've visited, stored locally in your browser.</p>
+    </div>
+  </div>
+
+  <div id="hauls-list"></div>
+
+  <div id="hauls-empty" class="hidden bg-gray-50 rounded-2xl p-8 text-center">
+    <div class="text-4xl mb-3">📦</div>
+    <h3 class="font-semibold text-gray-700 mb-2">No hauls found</h3>
+    <p class="text-gray-500 text-sm mb-4">
+      Hauls you visit will appear here. Create a haul using the
+      <a href="/extension" class="text-blue-600 hover:underline">Chrome extension</a>.
+    </p>
+    <p class="text-xs text-gray-400">
+      <i class="bi bi-info-circle mr-1"></i> Requires functional cookies to be accepted.
+    </p>
+  </div>
+
+  <div id="no-consent" class="hidden bg-amber-50 rounded-2xl p-8 text-center">
+    <div class="text-4xl mb-3">🍪</div>
+    <h3 class="font-semibold text-amber-900 mb-2">Functional cookies required</h3>
+    <p class="text-amber-800 text-sm">
+      My Hauls uses functional localStorage to remember your hauls.
+      Please accept functional cookies in the consent banner to use this feature.
+    </p>
+  </div>
+</section>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', function() {
+  var listEl = document.getElementById('hauls-list');
+  var emptyEl = document.getElementById('hauls-empty');
+  var noConsentEl = document.getElementById('no-consent');
+
+  if (typeof window.PwsStorage === 'undefined') {
+    if (noConsentEl) noConsentEl.classList.remove('hidden');
+    return;
+  }
+
+  var myHauls = window.PwsStorage.get('functional:my-hauls');
+  if (!myHauls || myHauls.length === 0) {
+    if (emptyEl) emptyEl.classList.remove('hidden');
+    return;
+  }
+
+  // Filter out expired hauls
+  var now = new Date();
+  myHauls = myHauls.filter(function(h) {
+    return new Date(h.expiresAt) > now;
+  });
+
+  if (myHauls.length === 0) {
+    if (emptyEl) emptyEl.classList.remove('hidden');
+    return;
+  }
+
+  // Sort by lastVisited descending
+  myHauls.sort(function(a, b) {
+    return new Date(b.lastVisited).getTime() - new Date(a.lastVisited).getTime();
+  });
+
+  var html = '<div class="grid gap-4 sm:grid-cols-2">';
+  myHauls.forEach(function(h) {
+    var daysLeft = Math.max(0, Math.ceil((new Date(h.expiresAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+    var visited = new Date(h.lastVisited).toLocaleDateString();
+    html += '<a href="/haul/' + h.id + '" class="block bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow no-underline">';
+    html += '<div class="flex items-center justify-between mb-2">';
+    html += '<h3 class="font-semibold text-gray-900 text-sm truncate">' + (h.name || '📦 ' + h.id) + '</h3>';
+    html += '<span class="text-xs text-gray-400 whitespace-nowrap ml-2">' + daysLeft + 'd left</span>';
+    html += '</div>';
+    html += '<p class="text-xs text-gray-500">';
+    html += h.scrapeCount + ' scrape' + (h.scrapeCount !== 1 ? 's' : '') + ' · Last visited ' + visited;
+    html += '</p>';
+    if (!h.name) {
+      html += '<p class="text-xs text-gray-400 font-mono mt-1 truncate">' + h.id + '</p>';
+    }
+    html += '</a>';
+  });
+  html += '</div>';
+
+  if (listEl) listEl.innerHTML = html;
+});
+</script>
+
+</BaseLayout>

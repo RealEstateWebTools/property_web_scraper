@@ -105,6 +105,24 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     extractionRate,
     createdAt: new Date().toISOString(),
     url,
+    // Enriched fields — omit zero/empty values to save space
+    price_float: listing.price_float || undefined,
+    currency: listing.currency || undefined,
+    count_bedrooms: listing.count_bedrooms || undefined,
+    count_bathrooms: listing.count_bathrooms || undefined,
+    constructed_area: listing.constructed_area || undefined,
+    area_unit: listing.area_unit !== 'sqmt' ? listing.area_unit : undefined,
+    latitude: listing.latitude || undefined,
+    longitude: listing.longitude || undefined,
+    city: listing.city || undefined,
+    country: listing.country || undefined,
+    address_string: listing.address_string || undefined,
+    main_image_url: listing.main_image_url || undefined,
+    import_host_slug: importHost.slug || undefined,
+    for_sale: listing.for_sale || undefined,
+    for_rent: listing.for_rent || undefined,
+    features: listing.features?.length ? listing.features : undefined,
+    description: listing.description ? listing.description.slice(0, 500) : undefined,
   };
 
   const { added, replaced } = await addScrapeToHaul(id, scrape);
