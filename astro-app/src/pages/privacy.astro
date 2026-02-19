@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Privacy Controls - Property Web Scraper">
+
+<section class="max-w-3xl mx-auto px-4 py-12">
+  <h1 class="text-2xl font-bold text-gray-900 mb-2">Privacy Controls</h1>
+  <p class="text-sm text-gray-500 mb-8">
+    Manage how this site uses browser storage. All data is stored locally in your browser and is never sent to any server.
+  </p>
+
+  <!-- Consent preferences -->
+  <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="bi bi-shield-check text-blue-600 mr-1"></i> Consent Preferences</h2>
+
+    <div class="space-y-3">
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div>
+          <p class="font-medium text-sm text-gray-900">Essential storage</p>
+          <p class="text-xs text-gray-500">Consent record, UI toggle states. Always active.</p>
+        </div>
+        <span class="text-xs font-medium bg-green-100 text-green-800 px-2 py-1 rounded">Always on</span>
+      </div>
+
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div>
+          <p class="font-medium text-sm text-gray-900">Functional storage</p>
+          <p class="text-xs text-gray-500">Recent extractions, cached results and hauls, recent URLs.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="functional-status" class="text-xs font-medium px-2 py-1 rounded bg-gray-200 text-gray-600">Loading...</span>
+          <button id="toggle-functional" type="button" class="text-xs bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 cursor-pointer border-0 transition">Toggle</button>
+        </div>
+      </div>
+    </div>
+
+    <button id="reset-all" type="button" class="mt-4 text-sm text-red-600 hover:text-red-700 cursor-pointer border-0 bg-transparent underline">
+      Reset all choices
+    </button>
+  </div>
+
+  <!-- Stored data viewer -->
+  <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="bi bi-database text-blue-600 mr-1"></i> Stored Data</h2>
+    <div id="data-table-container">
+      <p class="text-sm text-gray-500">Loading...</p>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="bg-white rounded-2xl shadow-md p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="bi bi-gear text-blue-600 mr-1"></i> Actions</h2>
+    <div class="flex flex-wrap gap-3">
+      <button id="download-data" type="button" class="inline-flex items-center gap-1.5 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer border-0 transition">
+        <i class="bi bi-download"></i> Download my data
+      </button>
+      <button id="delete-all" type="button" class="inline-flex items-center gap-1.5 bg-red-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-red-700 cursor-pointer border-0 transition">
+        <i class="bi bi-trash3"></i> Delete all data
+      </button>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof window.PwsStorage === 'undefined' || typeof window.PwsConsent === 'undefined') return;
+
+  var functionalStatus = document.getElementById('functional-status');
+  var toggleBtn = document.getElementById('toggle-functional');
+  var resetBtn = document.getElementById('reset-all');
+  var downloadBtn = document.getElementById('download-data');
+  var deleteBtn = document.getElementById('delete-all');
+  var tableContainer = document.getElementById('data-table-container');
+
+  function updateStatus() {
+    var state = window.PwsConsent.getState();
+    if (!state) {
+      functionalStatus.textContent = 'Not set';
+      functionalStatus.className = 'text-xs font-medium px-2 py-1 rounded bg-gray-200 text-gray-600';
+    } else if (state.functional === 'granted') {
+      functionalStatus.textContent = 'Granted';
+      functionalStatus.className = 'text-xs font-medium px-2 py-1 rounded bg-green-100 text-green-800';
+    } else {
+      functionalStatus.textContent = 'Denied';
+      functionalStatus.className = 'text-xs font-medium px-2 py-1 rounded bg-red-100 text-red-800';
+    }
+  }
+
+  function renderTable() {
+    var keys = window.PwsStorage.listKeys();
+    if (keys.length === 0) {
+      tableContainer.innerHTML = '<p class="text-sm text-gray-400 italic">No data stored.</p>';
+      return;
+    }
+    var html = '<div class="overflow-x-auto"><table class="w-full text-sm border border-gray-200 rounded">';
+    html += '<thead><tr class="bg-gray-50 text-left text-gray-500">';
+    html += '<th class="py-2 px-3 font-medium">Key</th>';
+    html += '<th class="py-2 px-3 font-medium">Category</th>';
+    html += '<th class="py-2 px-3 font-medium">Size</th>';
+    html += '<th class="py-2 px-3 font-medium">Expires</th>';
+    html += '</tr></thead><tbody>';
+    keys.forEach(function(k) {
+      var catClass = k.category === 'necessary' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
+      html += '<tr class="border-b border-gray-100">';
+      html += '<td class="py-2 px-3 font-mono text-xs break-all">' + k.key + '</td>';
+      html += '<td class="py-2 px-3"><span class="text-xs font-medium px-1.5 py-0.5 rounded ' + catClass + '">' + k.category + '</span></td>';
+      html += '<td class="py-2 px-3 text-xs text-gray-500">' + (k.sizeBytes / 1024).toFixed(1) + ' KB</td>';
+      html += '<td class="py-2 px-3 text-xs text-gray-500">' + new Date(k.expiresAt).toLocaleDateString() + '</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    tableContainer.innerHTML = html;
+  }
+
+  function refresh() {
+    updateStatus();
+    renderTable();
+  }
+
+  // Initial render
+  refresh();
+
+  // Toggle functional consent
+  toggleBtn.addEventListener('click', function() {
+    var state = window.PwsConsent.getState();
+    var newVal = (!state || state.functional === 'denied') ? 'granted' : 'denied';
+    window.PwsConsent.setState(newVal);
+    if (newVal === 'denied') {
+      window.PwsStorage.purgeCategory('functional');
+    }
+    refresh();
+  });
+
+  // Reset all choices
+  resetBtn.addEventListener('click', function() {
+    window.PwsConsent.reset();
+    refresh();
+  });
+
+  // Download data
+  downloadBtn.addEventListener('click', function() {
+    var json = window.PwsStorage.exportAll();
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'pws-data-export.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Delete all data
+  deleteBtn.addEventListener('click', function() {
+    if (!confirm('This will permanently delete all stored data and reset your consent choices. Continue?')) return;
+    window.PwsStorage.purgeAll();
+    window.PwsConsent.reset();
+    refresh();
+  });
+});
+</script>
+
+</BaseLayout>

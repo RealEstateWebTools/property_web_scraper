@@ -28,6 +28,10 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
       <div class="text-4xl mb-3">📦</div>
       <h2 class="font-semibold text-amber-900 text-lg mb-2">Haul not found</h2>
       <p class="text-amber-800 text-sm">This haul may have expired or the ID is invalid.</p>
+      <div id="cached-haul-fallback" class="hidden bg-white/60 rounded-lg p-4 mt-4 text-left text-sm text-gray-700">
+        <p class="font-semibold text-gray-600 mb-2"><i class="bi bi-clock-history mr-1"></i> Last known contents</p>
+        <div id="cached-haul-content"></div>
+      </div>
     </div>
   ) : (
     <>
@@ -196,6 +200,52 @@ document.addEventListener('DOMContentLoaded', () => {
       const compareUrl = h2cUrl + '/new?left_url=' + encodeURIComponent(urls[0]) + '&right_url=' + encodeURIComponent(urls[1]) + '&source=scraper';
       window.open(compareUrl, '_blank');
     });
+  }
+});
+</script>
+
+<script is:inline define:vars={{ id, haul: haul ? { id: haul.id, scrapes: haul.scrapes.map((s: any) => ({ resultId: s.resultId, title: s.title, grade: s.grade, price: s.price, extractionRate: s.extractionRate })), expiresAt: haul.expiresAt } : null }}>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof window.PwsStorage === 'undefined') return;
+  var haulId = id;
+  if (!haulId) return;
+
+  if (haul) {
+    // Cache haul summary (functional, 30d TTL)
+    var cacheSummary = {
+      id: haul.id,
+      scrapeCount: haul.scrapes.length,
+      expiresAt: haul.expiresAt,
+      scrapes: haul.scrapes.map(function(s) {
+        return {
+          resultId: s.resultId,
+          title: (s.title || '').slice(0, 80),
+          grade: s.grade,
+          price: s.price || '',
+          rate: Math.round((s.extractionRate || 0) * 100),
+        };
+      }),
+    };
+    window.PwsStorage.set('functional:haul-cache:' + haulId, cacheSummary);
+  } else {
+    // Not-found state: try showing cached data
+    var cached = window.PwsStorage.get('functional:haul-cache:' + haulId);
+    if (cached) {
+      var fallback = document.getElementById('cached-haul-fallback');
+      var content = document.getElementById('cached-haul-content');
+      if (fallback && content) {
+        var html = '<p class="mb-2">' + cached.scrapeCount + ' scrape(s) were in this haul</p>';
+        if (cached.scrapes && cached.scrapes.length > 0) {
+          html += '<ul class="list-disc pl-4 space-y-1">';
+          cached.scrapes.forEach(function(s) {
+            html += '<li>' + (s.title || 'Untitled') + (s.price ? ' — ' + s.price : '') + (s.grade ? ' (Grade ' + s.grade + ')' : '') + '</li>';
+          });
+          html += '</ul>';
+        }
+        content.innerHTML = html;
+        fallback.classList.remove('hidden');
+      }
+    }
   }
 });
 </script>

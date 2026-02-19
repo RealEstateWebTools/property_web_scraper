@@ -142,6 +142,7 @@ if (Astro.request.method === 'POST') {
             <input type="text" name="import_url" id="import_url"
                    class="w-full px-4 py-2.5 border-[1.5px] border-gray-300 rounded-lg text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition"
                    placeholder="https://www.idealista.com/inmueble/12345678/" required />
+            <div id="recent-urls" class="hidden mt-2 flex flex-wrap gap-1.5"></div>
           </div>
 
           <button type="submit"
@@ -166,5 +167,57 @@ if (Astro.request.method === 'POST') {
     </div>
   </div>
 </section>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof window.PwsStorage === 'undefined') return;
+
+  // Show recent URLs as clickable chips
+  var recentUrls = window.PwsStorage.get('functional:recent-urls') || [];
+  var container = document.getElementById('recent-urls');
+  var input = document.getElementById('import_url');
+  if (container && recentUrls.length > 0 && input) {
+    var label = document.createElement('span');
+    label.className = 'text-xs text-gray-400 self-center';
+    label.textContent = 'Recent:';
+    container.appendChild(label);
+    recentUrls.forEach(function(url) {
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full hover:bg-blue-50 hover:text-blue-600 transition cursor-pointer border-0';
+      // Show only hostname + path start for brevity
+      try {
+        var u = new URL(url);
+        chip.textContent = u.hostname + u.pathname.slice(0, 20) + (u.pathname.length > 20 ? '...' : '');
+      } catch { chip.textContent = url.slice(0, 40); }
+      chip.title = url;
+      chip.addEventListener('click', function() {
+        input.value = url;
+        input.focus();
+      });
+      container.appendChild(chip);
+    });
+    container.classList.remove('hidden');
+  }
+
+  // Save URL on form submit
+  var form = input ? input.closest('form') : null;
+  if (form) {
+    form.addEventListener('submit', function() {
+      var url = (input.value || '').trim();
+      if (!url) return;
+      // Strip query params for privacy
+      try { url = new URL(url).origin + new URL(url).pathname; } catch {}
+      // Max 200 chars
+      url = url.slice(0, 200);
+      var list = window.PwsStorage.get('functional:recent-urls') || [];
+      list = list.filter(function(u) { return u !== url; });
+      list.unshift(url);
+      if (list.length > 5) list = list.slice(0, 5);
+      window.PwsStorage.set('functional:recent-urls', list);
+    });
+  }
+});
+</script>
 
 </BaseLayout>
