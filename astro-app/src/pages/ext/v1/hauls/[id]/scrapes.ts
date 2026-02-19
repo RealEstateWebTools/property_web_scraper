@@ -86,7 +86,7 @@ export const POST: APIRoute = async ({ params, request }) => {
   }
 
   // Run extraction
-  const extractionResult = await runExtraction({ html, url, scraperMapping, importHost });
+  const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: 'manual_html' });
   if (!extractionResult) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Extraction failed — no data could be extracted', request);
   }
@@ -106,7 +106,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     url,
   };
 
-  const { added } = await addScrapeToHaul(id, scrape);
+  const { added, replaced } = await addScrapeToHaul(id, scrape);
   if (!added) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Haul is full (20/20 scrapes)', request);
   }
@@ -123,5 +123,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     },
     haul_url: `/haul/${id}`,
     results_url: resultsUrl,
+    was_existing_listing: extractionResult.wasExistingListing,
+    replaced,
   }, request, 201);
 };

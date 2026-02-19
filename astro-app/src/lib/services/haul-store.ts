@@ -3,6 +3,8 @@
  * Follows the same pattern as listing-store.ts.
  */
 
+import { deduplicationKey } from './url-canonicalizer.js';
+
 export interface HaulScrape {
   resultId: string;
   title: string;
@@ -76,16 +78,33 @@ export async function getHaul(id: string): Promise<Haul | undefined> {
 export async function addScrapeToHaul(
   id: string,
   scrape: HaulScrape,
-): Promise<{ haul: Haul; added: boolean }> {
+): Promise<{ haul: Haul; added: boolean; replaced: boolean }> {
   const haul = await getHaul(id);
   if (!haul) throw new Error('Haul not found');
-  if (haul.scrapes.length >= MAX_SCRAPES) {
-    return { haul, added: false };
+
+  // Check for existing scrape with the same canonical URL
+  const incomingKey = scrape.url ? deduplicationKey(scrape.url) : '';
+  let replaced = false;
+  if (incomingKey) {
+    const existingIdx = haul.scrapes.findIndex(
+      (s) => s.url && deduplicationKey(s.url) === incomingKey,
+    );
+    if (existingIdx !== -1) {
+      haul.scrapes[existingIdx] = scrape;
+      replaced = true;
+    }
   }
-  haul.scrapes.push(scrape);
+
+  if (!replaced) {
+    if (haul.scrapes.length >= MAX_SCRAPES) {
+      return { haul, added: false, replaced: false };
+    }
+    haul.scrapes.push(scrape);
+  }
+
   store.set(id, haul);
   if (kv) {
     await kv.put(kvKey(id), JSON.stringify(haul), { expirationTtl: remainingTtlSeconds(haul) });
   }
-  return { haul, added: true };
+  return { haul, added: true, replaced };
 }

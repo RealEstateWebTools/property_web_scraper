@@ -2,6 +2,13 @@ import { BaseModel, type AttributeDefinition } from '../firestore/base-model.js'
 import { sanitizePropertyHash } from '../extractor/field-processors.js';
 import type { ImageInfo } from '../types/image-info.js';
 
+export interface MergeDiff {
+  fieldsChanged: string[];
+  fieldsAdded: string[];
+  fieldsOverwritten: string[];
+  wasExistingListing: boolean;
+}
+
 /**
  * Represents a scraped real estate listing.
  * Port of Ruby PropertyWebScraper::Listing.
@@ -149,6 +156,204 @@ export class Listing extends BaseModel {
       'for_sale', 'for_rent', 'main_image_url',
       'last_retrieved_at', 'image_urls', 'features', 'unknown_fields',
     ]);
+  }
+
+  /**
+   * Field-level merge: incoming listing data is merged into an existing listing
+   * using category-specific rules. Returns a diff describing what changed.
+   */
+  static mergeIntoListing(existing: Listing, incoming: Listing): MergeDiff {
+    const diff: MergeDiff = {
+      fieldsChanged: [],
+      fieldsAdded: [],
+      fieldsOverwritten: [],
+      wasExistingListing: true,
+    };
+
+    const IMMUTABLE: Set<string> = new Set(['import_url', 'import_host_slug']);
+
+    const LATEST_WINS: Set<string> = new Set([
+      'price_string', 'price_float', 'price_cents', 'price_currency', 'currency',
+      'sold', 'reserved', 'for_sale', 'for_rent',
+      'for_rent_short_term', 'for_rent_long_term',
+      'last_retrieved_at', 'deleted_at', 'active_from',
+      'available_to_rent_from', 'available_to_rent_till',
+    ]);
+
+    const PREFER_RICHER: Set<string> = new Set([
+      'description', 'description_es', 'description_de',
+      'description_fr', 'description_it',
+    ]);
+
+    const ARRAY_FIELDS: Set<string> = new Set([
+      'image_urls', 'features', 'related_urls',
+    ]);
+
+    const NUMERIC_FIELDS: Set<string> = new Set([
+      'count_bedrooms', 'count_bathrooms', 'count_toilets', 'count_garages',
+      'constructed_area', 'plot_area', 'year_construction',
+      'energy_rating', 'energy_performance',
+      'latitude', 'longitude', 're_agent_id',
+      'price_float', 'price_cents',
+    ]);
+
+    const rec = existing as Record<string, unknown>;
+    const inc = incoming as Record<string, unknown>;
+
+    for (const key of Object.keys(Listing._attributeDefinitions)) {
+      if (IMMUTABLE.has(key) || key === 'import_history') continue;
+
+      const existingVal = rec[key];
+      const incomingVal = inc[key];
+
+      if (ARRAY_FIELDS.has(key)) {
+        const merged = Listing._mergeArray(key, existingVal, incomingVal);
+        if (merged !== undefined) {
+          const had = Array.isArray(existingVal) && existingVal.length > 0;
+          rec[key] = merged;
+          diff.fieldsChanged.push(key);
+          if (!had) {
+            diff.fieldsAdded.push(key);
+          } else {
+            diff.fieldsOverwritten.push(key);
+          }
+        }
+        continue;
+      }
+
+      if (LATEST_WINS.has(key)) {
+        // For latest-wins fields that are also numeric, skip if incoming is default
+        // Price fields are always overwritten by latest
+        if (incomingVal !== existingVal) {
+          const had = Listing._isPopulated(existingVal);
+          rec[key] = incomingVal;
+          diff.fieldsChanged.push(key);
+          if (!had && Listing._isPopulated(incomingVal)) {
+            diff.fieldsAdded.push(key);
+          } else if (had) {
+            diff.fieldsOverwritten.push(key);
+          }
+        }
+        continue;
+      }
+
+      if (PREFER_RICHER.has(key)) {
+        const existingStr = typeof existingVal === 'string' ? existingVal : '';
+        const incomingStr = typeof incomingVal === 'string' ? incomingVal : '';
+        if (incomingStr.length > existingStr.length) {
+          rec[key] = incomingStr;
+          diff.fieldsChanged.push(key);
+          if (!existingStr) {
+            diff.fieldsAdded.push(key);
+          } else {
+            diff.fieldsOverwritten.push(key);
+          }
+        }
+        continue;
+      }
+
+      if (NUMERIC_FIELDS.has(key) && !LATEST_WINS.has(key)) {
+        const existingNum = typeof existingVal === 'number' ? existingVal : 0;
+        const incomingNum = typeof incomingVal === 'number' ? incomingVal : 0;
+        if (incomingNum !== 0 && incomingNum !== existingNum) {
+          rec[key] = incomingNum;
+          diff.fieldsChanged.push(key);
+          if (existingNum === 0) {
+            diff.fieldsAdded.push(key);
+          } else {
+            diff.fieldsOverwritten.push(key);
+          }
+        }
+        continue;
+      }
+
+      // Default: prefer non-empty (text fields)
+      const existingStr = typeof existingVal === 'string' ? existingVal : '';
+      const incomingStr = typeof incomingVal === 'string' ? incomingVal : '';
+      if (incomingStr && incomingStr !== existingStr) {
+        rec[key] = incomingStr;
+        diff.fieldsChanged.push(key);
+        if (!existingStr) {
+          diff.fieldsAdded.push(key);
+        } else {
+          diff.fieldsOverwritten.push(key);
+        }
+      }
+    }
+
+    // Record merge in import_history
+    existing.import_history[new Date().toISOString()] = {
+      action: 'merge',
+      fieldsChanged: diff.fieldsChanged.length,
+      fieldsAdded: diff.fieldsAdded.length,
+      fieldsOverwritten: diff.fieldsOverwritten.length,
+    };
+
+    return diff;
+  }
+
+  /** Merge arrays by field type. Returns merged array or undefined if no change. */
+  private static _mergeArray(
+    key: string,
+    existing: unknown,
+    incoming: unknown,
+  ): unknown[] | undefined {
+    const existingArr = Array.isArray(existing) ? existing : [];
+    const incomingArr = Array.isArray(incoming) ? incoming : [];
+
+    if (incomingArr.length === 0) return undefined;
+
+    if (key === 'image_urls') {
+      // If incoming has strictly more items, prefer incoming outright
+      if (incomingArr.length > existingArr.length) return incomingArr;
+      // Otherwise union by URL
+      const seen = new Set<string>();
+      const merged: ImageInfo[] = [];
+      for (const img of [...existingArr, ...incomingArr]) {
+        const url = typeof img === 'string' ? img : (img as ImageInfo)?.url;
+        if (url && !seen.has(url)) {
+          seen.add(url);
+          merged.push(typeof img === 'string' ? { url: img } : img);
+        }
+      }
+      if (merged.length === existingArr.length) return undefined;
+      return merged;
+    }
+
+    if (key === 'features') {
+      if (incomingArr.length > existingArr.length) return incomingArr;
+      const seen = new Set<string>();
+      const merged: string[] = [];
+      for (const f of [...existingArr, ...incomingArr]) {
+        const lower = String(f).toLowerCase();
+        if (!seen.has(lower)) {
+          seen.add(lower);
+          merged.push(String(f));
+        }
+      }
+      if (merged.length === existingArr.length) return undefined;
+      return merged;
+    }
+
+    // related_urls and other arrays: union by value
+    if (incomingArr.length > existingArr.length) return incomingArr;
+    const seen = new Set(existingArr.map(String));
+    const merged = [...existingArr];
+    for (const item of incomingArr) {
+      if (!seen.has(String(item))) {
+        seen.add(String(item));
+        merged.push(item);
+      }
+    }
+    if (merged.length === existingArr.length) return undefined;
+    return merged;
+  }
+
+  /** Check if a value is "populated" (non-empty, non-zero, non-null) */
+  private static _isPopulated(val: unknown): boolean {
+    if (val === null || val === undefined || val === '' || val === 0 || val === false) return false;
+    if (Array.isArray(val) && val.length === 0) return false;
+    return true;
   }
 
   /**

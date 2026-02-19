@@ -144,9 +144,19 @@ export async function retrieveListing(
       diagnostics = result.diagnostics;
 
       if (result.success && result.properties.length > 0) {
-        listing.import_host_slug = importHost.slug;
-        listing.last_retrieved_at = new Date();
-        Listing.updateFromHash(listing, result.properties[0]);
+        if (existingListing) {
+          // Merge: build incoming listing and merge into existing
+          const incomingListing = new Listing();
+          incomingListing.assignAttributes({ import_url: importUrl });
+          incomingListing.import_host_slug = importHost.slug;
+          incomingListing.last_retrieved_at = new Date();
+          Listing.updateFromHash(incomingListing, result.properties[0]);
+          Listing.mergeIntoListing(listing, incomingListing);
+        } else {
+          listing.import_host_slug = importHost.slug;
+          listing.last_retrieved_at = new Date();
+          Listing.updateFromHash(listing, result.properties[0]);
+        }
 
         // Price normalization using portal's default currency
         const portal = findPortalByHost(validation.uri!.hostname);
