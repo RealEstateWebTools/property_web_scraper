@@ -19,6 +19,8 @@ export interface ExtractionSummary {
   criticalFieldsMissing?: string[];
   title: string;
   priceString: string;
+  visibility: string;
+  confidenceScore: number;
 }
 
 export interface ScraperStats {
@@ -75,6 +77,8 @@ export async function getRecentExtractions(limit = 100): Promise<ExtractionSumma
       criticalFieldsMissing: diag.criticalFieldsMissing,
       title: (listing as any).title || '',
       priceString: (listing as any).price_string || '',
+      visibility: (listing as any).visibility || diag.visibility || 'published',
+      confidenceScore: (listing as any).confidence_score ?? diag.confidenceScore ?? 1.0,
     });
   }
 

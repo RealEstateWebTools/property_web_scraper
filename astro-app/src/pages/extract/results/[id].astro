@@ -110,6 +110,23 @@ const attrs = [
                   )}
                 </div>
               )}
+              <div class="flex flex-wrap gap-2 mb-4">
+                <div class="inline-flex items-center gap-1.5 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg text-sm">
+                  <span class="text-gray-500 text-xs">Confidence:</span>
+                  <div class="w-16 bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                    <div class={`h-full ${diagnostics.confidenceScore > 0.7 ? 'bg-green-500' : diagnostics.confidenceScore > 0.4 ? 'bg-amber-500' : 'bg-red-500'}`} style={`width: ${diagnostics.confidenceScore * 100}%`}></div>
+                  </div>
+                  <span class="font-bold text-gray-700">{Math.round(diagnostics.confidenceScore * 100)}%</span>
+                </div>
+                <div class={`inline-flex items-center gap-1.5 border px-3 py-1 rounded-lg text-sm font-medium ${
+                  diagnostics.visibility === 'published' ? 'bg-green-50 border-green-100 text-green-700' :
+                  diagnostics.visibility === 'pending' ? 'bg-amber-50 border-amber-100 text-amber-700' :
+                  'bg-red-50 border-red-100 text-red-700'
+                }`}>
+                  <span class="text-xs opacity-70">Status:</span>
+                  <span class="capitalize">{diagnostics.visibility}</span>
+                </div>
+              </div>
               {!diagnostics.meetsExpectation && diagnostics.expectedExtractionRate != null && (
                 <div class="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-lg mb-4 text-sm">
                   <i class="bi bi-exclamation-triangle"></i>

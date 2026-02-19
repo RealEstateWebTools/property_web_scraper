@@ -143,26 +143,52 @@ export function assessQualityWeighted(
     : 0;
 
   let { grade, label } = computeQualityGrade(weightedRate);
-
-  // Cap grade at C if any critical fields are missing
-  if (criticalFieldsMissing.length > 0 && (grade === 'A' || grade === 'B')) {
-    grade = 'C';
-    label = 'Partial';
-  }
-
-  const expectation = compareAgainstExpectation(flatRate, expectedRate);
-  const expectedGrade = expectedRate != null ? computeQualityGrade(expectedRate).grade : undefined;
-
-  return {
-    grade,
-    label,
-    rate: flatRate,
-    expectedRate,
-    expectedGrade,
-    meetsExpectation: expectation.meetsExpectation,
-    expectationGap: expectation.expectationGap,
-    expectationStatus: expectation.expectationStatus,
-    weightedRate,
-    criticalFieldsMissing,
-  };
-}
+ 
+   // Cap grade at C if any critical fields are missing
+   if (criticalFieldsMissing.length > 0 && (grade === 'A' || grade === 'B')) {
+     grade = 'C';
+     label = 'Partial';
+   }
+ 
+   // Confidence score calculation (0 to 1)
+   const gradeScores: Record<QualityGrade, number> = { A: 1.0, B: 0.8, C: 0.5, F: 0.1 };
+   let confidenceScore = gradeScores[grade] * 0.6;
+   
+   // Bonus for having all critical fields
+   if (criticalFieldsMissing.length === 0) {
+     confidenceScore += 0.3;
+   }
+ 
+   // Bonus for image presence
+   if (fieldResults.find(f => f.field === 'image_urls' && f.populated)) {
+     confidenceScore += 0.1;
+   }
+ 
+   // Cap at 1.0
+   confidenceScore = Math.min(1.0, confidenceScore);
+ 
+   let visibility: 'published' | 'pending' | 'spam' = 'published';
+   if (confidenceScore < 0.4 || grade === 'F') {
+     visibility = 'spam';
+   } else if (confidenceScore < 0.7 || criticalFieldsMissing.length > 0) {
+     visibility = 'pending';
+   }
+ 
+   const expectation = compareAgainstExpectation(flatRate, expectedRate);
+   const expectedGrade = expectedRate != null ? computeQualityGrade(expectedRate).grade : undefined;
+ 
+   return {
+     grade,
+     label,
+     rate: flatRate,
+     expectedRate,
+     expectedGrade,
+     meetsExpectation: expectation.meetsExpectation,
+     expectationGap: expectation.expectationGap,
+     expectationStatus: expectation.expectationStatus,
+     weightedRate,
+     criticalFieldsMissing,
+     confidenceScore,
+     visibility,
+   };
+ }

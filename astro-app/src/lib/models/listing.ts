@@ -75,6 +75,8 @@ export class Listing extends BaseModel {
     related_urls: { type: 'array', default: [] },
     features: { type: 'array', default: [] },
     unknown_fields: { type: 'array', default: [] },
+    visibility: { type: 'string', default: 'published' },
+    confidence_score: { type: 'float', default: 1.0 },
     import_history: { type: 'hash', default: {} },
   };
 
@@ -137,6 +139,8 @@ export class Listing extends BaseModel {
   related_urls: string[] = [];
   features: string[] = [];
   unknown_fields: string[] = [];
+  visibility: 'published' | 'pending' | 'spam' | 'hidden' = 'published';
+  confidence_score = 1.0;
   import_history: Record<string, unknown> = {};
 
   /**
@@ -155,6 +159,7 @@ export class Listing extends BaseModel {
       'address_string', 'longitude', 'latitude',
       'for_sale', 'for_rent', 'main_image_url',
       'last_retrieved_at', 'image_urls', 'features', 'unknown_fields',
+      'visibility', 'confidence_score',
     ]);
   }
 
