@@ -58,6 +58,10 @@ export async function retrieveListing(
           listing.import_host_slug = syntheticHost.slug;
           listing.last_retrieved_at = new Date();
           Listing.updateFromHash(listing, result.properties[0]);
+          if (diagnostics) {
+            listing.confidence_score = diagnostics.confidenceScore;
+            listing.visibility = diagnostics.visibility;
+          }
           return { success: true, retrievedListing: listing, diagnostics };
         }
         return { success: true, retrievedListing: new Listing(), diagnostics };
@@ -156,6 +160,12 @@ export async function retrieveListing(
           listing.import_host_slug = importHost.slug;
           listing.last_retrieved_at = new Date();
           Listing.updateFromHash(listing, result.properties[0]);
+        }
+ 
+        // Sync quality metadata from diagnostics
+        if (diagnostics) {
+          listing.confidence_score = diagnostics.confidenceScore;
+          listing.visibility = diagnostics.visibility;
         }
 
         // Price normalization using portal's default currency

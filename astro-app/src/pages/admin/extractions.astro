@@ -140,6 +140,8 @@ function truncate(str: string, len: number): string {
               <th class="py-2 px-4 font-medium">Source URL</th>
               <th class="py-2 px-4 font-medium">Scraper</th>
               <th class="py-2 px-4 font-medium">Quality</th>
+              <th class="py-2 px-4 font-medium">Confidence</th>
+              <th class="py-2 px-4 font-medium">Status</th>
               <th class="py-2 px-4 font-medium">Rate</th>
               <th class="py-2 px-4 font-medium">Fields</th>
               <th class="py-2 px-4 font-medium">Title</th>
@@ -155,13 +157,53 @@ function truncate(str: string, len: number): string {
                 </td>
                 <td class="py-2 px-4 font-mono text-xs">{ext.scraperName}</td>
                 <td class="py-2 px-4"><QualityBadge grade={ext.qualityGrade} /></td>
+                <td class="py-2 px-4">
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-12 bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                      <div class={`h-full ${ext.confidenceScore > 0.7 ? 'bg-green-500' : ext.confidenceScore > 0.4 ? 'bg-amber-500' : 'bg-red-500'}`} style={`width: ${ext.confidenceScore * 100}%`}></div>
+                    </div>
+                    <span class="text-[10px] font-bold text-gray-500">{Math.round(ext.confidenceScore * 100)}%</span>
+                  </div>
+                </td>
+                <td class="py-2 px-4">
+                  <span class={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                    ext.visibility === 'published' ? 'bg-green-100 text-green-700' :
+                    ext.visibility === 'pending' ? 'bg-amber-100 text-amber-700' :
+                    ext.visibility === 'spam' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                  }`}>
+                    {ext.visibility}
+                  </span>
+                </td>
                 <td class="py-2 px-4 text-xs">{Math.round(ext.extractionRate * 100)}%</td>
                 <td class="py-2 px-4 text-xs">{ext.populatedExtractableFields}/{ext.extractableFields}</td>
                 <td class="py-2 px-4 text-xs max-w-[150px] truncate" title={ext.title}>
                   {truncate(ext.title, 30)}
                 </td>
                 <td class="py-2 px-4">
-                  <a href={`/admin/extractions/${ext.id}`} class="text-blue-600 hover:underline no-underline text-xs">View</a>
+                  <div class="flex items-center gap-2">
+                    <a href={`/admin/extractions/${ext.id}`} class="text-blue-600 hover:text-blue-800" title="View Details"><i class="bi bi-eye"></i></a>
+                    <div class="relative group">
+                      <button class="text-gray-400 hover:text-gray-600 border-0 bg-transparent p-0 cursor-pointer" title="Change Visibility">
+                        <i class="bi bi-gear"></i>
+                      </button>
+                      <div class="hidden group-hover:block absolute right-0 mt-0 w-32 bg-white shadow-lg border border-gray-100 rounded-md py-1 z-30">
+                        {['published', 'pending', 'hidden', 'spam'].map(v => (
+                          <button 
+                            class="w-full text-left px-3 py-1.5 text-[10px] font-medium hover:bg-gray-50 border-0 bg-transparent cursor-pointer disabled:opacity-50" 
+                            data-action="set_visibility" 
+                            data-id={ext.id} 
+                            data-visibility={v}
+                            disabled={ext.visibility === v}
+                          >
+                            Set to {v}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <button class="text-red-400 hover:text-red-600 border-0 bg-transparent p-0 cursor-pointer" data-action="delete" data-id={ext.id} title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -222,6 +264,40 @@ function truncate(str: string, len: number): string {
           const labels = { json: 'JSON', csv: 'CSV', geojson: 'GeoJSON' };
           b.innerHTML = '<i class="bi ' + (icons[fmt] || '') + '"></i> ' + (labels[fmt] || fmt);
         });
+      });
+    });
+ 
+    // Individual Actions
+    document.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const action = btn.getAttribute('data-action');
+        const listingId = btn.getAttribute('data-id');
+        const visibility = btn.getAttribute('data-visibility');
+
+        if (action === 'delete') {
+          if (!confirm('Are you sure you want to delete this extraction?')) return;
+        }
+
+        btn.classList.add('opacity-50', 'pointer-events-none');
+
+        try {
+          const res = await fetch('/admin/api/listings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, listingId, visibility }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            window.location.reload();
+          } else {
+            alert(data.error || 'Action failed');
+            btn.classList.remove('opacity-50', 'pointer-events-none');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Network error');
+          btn.classList.remove('opacity-50', 'pointer-events-none');
+        }
       });
     });
   });

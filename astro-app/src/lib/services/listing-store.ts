@@ -130,6 +130,26 @@ export function getStoreStats(): { count: number } {
   return { count: store.size };
 }
 
+export async function deleteListing(id: string): Promise<void> {
+  store.delete(id);
+  diagnosticsStore.delete(id);
+  if (kv) {
+    await kv.delete(`listing:${id}`);
+    await kv.delete(`diagnostics:${id}`);
+  }
+}
+ 
+export async function updateListingVisibility(id: string, visibility: string): Promise<void> {
+  const listing = await getListing(id);
+  if (listing) {
+    (listing as any).visibility = visibility;
+    store.set(id, listing);
+    if (kv) {
+      await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 3600 });
+    }
+  }
+}
+ 
 export function clearListingStore(): void {
   store.clear();
   diagnosticsStore.clear();

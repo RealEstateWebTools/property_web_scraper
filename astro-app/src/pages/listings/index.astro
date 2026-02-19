@@ -4,7 +4,10 @@ import { initKV, getAllListings } from '@lib/services/listing-store.js';
 
 initKV((Astro.locals as any).runtime?.env?.RESULTS);
 
-const entries = (await getAllListings()).reverse();
+const allEntries = await getAllListings();
+const entries = allEntries
+  .filter(e => (e.listing as any).visibility === 'published')
+  .reverse();
 ---
 <BaseLayout title="Recent Extractions - Property Web Scraper">
 
