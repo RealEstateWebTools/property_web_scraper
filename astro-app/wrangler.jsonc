@@ -9,10 +9,6 @@
     {
       "binding": "RESULTS",
       "id": "a256f3e986d048e8bda850e4a5ac967a"
-    },
-    {
-      "binding": "USERS",
-      "id": "TODO-create-with-wrangler-kv-namespace-create"
     }
   ]
 }
