@@ -193,10 +193,20 @@ describe('REST Client', () => {
 
     describe('healthCheck with mocked fetch', () => {
       const originalFetch = globalThis.fetch;
+      let importKeySpy: ReturnType<typeof vi.spyOn>;
+      let signSpy: ReturnType<typeof vi.spyOn>;
+
+      beforeEach(() => {
+        // Mock crypto.subtle so JWT generation succeeds with fake credentials
+        importKeySpy = vi.spyOn(crypto.subtle, 'importKey').mockResolvedValue({} as CryptoKey);
+        signSpy = vi.spyOn(crypto.subtle, 'sign').mockResolvedValue(new ArrayBuffer(32));
+      });
 
       afterEach(() => {
         globalThis.fetch = originalFetch;
         resetTokenCache();
+        importKeySpy.mockRestore();
+        signSpy.mockRestore();
       });
 
       it('returns ok:false when auth or fetch fails', async () => {
@@ -205,6 +215,85 @@ describe('REST Client', () => {
         const result = await client.healthCheck();
         expect(result.ok).toBe(false);
         expect(result.error).toBeTruthy();
+      });
+
+      it('uses POST :runQuery with diag_health_check collection', async () => {
+        const mockFetch = vi.fn()
+          // First call: OAuth token exchange
+          .mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ access_token: 'fake-token', expires_in: 3600 }),
+          })
+          // Second call: the :runQuery health check
+          .mockResolvedValueOnce({
+            ok: true,
+            json: async () => [{}],
+          });
+        globalThis.fetch = mockFetch;
+
+        const client = new RestFirestoreClient(fakeCreds);
+        await client.healthCheck();
+
+        // The second fetch call is the :runQuery
+        const [url, opts] = mockFetch.mock.calls[1];
+        expect(url).toContain(':runQuery');
+        expect(opts.method).toBe('POST');
+        const body = JSON.parse(opts.body);
+        expect(body.structuredQuery.from[0].collectionId).toBe('diag_health_check');
+      });
+
+      it('returns ok:true on 200', async () => {
+        globalThis.fetch = vi.fn()
+          .mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ access_token: 'fake-token', expires_in: 3600 }),
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            json: async () => [{}],
+          });
+
+        const client = new RestFirestoreClient(fakeCreds);
+        const result = await client.healthCheck();
+        expect(result.ok).toBe(true);
+      });
+
+      it('extracts error from JSON response', async () => {
+        globalThis.fetch = vi.fn()
+          .mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ access_token: 'fake-token', expires_in: 3600 }),
+          })
+          .mockResolvedValueOnce({
+            ok: false,
+            status: 403,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            text: async () => JSON.stringify([{ error: { message: 'Permission denied' } }]),
+          });
+
+        const client = new RestFirestoreClient(fakeCreds);
+        const result = await client.healthCheck();
+        expect(result.ok).toBe(false);
+        expect(result.error).toContain('Permission denied');
+      });
+
+      it('extracts title from HTML error response', async () => {
+        globalThis.fetch = vi.fn()
+          .mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ access_token: 'fake-token', expires_in: 3600 }),
+          })
+          .mockResolvedValueOnce({
+            ok: false,
+            status: 404,
+            headers: new Headers({ 'content-type': 'text/html' }),
+            text: async () => '<html><title>Not Found</title><body>Error</body></html>',
+          });
+
+        const client = new RestFirestoreClient(fakeCreds);
+        const result = await client.healthCheck();
+        expect(result.ok).toBe(false);
+        expect(result.error).toContain('Not Found');
       });
     });
   });

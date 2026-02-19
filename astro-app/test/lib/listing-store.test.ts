@@ -235,6 +235,81 @@ describe('listing-store', () => {
     });
   });
 
+  describe('Firestore fallback', () => {
+    it('getListing falls back to Firestore when not in memory', async () => {
+      // Save a listing to Firestore via the ORM
+      const listing = await Listing.create({
+        title: 'Firestore Fallback House',
+        price_float: 300000,
+      });
+      const firestoreId = listing.id;
+
+      // Clear in-memory store (does NOT clear InMemoryFirestoreClient)
+      clearListingStore();
+
+      // getListing should fall back to Listing.find() on the InMemoryFirestoreClient
+      const retrieved = await getListing(firestoreId);
+      expect(retrieved).toBeDefined();
+      expect(retrieved!.title).toBe('Firestore Fallback House');
+    });
+
+    it('getListing caches Firestore result in memory', async () => {
+      const listing = await Listing.create({
+        title: 'Cached Fallback',
+      });
+      const firestoreId = listing.id;
+
+      clearListingStore();
+
+      // First call fetches from Firestore
+      const first = await getListing(firestoreId);
+      expect(first).toBeDefined();
+
+      // Second call should still return (now from in-memory cache)
+      const second = await getListing(firestoreId);
+      expect(second).toBeDefined();
+      expect(second!.title).toBe('Cached Fallback');
+    });
+
+    it('getListing returns undefined when not in Firestore either', async () => {
+      clearListingStore();
+      const result = await getListing('totally-bogus-id');
+      expect(result).toBeUndefined();
+    });
+
+    it('getDiagnostics reconstructs from Firestore listing', async () => {
+      const listing = await Listing.create({
+        title: 'Diag Reconstruction Test',
+        scraper_name: 'uk_rightmove',
+        quality_grade: 'A',
+        quality_label: 'Excellent',
+        extraction_rate: 0.85,
+        weighted_extraction_rate: 0.9,
+        extractable_fields: 20,
+        populated_extractable_fields: 17,
+        meets_expectation: true,
+        critical_fields_missing: ['energy_rating'],
+        confidence_score: 0.95,
+      });
+      const firestoreId = listing.id;
+
+      // Clear both in-memory stores
+      clearListingStore();
+
+      const diag = await getDiagnostics(firestoreId);
+      expect(diag).toBeDefined();
+      expect(diag!.scraperName).toBe('uk_rightmove');
+      expect(diag!.qualityGrade).toBe('A');
+      expect(diag!.qualityLabel).toBe('Excellent');
+      expect(diag!.extractionRate).toBe(0.85);
+      expect(diag!.weightedExtractionRate).toBe(0.9);
+      expect(diag!.extractableFields).toBe(20);
+      expect(diag!.populatedExtractableFields).toBe(17);
+      expect(diag!.meetsExpectation).toBe(true);
+      expect(diag!.confidenceScore).toBe(0.95);
+    });
+  });
+
   describe('initKV', () => {
     it('accepts null without crashing', () => {
       expect(() => initKV(null)).not.toThrow();
