@@ -12,6 +12,7 @@ const isFetchBlocked = reason === 'fetch_blocked';
 const isNotRealEstate = reason === 'not_real_estate';
 const isSearchResults = reason === 'search_results';
 const isUnknownRealEstate = reason === 'unknown_real_estate';
+const isExperimental = reason === 'experimental';
 
 const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com'];
 const GITHUB_ISSUES_URL = 'https://github.com/RealEstateWebTools/property_web_scraper/issues';
@@ -85,6 +86,42 @@ const GITHUB_ISSUES_URL = 'https://github.com/RealEstateWebTools/property_web_sc
             </a>
             <a href="/sites" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
               <i class="bi bi-globe"></i> View Supported Sites
+            </a>
+          </div>
+        </div>
+      ) : isExperimental ? (
+        <!-- Experimental portal — blue/info card -->
+        <div class="bg-blue-50 rounded-2xl p-6">
+          <div class="text-3xl text-blue-600 mb-3">
+            <i class="bi bi-lightning"></i>
+          </div>
+          <h5 class="font-semibold text-blue-900 mb-2">This site uses generic extraction</h5>
+          <p class="text-blue-800 text-sm">
+            There's no dedicated mapping for this site. Extraction will use standard metadata (JSON-LD, OpenGraph, meta tags) and results may be incomplete.
+          </p>
+          {url && <p class="text-blue-700 text-xs mt-1 break-all">URL: {url}</p>}
+          <div class="bg-white/60 rounded-lg p-4 mt-4 text-sm text-gray-600">
+            <i class="bi bi-info-circle text-blue-600 mr-1"></i>
+            <strong>What to expect:</strong> Basic fields like title, price, description, and images will be extracted if the site uses standard metadata. Advanced fields (bedroom count, floor area, etc.) depend on the site's structured data.
+          </div>
+          <div class="bg-white/60 rounded-lg p-4 mt-3 text-sm text-gray-600">
+            <i class="bi bi-puzzle text-blue-600 mr-1"></i>
+            <strong>Tip:</strong> For better results, try <a href={`/extract/html${url ? `?url=${encodeURIComponent(url)}` : ''}`} class="text-blue-600 hover:underline font-medium">Paste HTML</a> mode — server-side fetching often returns a JavaScript shell with missing data.
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <form method="post" action="/extract/url" class="inline">
+              <input type="hidden" name="import_url" value={url} />
+              <input type="hidden" name="bypass_screen" value="1" />
+              <button type="submit" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 inline-flex items-center gap-1 cursor-pointer">
+                <i class="bi bi-play-fill"></i> Extract Anyway
+              </button>
+            </form>
+            <a href={`/extract/html${url ? `?url=${encodeURIComponent(url)}` : ''}`}
+               class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-code-slash"></i> Paste HTML Instead
+            </a>
+            <a href="/extract/url" class="border border-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 no-underline inline-flex items-center gap-1">
+              <i class="bi bi-arrow-left"></i> Back
             </a>
           </div>
         </div>
