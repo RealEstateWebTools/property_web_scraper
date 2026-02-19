@@ -2,8 +2,11 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getHaul, initHaulKV } from '@lib/services/haul-store.js';
 import { isValidHaulId } from '@lib/services/haul-id.js';
+import { getRuntimeConfig } from '@lib/services/runtime-config.js';
 
 initHaulKV((Astro.locals as any).runtime?.env?.RESULTS);
+
+const h2cUrl = getRuntimeConfig().homesToCompareUrl;
 
 const { id } = Astro.params;
 const validId = id && isValidHaulId(id);
@@ -58,6 +61,51 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
           </div>
         </div>
       </div>
+
+      {/* Compare on HomesToCompare */}
+      {haul.scrapes.length >= 2 && (
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+              <i class="bi bi-arrow-left-right text-blue-600"></i>
+              <span>Compare properties on <strong>HomesToCompare</strong></span>
+            </div>
+            {haul.scrapes.length === 2 ? (
+              <a
+                href={`${h2cUrl}/new?left_url=${encodeURIComponent(haul.scrapes[0].url)}&right_url=${encodeURIComponent(haul.scrapes[1].url)}&source=scraper`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 bg-indigo-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 no-underline transition"
+              >
+                <i class="bi bi-arrow-left-right"></i> Compare on HomesToCompare
+              </a>
+            ) : (
+              <div class="text-xs text-gray-400">Select 2 properties below, then click Compare</div>
+            )}
+          </div>
+          {haul.scrapes.length > 2 && (
+            <div class="mt-3" id="h2c-compare-section">
+              <p class="text-xs text-gray-500 mb-2">Select exactly 2 properties to compare:</p>
+              <div class="flex flex-wrap gap-2 mb-3" id="h2c-checkboxes">
+                {haul.scrapes.map((scrape, idx) => (
+                  <label class="inline-flex items-center gap-1.5 text-xs bg-gray-50 rounded-lg px-3 py-1.5 cursor-pointer border border-gray-200 hover:border-blue-300 transition">
+                    <input type="checkbox" class="h2c-scrape-checkbox" data-url={scrape.url} data-index={idx} />
+                    <span class="truncate max-w-[150px]">{scrape.title || `Scrape ${idx + 1}`}</span>
+                  </label>
+                ))}
+              </div>
+              <button
+                id="h2c-compare-btn"
+                type="button"
+                disabled
+                class="inline-flex items-center gap-1.5 bg-indigo-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 cursor-pointer border-0 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              >
+                <i class="bi bi-arrow-left-right"></i> Compare Selected
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Empty state */}
       {haul.scrapes.length === 0 ? (
@@ -117,7 +165,7 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
 
 </section>
 
-<script is:inline>
+<script is:inline define:vars={{ h2cUrl }}>
 document.addEventListener('DOMContentLoaded', () => {
   const copyBtn = document.getElementById('copy-haul-url');
   if (copyBtn) {
@@ -127,6 +175,26 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         copyBtn.innerHTML = '<i class="bi bi-link-45deg"></i> Copy Haul URL';
       }, 2000);
+    });
+  }
+
+  // Multi-select compare
+  const checkboxes = document.querySelectorAll('.h2c-scrape-checkbox');
+  const compareBtn = document.getElementById('h2c-compare-btn');
+  if (checkboxes.length > 0 && compareBtn) {
+    checkboxes.forEach((cb) => {
+      cb.addEventListener('change', () => {
+        const checked = document.querySelectorAll('.h2c-scrape-checkbox:checked');
+        compareBtn.disabled = checked.length !== 2;
+      });
+    });
+
+    compareBtn.addEventListener('click', () => {
+      const checked = document.querySelectorAll('.h2c-scrape-checkbox:checked');
+      if (checked.length !== 2) return;
+      const urls = Array.from(checked).map((cb) => cb.dataset.url);
+      const compareUrl = h2cUrl + '/new?left_url=' + encodeURIComponent(urls[0]) + '&right_url=' + encodeURIComponent(urls[1]) + '&source=scraper';
+      window.open(compareUrl, '_blank');
     });
   }
 });

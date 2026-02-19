@@ -5,9 +5,11 @@
 
 export interface RuntimeConfig {
   maxRequests: number;
+  homesToCompareUrl: string;
 }
 
 const DEFAULT_MAX_REQUESTS = 60;
+const DEFAULT_H2C_URL = 'https://homestocompare.com';
 
 let overrides: Partial<RuntimeConfig> = {};
 
@@ -19,9 +21,18 @@ function getEnvMaxRequests(): number {
   return DEFAULT_MAX_REQUESTS;
 }
 
+function getEnvH2CUrl(): string {
+  try {
+    const env = (import.meta as any).env?.HOMESTOCOMPARE_URL;
+    if (env) return env;
+  } catch { /* ignore */ }
+  return DEFAULT_H2C_URL;
+}
+
 export function getRuntimeConfig(): RuntimeConfig {
   return {
     maxRequests: overrides.maxRequests ?? getEnvMaxRequests(),
+    homesToCompareUrl: overrides.homesToCompareUrl ?? getEnvH2CUrl(),
   };
 }
 
