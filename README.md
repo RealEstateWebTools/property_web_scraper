@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/RealEstateWebTools/property_web_scraper/actions/workflows/ci.yml/badge.svg)](https://github.com/RealEstateWebTools/property_web_scraper/actions/workflows/ci.yml)
 
+> **Live demo:** [scraper.propertywebbuilder.com](https://scraper.propertywebbuilder.com/)
+
 **From the team behind [PropertyWebBuilder](https://github.com/etewiah/property_web_builder)** — the open-source real estate platform.
 
 A real estate listing extraction API and Chrome extension. Given a property listing URL (or pre-rendered HTML), it returns structured data: title, price, coordinates, images, and 70+ fields across 17 supported portals in 8 countries.
