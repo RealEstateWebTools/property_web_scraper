@@ -23,6 +23,7 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
 
   const url = new URL(request.url);
   const format = url.searchParams.get('format') as ExportFormat | null;
+  const inline = url.searchParams.get('inline') === '1';
 
   if (!format) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Missing required query parameter: format (json, csv, or geojson)', request);
@@ -67,16 +68,17 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
       durationMs: Date.now() - startTime,
     });
 
-    return new Response(result.data, {
-      status: 200,
-      headers: {
-        'Content-Type': result.mimeType,
-        'Content-Disposition': `attachment; filename="${result.filename}"`,
-        'X-Export-Format': result.format,
-        'X-Listing-Count': String(result.listingCount),
-        'X-Export-Timestamp': result.timestamp,
-      },
-    });
+    const headers: Record<string, string> = {
+      'Content-Type': inline ? 'application/json' : result.mimeType,
+      'X-Export-Format': result.format,
+      'X-Listing-Count': String(result.listingCount),
+      'X-Export-Timestamp': result.timestamp,
+    };
+    if (!inline) {
+      headers['Content-Disposition'] = `attachment; filename="${result.filename}"`;
+    }
+
+    return new Response(result.data, { status: 200, headers });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Export failed';
     logActivity({

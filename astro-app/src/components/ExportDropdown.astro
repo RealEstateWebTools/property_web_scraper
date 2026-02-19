@@ -14,7 +14,8 @@ const baseUrl = `/public_api/v1/listings/${listingId}/export`;
   >
     <i class="bi bi-download"></i> Download <i class="bi bi-chevron-down text-[0.6rem] ml-0.5"></i>
   </button>
-  <div class="hidden absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20" data-export-menu>
+  <div class="hidden absolute right-0 bottom-full mb-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20" data-export-menu>
+    <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Download</div>
     <a href={`${baseUrl}?format=json`} class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
       <i class="bi bi-braces text-blue-600"></i> JSON
     </a>
@@ -23,6 +24,14 @@ const baseUrl = `/public_api/v1/listings/${listingId}/export`;
     </a>
     <a href={`${baseUrl}?format=geojson`} class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
       <i class="bi bi-geo-alt text-orange-600"></i> GeoJSON
+    </a>
+    <div class="border-t border-gray-100 my-1"></div>
+    <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">View in browser</div>
+    <a href={`${baseUrl}?format=json&inline=1`} target="_blank" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+      <i class="bi bi-eye text-blue-600"></i> JSON
+    </a>
+    <a href={`${baseUrl}?format=geojson&inline=1`} target="_blank" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+      <i class="bi bi-eye text-orange-600"></i> GeoJSON
     </a>
   </div>
 </div>
