@@ -1,0 +1,181 @@
+---
+interface Props {
+  url: string;
+  title: string;
+  description?: string;
+}
+
+const { url, title, description = '' } = Astro.props;
+
+// Use an external API for QR code generation to avoid library dependency issues in Workers
+// and to keep the bundle small.
+const qrCodeImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(url)}`;
+
+const shareText = `${title}${description ? ' - ' + description.substring(0, 100) + '...' : ''}`;
+
+const shareLinks = [
+  {
+    name: 'WhatsApp',
+    icon: 'bi-whatsapp',
+    url: `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + url)}`,
+    color: 'bg-[#25D366]',
+    hoverColor: 'hover:bg-[#20ba5a]',
+    textColor: 'text-white'
+  },
+  {
+    name: 'Facebook',
+    icon: 'bi-facebook',
+    url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    color: 'bg-[#1877F2]',
+    hoverColor: 'hover:bg-[#166fe5]',
+    textColor: 'text-white'
+  },
+  {
+    name: 'Twitter',
+    icon: 'bi-twitter-x',
+    url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`,
+    color: 'bg-[#000000]',
+    hoverColor: 'hover:bg-[#333333]',
+    textColor: 'text-white'
+  },
+  {
+    name: 'LinkedIn',
+    icon: 'bi-linkedin',
+    url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+    color: 'bg-[#0A66C2]',
+    hoverColor: 'hover:bg-[#08529d]',
+    textColor: 'text-white'
+  }
+];
+---
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+  <h5 class="font-bold text-gray-800 mb-5 flex items-center gap-2">
+    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+      <i class="bi bi-share-fill text-blue-600 text-sm"></i>
+    </div>
+    Share Property
+  </h5>
+
+  <div class="grid grid-cols-4 gap-3 mb-6">
+    {shareLinks.map((link) => (
+      <a
+        href={link.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class={`flex flex-col items-center justify-center gap-2 aspect-square rounded-xl transition-all hover:-translate-y-1 active:scale-95 ${link.color} ${link.hoverColor} ${link.textColor} shadow-sm no-underline group`}
+        title={`Share on ${link.name}`}
+      >
+        <i class={`bi ${link.icon} text-xl group-hover:scale-110 transition-transform`}></i>
+        <span class="text-[0.6rem] font-bold uppercase tracking-wider opacity-90">{link.name}</span>
+      </a>
+    ))}
+  </div>
+
+  <div class="space-y-3">
+    <button
+      id="copyLinkBtn"
+      class="group relative flex items-center justify-between w-full p-1 pl-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 text-sm font-semibold hover:bg-white hover:border-blue-200 transition-all overflow-hidden"
+      data-url={url}
+    >
+      <div class="flex items-center gap-3">
+        <i class="bi bi-link-45deg text-lg text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+        <span>Copy link</span>
+      </div>
+      <div class="bg-white border-l border-gray-200 group-hover:bg-blue-50 transition-colors px-3 py-2 rounded-r-lg">
+        <i class="bi bi-copy text-gray-400 group-hover:text-blue-600"></i>
+      </div>
+    </button>
+
+    <button
+      id="toggleQrBtn"
+      class="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border border-blue-100 bg-blue-50 text-blue-700 text-sm font-bold hover:bg-blue-100 hover:shadow-md hover:shadow-blue-500/10 transition-all"
+    >
+      <i class="bi bi-qr-code-scan text-lg"></i>
+      <span>Show QR Code</span>
+    </button>
+  </div>
+
+  <div id="qrCodeContainer" class="hidden mt-6 flex-col items-center animate-[fadeIn_0.3s_ease-out]">
+    <div class="p-5 bg-white border border-gray-100 rounded-3xl shadow-xl shadow-blue-500/5 mb-4 relative group">
+      <div class="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-blue-200 rounded-tl-lg"></div>
+      <div class="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-blue-200 rounded-tr-lg"></div>
+      <div class="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-blue-200 rounded-bl-lg"></div>
+      <div class="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-blue-200 rounded-br-lg"></div>
+      
+      <img src={qrCodeImgUrl} alt="Property QR Code" class="w-44 h-44 block rounded-lg transition-transform group-hover:scale-105" />
+    </div>
+    <p class="text-[0.7rem] text-gray-400 font-medium text-center max-w-[180px]">
+      Scan this code to instantly view this property on your mobile device
+    </p>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+  const copyBtn = document.getElementById('copyLinkBtn');
+  const toggleQrBtn = document.getElementById('toggleQrBtn');
+  const qrContainer = document.getElementById('qrCodeContainer');
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      const url = copyBtn.getAttribute('data-url');
+      if (url) {
+        try {
+          await navigator.clipboard.writeText(url);
+          const span = copyBtn.querySelector('span');
+          if (span) {
+            const originalText = span.innerText;
+            span.innerText = 'Copied to clipboard!';
+            copyBtn.classList.add('border-green-300', 'bg-green-50');
+            copyBtn.classList.remove('bg-gray-50', 'border-gray-200');
+            
+            setTimeout(() => {
+              span.innerText = originalText;
+              copyBtn.classList.remove('border-green-300', 'bg-green-50');
+              copyBtn.classList.add('bg-gray-50', 'border-gray-200');
+            }, 2000);
+          }
+        } catch (err) {
+          console.error('Failed to copy: ', err);
+        }
+      }
+    });
+  }
+
+  if (toggleQrBtn && qrContainer) {
+    toggleQrBtn.addEventListener('click', () => {
+      const isHidden = qrContainer.classList.contains('hidden');
+      const span = toggleQrBtn.querySelector('span');
+      const icon = toggleQrBtn.querySelector('i');
+      
+      if (isHidden) {
+        qrContainer.classList.remove('hidden');
+        qrContainer.classList.add('flex');
+        if (span) span.innerText = 'Hide QR Code';
+        if (icon) {
+          icon.classList.remove('bi-qr-code-scan');
+          icon.classList.add('bi-x-lg');
+        }
+        toggleQrBtn.classList.add('bg-white', 'text-gray-500', 'border-gray-200');
+        toggleQrBtn.classList.remove('bg-blue-50', 'text-blue-700', 'border-blue-100');
+      } else {
+        qrContainer.classList.add('hidden');
+        qrContainer.classList.remove('flex');
+        if (span) span.innerText = 'Show QR Code';
+        if (icon) {
+          icon.classList.remove('bi-x-lg');
+          icon.classList.add('bi-qr-code-scan');
+        }
+        toggleQrBtn.classList.remove('bg-white', 'text-gray-500', 'border-gray-200');
+        toggleQrBtn.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-100');
+      }
+    });
+  }
+</script>

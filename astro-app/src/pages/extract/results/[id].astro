@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ExportDropdown from '../../../components/ExportDropdown.astro';
+import SocialShare from '../../../components/SocialShare.astro';
 import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
 import { initScrapeMetadataKV, getLatestScrapeForListing } from '@lib/services/scrape-metadata.js';
 
@@ -187,6 +188,12 @@ const attrs = [
                 </a>
                 <ExportDropdown listingId={id!} />
               </div>
+
+              <SocialShare
+                url={Astro.url.toString()}
+                title={listing.title || 'Extracted Property'}
+                description={listing.description ? listing.description.replace(/<[^>]*>?/gm, '').substring(0, 200) : ''}
+              />
 
               <button class="pws-details-toggle text-sm text-blue-600 cursor-pointer inline-flex items-center gap-1.5 border-0 bg-transparent p-0 mt-2 hover:underline" type="button">
                 <i class="bi bi-chevron-down"></i> Show all extracted fields
