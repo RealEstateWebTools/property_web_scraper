@@ -163,6 +163,48 @@
       text-decoration: underline;
     }
 
+    .privacy-section {
+      padding: 20px 24px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .privacy-section h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .privacy-notice {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .privacy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .scrape-count {
+      font-size: 13px;
+      font-weight: 500;
+      color: #475569;
+    }
+
+    .btn-clear {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .btn-clear:hover {
+      background: #fecaca;
+    }
+
     .portals-section {
       padding: 20px 24px;
       border-top: 1px solid #f1f5f9;
@@ -222,6 +264,15 @@
       <button id="save-btn" class="btn btn-save">Save Settings</button>
     </div>
 
+    <div class="privacy-section">
+      <h3>Data & Privacy</h3>
+      <p class="privacy-notice">Recent scrape summaries are stored locally in your browser. No full property URLs are stored. Data auto-expires after 30 days.</p>
+      <div class="privacy-row">
+        <span id="scrape-count" class="scrape-count">0 scrapes stored</span>
+        <button id="clear-history-btn" class="btn btn-clear">Clear History</button>
+      </div>
+    </div>
+
     <div class="portals-section">
       <h3>Supported Portals (17)</h3>
       <div class="portal-list">
@@ -246,6 +297,7 @@
     </div>
   </div>
 
+  <script src="haul-history.js"></script>
   <script src="options.js"></script>
 </body>
 </html>
