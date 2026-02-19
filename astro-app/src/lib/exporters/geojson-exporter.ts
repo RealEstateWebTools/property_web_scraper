@@ -93,6 +93,10 @@ export class GeoJSONExporter extends BaseExporter {
       for_sale: listing.for_sale,
       for_rent: listing.for_rent,
       furnished: listing.furnished,
+      property_type: listing.property_type || undefined,
+      tenure: listing.tenure || undefined,
+      agent_name: listing.agent_name || undefined,
+      listing_status: listing.listing_status || undefined,
     };
   }
 

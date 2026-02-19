@@ -5,44 +5,11 @@
 
 import { BaseExporter, type ExportOptions } from './base-exporter.js';
 import type { Listing } from '../models/listing.js';
+import { getFieldName } from './field-mappings.js';
 
 export interface XMLExportOptions extends ExportOptions {
   includeXmlDeclaration?: boolean;
 }
-
-/** Map listing fields to RETS standard names */
-const RETS_FIELD_MAP: Record<string, string> = {
-  reference: 'ListingKey',
-  title: 'ListingTitle',
-  price_float: 'ListPrice',
-  price_string: 'ListPriceDisplay',
-  currency: 'CurrencyCode',
-  count_bedrooms: 'BedroomsTotal',
-  count_bathrooms: 'BathroomsTotalInteger',
-  count_toilets: 'BathroomHalf',
-  count_garages: 'GarageSpaces',
-  constructed_area: 'LivingArea',
-  area_unit: 'LivingAreaUnits',
-  plot_area: 'LotSizeArea',
-  year_construction: 'YearBuilt',
-  address_string: 'UnparsedAddress',
-  street_name: 'StreetName',
-  street_number: 'StreetNumber',
-  postal_code: 'PostalCode',
-  city: 'City',
-  province: 'StateOrProvince',
-  region: 'CountyOrParish',
-  country: 'Country',
-  latitude: 'Latitude',
-  longitude: 'Longitude',
-  description: 'PublicRemarks',
-  main_image_url: 'MediaURL',
-  import_url: 'OriginalListingURL',
-  for_sale: 'ForSale',
-  for_rent: 'ForLease',
-  furnished: 'Furnished',
-  energy_rating: 'GreenBuildingCertification',
-};
 
 export class XMLExporter extends BaseExporter {
   protected format = 'xml';
@@ -70,7 +37,7 @@ export class XMLExporter extends BaseExporter {
         const value = (listing as any)[field];
         if (value == null || value === '' || value === 0 || value === false) continue;
 
-        const retsName = RETS_FIELD_MAP[field] || toPascalCase(field);
+        const retsName = getFieldName(field, 'reso') || toPascalCase(field);
         const strValue = formatValue(value);
         lines.push(`    <${retsName}>${escapeXml(strValue)}</${retsName}>`);
       }

@@ -51,6 +51,11 @@ export const FIELD_IMPORTANCE: Record<string, FieldImportance> = {
   description: 'important',
   image_urls: 'important',
   reference: 'important',
+  property_type: 'important',
+  agent_name: 'optional',
+  tenure: 'optional',
+  listing_status: 'optional',
+  energy_certificate_grade: 'optional',
 };
 
 export function getFieldImportance(fieldName: string): FieldImportance {

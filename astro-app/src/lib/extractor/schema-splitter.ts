@@ -13,6 +13,8 @@ const ASSET_FIELDS = new Set([
   'count_bedrooms', 'count_bathrooms', 'count_toilets', 'count_garages',
   'year_construction', 'energy_rating', 'energy_performance',
   'image_urls', 'main_image_url', 'features',
+  'property_type', 'property_subtype', 'tenure',
+  'energy_certificate_grade', 'floor_plan_urls',
 ]);
 
 const LISTING_FIELDS = new Set([
@@ -21,6 +23,8 @@ const LISTING_FIELDS = new Set([
   'currency', 'locale_code',
   'for_sale', 'for_rent', 'for_rent_short_term', 'for_rent_long_term',
   'furnished', 'sold', 'reserved',
+  'listing_status', 'price_qualifier',
+  'agent_name', 'agent_phone', 'agent_email', 'agent_logo_url',
 ]);
 
 /**

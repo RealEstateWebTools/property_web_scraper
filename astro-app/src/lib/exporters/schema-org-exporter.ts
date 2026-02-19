@@ -107,7 +107,26 @@ export class SchemaOrgExporter extends BaseExporter {
       ];
     }
 
+    // Energy certificate grade
+    if (listing.energy_certificate_grade) {
+      accommodation['energyEfficiencyScaleMax'] = 'A';
+      accommodation['energyEfficiencyScaleMin'] = 'G';
+      accommodation['hasEnergyEfficiencyCategory'] = listing.energy_certificate_grade;
+    }
+
     node['about'] = accommodation;
+
+    // Agent as RealEstateAgent
+    if (listing.agent_name) {
+      const agent: Record<string, unknown> = {
+        '@type': 'RealEstateAgent',
+        'name': listing.agent_name,
+      };
+      if (listing.agent_phone) agent['telephone'] = listing.agent_phone;
+      if (listing.agent_email) agent['email'] = listing.agent_email;
+      if (listing.agent_logo_url) agent['logo'] = listing.agent_logo_url;
+      node['agent'] = agent;
+    }
 
     // Images
     if (listing.main_image_url) {
@@ -133,7 +152,21 @@ export class SchemaOrgExporter extends BaseExporter {
     const defaultType = (this.options as SchemaOrgExportOptions).defaultPropertyType;
     if (defaultType) return defaultType;
 
-    // Infer from bedroom count — simple heuristic
+    // Use property_type when populated
+    if (listing.property_type) {
+      const typeMap: Record<string, string> = {
+        apartment: 'Apartment',
+        flat: 'Apartment',
+        house: 'SingleFamilyResidence',
+        villa: 'SingleFamilyResidence',
+        studio: 'Apartment',
+      };
+      const lower = listing.property_type.toLowerCase();
+      const mapped = typeMap[lower];
+      if (mapped) return mapped;
+    }
+
+    // Fall back to bedroom-count heuristic
     if (listing.count_bedrooms === 0) return 'Accommodation';
     if (listing.count_bedrooms <= 2) return 'Apartment';
     return 'SingleFamilyResidence';

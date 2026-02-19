@@ -9,9 +9,12 @@ import { GeoJSONExporter } from './geojson-exporter.js';
 import { XMLExporter } from './xml-exporter.js';
 import { SchemaOrgExporter } from './schema-org-exporter.js';
 import { ICalExporter } from './ical-exporter.js';
+import { BLMExporter } from './blm-exporter.js';
+import { KyeroExporter } from './kyero-exporter.js';
+import { RESOJsonExporter } from './reso-json-exporter.js';
 import { BaseExporter, type ExportOptions } from './base-exporter.js';
 
-export type ExportFormat = 'json' | 'csv' | 'geojson' | 'xml' | 'schema-org' | 'icalendar';
+export type ExportFormat = 'json' | 'csv' | 'geojson' | 'xml' | 'schema-org' | 'icalendar' | 'blm' | 'kyero' | 'reso-json';
 
 export interface ExporterConfig {
   format: ExportFormat;
@@ -83,6 +86,33 @@ export const EXPORTER_REGISTRY: Record<ExportFormat, ExporterConfig> = {
     isAvailable: true,
     isProduction: true,
   },
+  blm: {
+    format: 'blm',
+    label: 'BLM (Rightmove)',
+    description: 'BLM pipe-delimited format for UK property portals (Rightmove/Zoopla)',
+    fileExtension: '.blm',
+    mimeType: 'text/plain',
+    isAvailable: true,
+    isProduction: true,
+  },
+  kyero: {
+    format: 'kyero',
+    label: 'Kyero XML',
+    description: 'Kyero XML format for Spanish property market',
+    fileExtension: '.xml',
+    mimeType: 'application/xml',
+    isAvailable: true,
+    isProduction: true,
+  },
+  'reso-json': {
+    format: 'reso-json',
+    label: 'RESO JSON',
+    description: 'RESO Web API JSON format for US/Canadian MLS',
+    fileExtension: '.json',
+    mimeType: 'application/json',
+    isAvailable: true,
+    isProduction: true,
+  },
 };
 
 /**
@@ -110,6 +140,15 @@ export function createExporter(
 
     case 'icalendar':
       return new ICalExporter(options);
+
+    case 'blm':
+      return new BLMExporter(options);
+
+    case 'kyero':
+      return new KyeroExporter(options);
+
+    case 'reso-json':
+      return new RESOJsonExporter(options);
 
     default:
       throw new Error(`Unknown export format: ${format}`);
