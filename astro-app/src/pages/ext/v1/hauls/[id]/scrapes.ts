@@ -2,8 +2,9 @@ import type { APIRoute } from 'astro';
 import { isValidHaulId } from '@lib/services/haul-id.js';
 import { getHaul, addScrapeToHaul, initHaulKV } from '@lib/services/haul-store.js';
 import type { HaulScrape } from '@lib/services/haul-store.js';
-import { validateUrl } from '@lib/services/url-validator.js';
+import { validateUrl, UNSUPPORTED } from '@lib/services/url-validator.js';
 import { findByName } from '@lib/extractor/mapping-loader.js';
+import { ImportHost } from '@lib/models/import-host.js';
 import { MAX_HTML_SIZE } from '@lib/services/auth.js';
 import { runExtraction } from '@lib/services/extraction-runner.js';
 import {
@@ -59,13 +60,26 @@ export const POST: APIRoute = async ({ params, request }) => {
     return errorResponse(ApiErrorCode.PAYLOAD_TOO_LARGE, 'HTML payload exceeds 10MB limit', request);
   }
 
-  // Validate URL
+  // Validate URL — fall back to generic_real_estate for unknown hosts
   const validation = await validateUrl(url);
-  if (!validation.valid) {
+  let importHost = validation.importHost;
+
+  if (!validation.valid && validation.errorCode === UNSUPPORTED) {
+    const genericMapping = findByName('generic_real_estate');
+    if (genericMapping) {
+      importHost = new ImportHost();
+      importHost.host = new URL(url).hostname;
+      importHost.scraper_name = 'generic_real_estate';
+      importHost.slug = 'generic';
+    }
+  } else if (!validation.valid) {
     return errorResponse(mapValidatorError(validation.errorCode), validation.errorMessage!, request);
   }
 
-  const importHost = validation.importHost!;
+  if (!importHost) {
+    return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found', request);
+  }
+
   const scraperMapping = findByName(importHost.scraper_name);
   if (!scraperMapping) {
     return errorResponse(ApiErrorCode.MISSING_SCRAPER, 'No scraper mapping found', request);

@@ -29,9 +29,13 @@ function updateBadge(tabId, url) {
       chrome.action.setBadgeText({ tabId, text: '✓' });
       chrome.action.setBadgeBackgroundColor({ tabId, color: '#22c55e' });
       chrome.action.setTitle({ tabId, title: 'Property Web Scraper — Supported site' });
+    } else if (url.startsWith('http://') || url.startsWith('https://')) {
+      chrome.action.setBadgeText({ tabId, text: '~' });
+      chrome.action.setBadgeBackgroundColor({ tabId, color: '#3b82f6' });
+      chrome.action.setTitle({ tabId, title: 'Property Web Scraper — Generic extraction available' });
     } else {
       chrome.action.setBadgeText({ tabId, text: '' });
-      chrome.action.setTitle({ tabId, title: 'Property Web Scraper — Site not supported' });
+      chrome.action.setTitle({ tabId, title: 'Property Web Scraper' });
     }
   } catch {
     chrome.action.setBadgeText({ tabId, text: '' });
@@ -62,7 +66,10 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
 
   if (msg.type === 'CHECK_SUPPORT') {
-    sendResponse({ supported: isSupportedHost(msg.hostname) });
+    sendResponse({
+      supported: isSupportedHost(msg.hostname),
+      level: isSupportedHost(msg.hostname) ? 'supported' : 'generic',
+    });
     return false;
   }
 
