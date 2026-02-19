@@ -43,10 +43,8 @@ async function init() {
     return;
   }
 
-  // Check if site is supported
-  const hostname = new URL(tab.url).hostname;
-  const supportCheck = await chrome.runtime.sendMessage({ type: 'CHECK_SUPPORT', hostname });
-  if (!supportCheck?.supported) {
+  // Block non-http pages (chrome://, about:, etc.)
+  if (!tab.url.startsWith('http://') && !tab.url.startsWith('https://')) {
     showState('unsupported');
     return;
   }
@@ -103,6 +101,7 @@ function showError(msg) {
 }
 
 $('#retry-btn').addEventListener('click', init);
+$('#try-anyway-btn').addEventListener('click', init);
 
 // ─── Render results ──────────────────────────────────────────────
 

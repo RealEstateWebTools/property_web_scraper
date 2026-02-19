@@ -135,7 +135,38 @@ export abstract class BaseExporter {
       }
     }
 
+    this.ensureImageConsistency(values);
+
     return values;
+  }
+
+  private ensureImageConsistency(values: Record<string, unknown>): void {
+    if (!("main_image_url" in values) || !("image_urls" in values)) {
+      return;
+    }
+
+    const mainImageUrl = typeof values.main_image_url === 'string'
+      ? values.main_image_url.trim()
+      : '';
+
+    if (!mainImageUrl) {
+      return;
+    }
+
+    const rawImageUrls = Array.isArray(values.image_urls) ? values.image_urls : [];
+    const hasMainImageInArray = rawImageUrls.some((item) => {
+      if (typeof item === 'string') {
+        return item === mainImageUrl;
+      }
+      if (item && typeof item === 'object' && 'url' in item) {
+        return (item as { url?: unknown }).url === mainImageUrl;
+      }
+      return false;
+    });
+
+    if (rawImageUrls.length === 0 || !hasMainImageInArray) {
+      values.image_urls = [{ url: mainImageUrl }, ...rawImageUrls];
+    }
   }
 
   /**

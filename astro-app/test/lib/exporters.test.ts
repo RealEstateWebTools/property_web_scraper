@@ -167,6 +167,23 @@ describe('Exporters', () => {
       expect(result).not.toContain('\n');
       expect(JSON.parse(result)).toBeDefined();
     });
+
+    it('ensures image_urls includes main_image_url when empty', async () => {
+      const exporter = new JSONExporter({ fieldSelection: 'all' });
+      const result = await exporter.export([
+        makeListing({
+          main_image_url: 'https://example.com/primary.jpg',
+          image_urls: [],
+        }),
+      ]);
+      const parsed = JSON.parse(result);
+      const listing = parsed.listings[0];
+
+      expect(listing.main_image_url).toBe('https://example.com/primary.jpg');
+      expect(Array.isArray(listing.image_urls)).toBe(true);
+      expect(listing.image_urls.length).toBeGreaterThan(0);
+      expect(listing.image_urls[0]).toEqual({ url: 'https://example.com/primary.jpg' });
+    });
   });
 
   describe('CSVExporter', () => {
