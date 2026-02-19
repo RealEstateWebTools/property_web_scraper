@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { generateHaulId } from '@lib/services/haul-id.js';
 import { createHaul, initHaulKV } from '@lib/services/haul-store.js';
+import { resolveKV } from '@lib/services/kv-resolver.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 
 // Simple sliding-window rate limit for haul creation: 5 per hour per IP
@@ -22,7 +23,7 @@ export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request)
 /**
  * POST /ext/v1/hauls — Create a new haul. No auth required.
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const ip = request.headers.get('cf-connecting-ip')
     || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     || 'unknown';
@@ -31,7 +32,7 @@ export const POST: APIRoute = async ({ request }) => {
     return errorResponse(ApiErrorCode.RATE_LIMITED, 'Too many hauls created. Try again later.', request);
   }
 
-  initHaulKV((globalThis as any).__kvNamespace ?? undefined);
+  initHaulKV(resolveKV(locals));
 
   const id = generateHaulId();
   const haul = await createHaul(id, ip);

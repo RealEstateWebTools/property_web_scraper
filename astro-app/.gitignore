@@ -5,3 +5,4 @@ dist/
 config/firebase-credentials.json
 test-results/
 .wrangler/
+.kv-data/
