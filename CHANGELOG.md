@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- `description_html` field on `Listing` and `HaulScrape` — preserves the original HTML markup from scrapers (e.g. `<b>`, `<br />`, `<p>`) before tag-stripping; plain-text `description` is unchanged for all exporters and downstream consumers; listing detail page now renders the HTML version when available
+- `description_html` (and locale variants `description_es_html`, etc.) are populated automatically by `sanitizePropertyHash` whenever the source value contains HTML tags; haul endpoints include `description_html` capped at 1000 chars to avoid broken truncated markup
 - Anonymous haul collections for Chrome extension — browse multiple listings, collect them into a shareable results page without login or API key
 - `POST /ext/v1/hauls`, `GET /ext/v1/hauls/:id`, `POST /ext/v1/hauls/:id/scrapes` endpoints
 - KV-backed haul store with in-memory fallback (`haul-store.ts`)

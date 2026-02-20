@@ -29,6 +29,7 @@ export function haulScrapeToListing(scrape: HaulScrape): Listing {
   listing.for_rent = scrape.for_rent ?? false;
   listing.features = scrape.features ?? [];
   listing.description = scrape.description ?? '';
+  listing.description_html = scrape.description_html ?? '';
   listing.property_type = scrape.property_type ?? '';
   listing.property_subtype = scrape.property_subtype ?? '';
   listing.tenure = scrape.tenure ?? '';

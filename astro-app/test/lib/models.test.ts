@@ -49,6 +49,15 @@ describe('Models', () => {
       expect(listing.image_urls).toHaveLength(2);
     });
 
+    it('updateFromHash captures description_html and strips description', () => {
+      const listing = new Listing();
+      const html = '<p>Spacious <b>home</b> with garden.</p>';
+      Listing.updateFromHash(listing, { description: html });
+
+      expect(listing.description).toBe('Spacious home with garden.');
+      expect(listing.description_html).toBe(html);
+    });
+
     it('serializes to JSON with correct fields', () => {
       const listing = new Listing();
       listing.assignAttributes({
@@ -62,6 +71,16 @@ describe('Models', () => {
       expect(json['import_url']).toBe('https://example.com/p/1');
       // Should not include internal fields
       expect(json).not.toHaveProperty('import_history');
+    });
+
+    it('asJson includes description_html', () => {
+      const listing = new Listing();
+      listing.description = 'Plain text';
+      listing.description_html = '<p>Plain text</p>';
+
+      const json = listing.asJson();
+      expect(json['description']).toBe('Plain text');
+      expect(json['description_html']).toBe('<p>Plain text</p>');
     });
   });
 

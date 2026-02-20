@@ -118,6 +118,7 @@ describe('haul-store', () => {
         for_sale: true,
         features: ['Garden', 'Parking'],
         description: 'A nice property',
+        description_html: '<p>A <b>nice</b> property</p>',
       });
       await addScrapeToHaul(haulId, scrape);
 
@@ -135,6 +136,7 @@ describe('haul-store', () => {
       expect(s.for_sale).toBe(true);
       expect(s.features).toEqual(['Garden', 'Parking']);
       expect(s.description).toBe('A nice property');
+      expect(s.description_html).toBe('<p>A <b>nice</b> property</p>');
     });
   });
 

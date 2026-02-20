@@ -28,6 +28,7 @@ function makeEnrichedScrape(overrides: Partial<HaulScrape> = {}): HaulScrape {
     for_rent: false,
     features: ['Garden', 'Parking', 'Central Heating'],
     description: 'A lovely property in London',
+    description_html: '<p>A lovely property in <b>London</b></p>',
     property_type: 'house',
     property_subtype: 'detached',
     tenure: 'freehold',
@@ -81,6 +82,7 @@ describe('haul-export-adapter', () => {
       expect(listing.for_rent).toBe(false);
       expect(listing.features).toEqual(['Garden', 'Parking', 'Central Heating']);
       expect(listing.description).toBe('A lovely property in London');
+      expect(listing.description_html).toBe('<p>A lovely property in <b>London</b></p>');
       expect(listing.property_type).toBe('house');
       expect(listing.property_subtype).toBe('detached');
       expect(listing.tenure).toBe('freehold');
@@ -108,6 +110,7 @@ describe('haul-export-adapter', () => {
       expect(listing.city).toBe('');
       expect(listing.features).toEqual([]);
       expect(listing.description).toBe('');
+      expect(listing.description_html).toBe('');
       // New interoperability fields default to empty for legacy scrapes
       expect(listing.property_type).toBe('');
       expect(listing.property_subtype).toBe('');

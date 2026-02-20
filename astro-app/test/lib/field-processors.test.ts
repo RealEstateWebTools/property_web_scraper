@@ -103,6 +103,38 @@ describe('sanitizePropertyHash', () => {
     expect(result['description']).toBe('Very nice');
   });
 
+  it('preserves original HTML in description_html when description contains HTML tags', () => {
+    const html = '<p>Spacious <b>3-bed</b> home.<br/>Great location.</p>';
+    const hash = { description: html };
+    const result = sanitizePropertyHash(hash);
+    expect(result['description']).toBe('Spacious 3-bed home.Great location.');
+    expect(result['description_html']).toBe(html);
+  });
+
+  it('does not create description_html when description is plain text', () => {
+    const hash = { description: 'A lovely home with no tags' };
+    const result = sanitizePropertyHash(hash);
+    expect(result['description']).toBe('A lovely home with no tags');
+    expect(result['description_html']).toBeUndefined();
+  });
+
+  it('creates _html variants for all description locale fields', () => {
+    const html = '<p>Descripción</p>';
+    const hash = { description_es: html, description_de: html, description_fr: html, description_it: html };
+    const result = sanitizePropertyHash(hash);
+    expect(result['description_es_html']).toBe(html);
+    expect(result['description_de_html']).toBe(html);
+    expect(result['description_fr_html']).toBe(html);
+    expect(result['description_it_html']).toBe(html);
+  });
+
+  it('does not create title_html — only description fields get _html variants', () => {
+    const hash = { title: '<b>Nice House</b>' };
+    const result = sanitizePropertyHash(hash);
+    expect(result['title']).toBe('Nice House');
+    expect(result['title_html']).toBeUndefined();
+  });
+
   it('does not modify non-text fields', () => {
     const hash = { price_float: 100000, count_bedrooms: 3 };
     const result = sanitizePropertyHash(hash);
