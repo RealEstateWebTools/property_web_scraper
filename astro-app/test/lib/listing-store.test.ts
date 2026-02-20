@@ -12,6 +12,8 @@ import {
   findListingByUrl,
   getHtmlHash,
   storeHtmlHash,
+  deleteListing,
+  updateListingVisibility,
 } from '../../src/lib/services/listing-store.js';
 import { Listing } from '../../src/lib/models/listing.js';
 import type { ExtractionDiagnostics } from '../../src/lib/extractor/html-extractor.js';
@@ -499,6 +501,146 @@ describe('listing-store', () => {
       expect(entry!.size).toBe(size);
 
       initKV(null);
+    });
+  });
+
+  describe('deleteListing', () => {
+    it('removes listing from in-memory store', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({ title: 'To Delete', import_url: 'https://example.com/del/1' });
+      await storeListing(id, listing);
+
+      expect(await getListing(id)).toBeDefined();
+
+      await deleteListing(id);
+
+      expect(await getListing(id)).toBeUndefined();
+      expect(getStoreStats().count).toBe(0);
+    });
+
+    it('removes associated diagnostics', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({ title: 'Del Diag' });
+      await storeListing(id, listing);
+      await storeDiagnostics(id, {
+        scraperName: 'test',
+        fieldTraces: [],
+        totalFields: 0,
+        populatedFields: 0,
+        emptyFields: [],
+      });
+
+      expect(await getDiagnostics(id)).toBeDefined();
+
+      await deleteListing(id);
+
+      expect(await getDiagnostics(id)).toBeUndefined();
+    });
+
+    it('clears the URL index entry', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({
+        title: 'URL Index Test',
+        import_url: 'https://example.com/del-url-index',
+      });
+      await storeListing(id, listing);
+
+      expect(findListingByUrl('https://example.com/del-url-index')).toBe(id);
+
+      await deleteListing(id);
+
+      expect(findListingByUrl('https://example.com/del-url-index')).toBeUndefined();
+    });
+
+    it('removes listing from Firestore', async () => {
+      const listing = await Listing.create({
+        title: 'Firestore Delete Test',
+        price_float: 100000,
+      });
+      const firestoreId = listing.id;
+
+      // Also store in memory
+      await storeListing(firestoreId, listing);
+
+      await deleteListing(firestoreId);
+
+      // Clear in-memory to force Firestore lookup
+      clearListingStore();
+
+      const retrieved = await getListing(firestoreId);
+      expect(retrieved).toBeUndefined();
+    });
+
+    it('does not throw when listing does not exist', async () => {
+      await expect(deleteListing('nonexistent-id-xyz')).resolves.toBeUndefined();
+    });
+  });
+
+  describe('updateListingVisibility', () => {
+    it('updates visibility on an in-memory listing', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({ title: 'Vis Test', import_url: 'https://example.com/vis/1' });
+      await storeListing(id, listing);
+
+      await updateListingVisibility(id, 'hidden');
+
+      const updated = await getListing(id);
+      expect(updated).toBeDefined();
+      expect(updated!.visibility).toBe('hidden');
+      expect(updated!.manual_override).toBe(true);
+    });
+
+    it('updates from published to spam', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({ title: 'Spam Test', visibility: 'published' });
+      await storeListing(id, listing);
+
+      await updateListingVisibility(id, 'spam');
+
+      const updated = await getListing(id);
+      expect(updated!.visibility).toBe('spam');
+    });
+
+    it('updates from hidden to published', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({ title: 'Unhide Test', visibility: 'hidden' });
+      await storeListing(id, listing);
+
+      await updateListingVisibility(id, 'published');
+
+      const updated = await getListing(id);
+      expect(updated!.visibility).toBe('published');
+      expect(updated!.manual_override).toBe(true);
+    });
+
+    it('throws when listing does not exist', async () => {
+      await expect(
+        updateListingVisibility('nonexistent-id-xyz', 'hidden'),
+      ).rejects.toThrow('Listing not found');
+    });
+
+    it('persists visibility change to Firestore', async () => {
+      const listing = await Listing.create({
+        title: 'Firestore Vis Test',
+        visibility: 'published',
+      });
+      const firestoreId = listing.id;
+      await storeListing(firestoreId, listing);
+
+      await updateListingVisibility(firestoreId, 'pending');
+
+      // Clear in-memory to force Firestore lookup
+      clearListingStore();
+
+      const retrieved = await getListing(firestoreId);
+      expect(retrieved).toBeDefined();
+      expect(retrieved!.visibility).toBe('pending');
     });
   });
 });
