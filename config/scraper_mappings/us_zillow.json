@@ -1,0 +1,124 @@
+[{
+  "name": "us_zillow",
+  "expectedExtractionRate": 0.80,
+  "defaultValues": {
+    "country": { "value": "USA" },
+    "currency": { "value": "USD" },
+    "area_unit": { "value": "sqft" },
+    "locale_code": { "value": "en" },
+    "for_rent_short_term": { "value": "false" }
+  },
+  "floatFields": {
+    "price_float": {
+      "cssLocator": ".price-text",
+      "cssCountId": "0",
+      "stripPunct": "true",
+      "stripFirstChar": "true",
+      "fallbacks": [
+        {
+          "jsonLdPath": "offers.price"
+        }
+      ]
+    },
+    "constructed_area": {
+      "cssLocator": "[data-testid=\"desktop-bed-bath-sqft\"] [data-testid=\"bed-bath-sqft-text__value\"]",
+      "cssCountId": "2",
+      "stripPunct": "true"
+    },
+    "latitude": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.componentProps.searchPageStateParams.query.latitude"
+    },
+    "longitude": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.componentProps.searchPageStateParams.query.longitude"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "cssLocator": "meta[property='zillow_fb:beds']",
+      "cssAttr": "content"
+    },
+    "count_bathrooms": {
+      "cssLocator": "meta[property='zillow_fb:baths']",
+      "cssAttr": "content"
+    },
+    "year_construction": {
+      "scriptRegEx": "(?<=\\\\\"yearBuilt\\\\\":)\\d+"
+    }
+  },
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "splitTextCharacter": " | ",
+      "splitTextArrayId": "0"
+    },
+    "address_string": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "splitTextCharacter": " | ",
+      "splitTextArrayId": "0"
+    },
+    "street_address": {
+      "jsonLdPath": "location.address.streetAddress"
+    },
+    "city": {
+      "jsonLdPath": "location.address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "location.address.addressRegion"
+    },
+    "postal_code": {
+      "jsonLdPath": "location.address.postalCode"
+    },
+    "description": {
+      "cssLocator": "meta[name='description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".price-text",
+      "cssCountId": "0"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "reference": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.componentProps.zpid"
+    },
+    "property_type": {
+      "scriptRegEx": "(?<=\\\\\"homeType\\\\\":\\\\\")\\w+"
+    }
+  },
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.componentProps.homeInfoForHistoryModify.homeStatus",
+      "evaluator": "include?",
+      "evaluatorParam": "FOR_SALE",
+      "caseInsensitive": true
+    },
+    "for_rent": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.componentProps.homeInfoForHistoryModify.homeStatus",
+      "evaluator": "include?",
+      "evaluatorParam": "FOR_RENT",
+      "caseInsensitive": true
+    },
+    "for_rent_long_term": {
+      "scriptJsonVar": "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.componentProps.homeInfoForHistoryModify.homeStatus",
+      "evaluator": "include?",
+      "evaluatorParam": "FOR_RENT",
+      "caseInsensitive": true
+    }
+  },
+  "images": [
+    {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  ]
+}]

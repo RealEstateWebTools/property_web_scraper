@@ -116,10 +116,10 @@ describe('portal-registry', () => {
       expect(portal!.country).toBe('US');
     });
 
-    it('finds zillow with generic_real_estate scraper', () => {
+    it('finds zillow with us_zillow scraper', () => {
       const portal = findPortalByHost('www.zillow.com');
       expect(portal).toBeDefined();
-      expect(portal!.scraperName).toBe('generic_real_estate');
+      expect(portal!.scraperName).toBe('us_zillow');
       expect(portal!.supportTier).toBe('experimental');
     });
 

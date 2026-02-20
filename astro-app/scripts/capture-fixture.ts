@@ -82,6 +82,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'domain.com.au': 'au_domain',
   'www.realestate.com.au': 'au_realestate',
   'realestate.com.au': 'au_realestate',
+  'www.zillow.com': 'us_zillow',
+  'zillow.com': 'us_zillow',
 };
 
 const HELP_TEXT = `
