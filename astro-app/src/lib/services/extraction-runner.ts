@@ -56,8 +56,9 @@ export async function runExtraction(opts: {
   scraperMapping: ScraperMapping;
   importHost: ImportHost;
   sourceType?: ScrapeSourceType;
+  kvBinding?: unknown;
 }): Promise<ExtractionResult | null> {
-  const { html, url, scraperMapping, importHost, sourceType } = opts;
+  const { html, url, scraperMapping, importHost, sourceType, kvBinding } = opts;
 
   const result = extractFromHtml({
     html,
@@ -99,7 +100,7 @@ export async function runExtraction(opts: {
   let mergeDiff: MergeDiff | undefined;
 
   try {
-    initKV(undefined);
+    if (kvBinding !== undefined) initKV(kvBinding);
     const existing = await getListingByUrl(url);
     if (existing) {
       // Merge incoming into existing

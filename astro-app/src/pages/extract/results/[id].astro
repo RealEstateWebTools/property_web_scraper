@@ -208,6 +208,20 @@ const attrs = [
                   <i class="bi bi-eye"></i> View Full Details
                 </a>
                 <ExportDropdown listingId={id!} />
+                <div class="relative">
+                  <button id="add-to-haul-btn" type="button"
+                    class="bg-amber-500 text-white text-sm px-3 py-1.5 rounded-lg hover:bg-amber-600 inline-flex items-center gap-1 cursor-pointer border-0">
+                    <i class="bi bi-box-seam"></i> Add to Haul
+                  </button>
+                  <div id="haul-picker" class="hidden absolute bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-10 mt-1 w-64 right-0">
+                    <div id="haul-picker-list" class="max-h-40 overflow-y-auto"></div>
+                    <button id="haul-create-new" type="button"
+                      class="w-full text-left text-sm text-blue-600 hover:bg-blue-50 px-2 py-1.5 rounded mt-1 cursor-pointer border-0 bg-transparent inline-flex items-center gap-1">
+                      <i class="bi bi-plus-lg"></i> New Haul
+                    </button>
+                    <div id="haul-picker-status" class="text-xs mt-2 hidden"></div>
+                  </div>
+                </div>
               </div>
 
               <SocialShare
@@ -510,6 +524,131 @@ document.addEventListener('DOMContentLoaded', () => {
         fallback.classList.remove('hidden');
       }
     }
+  }
+});
+</script>
+
+<script is:inline define:vars={{ id }}>
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('add-to-haul-btn');
+  var picker = document.getElementById('haul-picker');
+  var listEl = document.getElementById('haul-picker-list');
+  var createBtn = document.getElementById('haul-create-new');
+  var statusEl = document.getElementById('haul-picker-status');
+  if (!btn || !picker) return;
+
+  function showStatus(msg, isError) {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.className = 'text-xs mt-2 ' + (isError ? 'text-red-600' : 'text-green-600');
+    statusEl.classList.remove('hidden');
+  }
+
+  function hideStatus() {
+    if (statusEl) statusEl.classList.add('hidden');
+  }
+
+  function renderHaulList() {
+    if (!listEl) return;
+    if (typeof window.PwsStorage === 'undefined') {
+      listEl.innerHTML = '<p class="text-xs text-amber-600">Enable functional cookies to use hauls.</p>';
+      return;
+    }
+    var myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+    var now = new Date();
+    myHauls = myHauls.filter(function(h) { return new Date(h.expiresAt) > now; });
+    if (myHauls.length === 0) {
+      listEl.innerHTML = '<p class="text-xs text-gray-500 mb-1">No hauls yet. Create one below.</p>';
+      return;
+    }
+    myHauls.sort(function(a, b) { return new Date(b.lastVisited).getTime() - new Date(a.lastVisited).getTime(); });
+    var html = '';
+    myHauls.forEach(function(h) {
+      html += '<button type="button" class="haul-pick-item w-full text-left text-sm px-2 py-1.5 rounded hover:bg-gray-100 cursor-pointer border-0 bg-transparent flex justify-between items-center" data-haul-id="' + h.id + '">';
+      html += '<span class="truncate">' + (h.name || h.id) + '</span>';
+      html += '<span class="text-xs text-gray-400 ml-2 whitespace-nowrap">' + (h.scrapeCount || 0) + '/20</span>';
+      html += '</button>';
+    });
+    listEl.innerHTML = html;
+  }
+
+  // Toggle picker
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    hideStatus();
+    renderHaulList();
+    picker.classList.toggle('hidden');
+  });
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (!picker.contains(e.target) && e.target !== btn) {
+      picker.classList.add('hidden');
+    }
+  });
+
+  async function addResultToHaul(haulId) {
+    showStatus('Adding...', false);
+    try {
+      var res = await fetch('/ext/v1/hauls/' + haulId + '/add-result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resultId: id }),
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed');
+      // Update local haul entry
+      if (typeof window.PwsStorage !== 'undefined') {
+        var myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+        var entry = myHauls.find(function(h) { return h.id === haulId; });
+        if (entry) {
+          entry.scrapeCount = (entry.scrapeCount || 0) + (data.replaced ? 0 : 1);
+          entry.lastVisited = new Date().toISOString();
+          window.PwsStorage.set('functional:my-hauls', myHauls);
+        }
+      }
+      showStatus('Added to ' + haulId, false);
+      setTimeout(function() { picker.classList.add('hidden'); }, 1500);
+    } catch (err) {
+      showStatus(err.message || 'Failed to add', true);
+    }
+  }
+
+  // Delegate click on haul items
+  if (listEl) {
+    listEl.addEventListener('click', function(e) {
+      var item = e.target.closest('.haul-pick-item');
+      if (item) addResultToHaul(item.dataset.haulId);
+    });
+  }
+
+  // Create new haul then add
+  if (createBtn) {
+    createBtn.addEventListener('click', async function() {
+      showStatus('Creating haul...', false);
+      try {
+        var res = await fetch('/ext/v1/hauls', { method: 'POST' });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error?.message || 'Failed');
+        var haulId = data.haul_id;
+        // Save to my-hauls
+        if (typeof window.PwsStorage !== 'undefined') {
+          var myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+          myHauls.unshift({
+            id: haulId,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            lastVisited: new Date().toISOString(),
+            scrapeCount: 0,
+            name: null,
+          });
+          window.PwsStorage.set('functional:my-hauls', myHauls);
+        }
+        await addResultToHaul(haulId);
+        renderHaulList();
+      } catch (err) {
+        showStatus(err.message || 'Failed to create haul', true);
+      }
+    });
   }
 });
 </script>
