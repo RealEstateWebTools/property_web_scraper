@@ -2,6 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ExportDropdown from '../../../components/ExportDropdown.astro';
 import SocialShare from '../../../components/SocialShare.astro';
+import DataBridgeNotice from '../../../components/DataBridgeNotice.astro';
 import { getListing, getDiagnostics } from '@lib/services/listing-store.js';
 import { getLatestScrapeForListing } from '@lib/services/scrape-metadata.js';
 
@@ -408,6 +409,8 @@ const attrs = [
               </div>
             </div>
           </div>
+
+          <DataBridgeNotice />
         </>
       )}
 

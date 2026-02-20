@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ExportDropdown from '../../components/ExportDropdown.astro';
 import SocialShare from '../../components/SocialShare.astro';
+import DataBridgeNotice from '../../components/DataBridgeNotice.astro';
 import { getListing } from '@lib/services/listing-store.js';
 import { getRuntimeConfig } from '@lib/services/runtime-config.js';
 
@@ -140,6 +141,8 @@ if (listing) {
             </div>
           </div>
         )}
+
+        <DataBridgeNotice />
       </div>
 
       <div>
