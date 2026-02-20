@@ -89,14 +89,14 @@ async function handleExtraction({ url, html }) {
   const apiUrl = (config.apiUrl || 'https://property-web-scraper.pages.dev').replace(/\/+$/, '');
   const haulId = config.haulId || '';
 
-  if (!haulId) {
-    throw new Error('No Haul ID configured. Open Settings to create or enter one.');
-  }
+  // Use the auto-haul endpoint, passing haul_id if we have one
+  const payload = { url, html };
+  if (haulId) payload.haul_id = haulId;
 
-  const response = await fetch(`${apiUrl}/ext/v1/hauls/${haulId}/scrapes`, {
+  const response = await fetch(`${apiUrl}/ext/v1/scrapes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ url, html }),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
@@ -106,7 +106,14 @@ async function handleExtraction({ url, html }) {
 
   const data = await response.json();
 
+  // Persist the haul_id returned by the server (may be newly created)
+  const returnedHaulId = data.haul_id;
+  if (returnedHaulId && returnedHaulId !== haulId) {
+    await chrome.storage.sync.set({ haulId: returnedHaulId });
+  }
+
   // Persist scrape summary to local history
+  const activeHaulId = returnedHaulId || haulId;
   try {
     const scrape = data.scrape || {};
     const extracted = scrape.fields_extracted || 0;
@@ -119,7 +126,7 @@ async function handleExtraction({ url, html }) {
       hostname = parsed.hostname.replace(/^www\./, '');
       sourceUrl = parsed.origin + parsed.pathname;
     } catch {}
-    await HaulHistory.saveScrape(haulId, {
+    await HaulHistory.saveScrape(activeHaulId, {
       resultId: data.result_id || scrape.result_id || '',
       title: scrape.title || '',
       grade: scrape.grade || '?',

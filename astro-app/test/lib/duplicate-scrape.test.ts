@@ -6,6 +6,8 @@ import {
   findExistingScrapeByUrl,
 } from '../../src/lib/services/haul-store.js';
 import type { HaulScrape } from '../../src/lib/services/haul-store.js';
+import { Listing } from '../../src/lib/models/listing.js';
+import { storeListing, getListingByUrl, clearListingStore } from '../../src/lib/services/listing-store.js';
 
 function makeScrape(overrides: Partial<HaulScrape> = {}): HaulScrape {
   return {
@@ -210,6 +212,106 @@ describe('duplicate scrape detection', () => {
         url: 'https://www.rightmove.co.uk/properties/456',
       }));
       expect(added).toBe(true);
+    });
+  });
+
+  describe('cross-application duplicate detection via listing store', () => {
+    beforeEach(() => {
+      clearListingStore();
+    });
+
+    it('detects a listing that was previously extracted by another user', async () => {
+      // Simulate a listing that was extracted previously (by any user/haul)
+      const listing = new Listing();
+      listing.assignAttributes({
+        import_url: 'https://www.rightmove.co.uk/properties/789',
+        title: 'Previously Extracted Property',
+        price_string: '500,000',
+      });
+      await storeListing('prev-id-1', listing);
+
+      // A new user tries to scrape the same URL
+      const existing = await getListingByUrl('https://www.rightmove.co.uk/properties/789');
+      expect(existing).toBeDefined();
+      expect(existing!.id).toBe('prev-id-1');
+      expect(existing!.listing.title).toBe('Previously Extracted Property');
+    });
+
+    it('detects cross-application duplicates even with different query params', async () => {
+      const listing = new Listing();
+      listing.assignAttributes({
+        import_url: 'https://www.rightmove.co.uk/properties/789',
+        title: 'A House',
+      });
+      await storeListing('prev-id-2', listing);
+
+      // Same URL but with tracking params
+      const existing = await getListingByUrl(
+        'https://www.rightmove.co.uk/properties/789?utm_source=email',
+      );
+      expect(existing).toBeDefined();
+      expect(existing!.id).toBe('prev-id-2');
+    });
+
+    it('returns undefined for a URL never extracted before', async () => {
+      const existing = await getListingByUrl('https://www.rightmove.co.uk/properties/never-seen');
+      expect(existing).toBeUndefined();
+    });
+
+    it('allows adding a cross-app duplicate to a haul as a reference', async () => {
+      // A listing extracted by someone else
+      const listing = new Listing();
+      listing.assignAttributes({
+        import_url: 'https://www.rightmove.co.uk/properties/789',
+        title: 'Shared Property',
+        price_string: '400,000',
+      });
+      await storeListing('shared-id', listing);
+
+      // The haul has no scrapes yet for this URL
+      const inHaul = await findExistingScrapeByUrl(haulId, 'https://www.rightmove.co.uk/properties/789');
+      expect(inHaul).toBeUndefined();
+
+      // But the listing store knows about it
+      const fromStore = await getListingByUrl('https://www.rightmove.co.uk/properties/789');
+      expect(fromStore).toBeDefined();
+
+      // The endpoint would add it to the haul without re-extracting
+      const scrape = makeScrape({
+        resultId: fromStore!.id,
+        url: 'https://www.rightmove.co.uk/properties/789',
+        title: fromStore!.listing.title || 'Untitled',
+        price: fromStore!.listing.price_string || '',
+      });
+      const { added } = await addScrapeToHaul(haulId, scrape);
+      expect(added).toBe(true);
+
+      const haul = await getHaul(haulId);
+      expect(haul!.scrapes).toHaveLength(1);
+      expect(haul!.scrapes[0].resultId).toBe('shared-id');
+      expect(haul!.scrapes[0].title).toBe('Shared Property');
+    });
+
+    it('same-haul check takes priority over cross-app check', async () => {
+      // Store a listing in the listing store
+      const listing = new Listing();
+      listing.assignAttributes({
+        import_url: 'https://www.rightmove.co.uk/properties/789',
+        title: 'Some Property',
+      });
+      await storeListing('store-id', listing);
+
+      // Also add it to the haul
+      await addScrapeToHaul(haulId, makeScrape({
+        resultId: 'store-id',
+        url: 'https://www.rightmove.co.uk/properties/789',
+        title: 'Some Property',
+      }));
+
+      // Same-haul check should catch it first (returns 409, no re-add)
+      const inHaul = await findExistingScrapeByUrl(haulId, 'https://www.rightmove.co.uk/properties/789');
+      expect(inHaul).toBeDefined();
+      expect(inHaul!.resultId).toBe('store-id');
     });
   });
 });
