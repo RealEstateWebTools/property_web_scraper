@@ -89,7 +89,7 @@ function resolveAllowOrigin(request?: Request): { allowOrigin: string | null; us
   return { allowOrigin: null, usingAllowlist: true };
 }
 
-function buildCorsHeaders(request?: Request): Record<string, string> {
+export function buildCorsHeaders(request?: Request): Record<string, string> {
   const { allowOrigin, usingAllowlist } = resolveAllowOrigin(request);
   const headers: Record<string, string> = {
   'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',

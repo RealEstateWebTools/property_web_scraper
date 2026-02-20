@@ -5,6 +5,8 @@
   "description": "Extract structured property data from real estate listing pages",
   "permissions": ["activeTab", "scripting", "storage", "tabs"],
   "host_permissions": [
+    "https://scraper.propertywebbuilder.com/*",
+    "https://property-web-scraper.pages.dev/*",
     "*://*.rightmove.co.uk/*",
     "*://*.zoopla.co.uk/*",
     "*://*.onthemarket.com/*",
