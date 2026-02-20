@@ -26,6 +26,7 @@ tmp/
 # Secrets and credentials
 .env
 .env.local
+.dev.vars
 .byebug_history
 config/firebase-credentials.json
 firebase/creds.json

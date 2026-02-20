@@ -1,6 +1,9 @@
 ---
 import { PUBLIC_NAV_LINKS } from '@lib/nav-data.js';
+const fbApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
+const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
 ---
+<div id="fb-nav-config" data-api-key={fbApiKey} data-auth-domain={fbAuthDomain} class="hidden"></div>
 <nav class="bg-surface border-b border-border">
   <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
     <a class="font-bold text-lg text-text no-underline flex items-center gap-1" href="/">
@@ -27,6 +30,15 @@ import { PUBLIC_NAV_LINKS } from '@lib/nav-data.js';
           {link.label}
         </a>
       ))}
+      <!-- Auth nav items — shown/hidden by client JS based on Firebase auth state -->
+      <a id="nav-signin" href="/login"
+        class="hidden text-sm text-text-secondary hover:text-primary no-underline transition">
+        Sign In
+      </a>
+      <a id="nav-account" href="/account"
+        class="hidden text-sm text-text-secondary hover:text-primary no-underline transition flex items-center gap-1">
+        <i class="bi bi-person-circle"></i> My Account
+      </a>
     </div>
   </div>
   <!-- Mobile menu -->
@@ -41,10 +53,19 @@ import { PUBLIC_NAV_LINKS } from '@lib/nav-data.js';
         {link.label}
       </a>
     ))}
+    <a id="nav-signin-mobile" href="/login"
+      class="hidden block py-2 text-sm text-text-secondary hover:text-primary no-underline">
+      Sign In
+    </a>
+    <a id="nav-account-mobile" href="/account"
+      class="hidden block py-2 text-sm text-text-secondary hover:text-primary no-underline flex items-center gap-1">
+      <i class="bi bi-person-circle"></i> My Account
+    </a>
   </div>
 </nav>
 
 <script is:inline>
+  // Mobile menu toggle
   const toggle = document.getElementById('navToggle');
   const menu = document.getElementById('mobileMenu');
   if (toggle && menu) {
@@ -53,4 +74,49 @@ import { PUBLIC_NAV_LINKS } from '@lib/nav-data.js';
       toggle.setAttribute('aria-expanded', String(!expanded));
     });
   }
+
+  // Auth state — show Sign In or My Account based on Firebase session
+  (function () {
+    var cfg = document.getElementById('fb-nav-config');
+    var apiKey = cfg && cfg.dataset.apiKey;
+    var authDomain = cfg && cfg.dataset.authDomain;
+
+    if (!apiKey || !authDomain) return;
+
+    var navSignin = document.getElementById('nav-signin');
+    var navAccount = document.getElementById('nav-account');
+    var navSigninMobile = document.getElementById('nav-signin-mobile');
+    var navAccountMobile = document.getElementById('nav-account-mobile');
+
+    function showSignedIn() {
+      navSignin && navSignin.classList.add('hidden');
+      navAccount && navAccount.classList.remove('hidden');
+      navSigninMobile && navSigninMobile.classList.add('hidden');
+      navAccountMobile && navAccountMobile.classList.remove('hidden');
+    }
+
+    function showSignedOut() {
+      navSignin && navSignin.classList.remove('hidden');
+      navAccount && navAccount.classList.add('hidden');
+      navSigninMobile && navSigninMobile.classList.remove('hidden');
+      navAccountMobile && navAccountMobile.classList.add('hidden');
+    }
+
+    import('https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js').then(function (appMod) {
+      return import('https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js').then(function (authMod) {
+        var firebaseApp = appMod.initializeApp({ apiKey: apiKey, authDomain: authDomain });
+        var auth = authMod.getAuth(firebaseApp);
+        authMod.onAuthStateChanged(auth, function (user) {
+          if (user) {
+            showSignedIn();
+          } else {
+            showSignedOut();
+          }
+        });
+      });
+    }).catch(function () {
+      // Firebase unavailable — show Sign In by default
+      showSignedOut();
+    });
+  })();
 </script>

@@ -1,56 +1,233 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+const fbApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
+const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
 ---
 <BaseLayout title="My Account — Property Web Scraper">
+
+<div id="fb-config" data-api-key={fbApiKey} data-auth-domain={fbAuthDomain} class="hidden"></div>
 
 <section class="max-w-lg mx-auto px-4 py-12">
   <h1 class="text-2xl font-bold text-gray-900 mb-8">My Account</h1>
 
-  <!-- API Key card -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
-    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">API Key</h2>
-
-    <p class="text-sm text-gray-600 mb-4">
-      Your API key unlocks unlimited haul creation and is used to authenticate requests
-      from the Chrome extension and the API.
+  <!-- Signed-out state -->
+  <div id="signed-out-section" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+    <p class="text-gray-600 mb-4">Sign in to view your account and API key.</p>
+    <a href="/login"
+      class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl text-sm transition-colors no-underline">
+      Sign In
+    </a>
+    <p class="text-xs text-gray-400 mt-4">
+      No account yet? <a href="/register" class="text-blue-600 hover:underline">Create one</a>
     </p>
+  </div>
 
+  <!-- Email-not-verified state -->
+  <div id="unverified-section" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
     <div class="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-800 mb-4">
-      <strong>Don't have a key yet?</strong>
-      <a href="/signup" class="text-blue-600 hover:underline ml-1">Sign up to get one →</a>
+      <strong>Verify your email</strong> to access your API key.
     </div>
-
-    <div class="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-800">
-      <strong>Lost your key?</strong> Sign up again with the same email — a new key will be added to your account.
-      <a href="/signup" class="text-blue-600 hover:underline ml-1">Sign up →</a>
-    </div>
+    <a href="/verify-email"
+      class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl text-sm transition-colors no-underline">
+      Go to verification page
+    </a>
   </div>
 
-  <!-- Extension setup card -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
-    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Using the Chrome Extension</h2>
-    <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700">
-      <li>Open the extension popup and click the <strong>⚙️</strong> settings icon</li>
-      <li>Paste your API key into the <strong>API Key</strong> field</li>
-      <li>Click <strong>Save Settings</strong></li>
-      <li>You can now create unlimited hauls from the extension</li>
-    </ol>
-  </div>
+  <!-- Signed-in and verified state -->
+  <div id="account-section" class="hidden">
 
-  <!-- Upgrade card -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Plan</h2>
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="font-semibold text-gray-900">Free</p>
-        <p class="text-sm text-gray-500">500 extractions/day · Unlimited hauls</p>
+    <!-- Profile card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Account</h2>
+      <p class="text-sm text-gray-700">
+        Signed in as <strong id="user-email"></strong>
+      </p>
+    </div>
+
+    <!-- API Key card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">API Key</h2>
+
+      <p class="text-sm text-gray-600 mb-4">
+        Your API key is used by the Chrome extension and the API to authenticate requests.
+        <strong>The key is shown once — save it somewhere safe.</strong>
+      </p>
+
+      <!-- Before key is fetched -->
+      <div id="key-prompt">
+        <p id="key-error" class="text-red-600 text-xs mb-3 hidden"></p>
+        <button id="get-key-btn"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl text-sm transition-colors cursor-pointer border-0">
+          Get My API Key
+        </button>
       </div>
-      <a href="/pricing"
-        class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors no-underline">
-        Upgrade
-      </a>
+
+      <!-- After key is fetched -->
+      <div id="key-display" class="hidden">
+        <div class="relative mb-4">
+          <code id="api-key-value"
+            class="block w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono text-gray-800 break-all pr-20">
+          </code>
+          <button id="copy-btn"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition-colors border-0 cursor-pointer font-semibold">
+            Copy
+          </button>
+        </div>
+        <p class="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+          This key will not be shown again. A new key will be generated each time you click the button above.
+        </p>
+      </div>
     </div>
+
+    <!-- Extension setup card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Using the Chrome Extension</h2>
+      <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700">
+        <li>Open the extension popup and click the <strong>⚙️</strong> settings icon</li>
+        <li>Paste your API key into the <strong>API Key</strong> field</li>
+        <li>Click <strong>Save Settings</strong></li>
+        <li>You can now create unlimited hauls from the extension</li>
+      </ol>
+    </div>
+
+    <!-- Plan card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Plan</h2>
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="font-semibold text-gray-900">Free</p>
+          <p class="text-sm text-gray-500">500 extractions/day · Unlimited hauls</p>
+        </div>
+        <a href="/pricing"
+          class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors no-underline">
+          Upgrade
+        </a>
+      </div>
+    </div>
+
+    <!-- Sign out -->
+    <button id="signout-btn"
+      class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold py-3 px-6 rounded-xl text-sm transition-colors cursor-pointer border-0">
+      Sign Out
+    </button>
+
   </div>
+
+  <!-- Loading state (shown while Firebase initialises) -->
+  <div id="loading-section" class="text-center py-12 text-gray-400 text-sm">
+    Loading…
+  </div>
+
 </section>
+
+<script is:inline>
+(function () {
+  var cfg = document.getElementById('fb-config');
+  var apiKey = cfg && cfg.dataset.apiKey;
+  var authDomain = cfg && cfg.dataset.authDomain;
+
+  var loadingSection = document.getElementById('loading-section');
+  var signedOutSection = document.getElementById('signed-out-section');
+  var unverifiedSection = document.getElementById('unverified-section');
+  var accountSection = document.getElementById('account-section');
+  var userEmail = document.getElementById('user-email');
+  var keyPrompt = document.getElementById('key-prompt');
+  var keyDisplay = document.getElementById('key-display');
+  var keyError = document.getElementById('key-error');
+  var getKeyBtn = document.getElementById('get-key-btn');
+  var apiKeyValue = document.getElementById('api-key-value');
+  var copyBtn = document.getElementById('copy-btn');
+  var signoutBtn = document.getElementById('signout-btn');
+
+  var firebaseAuth = null;
+  var authModule = null;
+
+  function showSection(id) {
+    ['loading-section', 'signed-out-section', 'unverified-section', 'account-section'].forEach(function (s) {
+      document.getElementById(s).classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  async function init() {
+    if (!apiKey || !authDomain) {
+      showSection('signed-out-section');
+      return;
+    }
+
+    var baseUrl = 'https://www.gstatic.com/firebasejs/11.3.1/';
+    var app = await import(baseUrl + 'firebase-app.js');
+    authModule = await import(baseUrl + 'firebase-auth.js');
+
+    var firebaseApp = app.initializeApp({ apiKey: apiKey, authDomain: authDomain });
+    firebaseAuth = authModule.getAuth(firebaseApp);
+
+    authModule.onAuthStateChanged(firebaseAuth, function (user) {
+      if (!user) {
+        showSection('signed-out-section');
+        return;
+      }
+      if (!user.emailVerified) {
+        showSection('unverified-section');
+        return;
+      }
+      userEmail.textContent = user.email;
+      showSection('account-section');
+    });
+  }
+
+  getKeyBtn.addEventListener('click', async function () {
+    keyError.classList.add('hidden');
+    getKeyBtn.disabled = true;
+    getKeyBtn.textContent = 'Generating key…';
+
+    try {
+      var user = firebaseAuth && firebaseAuth.currentUser;
+      if (!user) throw new Error('Not signed in');
+
+      var idToken = await user.getIdToken(/* forceRefresh */ true);
+
+      var res = await fetch('/public_api/v1/account/api-key', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + idToken },
+      });
+      var data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error && data.error.message || 'Failed to generate key');
+      }
+
+      apiKeyValue.textContent = data.api_key || '';
+      keyPrompt.classList.add('hidden');
+      keyDisplay.classList.remove('hidden');
+    } catch (err) {
+      getKeyBtn.disabled = false;
+      getKeyBtn.textContent = 'Get My API Key';
+      keyError.textContent = err.message || 'Something went wrong.';
+      keyError.classList.remove('hidden');
+    }
+  });
+
+  copyBtn.addEventListener('click', function () {
+    var key = apiKeyValue.textContent.trim();
+    navigator.clipboard.writeText(key).then(function () {
+      copyBtn.textContent = '✓ Copied';
+      setTimeout(function () { copyBtn.textContent = 'Copy'; }, 2000);
+    });
+  });
+
+  signoutBtn.addEventListener('click', async function () {
+    if (firebaseAuth && authModule) {
+      await authModule.signOut(firebaseAuth);
+      window.location.href = '/';
+    }
+  });
+
+  init().catch(function (err) {
+    console.error('Firebase init failed:', err);
+    showSection('signed-out-section');
+  });
+})();
+</script>
 
 </BaseLayout>
