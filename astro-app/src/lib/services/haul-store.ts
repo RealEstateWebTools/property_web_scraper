@@ -33,6 +33,7 @@ export interface HaulScrape {
   for_rent?: boolean;
   features?: string[];
   description?: string;
+  description_html?: string;
   // New interoperability fields
   property_type?: string;
   property_subtype?: string;
