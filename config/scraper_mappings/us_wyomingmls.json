@@ -80,7 +80,7 @@
     },
     "title":
     {
-      "cssLocator": "title"
+      "cssLocator": "head > title"
     },
     "description":
     {

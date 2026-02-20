@@ -45,7 +45,7 @@
     },
     "textFields": {
       "title": {
-        "cssLocator": "title",
+        "cssLocator": "head > title",
         "fallbacks": [
           {
             "cssLocator": "meta[property='og:title']",
