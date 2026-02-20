@@ -7,6 +7,7 @@
 import { BaseExporter, type ExportOptions } from './base-exporter.js';
 import type { Listing } from '../models/listing.js';
 import { normalizePropertyType } from '../extractor/property-type-normalizer.js';
+import { primaryLanguage } from '../utils/locale.js';
 
 export interface KyeroExportOptions extends ExportOptions {
   defaultCurrency?: string;
@@ -53,9 +54,8 @@ export class KyeroExporter extends BaseExporter {
 
   private writePropertyElements(listing: Listing, lines: string[]): void {
     // Determine language slot from locale_code; fall back to 'en'
-    const lang = (listing.locale_code && KYERO_LANGUAGES.has(listing.locale_code))
-      ? listing.locale_code
-      : 'en';
+    const baseLang = listing.locale_code ? primaryLanguage(listing.locale_code) : '';
+    const lang = KYERO_LANGUAGES.has(baseLang) ? baseLang : 'en';
 
     // Core fields
     if (listing.reference) {

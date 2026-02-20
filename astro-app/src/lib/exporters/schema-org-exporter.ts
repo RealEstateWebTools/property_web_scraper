@@ -5,6 +5,7 @@
 
 import { BaseExporter, type ExportOptions } from './base-exporter.js';
 import type { Listing } from '../models/listing.js';
+import { primaryLanguage } from '../utils/locale.js';
 
 export interface SchemaOrgExportOptions extends ExportOptions {
   /** Use SingleFamilyResidence vs Apartment etc */
@@ -49,6 +50,7 @@ export class SchemaOrgExporter extends BaseExporter {
     if (listing.title) node['name'] = listing.title;
     if (listing.description) node['description'] = listing.description;
     if (listing.import_url) node['url'] = listing.import_url;
+    if (listing.locale_code) node['inLanguage'] = primaryLanguage(listing.locale_code);
 
     // Price as Offer
     if (listing.price_float > 0) {

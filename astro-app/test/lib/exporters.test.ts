@@ -557,6 +557,30 @@ describe('Exporters', () => {
       const exporter = new SchemaOrgExporter();
       await expect(exporter.export([])).rejects.toThrow('Cannot export empty listing array');
     });
+
+    it('emits inLanguage "en" for locale_code "en-AU"', async () => {
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([makeListing({ locale_code: 'en-AU' })]);
+      const node = JSON.parse(result)['@graph'][0];
+
+      expect(node['inLanguage']).toBe('en');
+    });
+
+    it('emits inLanguage "es" for locale_code "es"', async () => {
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([makeListing({ locale_code: 'es' })]);
+      const node = JSON.parse(result)['@graph'][0];
+
+      expect(node['inLanguage']).toBe('es');
+    });
+
+    it('omits inLanguage when locale_code is empty', async () => {
+      const exporter = new SchemaOrgExporter();
+      const result = await exporter.export([makeListing({ locale_code: '' })]);
+      const node = JSON.parse(result)['@graph'][0];
+
+      expect(node['inLanguage']).toBeUndefined();
+    });
   });
 
   describe('ICalExporter', () => {
@@ -794,6 +818,31 @@ describe('Exporters', () => {
 
       expect(result).toContain('<en>Modern Apartment</en>');
       expect(result).toContain('<en>A great place</en>');
+    });
+
+    it('normalizes BCP-47 locale de-DE to <de> slot', async () => {
+      const listing = makeListing({
+        title: 'Modernes Apartment in Berlin',
+        description: 'Ein toller Ort',
+        locale_code: 'de-DE',
+      });
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<de>Modernes Apartment in Berlin</de>');
+      expect(result).toContain('<de>Ein toller Ort</de>');
+    });
+
+    it('falls back to <en> for non-Kyero language pt', async () => {
+      const listing = makeListing({
+        title: 'Apartamento em Lisboa',
+        description: 'Um lugar incrível',
+        locale_code: 'pt',
+      });
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<en>Apartamento em Lisboa</en>');
     });
 
     it('normalizes property type', async () => {

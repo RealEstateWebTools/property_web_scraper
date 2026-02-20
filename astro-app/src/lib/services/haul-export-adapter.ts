@@ -41,6 +41,7 @@ export function haulScrapeToListing(scrape: HaulScrape): Listing {
   listing.price_qualifier = scrape.price_qualifier ?? '';
   listing.floor_plan_urls = scrape.floor_plan_urls ?? [];
   listing.energy_certificate_grade = scrape.energy_certificate_grade ?? '';
+  listing.locale_code = scrape.locale_code ?? '';
 
   return listing;
 }

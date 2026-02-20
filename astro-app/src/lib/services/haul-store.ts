@@ -46,6 +46,7 @@ export interface HaulScrape {
   price_qualifier?: string;
   floor_plan_urls?: string[];
   energy_certificate_grade?: string;
+  locale_code?: string;
 }
 
 export interface Haul {

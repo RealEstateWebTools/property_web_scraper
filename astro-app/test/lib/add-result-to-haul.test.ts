@@ -140,4 +140,18 @@ describe('buildHaulScrapeFromListing', () => {
 
     expect(scrape.description_html).toBeUndefined();
   });
+
+  it('includes locale_code in HaulScrape when set on listing', () => {
+    const listing = makeListing({ locale_code: 'de-DE' });
+    const scrape = buildHaulScrapeFromListing('res-8', listing, makeDiagnostics());
+
+    expect(scrape.locale_code).toBe('de-DE');
+  });
+
+  it('omits locale_code when empty on listing', () => {
+    const listing = makeListing({ locale_code: '' });
+    const scrape = buildHaulScrapeFromListing('res-9', listing, makeDiagnostics());
+
+    expect(scrape.locale_code).toBeUndefined();
+  });
 });
