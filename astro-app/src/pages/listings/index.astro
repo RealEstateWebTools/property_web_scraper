@@ -1,8 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { initKV, getAllListings } from '@lib/services/listing-store.js';
-
-initKV((Astro.locals as any).runtime?.env?.RESULTS);
+import { getAllListings } from '@lib/services/listing-store.js';
 
 const allEntries = await getAllListings();
 const entries = allEntries

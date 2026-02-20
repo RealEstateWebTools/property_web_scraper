@@ -2,11 +2,8 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ExportDropdown from '../../../components/ExportDropdown.astro';
 import SocialShare from '../../../components/SocialShare.astro';
-import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
-import { initScrapeMetadataKV, getLatestScrapeForListing } from '@lib/services/scrape-metadata.js';
-
-initKV((Astro.locals as any).runtime?.env?.RESULTS);
-initScrapeMetadataKV((Astro.locals as any).runtime?.env?.RESULTS);
+import { getListing, getDiagnostics } from '@lib/services/listing-store.js';
+import { getLatestScrapeForListing } from '@lib/services/scrape-metadata.js';
 
 const { id } = Astro.params;
 const listing = id ? await getListing(id) : undefined;

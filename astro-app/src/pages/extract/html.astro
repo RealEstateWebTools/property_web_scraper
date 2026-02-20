@@ -1,12 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { retrieveListing } from '@lib/services/listing-retriever.js';
-import { initKV, generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
-import { initScrapeMetadataKV, recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
+import { generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
+import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import { screenUrl } from '@lib/services/url-screener.js';
-
-initKV((Astro.locals as any).runtime?.env?.RESULTS);
-initScrapeMetadataKV((Astro.locals as any).runtime?.env?.RESULTS);
 
 const prefillUrl = Astro.url.searchParams.get('url') || '';
 

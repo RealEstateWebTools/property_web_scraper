@@ -1,11 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getHaul, initHaulKV } from '@lib/services/haul-store.js';
+import { getHaul } from '@lib/services/haul-store.js';
 import { isValidHaulId } from '@lib/services/haul-id.js';
 import { getRuntimeConfig } from '@lib/services/runtime-config.js';
 import { computeHaulSummary } from '@lib/services/haul-summary.js';
-
-initHaulKV((Astro.locals as any).runtime?.env?.RESULTS);
 
 const h2cUrl = getRuntimeConfig().homesToCompareUrl;
 

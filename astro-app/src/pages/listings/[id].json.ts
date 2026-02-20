@@ -1,9 +1,8 @@
 import type { APIRoute } from 'astro';
-import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
+import { getListing, getDiagnostics } from '@lib/services/listing-store.js';
 import { splitPropertyHash } from '@lib/extractor/schema-splitter.js';
 
-export const GET: APIRoute = async ({ params, locals }) => {
-  initKV((locals as any).runtime?.env?.RESULTS);
+export const GET: APIRoute = async ({ params }) => {
   const listing = params.id ? await getListing(params.id) : undefined;
 
   if (!listing) {

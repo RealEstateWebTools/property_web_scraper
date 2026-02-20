@@ -2,10 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ExportDropdown from '../../components/ExportDropdown.astro';
 import SocialShare from '../../components/SocialShare.astro';
-import { initKV, getListing } from '@lib/services/listing-store.js';
+import { getListing } from '@lib/services/listing-store.js';
 import { getRuntimeConfig } from '@lib/services/runtime-config.js';
-
-initKV((Astro.locals as any).runtime?.env?.RESULTS);
 
 const h2cUrl = getRuntimeConfig().homesToCompareUrl;
 
