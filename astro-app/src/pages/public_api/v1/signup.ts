@@ -16,6 +16,9 @@ import {
 import {
   getUser, createUser, generateApiKey,
 } from '@lib/services/api-key-service.js';
+import { sendNotification } from '@lib/services/ntfy-service.js';
+
+let signupCount = 0;
 
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
@@ -44,6 +47,12 @@ export const POST: APIRoute = async ({ request }) => {
   const existing = await getUser(userId);
   if (!existing) {
     await createUser(userId, email);
+    signupCount++;
+    if (signupCount <= 10) {
+      sendNotification('New signup', `${email} (account #${signupCount})`, {
+        tags: ['bust_in_silhouette'],
+      });
+    }
   }
 
   // Always generate a new key — raw key shown once
