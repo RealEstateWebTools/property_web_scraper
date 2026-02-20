@@ -101,7 +101,9 @@ const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
       }
 
       try {
-        await auth.sendEmailVerification(user);
+        await auth.sendEmailVerification(user, {
+          url: window.location.origin + '/verify-email',
+        });
         resendBtn.textContent = 'Sent! Check your inbox';
         setTimeout(function () {
           resendBtn.disabled = false;
