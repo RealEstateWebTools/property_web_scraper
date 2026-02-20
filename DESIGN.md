@@ -263,9 +263,11 @@ KV-backed persistence for anonymous haul collections created by the Chrome exten
 
 In-memory sliding window per API key or IP. 60 requests/minute default (configurable via `PWS_RATE_LIMIT`).
 
-### Content Sanitizer (`content-sanitizer.ts`)
+### Content Sanitizer (`field-processors.ts` — `sanitizePropertyHash`)
 
 Strips HTML tags from text fields, rejects `javascript:` and `data:` URI schemes, normalizes protocol-relative URLs.
+
+For description fields (`description`, `description_es`, `description_de`, `description_fr`, `description_it`), the original HTML is first captured into a parallel `_html` field (e.g. `description_html`) before stripping — only when the value actually contains HTML tags. This allows the listing detail page to render formatted HTML while exporters and downstream consumers continue to receive guaranteed plain text.
 
 ### Activity Logger (`activity-logger.ts`)
 

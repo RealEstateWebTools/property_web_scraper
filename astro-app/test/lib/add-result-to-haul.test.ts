@@ -117,4 +117,27 @@ describe('buildHaulScrapeFromListing', () => {
 
     expect(scrape.description).toHaveLength(500);
   });
+
+  it('includes description_html when present and within 1000 chars', () => {
+    const html = '<p>Spacious <b>3-bed</b> home.</p>';
+    const listing = makeListing({ description_html: html });
+    const scrape = buildHaulScrapeFromListing('res-5', listing, makeDiagnostics());
+
+    expect(scrape.description_html).toBe(html);
+  });
+
+  it('omits description_html when it exceeds 1000 characters', () => {
+    const longHtml = '<p>' + 'A'.repeat(1001) + '</p>';
+    const listing = makeListing({ description_html: longHtml });
+    const scrape = buildHaulScrapeFromListing('res-6', listing, makeDiagnostics());
+
+    expect(scrape.description_html).toBeUndefined();
+  });
+
+  it('omits description_html when not present on listing', () => {
+    const listing = makeListing({ description_html: '' });
+    const scrape = buildHaulScrapeFromListing('res-7', listing, makeDiagnostics());
+
+    expect(scrape.description_html).toBeUndefined();
+  });
 });
