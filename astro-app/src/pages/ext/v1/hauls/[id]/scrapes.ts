@@ -120,6 +120,8 @@ export const POST: APIRoute = async ({ params, request }) => {
     for_rent: listing.for_rent || undefined,
     features: listing.features?.length ? listing.features : undefined,
     description: listing.description ? listing.description.slice(0, 500) : undefined,
+    description_html: (listing.description_html && listing.description_html.length <= 1000)
+      ? listing.description_html : undefined,
     property_type: listing.property_type || undefined,
     property_subtype: listing.property_subtype || undefined,
     tenure: listing.tenure || undefined,

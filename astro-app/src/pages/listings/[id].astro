@@ -108,7 +108,7 @@ if (listing) {
         {listing.description && (
           <div class="bg-white rounded-xl shadow-md p-6 mb-5">
             <h5 class="font-semibold text-base text-gray-800 mb-4"><i class="bi bi-text-paragraph mr-2"></i>Description</h5>
-            <div class="text-sm leading-relaxed text-gray-600" set:html={listing.description}></div>
+            <div class="text-sm leading-relaxed text-gray-600" set:html={(listing as any).description_html || listing.description}></div>
           </div>
         )}
 

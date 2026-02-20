@@ -29,6 +29,11 @@ const TEXT_FIELDS = new Set([
   'title_fr', 'description_fr', 'title_it', 'description_it',
 ]);
 
+const DESCRIPTION_FIELDS = new Set([
+  'description', 'description_es', 'description_de',
+  'description_fr', 'description_it',
+]);
+
 const URL_FIELDS = new Set(['main_image_url']);
 const URL_ARRAY_FIELDS = new Set(['related_urls']);
 const SAFE_SCHEMES = new Set(['http:', 'https:']);
@@ -63,6 +68,9 @@ export function sanitizePropertyHash(hash: Record<string, unknown>): Record<stri
   for (const field of TEXT_FIELDS) {
     const value = hash[field];
     if (typeof value === 'string') {
+      if (DESCRIPTION_FIELDS.has(field) && /<[a-zA-Z]/.test(value)) {
+        hash[`${field}_html`] = value;   // preserve original HTML
+      }
       hash[field] = stripTags(value).trim();
     }
   }

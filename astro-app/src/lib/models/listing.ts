@@ -48,6 +48,11 @@ export class Listing extends BaseModel {
     description_fr: { type: 'string' },
     title_it: { type: 'string' },
     description_it: { type: 'string' },
+    description_html: { type: 'string' },
+    description_es_html: { type: 'string' },
+    description_de_html: { type: 'string' },
+    description_fr_html: { type: 'string' },
+    description_it_html: { type: 'string' },
     furnished: { type: 'boolean', default: false },
     sold: { type: 'boolean', default: false },
     reserved: { type: 'boolean', default: false },
@@ -135,6 +140,11 @@ export class Listing extends BaseModel {
   description_fr = '';
   title_it = '';
   description_it = '';
+  description_html = '';
+  description_es_html = '';
+  description_de_html = '';
+  description_fr_html = '';
+  description_it_html = '';
   furnished = false;
   sold = false;
   reserved = false;
@@ -198,7 +208,7 @@ export class Listing extends BaseModel {
     return super.asJson([
       'import_url', 'reference', 'price_string', 'price_float',
       'price_cents', 'price_currency',
-      'title', 'description', 'area_unit', 'plot_area', 'constructed_area',
+      'title', 'description', 'description_html', 'area_unit', 'plot_area', 'constructed_area',
       'year_construction', 'count_bedrooms', 'count_bathrooms',
       'count_toilets', 'count_garages', 'currency',
       'street_number', 'street_name', 'street_address', 'postal_code',
@@ -237,8 +247,11 @@ export class Listing extends BaseModel {
     ]);
 
     const PREFER_RICHER: Set<string> = new Set([
-      'description', 'description_es', 'description_de',
-      'description_fr', 'description_it',
+      'description', 'description_html',
+      'description_es', 'description_es_html',
+      'description_de', 'description_de_html',
+      'description_fr', 'description_fr_html',
+      'description_it', 'description_it_html',
     ]);
 
     const ARRAY_FIELDS: Set<string> = new Set([
@@ -420,7 +433,7 @@ export class Listing extends BaseModel {
     const sanitized = sanitizePropertyHash({ ...propertyHash });
 
     const stdAttributes = [
-      'reference', 'title', 'description', 'price_string', 'price_float',
+      'reference', 'title', 'description', 'description_html', 'price_string', 'price_float',
       'area_unit', 'currency', 'country', 'longitude', 'latitude',
       'main_image_url', 'for_rent', 'for_sale', 'image_urls',
       'for_rent_short_term', 'for_rent_long_term',
