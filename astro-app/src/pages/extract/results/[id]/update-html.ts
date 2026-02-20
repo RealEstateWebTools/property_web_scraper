@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { retrieveListing } from '@lib/services/listing-retriever.js';
-import { initKV, getListing, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
-import { initScrapeMetadataKV, recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
+import { getListing, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
+import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 
 function redirectTo(path: string): Response {
   return new Response(null, {
@@ -10,10 +10,7 @@ function redirectTo(path: string): Response {
   });
 }
 
-export const POST: APIRoute = async ({ params, request, locals }) => {
-  initKV((locals as any).runtime?.env?.RESULTS);
-  initScrapeMetadataKV((locals as any).runtime?.env?.RESULTS);
-
+export const POST: APIRoute = async ({ params, request }) => {
   const id = params.id;
   if (!id) {
     return redirectTo('/extract/error?reason=error&message=Missing%20result%20id');

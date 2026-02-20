@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { isValidHaulId } from '@lib/services/haul-id.js';
-import { getHaul, initHaulKV } from '@lib/services/haul-store.js';
-import { resolveKV } from '@lib/services/kv-resolver.js';
+import { getHaul } from '@lib/services/haul-store.js';
 import { haulScrapesToListings } from '@lib/services/haul-export-adapter.js';
 import { getExportService } from '@lib/services/export-service.js';
 import { getAvailableExporters, type ExportFormat } from '@lib/exporters/exporter-registry.js';
@@ -14,13 +13,11 @@ export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request)
 /**
  * GET /ext/v1/hauls/{id}/export?format=csv|json|geojson[&inline=1]
  */
-export const GET: APIRoute = async ({ params, request, locals }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   const { id } = params;
   if (!id || !isValidHaulId(id)) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Invalid haul ID format', request);
   }
-
-  initHaulKV(resolveKV(locals));
 
   const url = new URL(request.url);
   const format = url.searchParams.get('format') as ExportFormat | null;

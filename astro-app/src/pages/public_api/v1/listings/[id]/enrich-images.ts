@@ -1,15 +1,13 @@
 import type { APIRoute } from 'astro';
 import { authenticateApiKey } from '@lib/services/auth.js';
-import { initKV, getListing, storeListing } from '@lib/services/listing-store.js';
+import { getListing, storeListing } from '@lib/services/listing-store.js';
 import { checkRateLimit } from '@lib/services/rate-limiter.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 import { enrichImages } from '@lib/services/image-enricher.js';
 
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
-export const POST: APIRoute = async ({ params, request, locals }) => {
-  initKV((locals as any).runtime?.env?.RESULTS);
-
+export const POST: APIRoute = async ({ params, request }) => {
   const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 

@@ -3,11 +3,11 @@ import { authenticateApiKey } from '@lib/services/auth.js';
 import { checkRateLimit } from '@lib/services/rate-limiter.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
-import { initScrapeMetadataKV, getScrapeHistoryForListing } from '@lib/services/scrape-metadata.js';
+import { getScrapeHistoryForListing } from '@lib/services/scrape-metadata.js';
 
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
-export const GET: APIRoute = async ({ params, request, locals }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   const startTime = Date.now();
   const path = `/public_api/v1/listings/${params.id}/scrapes`;
 
@@ -31,8 +31,6 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
     });
     return errorResponse(ApiErrorCode.MISSING_URL, 'Missing listing ID', request);
   }
-
-  initScrapeMetadataKV((locals as any).runtime?.env?.RESULTS);
 
   const url = new URL(request.url);
   const limitParam = url.searchParams.get('limit');

@@ -1,8 +1,7 @@
 import type { APIRoute } from 'astro';
 import { isValidHaulId } from '@lib/services/haul-id.js';
-import { getHaul, addScrapeToHaul, initHaulKV } from '@lib/services/haul-store.js';
+import { getHaul, addScrapeToHaul } from '@lib/services/haul-store.js';
 import type { HaulScrape } from '@lib/services/haul-store.js';
-import { resolveKV } from '@lib/services/kv-resolver.js';
 import { validateUrl, UNSUPPORTED } from '@lib/services/url-validator.js';
 import { findByName } from '@lib/extractor/mapping-loader.js';
 import { ImportHost } from '@lib/models/import-host.js';
@@ -18,13 +17,11 @@ export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request)
 /**
  * POST /ext/v1/hauls/{id}/scrapes — Add a scrape to a haul. No auth required.
  */
-export const POST: APIRoute = async ({ params, request, locals }) => {
+export const POST: APIRoute = async ({ params, request }) => {
   const { id } = params;
   if (!id || !isValidHaulId(id)) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Invalid haul ID format', request);
   }
-
-  initHaulKV(resolveKV(locals));
 
   // Check haul exists
   const haul = await getHaul(id);

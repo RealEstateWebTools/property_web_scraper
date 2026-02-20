@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { isValidHaulId } from '@lib/services/haul-id.js';
-import { getHaul, updateHaulMeta, initHaulKV } from '@lib/services/haul-store.js';
-import { resolveKV } from '@lib/services/kv-resolver.js';
+import { getHaul, updateHaulMeta } from '@lib/services/haul-store.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
@@ -9,13 +8,11 @@ export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request)
 /**
  * GET /ext/v1/hauls/{id} — Get haul details.
  */
-export const GET: APIRoute = async ({ params, request, locals }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   const { id } = params;
   if (!id || !isValidHaulId(id)) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Invalid haul ID format', request);
   }
-
-  initHaulKV(resolveKV(locals));
 
   const haul = await getHaul(id);
   if (!haul) {
@@ -37,7 +34,7 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
 /**
  * PATCH /ext/v1/hauls/{id} — Update haul name/notes.
  */
-export const PATCH: APIRoute = async ({ params, request, locals }) => {
+export const PATCH: APIRoute = async ({ params, request }) => {
   const { id } = params;
   if (!id || !isValidHaulId(id)) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Invalid haul ID format', request);
@@ -61,8 +58,6 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
   if (name === undefined && notes === undefined) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Provide name and/or notes', request);
   }
-
-  initHaulKV(resolveKV(locals));
 
   try {
     const haul = await updateHaulMeta(id, { name, notes });

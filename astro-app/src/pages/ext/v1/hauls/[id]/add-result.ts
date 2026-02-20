@@ -1,9 +1,8 @@
 import type { APIRoute } from 'astro';
 import { isValidHaulId } from '@lib/services/haul-id.js';
-import { getHaul, addScrapeToHaul, initHaulKV } from '@lib/services/haul-store.js';
+import { getHaul, addScrapeToHaul } from '@lib/services/haul-store.js';
 import type { HaulScrape } from '@lib/services/haul-store.js';
-import { initKV, getListing, getDiagnostics } from '@lib/services/listing-store.js';
-import { resolveKV } from '@lib/services/kv-resolver.js';
+import { getListing, getDiagnostics } from '@lib/services/listing-store.js';
 import {
   errorResponse, successResponse, corsPreflightResponse,
   ApiErrorCode,
@@ -74,15 +73,11 @@ export function buildHaulScrapeFromListing(
  * POST /ext/v1/hauls/{id}/add-result — Add a previously extracted result to a haul.
  * Body: { "resultId": "<listing-store-id>" }
  */
-export const POST: APIRoute = async ({ params, request, locals }) => {
+export const POST: APIRoute = async ({ params, request }) => {
   const { id } = params;
   if (!id || !isValidHaulId(id)) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Invalid haul ID format', request);
   }
-
-  const kvBinding = resolveKV(locals);
-  initHaulKV(kvBinding);
-  initKV(kvBinding);
 
   // Check haul exists
   const haul = await getHaul(id);
