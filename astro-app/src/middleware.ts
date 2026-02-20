@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from 'astro';
 import { validateEnv } from '@lib/services/env-validator.js';
-import { corsPreflightResponse } from '@lib/services/api-response.js';
+import { corsPreflightResponse, buildCorsHeaders } from '@lib/services/api-response.js';
 import { initAllKV } from '@lib/services/kv-init.js';
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
@@ -21,6 +21,15 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   }
 
   const response = await next();
+
+  // Ensure CORS headers are present on all API responses, not just those that
+  // go through successResponse/errorResponse (catches uncaught errors, 500s, etc.)
+  if (url.pathname.startsWith('/public_api/') || url.pathname.startsWith('/ext/')) {
+    const corsHeaders = buildCorsHeaders(context.request);
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      response.headers.set(key, value);
+    }
+  }
 
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
