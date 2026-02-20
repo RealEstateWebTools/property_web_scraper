@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { isValidHaulId } from '@lib/services/haul-id.js';
-import { getHaul, addScrapeToHaul } from '@lib/services/haul-store.js';
+import { getHaul, addScrapeToHaul, findExistingScrapeByUrl } from '@lib/services/haul-store.js';
 import type { HaulScrape } from '@lib/services/haul-store.js';
 import { validateUrl, UNSUPPORTED } from '@lib/services/url-validator.js';
 import { findByName } from '@lib/extractor/mapping-loader.js';
@@ -56,6 +56,24 @@ export const POST: APIRoute = async ({ params, request }) => {
   }
   if (html.length > MAX_HTML_SIZE) {
     return errorResponse(ApiErrorCode.PAYLOAD_TOO_LARGE, 'HTML payload exceeds 10MB limit', request);
+  }
+
+  // Duplicate check — reject if this URL is already in the haul
+  const existingScrape = await findExistingScrapeByUrl(id, url);
+  if (existingScrape) {
+    return successResponse({
+      duplicate: true,
+      message: 'This property has already been scraped',
+      existing_scrape: {
+        result_id: existingScrape.resultId,
+        title: existingScrape.title,
+        grade: existingScrape.grade,
+        price: existingScrape.price,
+        url: existingScrape.url,
+      },
+      haul_url: `/haul/${id}`,
+      results_url: `/extract/results/${existingScrape.resultId}`,
+    }, request, 409);
   }
 
   // Validate URL — fall back to generic_real_estate for unknown hosts
