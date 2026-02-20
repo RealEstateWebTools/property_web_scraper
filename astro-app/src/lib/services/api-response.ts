@@ -14,6 +14,7 @@ export const ApiErrorCode = {
   UNSUPPORTED_CONTENT_TYPE: 'UNSUPPORTED_CONTENT_TYPE',
   FETCH_BLOCKED: 'FETCH_BLOCKED',
   HAUL_LIMIT_REACHED: 'HAUL_LIMIT_REACHED',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
 } as const;
 
 export type ApiErrorCodeValue = (typeof ApiErrorCode)[keyof typeof ApiErrorCode];
@@ -32,6 +33,7 @@ const HTTP_STATUS: Record<ApiErrorCodeValue, number> = {
   [ApiErrorCode.UNSUPPORTED_CONTENT_TYPE]: 415,
   [ApiErrorCode.FETCH_BLOCKED]: 422,
   [ApiErrorCode.HAUL_LIMIT_REACHED]: 402,
+  [ApiErrorCode.EMAIL_NOT_VERIFIED]: 403,
 };
 
 const VALIDATOR_CODE_MAP: Record<string, ApiErrorCodeValue> = {
@@ -93,7 +95,7 @@ export function buildCorsHeaders(request?: Request): Record<string, string> {
   const { allowOrigin, usingAllowlist } = resolveAllowOrigin(request);
   const headers: Record<string, string> = {
   'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-Api-Key',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Api-Key, Authorization',
 };
   if (allowOrigin) {
     headers['Access-Control-Allow-Origin'] = allowOrigin;

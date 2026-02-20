@@ -1,0 +1,131 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const fbApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
+const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
+---
+<BaseLayout title="Verify Your Email — Property Web Scraper">
+
+<div id="fb-config" data-api-key={fbApiKey} data-auth-domain={fbAuthDomain} class="hidden"></div>
+
+<section class="max-w-lg mx-auto px-4 py-12">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+    <div class="bg-gradient-to-br from-blue-600 to-blue-700 px-8 py-8 text-white">
+      <h1 class="text-2xl font-bold mb-1">Check your inbox</h1>
+      <p class="text-blue-100 text-sm">We sent a verification link to your email address.</p>
+    </div>
+
+    <div class="px-8 py-8">
+      <div class="bg-blue-50 rounded-xl p-4 text-sm text-blue-800 mb-6">
+        <p class="font-semibold mb-1">What to do:</p>
+        <ol class="list-decimal list-inside space-y-1 text-blue-700">
+          <li>Open the verification email from Firebase</li>
+          <li>Click the "Verify email address" link</li>
+          <li>Return here — this page will redirect you automatically</li>
+        </ol>
+      </div>
+
+      <p id="status-msg" class="text-sm text-gray-500 mb-4 text-center">Waiting for email verification…</p>
+      <p id="error-msg" class="text-red-600 text-xs mb-4 hidden text-center"></p>
+
+      <button id="resend-btn"
+        class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl text-sm transition-colors cursor-pointer border-0 mb-3">
+        Resend verification email
+      </button>
+
+      <p class="text-center text-xs text-gray-400">
+        <a href="/login" class="text-blue-600 hover:underline">Back to sign in</a>
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<script is:inline>
+(function () {
+  var cfg = document.getElementById('fb-config');
+  var apiKey = cfg && cfg.dataset.apiKey;
+  var authDomain = cfg && cfg.dataset.authDomain;
+
+  var statusMsg = document.getElementById('status-msg');
+  var errorMsg = document.getElementById('error-msg');
+  var resendBtn = document.getElementById('resend-btn');
+
+  var pollInterval = null;
+  var firebaseAuth = null;
+
+  async function initFirebase() {
+    var baseUrl = 'https://www.gstatic.com/firebasejs/11.3.1/';
+    var app = await import(baseUrl + 'firebase-app.js');
+    var auth = await import(baseUrl + 'firebase-auth.js');
+
+    var firebaseApp = app.initializeApp({ apiKey: apiKey, authDomain: authDomain });
+    firebaseAuth = auth.getAuth(firebaseApp);
+
+    // Immediate check if already verified
+    auth.onAuthStateChanged(firebaseAuth, function (user) {
+      if (!user) {
+        // Not signed in — send to login
+        window.location.href = '/login';
+        return;
+      }
+      if (user.emailVerified) {
+        window.location.href = '/account';
+        return;
+      }
+
+      // Poll every 3 seconds
+      pollInterval = setInterval(async function () {
+        try {
+          await user.reload();
+          if (user.emailVerified) {
+            clearInterval(pollInterval);
+            statusMsg.textContent = 'Email verified! Redirecting…';
+            window.location.href = '/account';
+          }
+        } catch (e) {
+          // ignore reload errors
+        }
+      }, 3000);
+    });
+
+    resendBtn.addEventListener('click', async function () {
+      errorMsg.classList.add('hidden');
+      resendBtn.disabled = true;
+      resendBtn.textContent = 'Sending…';
+
+      var user = firebaseAuth.currentUser;
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        await auth.sendEmailVerification(user);
+        resendBtn.textContent = 'Sent! Check your inbox';
+        setTimeout(function () {
+          resendBtn.disabled = false;
+          resendBtn.textContent = 'Resend verification email';
+        }, 10000);
+      } catch (err) {
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Resend verification email';
+        errorMsg.textContent = err.message || 'Failed to send email. Please try again.';
+        errorMsg.classList.remove('hidden');
+      }
+    });
+  }
+
+  initFirebase().catch(function (err) {
+    statusMsg.textContent = 'Failed to initialise. Please refresh the page.';
+    console.error(err);
+  });
+
+  // Clean up on page unload
+  window.addEventListener('beforeunload', function () {
+    if (pollInterval) clearInterval(pollInterval);
+  });
+})();
+</script>
+
+</BaseLayout>

@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const fbApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
+const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
+---
+<BaseLayout title="Sign In — Property Web Scraper">
+
+<div id="fb-config" data-api-key={fbApiKey} data-auth-domain={fbAuthDomain} class="hidden"></div>
+
+<section class="max-w-lg mx-auto px-4 py-12">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+    <div class="bg-gradient-to-br from-blue-600 to-blue-700 px-8 py-8 text-white">
+      <h1 class="text-2xl font-bold mb-1">Sign in</h1>
+      <p class="text-blue-100 text-sm">Access your account and API key.</p>
+    </div>
+
+    <div id="form-section" class="px-8 py-8">
+      <div class="mb-5">
+        <label for="email-input" class="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
+        <input
+          id="email-input"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+        />
+      </div>
+
+      <div class="mb-6">
+        <label for="password-input" class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+        <input
+          id="password-input"
+          type="password"
+          placeholder="Your password"
+          autocomplete="current-password"
+          class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+        />
+      </div>
+
+      <p id="form-error" class="text-red-600 text-xs mb-4 hidden"></p>
+
+      <button id="login-btn"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl text-sm transition-colors cursor-pointer border-0">
+        Sign In
+      </button>
+
+      <div class="mt-4 flex flex-col gap-1 text-center text-xs text-gray-500">
+        <a href="/forgot-password" class="text-blue-600 hover:underline">Forgot password?</a>
+        <span>Don't have an account? <a href="/register" class="text-blue-600 hover:underline">Create one</a></span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script is:inline>
+(function () {
+  var cfg = document.getElementById('fb-config');
+  var apiKey = cfg && cfg.dataset.apiKey;
+  var authDomain = cfg && cfg.dataset.authDomain;
+
+  var emailInput = document.getElementById('email-input');
+  var passwordInput = document.getElementById('password-input');
+  var formError = document.getElementById('form-error');
+  var loginBtn = document.getElementById('login-btn');
+
+  function showError(msg) {
+    formError.textContent = msg;
+    formError.classList.remove('hidden');
+  }
+
+  async function doLogin() {
+    formError.classList.add('hidden');
+
+    var email = emailInput.value.trim();
+    var password = passwordInput.value;
+
+    if (!email || !email.includes('@')) {
+      showError('Please enter a valid email address.');
+      return;
+    }
+    if (!password) {
+      showError('Please enter your password.');
+      return;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Signing in…';
+
+    try {
+      var baseUrl = 'https://www.gstatic.com/firebasejs/11.3.1/';
+      var app = await import(baseUrl + 'firebase-app.js');
+      var auth = await import(baseUrl + 'firebase-auth.js');
+
+      var firebaseApp = app.initializeApp({ apiKey: apiKey, authDomain: authDomain });
+      var firebaseAuth = auth.getAuth(firebaseApp);
+
+      var cred = await auth.signInWithEmailAndPassword(firebaseAuth, email, password);
+
+      if (cred.user.emailVerified) {
+        window.location.href = '/account';
+      } else {
+        window.location.href = '/verify-email';
+      }
+    } catch (err) {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Sign In';
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+        showError('Invalid email or password.');
+      } else {
+        showError(err.message || 'Something went wrong. Please try again.');
+      }
+    }
+  }
+
+  loginBtn.addEventListener('click', doLogin);
+  passwordInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') doLogin();
+  });
+})();
+</script>
+
+</BaseLayout>
