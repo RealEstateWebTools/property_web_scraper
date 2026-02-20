@@ -8,7 +8,8 @@ import { Listing } from '@lib/models/listing.js';
 import type { MergeDiff } from '@lib/models/listing.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { normalizePrice } from '@lib/extractor/price-normalizer.js';
-import { generateStableId, getListingByUrl, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
+import { generateStableId, getListingByUrl, storeListing, storeDiagnostics, getDiagnostics, getHtmlHash, storeHtmlHash } from '@lib/services/listing-store.js';
+import { computeHtmlHash } from '@lib/utils/html-hash.js';
 import { recordSnapshot } from '@lib/services/price-history.js';
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import type { ScrapeSourceType } from '@lib/services/scrape-metadata.js';
@@ -48,6 +49,7 @@ export interface ExtractionResult {
   splitSchema?: unknown;
   mergeDiff?: MergeDiff;
   wasExistingListing: boolean;
+  wasUnchanged: boolean;
 }
 
 export async function runExtraction(opts: {
@@ -58,6 +60,30 @@ export async function runExtraction(opts: {
   sourceType?: ScrapeSourceType;
 }): Promise<ExtractionResult | null> {
   const { html, url, scraperMapping, importHost, sourceType } = opts;
+
+  // HTML change detection: skip redundant extraction when content is unchanged
+  const htmlHash = await computeHtmlHash(html);
+  const skipHashCheck = sourceType === 'result_html_update';
+
+  if (!skipHashCheck) {
+    const stored = await getHtmlHash(url);
+    if (stored && stored.size === html.length && stored.hash === htmlHash) {
+      const cached = await getListingByUrl(url);
+      if (cached) {
+        return {
+          listing: cached.listing,
+          resultId: cached.id,
+          resultsUrl: `/extract/results/${cached.id}`,
+          fieldsExtracted: 0,
+          fieldsAvailable: countAvailableFields(scraperMapping),
+          diagnostics: await getDiagnostics(cached.id),
+          rawProps: {},
+          wasExistingListing: true,
+          wasUnchanged: true,
+        };
+      }
+    }
+  }
 
   const result = extractFromHtml({
     html,
@@ -120,6 +146,7 @@ export async function runExtraction(opts: {
     if (result.diagnostics) {
       await storeDiagnostics(resultId, result.diagnostics);
     }
+    storeHtmlHash(url, htmlHash, html.length).catch(() => {});
     try { await listing.save(); } catch (err) { console.error('[ExtractionRunner] Firestore save failed:', (err as Error).message || err); }
   } catch (outerErr) {
     console.error('[ExtractionRunner] Listing store/dedup failed, using fallback:', (outerErr as Error).message || outerErr);
@@ -135,6 +162,7 @@ export async function runExtraction(opts: {
       if (result.diagnostics) {
         await storeDiagnostics(resultId, result.diagnostics);
       }
+      storeHtmlHash(url, htmlHash, html.length).catch(() => {});
       try { await listing.save(); } catch (err) { console.error('[ExtractionRunner] Firestore save failed (fallback):', (err as Error).message || err); }
     } catch (err) { console.error('[ExtractionRunner] Listing store failure (fallback):', (err as Error).message || err); }
   }
@@ -161,6 +189,7 @@ export async function runExtraction(opts: {
       scraperName: importHost.scraper_name,
       portalSlug: importHost.slug,
       diagnostics: result.diagnostics,
+      html_hash: htmlHash,
     }).catch((err) => { console.error('[ExtractionRunner] Scrape metadata recording failed:', err.message || err); });
   }
 
@@ -175,5 +204,6 @@ export async function runExtraction(opts: {
     splitSchema: result.splitSchema,
     mergeDiff,
     wasExistingListing,
+    wasUnchanged: false,
   };
 }

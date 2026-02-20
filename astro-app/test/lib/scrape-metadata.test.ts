@@ -751,4 +751,17 @@ describe('scrape-metadata', () => {
       expect(history.length).toBeGreaterThanOrEqual(1);
     });
   });
+
+  describe('html_hash field', () => {
+    it('stores html_hash in ScrapeRecord when provided', async () => {
+      const hash = 'aabbccddeeff0011';
+      const scrape = await recordScrapeAndUpdatePortal(makeInput({ html_hash: hash }));
+      expect(scrape.html_hash).toBe(hash);
+    });
+
+    it('html_hash is absent from ScrapeRecord when not provided (backward compat)', async () => {
+      const scrape = await recordScrapeAndUpdatePortal(makeInput());
+      expect(scrape.html_hash).toBeUndefined();
+    });
+  });
 });

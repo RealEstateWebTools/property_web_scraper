@@ -283,6 +283,30 @@ The engine uses a **single-field + locale tag** model rather than per-locale fie
 
 Per-locale duplicate fields (`description_es`, `title_de`, etc.) are not used — they added complexity without real-world coverage since no portal delivers a listing in two languages simultaneously.
 
+### HTML Change Detection
+
+Every time a URL is submitted for scraping, the engine fingerprints the raw HTML and compares it against the stored hash for that URL. If the content is unchanged and the cached listing still exists, extraction is skipped and the cached result is returned immediately.
+
+**Why:** Avoids redundant Cheerio parsing, CSS selector evaluation, and KV/Firestore writes when the Chrome extension (or any caller) resubmits a page that hasn't changed since the last scrape.
+
+**How it works:**
+
+1. `computeHtmlHash(html)` — SHA-256 of raw HTML, truncated to 16 hex chars (same Web Crypto pattern as `api-key-service.ts`), in `src/lib/utils/html-hash.ts`
+2. **Size pre-check** — `html.length` is compared against `HtmlHashEntry.size` (free synchronous gate). A different size means the page definitely changed; hash computation is skipped and extraction proceeds immediately. A matching size triggers the full hash comparison.
+3. `getHtmlHash(url)` — KV read at `html-hash:{stableId}` returns `{ hash, size }` or `null`
+4. On hash match + live cached listing → return early with `wasUnchanged: true`
+5. On miss, mismatch, or expired listing → run full extraction, then `storeHtmlHash(url, hash, size)` (fire-and-forget, 30-day TTL)
+
+**KV key:** `html-hash:{stableId}` where `stableId = generateStableId(url)` (same 12-char SHA-256 hex already used for listings)
+
+**TTL:** 30 days — intentionally longer than the listing's 24-hour KV TTL so the hash survives listing expiry. If the hash matches but the listing is gone, extraction runs normally.
+
+**`wasUnchanged` flag:** Exposed as `wasUnchanged: boolean` on `ExtractionResult` and as `was_unchanged` in the `/ext/v1/hauls/:id/scrapes` API response — lets callers know whether the page content changed since the last seen scrape.
+
+**Bypass:** When `sourceType === 'result_html_update'` (explicit user-initiated re-extraction), the hash check is skipped and extraction always runs.
+
+**`html_hash` in `ScrapeRecord`:** The computed hash is stored as `html_hash` in the scrape record for per-URL content change observability in scrape history.
+
 ### Activity Logger (`activity-logger.ts`)
 
 Structured JSON logging of extraction events (error/warn/info levels).

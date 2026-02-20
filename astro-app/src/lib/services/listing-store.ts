@@ -245,6 +245,28 @@ export function getStoreStats(): { count: number } {
   return { count: store.size };
 }
 
+// ─── HTML hash storage ──────────────────────────────────────────
+
+export interface HtmlHashEntry {
+  hash: string;   // 16-char hex
+  size: number;   // html.length at time of storage
+}
+
+export async function getHtmlHash(url: string): Promise<HtmlHashEntry | null> {
+  const id = generateStableId(url);
+  if (!kv) return null;
+  return kv.get(`html-hash:${id}`, 'json') as Promise<HtmlHashEntry | null>;
+}
+
+export async function storeHtmlHash(url: string, hash: string, size: number): Promise<void> {
+  const id = generateStableId(url);
+  if (!kv) return;
+  const entry: HtmlHashEntry = { hash, size };
+  await kv.put(`html-hash:${id}`, JSON.stringify(entry), {
+    expirationTtl: 30 * 24 * 60 * 60,  // 30 days
+  });
+}
+
 export async function deleteListing(id: string): Promise<void> {
   store.delete(id);
   diagnosticsStore.delete(id);
