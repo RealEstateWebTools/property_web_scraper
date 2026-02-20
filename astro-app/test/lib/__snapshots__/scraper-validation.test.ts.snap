@@ -1,0 +1,884 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Scraper validation > au_domain scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "133 Bethany Road, Hoppers Crossing VIC 3029",
+  "area_unit": "sqmt",
+  "city": "Hoppers Crossing",
+  "count_bathrooms": 1,
+  "count_bedrooms": 3,
+  "count_parking": 1,
+  "country": "AU",
+  "currency": "AUD",
+  "description": "3 bedroom house for Sale at 133 Bethany Road, Hoppers Crossing VIC 3029. View property photos, floor plans, local school catchments & lots more on Domain.com.au. 2020615556",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://bucket-api.domain.com.au/v1/bucket/image/2020615556_1_1_260218_045427-w1600-h1067",
+    },
+    {
+      "url": "https://bucket-api.domain.com.au/v1/bucket/image/2020615556_2_1_260218_045427-w1600-h1067",
+    },
+    {
+      "url": "https://bucket-api.domain.com.au/v1/bucket/image/2020615556_3_1_260218_045427-w1600-h1067",
+    },
+  ],
+  "land_area": 315.15,
+  "latitude": -37.8539502,
+  "locale_code": "en-AU",
+  "longitude": 144.6720433,
+  "main_image_url": "https://bucket-api.domain.com.au/v1/bucket/image/2020615556_1_1_260218_045427-w1600-h1067",
+  "postal_code": "3029",
+  "price_string": "$470,000 - $500,000",
+  "property_type": "House",
+  "reference": "2020615556",
+  "region": "vic",
+  "title": "133 Bethany Road, Hoppers Crossing VIC 3029 | Domain",
+}
+`;
+
+exports[`Scraper validation > es_fotocasa scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "",
+  "area_unit": "sqmt",
+  "city": "Benavente",
+  "constructed_area": 95,
+  "count_bathrooms": 1,
+  "count_bedrooms": 3,
+  "country": "Spain",
+  "currency": "EUR",
+  "description": "Piso de 3 dormitorios en venta en Avda Libertad, Benavente.
+
+La vivienda cuenta con 95.59 m2 distribuidos en vestíbulo de entrada, salón comedor, cocina, tres dormitorios, un cuarto de baño y dos terrazas.
+
+El sistema de calefacción es mediante caldera individual alimentada por propano.
+
+¡Contacta con Inmobiliaria Procasa y te informaremos sin compromiso! [IW]",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://static.fotocasa.es/images/ads/d38801fe-dbb4-4a8e-8365-f8e354a38b8a?rule=f_640x480_jpg_70",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/d38801fe-dbb4-4a8e-8365-f8e354a38b8a?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/dd3d14cb-f807-4119-ba1c-75fe514d941b?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/16ed6253-5987-4434-9416-58d1940f1816?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/00840fcb-c568-4384-a7ff-185a22611a6f?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/bbe4bd4c-b92f-47d2-b666-38cc6bc78b31?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/d71502bf-c1b7-4c78-b667-e43519174ead?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/42c4b57d-6df2-4654-9eae-b72b55a8e40f?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/f6f91699-0b6b-4240-84ea-34b9b2d0a057?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/aecfc8e8-b2bd-4469-9f25-bfc8c79051f7?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/5e7c08c8-4c7f-4310-9e40-98ec2d27a4fe?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/2afa057a-df68-422f-b086-0c12ab93ae09?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/79ec5a48-9a12-439b-8c9b-d57ea8259dfe?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/357280c6-32ee-4fd1-b79f-f4c59711443b?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/bbdb4510-604b-416d-b76a-73f1f32ad37a?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/5dde45cb-6e65-427c-8a7f-a72383fe9ea3?rule=original",
+    },
+    {
+      "url": "https://static.fotocasa.es/images/ads/6b738259-24fc-4f1e-858e-4c4b4a121c3d?rule=original",
+    },
+  ],
+  "latitude": 41.99463,
+  "locale_code": "es",
+  "longitude": -5.6792,
+  "main_image_url": "https://static.fotocasa.es/images/ads/d38801fe-dbb4-4a8e-8365-f8e354a38b8a?rule=f_640x480_jpg_70",
+  "postal_code": "49600",
+  "price_float": 65000,
+  "price_string": "65.000 €",
+  "reference": "185235713",
+  "region": "Zamora",
+  "title": "Piso en venta en Avenida de la Libertad, 13, Benavente, Zamora",
+}
+`;
+
+exports[`Scraper validation > es_idealista scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Goya, Madrid",
+  "area_unit": "sqm",
+  "constructed_area": 273,
+  "count_bathrooms": 5,
+  "count_bedrooms": 4,
+  "country": "Spain",
+  "currency": "EUR",
+  "description": "We present to you EXCLUSIVELY a unique property on the top floor of a royal estate with an exceptional location. La Casa de las Bolas, also known as the Casa de los Picos, is a unique building located in the Salamanca neighborhood, in Madrid. Its name comes from the peculiar façade adorned with protruding stone bollards or “balls”, a feature that gives it a distinctive and striking appearance compared to the architectural style of the surrounding buildings. This peculiar design responds to a mix of historical and artistic influences, which have given rise to a unique structure of its kind and an object of curiosity for those who visit the area. Built at the beginning of the 20th century, the Casa de las Bolas was designed by architect Julio Martínez Zapata, known for his modernist approach and his ability to integrate innovative and decorative elements in his works. The building has several floors, and its façade is decorated with a series of stone balls that run throughout its exterior in an orderly manner, generating an impressive visual effect.  In addition to its unique façade, the Casa de las Bolas has a structure and interior layout typical of buildings from the early 20th century in Madrid, with high ceilings, large windows and a spacious layout. However, the particularity of its external design makes it a point of interest for photographers, architects and tourists looking for historical and curious buildings in the Spanish capital. Today, the Casa de las Bolas is a symbol of the Salamanca neighborhood and a leading example of the unique architecture that can be found in Madrid, reminding us of the rich architectural history and creativity of urban designs that have shaped this city. Currently being renovated, this spacious home has six bedrooms and four bathrooms.  This unique and unique home has 14 balconies facing the street, in addition to its magnificent south-east, west orientation, it offers you, as it is a corner and with height, an unmatched luminosity, from where you can see the skyline of Madrid from an unbeatable situation. A few meters from Retiro Park, the green lung of the city.  Don't miss this investment opportunity in one of the most sought-after areas. Contact us for more information and to schedule a visit! Walter Haus Real Estate is a real estate group based in the main capitals of Spain, in the main locations of Madrid, Barcelona and Costa Brava. We have more than 20 years of experience, with a dynamic team of professionals with experience in personal advice in constant training and with a very specific specialization in each area of action, which allows us to find solutions to the needs of each client.  Walter Haus Real Estate is a real estate group based in the main capitals of Spain, in the main locations of Madrid, Barcelona and Costa Brava. We have more than 20 years of experience, with a dynamic team of professionals with experience in personal advice in constant training and with a very specific specialization in each area of action, which allows us to find solutions to the needs of each client.",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://img4.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/c0/ac/cc/1382500227.jpg",
+    },
+  ],
+  "locale_code": "es",
+  "main_image_url": "https://img4.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/c0/ac/cc/1382500227.jpg",
+  "price_float": 3600000,
+  "price_string": "3,600,000 €",
+  "reference": "106387165",
+  "title": "Duplex for sale in Calle de Alcalá",
+}
+`;
+
+exports[`Scraper validation > es_idealista scraper [server-fetched] > matches full extraction snapshot 1`] = `
+{
+  "address_string": "",
+  "area_unit": "sqm",
+  "constructed_area": 0,
+  "count_bathrooms": 0,
+  "count_bedrooms": 0,
+  "country": "Spain",
+  "currency": "EUR",
+  "description": "",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": false,
+  "image_urls": [],
+  "locale_code": "es",
+  "main_image_url": "",
+  "price_float": 0,
+  "price_string": "",
+  "reference": "",
+  "title": "idealista.com",
+}
+`;
+
+exports[`Scraper validation > es_pisos scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Goya (Distrito Salamanca. Madrid Capital)",
+  "area_unit": "sqmt",
+  "country": "Spain",
+  "currency": "EUR",
+  "description": "¡Inmueble en rentabilidad¡ Esta vivienda acaba de ser alquilada con todo tipo de garantías, es ideal para personas que quieran invertir en el barrio de salamanca, en l...",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://fotos.imghs.net/xl/1001/738/1001_PX1495_-_38604738-38604738_1_2017122101080331250.jpg",
+    },
+  ],
+  "locale_code": "es",
+  "main_image_url": "https://fotos.imghs.net/xl/1001/738/1001_PX1495_-_38604738-38604738_1_2017122101080331250.jpg",
+  "price_float": 990000,
+  "price_string": "990.000 €",
+  "reference": "",
+  "title": "Piso en venta en Calle Goya, nº 54 en Goya por 990.000 €",
+}
+`;
+
+exports[`Scraper validation > ie_daft scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "12 The Avenue, Plunkett Hall, Dunboyne, Co. Meath, A86VW70",
+  "area_unit": "sqm",
+  "city": "Dunboyne",
+  "constructed_area": 151,
+  "count_bathrooms": 3,
+  "count_bedrooms": 4,
+  "country": "Ireland",
+  "currency": "EUR",
+  "description": "The Property Shop are delighted to present this impressive four bedroom detached property with garage to the market in the exclusive development of Plunkett Hall. The property is exceptionally well located and is only a short stroll to a diverse variety of the finest schools, a selection of fine restaurants, shops and pubs making this a wonderful location to live. Dunboyne is served by both bus & rail with the M3/M50 road network easily accessible. The property is superbly situated in a small, quiet cul-de-sac overlooking a large green area with a sunny south/west facing rear garden. Number 12 has been well maintained by the current owners and is in excellent decorative order throughout. The accommodation measures approx. 151m2 and briefly comprises entrance hall with guest WC, lounge, dining, kitchen, study, four bedrooms (master en suite), family bathroom and garage. Viewing is highly recommended and is by appointment only through The Property Shop on 01 825 5222.
+
+FEATURES:
+- Upgraded windows to the front
+- Sunny South/West facing rear garden
+- Perfectly positioned at the end of a cul-de-sac
+- Walking distance of Dunboyne Village
+- Ample off street parking
+- Garage with light & power
+- Overlooking large open green area
+- Gas fired central heating
+
+ACCOMMODATION DETAILS:
+ENTRANCE HALL
+Enter from storm porch to hall with american oak wood floor, guest WC and alarm point.
+
+LOUNGE - 5.19m (17'0") x 3.63m (11'11") : 18.84 sqm (203 sqft)
+with feature fireplace with gas inset, TV point, American oak wood flooring and double doors leading to.....
+
+DINING ROOM - 3.63m (11'11") x 3.52m (11'7") : 12.78 sqm (138 sqft)
+Currently in use as a home bar with American oak wood floor and sliding door to patio area with Pergola.
+
+KITCHEN - 5.11m (16'9") x 4.21m (13'10") : 21.51 sqm (232 sqft)
+Shaker style kitchen with a range of eye and low level units, granite counters and upstand, some integrated appliances, tile floor and access to rear garden.
+
+STUDY - 4.42m (14'6") x 2.79m (9'2") : 12.33 sqm (133 sqft)
+Suitable for a several uses such as home office, play room or TV room with American oak wood floor.
+
+BEDROOM ONE - 4.46m (14'8") x 3.78m (12'5") : 16.86 sqm (181 sqft)
+Master bedroom with en suite, ample built in wardrobes, TV point and laminate flooring.
+
+EN SUITE
+with wc, whb, shower, tile flooring and window for natural light and ventilation.
+
+BEDROOM TWO - 3.39m (11'1") x 3.36m (11'0") : 11.39 sqm (123 sqft)
+Double room located to the front of the property with built in wardrobes and laminate flooring.
+
+BEDROOM THREE - 2.92m (9'7") x 2.74m (9'0") : 8.00 sqm (86 sqft)
+Double room with built in wardrobes and laminate flooring.
+
+BEDROOM FOUR - 2.64m (8'8") x 2.41m (7'11") : 6.36 sqm (68 sqft)
+Located to the rear of the property with built in wardrobes and laminate flooring.
+
+BATHROOM - 2.46m (8'1") x 1.69m (5'7") : 4.16 sqm (45 sqft)
+Family bathroom with wc, whb with tile splash, bath with pumped shower over and tile flooring.
+
+GARAGE - 5.03m (16'6") x 2.84m (9'4") : 14.29 sqm (154 sqft)
+Ready for conversion to habitable room with light and power. Also plumbed for washing machine and sink.
+
+GARDEN
+Sunny south/west facing rear garden part laid to lawn with border of plants and shrubs, patio area with Pergola, dual side entrances, outside power sockets and tap and access to the garage.",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJkLzEvZDFhMjVmYWYtY2FhZi00NTk3LTg2MmQtMmVjN2YwYzBmZjQ3LkpQRUcifQ==?signature=2fdbfc44febe3ea0afe3b8c9c131723ad7819a43ba6ecdfc33ffcb9efdee1297",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJiLzYvYjYzN2RhMjQtOGIyNy00NzA2LWE4YzMtNjYyYzZkZDhiNjM0LkpQRUcifQ==?signature=99f61bd303ec7c6b7b51eabc8a417d2df911d10c9cbc41ea2af29e2160f632b8",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiIzLzMvMzNmZWE4ZDUtODA2Yi00YjliLTg0NjItNzdiZmY2ZmExZThjLkpQRUcifQ==?signature=4695f964e61d0c26020aa34e76477b70f70d3f8d2bfbe13ef7c00d2e677054d9",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJhLzgvYTgwMjI0OWMtZTM3OC00NjJjLThmNWEtZTlmNWFmMzY3NzM3LkpQRUcifQ==?signature=ca251019b712cfb14bd73728c4259f1502625f45ca78e358ee1ba82055d6ef6c",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiIxL2EvMWFhMWVhODktMDQ4ZC00NjAyLTkxYjktNWM4ZDZkNDEzZTNhLkpQRUcifQ==?signature=1870710be657274cbf3643153a53587724678688af77b9ff4b1ef94d3a90113e",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJiLzQvYjQ2YzA3ZWItNWNlYi00Y2JhLWI0MzctODJlOTYzODRiMDM2LkpQRUcifQ==?signature=2a578b34bd573cade9ab1e50d148027b6c2605f7c361d16d72b6eb9e473fbef6",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJjLzYvYzYxZTkxZTktNGEzYy00MGU4LTgzZjgtM2NhNTQyMmFhZmJkLkpQRUcifQ==?signature=b25d97cfe9f23eff78475f474e6c2a2d604faa88c0ba15ed890e5abf4f5f8e43",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJjLzEvYzE1Zjk3N2ItMWIxNi00OGE0LWJkNTMtMDFhZDk1ZTJjZWVkLkpQRUcifQ==?signature=b601bdf7554aa8f4278d51475a4a5cdc17bc50accf8eb962cc27bb157c0b6884",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiIzL2YvM2YwZjYyYmEtZjI4ZS00OWU3LWEwNzUtOWQ5YjM2Y2UxZDU3LkpQRUcifQ==?signature=58ba202e501257301fa181a33321c5f34ef6d8245710bd16f0a5900accc14172",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJkLzcvZDc4NTU3OTMtNDhjYi00YTcxLTk3NTAtMGU5ZGI3MzdmZTk0LkpQRUcifQ==?signature=2395958516f3b56382dffeb355f25fae2fae9658b576f2ce742ff7e4c840020e",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiI3LzIvNzI1ZmZkOTUtNmZlZS00YWY5LThjMGEtMzIxYWQ3NGU2MWVhLkpQRUcifQ==?signature=588a977c7105f4c82612a76550c4b1d536befafb5f5916d13b5c673ae03fdc64",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiI4L2QvOGQxYWUzNjMtMDAxMC00ZDZmLTg1NWEtZmJkY2E1NjhjOWIzLkpQRUcifQ==?signature=106d9f9bf3d790462c272299c5ed83e87b999019813a048c7528836d428e73c9",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJhLzQvYTRkMDllYzQtMjVkMC00ZjYzLWFiOGMtMTU0MGRmMjg5Y2FkLkpQRUcifQ==?signature=b16ce97b2e119f500f23b76c8f2c26fcc602cc4a5ab0f1db6306e51b66364448",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJhL2MvYWM4NTMxMjMtNjhiZC00MzZhLTg5ZDctN2NjZWQwNzM5NTM4LkpQRUcifQ==?signature=3dcb28a03d3c8460a63f5f14ef83ec9b746732025f3e01cf1ea5369ec5ac1798",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiIyLzcvMjc3M2M0ZDAtM2Y0ZC00YjcwLThjYzItOTE4M2IzZDg3YjE0LkpQRUcifQ==?signature=a9064fcbc66dce1de6e5ce00816bb29796240ad5ee8c37f1a2478bd3efec76c7",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJiLzEvYjEyOGI0MTUtMTRkNC00Y2RjLWE3ZjctNzQ4NDYyMWRjNzZkLkpQRUcifQ==?signature=efc19260a6a21acca40d78539bdcba116b59dc8a93bef36daaf49a952edc899a",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiI5LzQvOTQwZjZmY2ItMWQ2ZS00Y2E5LWE4NWMtYjljMzZiODA1M2U5LkpQRUcifQ==?signature=a4a9643b0e7e72ba1ec93fc7da03006176ef7d199326cf8aa279d3cc90ae3173",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJjL2QvY2Q4YWZjNmYtNjM0Mi00M2U5LWI0MDctN2MwMWM4YWFiNDhhLkpQRUcifQ==?signature=3de3c55c49b54d4e3546f3346d4d42012ec1d38fd40d4c8d8663af49d4b3e766",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiI3L2EvN2E1Njg5Y2UtNDMyNC00NGQwLWJjMzEtMDBjOWU2ZDZhMzZjLkpQRUcifQ==?signature=f2cb79bbfd531811a6e6781a65b0da21be91b3940a688b52fc663ee6e038cc50",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRod2VzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiI0L2QvNGRjODZjYzktODQ0Ny00Mzc3LTlmOWQtMDFkMmE0ZDcxNWRmLkpQRUcifQ==?signature=49e5f83287098998394a593ca29dbec627df932ee030060ea722c164a5d675c4",
+    },
+    {
+      "url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiIyL2EvMmFmZjNjYmYtOTI5Yy00MDdiLWIyODYtMzBiNTUxMzUzY2IyLkpQRUcifQ==?signature=2ecb83d7c3016df287a8d6a2c0a5e4c7f13909b95a9278dce31e4068e8ef6d72",
+    },
+  ],
+  "latitude": 53.425962,
+  "locale_code": "en",
+  "longitude": -6.48145,
+  "main_image_url": "https://media.daft.ie/eyJidWNrZXQiOiJtZWRpYW1hc3Rlci1zM2V1IiwiZWRpdHMiOnsib3ZlcmxheVdpdGgiOnsiYnVja2V0IjoibWVkaWFtYXN0ZXItczNldSIsIm9wdGlvbnMiOnsiZ3Jhdml0eSI6InNvdXRoZWFzdCJ9LCJrZXkiOiJ3YXRlcm1hcmstZGFmdC1sb2dvLXNtYWxsMy12NC5wbmcifSwicmVzaXplIjp7ImZpdCI6ImNvdmVyIiwid2lkdGgiOjE0NDAsImhlaWdodCI6OTYwfX0sIm91dHB1dEZvcm1hdCI6ImpwZWciLCJrZXkiOiJkLzEvZDFhMjVmYWYtY2FhZi00NTk3LTg2MmQtMmVjN2YwYzBmZjQ3LkpQRUcifQ==?signature=2fdbfc44febe3ea0afe3b8c9c131723ad7819a43ba6ecdfc33ffcb9efdee1297",
+  "price_float": 795000,
+  "price_string": "€795,000",
+  "property_type": "Detached",
+  "reference": "6477069",
+  "region": "Meath",
+  "title": "12 The Avenue, Plunkett Hall, Dunboyne, Co. Meath, A86VW70 is for sale on Daft.ie",
+}
+`;
+
+exports[`Scraper validation > in_realestateindia scraper > matches full extraction snapshot 1`] = `
+{
+  "area_unit": "sqyd",
+  "country": "India",
+  "currency": "INR",
+  "description": "Find detail of 2 BHK Flats & Apartments for Rent in Andheri West, Mumbai, Maharashtra (REI712907) posted by Vikas Estate Agency - on RealEstateIndia.com.",
+  "for_rent": true,
+  "for_rent_long_term": true,
+  "for_rent_short_term": "false",
+  "for_sale": false,
+  "latitude": 0,
+  "locale_code": "en",
+  "longitude": 0,
+  "price_float": 45000,
+  "price_string": "45,000",
+  "title": "2 BHK Flats & Apartments for Rent in Andheri West, Mumbai - 10000 Sq. Yards",
+}
+`;
+
+exports[`Scraper validation > uk_jitty scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Sandland Grove, Nantwich",
+  "area_unit": "sqft",
+  "constructed_area": 1611,
+  "count_bathrooms": 3,
+  "count_bedrooms": 4,
+  "country": "UK",
+  "currency": "GBP",
+  "description": "4 Bed Detached House For Sale In Sandland Grove, Nantwich. Cut through irrelevant listings with powerful filters and AI search.",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://jitty-cdn.com/cdn-cgi/image/w=1200,h=630,fit=cover/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSDRMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--96d8e238014408cf06777f75aa945bd1987552a3",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSDRMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--96d8e238014408cf06777f75aa945bd1987552a3?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSDhMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--05ad81386414405c391ae50efd4964a02d8636b2?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSUVMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--be77edf0a1cbc770a2a65c4ecba3a745e4dbc2c3?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSVFMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--7c08a670d280c42aaec5f64809f807d2391961f2?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSVlMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--867adb96fe241c91977dc049dde6ae57baaab234?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSWNMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--8a54e37c3f14ef54dde1ae34ba7e62f1439f0393?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSWdMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--a1477085a2bd6f55fbc68e90c0bebfc8b46f9f2d?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSW9MMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--0a664a0dd5c169053822d726e2fb130e1688a84e?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSXNMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--50d6fae6b4ca8701c20c68fcc5cfae1350608292?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSXdMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--38c4300a6b6bfdff81a28d5380935aa040b676b9?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSTBMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--54ee380f1a4b8d4b1b69124713f9bd2d9fd15a1f?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSkFMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--556092104cd2b5ae8fe49fbd5240cd5561d6d386?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSkVMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--e4925815bad8a6664de6ae74915c6aa89afab886?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSklMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--e361a70691b8a2b8933876ba44156e5749d89bc6?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSk1MMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--959b705fcc810e0dbfaf73d9d1a74c8b2be350c0?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSllMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--773d4b428ef11d4edf1f553106f294130c0a9f2f?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSmdMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--89a82805bca29db6e66c4aac4ac66284ef8ed443?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSmtMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--dec9442cd230531211d31bf99e6f01bc6e329f4f?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSm9MMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--23235118fc3d0ba72462264ce6c1b9f8f35653b1?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSndMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--c9978f4b876f7a0f47c70deb7ca88752624b5934?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSjhMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--e17bb58ebd6ae67860a445cfce076cefd39dafa8?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCS0FMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--b9995354f4872e61da2c4dfca18e8b373f8dc408?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCS0lMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--2f50c421e4b2fc83c2e74158cf35e11bc8304f0a?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCS01MMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--01c6b7c5e21e0afe8b28b95e231c0ef3021a71b3?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCS1VMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--c745938f6d634f62e58ea8accc38298b06a2bc9f?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCS2NMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--32904a6255a30fbc7cba1509447c604bc0fb8ee5?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCS2dMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--d281eb77bcb28c84adf562aca876794c7c22a3d0?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSDRMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--96d8e238014408cf06777f75aa945bd1987552a3?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSDhMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--05ad81386414405c391ae50efd4964a02d8636b2?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSUVMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--be77edf0a1cbc770a2a65c4ecba3a745e4dbc2c3?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSVFMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--7c08a670d280c42aaec5f64809f807d2391961f2?variant=thumb_1x",
+    },
+    {
+      "url": "https://jitty-cdn.com/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSVlMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--867adb96fe241c91977dc049dde6ae57baaab234?variant=thumb_1x",
+    },
+  ],
+  "latitude": 53.0651626587,
+  "locale_code": "en",
+  "longitude": -2.50606894493,
+  "main_image_url": "https://jitty-cdn.com/cdn-cgi/image/w=1200,h=630,fit=cover/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSDRMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--96d8e238014408cf06777f75aa945bd1987552a3",
+  "price_float": 465000,
+  "price_string": "£465,000",
+  "property_type": "Detached",
+  "reference": "rtI0BPlsWvEohngvc7HB",
+  "title": "Sandland Grove, Nantwich",
+}
+`;
+
+exports[`Scraper validation > uk_onthemarket scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Upper Pavenhill, Purton SN5",
+  "area_unit": "sqft",
+  "count_bathrooms": 0,
+  "count_bedrooms": 0,
+  "country": "UK",
+  "currency": "GBP",
+  "description": "Land at South Pavenhill Farm, PurtonRESIDENTIAL DEVELOPMENT LAND - 60 DWELLINGSLOCATION AND SITUATION
+The site is located on the western edge of Purton, a large village in North Wiltshire. It is situated on  elevated land and provides scenic views over the countryside towards the Cotswolds National  Landscape to the north. Purton is situated approximately 4 miles (6.5 km) northwest of Swindon town centre, 9 miles (18.9 km)  to the east of Malmesbury, 10 miles (15 km) to the south east of Cirencester.  The village benefits from good transport links with access to the M4 motorway Junction 16, located circa  4.5 miles (7.2 km) to the south offering connections to London, Bristol, and South Wales. Vehicular  access to the site is from Pavenhill Road, which forms the northern boundary of the site. Pavenhill Road  is the main transport road into the village from east to west. Swindon Railway Station is located circa 5.5 miles (7 km) to the south east, offering Great Western Rail services to London Paddington, Reading, Bath, Bristol within 1 hour. Purton is well served with local shops and services such as Co-op Food,  a village store with a Post Office and a local butchers. There are education, healthcare and recreational/ sport facilities also available: St. Mary’s Primary School, Bradon Forest Secondary School, Purton Surgery, a local pharmacy, dental services, Purton Village Hall, Red House Club, cricket and tennis clubs, Purton offers access to outdoor spaces such as the Cotswolds National Landscape, Cotswold Water Park and Mouldon Hill Country Park. Further amenities are offered in Swindon with a continually expanding and improving shopping centre, together with a wide choice of leisure facilities including golf, ice skating, swimming and water parks.PLANNING
+An outline planning application (Application Ref: PL/2022/00395) was submitted by Castlewood Properties Ventures Ltd and validated in February 2022 as follows: Outline application for the erection of up to 60 dwellings (including affordable homes), point of connection of access road from Pavenhill and shared footpath/cycleway and emergency access from Ringsbury Close, open space, sustainable drainage system and associated landscaping and infrastructure with all other matters (relating to appearance, landscaping, scale and layout) reserved. Planning was approved at appeal (Ref: APP/Y3940/W/24/3349801) by Wiltshire Council on the 5th March 2025. Bids are invited on an unconditional basis. If bidders have any planning questions please feel free to contact Nev Surtees, Savills.SECTION 106 AGREEMENT
+The buyer will purchase the land subject to a Section 106 Agreement and any bids will need to take into full account the obligations set out within the Agreement. A copy of the finalised s106 can be found in the data room. For the avoidance of doubt, the Section 106 Agreement commits the buyer to provide a minimum of 40% affordable houses of which 14 units will be affordable rented and 10 units will be shared ownership. TENURE AND POSSESSIONThe property is freehold with vacant possession. The land sits within the single Title number WT426578. Copies of the relevant Title Register and accompanying plans are provided in the online data room. UTILITIES
+Mains services are understood to be available with connections agreed in principle as part of the Outline Planning consent. Prospective purchasers are required to seek confirmation from the various utility companies that mains services are readily available. Up to date utility reports and quotations are available in the online data room. METHOD OF SALE
+The property is to be sold by way of informal tender. Offers are invited on an unconditional basis by noon on Thursday 5th June 2025. Please note that the Vendor is not obligated to accept the highest or any other offer. In order to accurately appraise offers on a like-for-like basis, please include the following information in support of your bid:Fully completed Bid Proforma - template provided in the online data room;
+Provide any other information that you feel should be taken into consideration in the assessment of your bid, e.g., recent experience of delivering a scheme of this nature and or within Wiltshire District Council.Upon offers being received, we anticipate holding developer interviews on Wednesday 11th June 2025 at AJW Land & Development’s office (Old Barn, Rodbourne Rail Farm, Rodbourne, Malmesbury, Wiltshire, SN16 0ES) and request that you keep this date free and available in the event that you are selected to attend.CONDITIONS OF SALE
+As part of the sale, the chosen buyer will be required to adhere to certain conditions and terms, including:
+The Seller will retain a ransom strip along the southern and part of the eastern boundary, between points AB and BC marked red on the image below;An overage of 50% of the price paid per plot, indexed linked from the date of completion, for a term of 20 years, for any additional dwellings than the proposed 60 units; Full vehicular rights and services will be reserved to adjoining land for future connections. See the relevant map within the data room marking the necessary access points. These must be delivered to adoptable highways standards.VIEWINGS
+We recommend that parties contact Savills or AJW Land & Development prior to viewing to discuss the opportunity and register their interest. Please note that neither the Vendors nor their agents will be responsible for any damage or loss caused by any potential purchasers, their agents or consultants whilst on site.What3words ///rankings.hedgehog.standardsDATA ROOM
+An online data room containing all relevant planning, technical and legal information will be made available on request. Please contact Jemima Upton, Savills, for access.VAT
+The Vendor has elected to charge VAT on the purchase.
+ LEGAL COSTS
+ The purchaser will be expected to give a legal undertaking of up to £20,000 plus VAT in the event they withdraw from the transaction following the agreement of the Heads of Terms.",
+  "features": [],
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://media.onthemarket.com/properties/16979647/1543454825/image-0-1024x1024.jpg",
+    },
+    {
+      "url": "https://media.onthemarket.com/properties/16979647/1543454825/image-1-1024x1024.jpg",
+    },
+    {
+      "url": "https://media.onthemarket.com/properties/16979647/1543454825/image-2-1024x1024.jpg",
+    },
+    {
+      "url": "https://media.onthemarket.com/properties/16979647/1543454825/image-3-1024x1024.jpg",
+    },
+  ],
+  "latitude": 51.586400914027536,
+  "locale_code": "en",
+  "longitude": -1.889361933868401,
+  "main_image_url": "https://media.onthemarket.com/properties/16979647/1543454825/image-0-1024x1024.jpg",
+  "price_float": 4000000,
+  "price_string": "£4,000,000",
+  "property_type": "Residential development",
+  "reference": "16979647",
+  "tenure": "",
+  "title": "Upper Pavenhill, Purton SN5 Residential development - £4,000,000",
+}
+`;
+
+exports[`Scraper validation > uk_rightmove scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Stephen Road, Headington, OX3",
+  "area_unit": "sqft",
+  "count_bathrooms": 2,
+  "count_bedrooms": 4,
+  "country": "UK",
+  "currency": "GBP",
+  "description": "Property DescriptionOffered with no onward chain this is an excellent opportunity to acquire a detached home  located in central Headington offering four well proportioned bedrooms, private garden and parking all whilst being less that 100m walk from Headington's amenities.Property DetailsThis deceptively spacious detached home, arranged over two floors offers light-filled, well-proportioned accommodation. Greeted with an entrance porch and large hallway, the ground floor features a generously sized sitting room with dual aspect lighting, a dining room, and a well kept fitted  kitchen opening directly onto a pleasant south-west facing private garden. A WC is also located on this level. The first floor comprises four double bedrooms serviced by a family bathroom. 
+
+Externally the property offers driveway parking and a rear garden extending over 70ft in length. Additionally there is a single garage with up-and-over door providing excellent storage or a potential workshop.
+
+The property occupies a desirable position on the south-west side of this highly sought after no through road. Stephen Road is a prime central Headington location, offering convenient access to Waitrose, Tesco, Sainsbury’s, restaurants, and a range of artisan coffee shops and delicatessens, all while enjoying a peaceful setting away from busy passing traffic.",
+  "features": [
+    "No onward chain",
+    "Prime Headington location",
+  ],
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/1ea796601/171844895/1ea796601ef4700b5cfa10c29a148d74.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/ce74284df/171844895/ce74284df991a91289a3dd16edca0dab.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/0de1409ae/171844895/0de1409ae666fb8b828f26d1c1066071.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/c75fe22cd/171844895/c75fe22cd227def80645fba6ace8153f.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/b56e5b227/171844895/b56e5b22769eca5d943dba6907d08ca2.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/59e45c916/171844895/59e45c916868ce1cd0ee113fb1979ed4.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/b68697344/171844895/b6869734471a1de7647bf9d90fb0af51.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/2cf65b2c2/171844895/2cf65b2c2a46891c9cc4d295fc4c35ba.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/613b480db/171844895/613b480dbb065ee59af07548ec7bd8fa.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/0652835aa/171844895/0652835aa5985072668dd5bd52b5f6c4.jpeg",
+    },
+    {
+      "url": "https://media.rightmove.co.uk/property-photo/4aebf2aa9/171844895/4aebf2aa9646ffdd4cb101cdebbfb7f6.jpeg",
+    },
+  ],
+  "latitude": 51.76085,
+  "locale_code": "en",
+  "longitude": -1.212635,
+  "main_image_url": "https://media.rightmove.co.uk/property-photo/1ea796601/171844895/1ea796601ef4700b5cfa10c29a148d74.jpeg",
+  "postal_code": "OX3 9AY",
+  "price_float": 695000,
+  "price_string": "£695,000",
+  "property_type": "Detached",
+  "reference": "171844895",
+  "region": "England",
+  "tenure": "FREEHOLD",
+  "title": "4 bedroom detached house for sale in Stephen Road, Headington, OX3",
+}
+`;
+
+exports[`Scraper validation > uk_zoopla scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Cecil Park, Herne Bay CT6",
+  "area_unit": "sqft",
+  "count_bathrooms": 2,
+  "count_bedrooms": 4,
+  "country": "UK",
+  "currency": "GBP",
+  "description": "This exquisite Victorian Villa exudes opulence; a substantial property arranged over three floors with rooms of elegant proportions and an abundance of period features.The beautiful entrance hall provides an immediate sense of grandeur with tiled floor, period corbels and attractive balustrade staircase.A through lounge and dining room provides wonderfully light and spacious accommodation with high ceilings, a feature period fireplace and attractive bay window.The impressive kitchen/breakfast room with stunning granite work surfaces has been updated over recent years with attractive, traditional units and is adjacent to the large utility room which completes the ground floor along with a downstairs cloakroom.The large first floor landing presents an exceptional Master Suite with doors opening to an ornate balcony and the added benefit of a dressing room with en-suite shower room.",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://lid.zoocdn.com/u/480/360/611ee8a15bb93510c3c3da707c92843b4f84d521.jpg",
+    },
+    {
+      "url": "https://lid.zoocdn.com/150/113/321985335c98b1462395fefcf199738882e7669d.jpg",
+    },
+    {
+      "url": "https://lid.zoocdn.com/150/113/9be5402efdff3d60f3c436c2609e4d6550560a4a.jpg",
+    },
+    {
+      "url": "https://lid.zoocdn.com/150/113/7815a59dc42cfe5ced0e746ca5c075f74129a383.jpg",
+    },
+    {
+      "url": "https://lid.zoocdn.com/150/113/9292366fb0a9b2607460344567735d8ea067424f.jpg",
+    },
+  ],
+  "latitude": 51.36907,
+  "locale_code": "en",
+  "longitude": 1.134746,
+  "main_image_url": "https://lid.zoocdn.com/u/480/360/611ee8a15bb93510c3c3da707c92843b4f84d521.jpg",
+  "postal_code": "CT6 6DL",
+  "price_float": 550000,
+  "price_string": "£550,000",
+  "property_type": "semi_detached",
+  "reference": "71365505",
+  "title": "Cecil Park, Herne Bay CT6, 4 bed semi-detached house for sale, £550,000 - Zoopla",
+}
+`;
+
+exports[`Scraper validation > us_forsalebyowner scraper > matches full extraction snapshot 1`] = `
+{
+  "area_unit": "sqft",
+  "country": "USA",
+  "currency": "USD",
+  "description": "Charming 4 bedroom home with modern updates throughout. Open floor plan with hardwood floors.",
+  "for_rent_short_term": "false",
+  "image_urls": [
+    {
+      "url": "https://photos.forsalebyowner.com/listings/456/photo1.jpg",
+    },
+    {
+      "url": "https://photos.forsalebyowner.com/listings/456/photo2.jpg",
+    },
+  ],
+  "locale_code": "en",
+  "price_string": "$349,900",
+}
+`;
+
+exports[`Scraper validation > us_mlslistings scraper > matches full extraction snapshot 1`] = `
+{
+  "area_unit": "sqft",
+  "constructed_area": 1176,
+  "count_bedrooms": "3",
+  "country": "USA",
+  "currency": "USD",
+  "description": "A Masterpiece in the Heart of San Jose. Welcome to this turn-key property conveniently located in the heart of San Jose. Completely remodeled throughout with new kitchen, bathrooms and flooring. Highlights include open living room, tile and carpet flooring, gourmet kitchen with granite countertops, stainless steel appliances and wood cabinets. Abundance of windows offering natural light, private patio, central heating, laundry area with storage, 2 spacious carports and kids playground. Walkable distance to restaurants, grocery store, cinema, banks, and more. Easy access to freeways 101, 280, 85, 87 and approximately 18 to 25 minutes from Apple and Google Headquarters.",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "http://data.mlslistings.com/GetMedia.ashx?Q=RmlsZUlEPTM5NjkwMTI5NQ%3d%3d&Hash=5a5ff2643e30251129add44affeb7455",
+    },
+  ],
+  "latitude": 37.313407,
+  "longitude": -121.823499,
+  "main_image_url": "http://data.mlslistings.com/GetMedia.ashx?Q=RmlsZUlEPTM5NjkwMTI5NQ%3d%3d&Hash=5a5ff2643e30251129add44affeb7455",
+  "price_float": 489000,
+  "price_string": "$489,000",
+  "property_type": "Condominium",
+  "reference": "ML81643266",
+  "title": "1547 Desdemona CT, SAN JOSE, CA 95121 ( For Sale )",
+  "year_construction": 1972,
+}
+`;
+
+exports[`Scraper validation > us_realtor scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "2200 Pacific Ave Unit 1B",
+  "area_unit": "sqft",
+  "city": "San Francisco",
+  "constructed_area": 0,
+  "count_bathrooms": 1,
+  "count_bedrooms": 1,
+  "country": "USA",
+  "currency": "USD",
+  "description": "2200 Pacific Ave Unit 1B, San Francisco, CA 94115 is for sale. View detailed information about property including listing details, property photos, open house information, school and neighborhood data, and much more.",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m3019156007s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m2477490749s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m1349106862s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m2946461516s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m353233490s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m3935033315s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m2609471697s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m632469089s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m2928383944s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m3627722707s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m4288492113s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m3440925170s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m739698719s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m4054219086s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m1520472594s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m3635401531s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m2080932329s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m3608136962s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m2606231018s.jpg",
+    },
+    {
+      "url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m1662373068s.jpg",
+    },
+  ],
+  "land_area": 14449,
+  "latitude": 37.794001,
+  "longitude": -122.431811,
+  "main_image_url": "https://ap.rdcpix.com/d0e0a1cd96f9395db40ac03d2d623935l-m3019156007s.jpg",
+  "postal_code": "94115",
+  "price_float": 1495000,
+  "price_string": "1495000",
+  "property_type": "condo",
+  "reference": "2034151800",
+  "region": "CA",
+  "title": "2200 Pacific Ave Unit 1B",
+}
+`;
+
+exports[`Scraper validation > us_wyomingmls scraper > matches full extraction snapshot 1`] = `
+{
+  "area_unit": "sqft",
+  "constructed_area": 1056,
+  "count_bathrooms": 2,
+  "count_bedrooms": 3,
+  "country": "USA",
+  "currency": "USD",
+  "description": "350 N FOREST DR LOT #20  -  THIS HOME CAN BE MOVED  2002 16x66 3 bedroom 2 bathroom mobile home for sale. This mobile home is in immaculate condition and sits on a beautiful lot! The home includes a $2,000 shed, has a new $5,000 roof, fenced yard, fresh paint and has brand new beautiful flooring. This is a must see! Motivated Seller - bring your offer! Call Janet Reinhart 307-262-0361 for your private showing!",
+  "for_rent_long_term": "false",
+  "for_rent_short_term": "false",
+  "for_sale": "true",
+  "image_urls": [
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813a.jpg",
+    },
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813b.jpg",
+    },
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813c.jpg",
+    },
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813d.jpg",
+    },
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813e.jpg",
+    },
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813f.jpg",
+    },
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813h.jpg",
+    },
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813i.jpg",
+    },
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813j.jpg",
+    },
+    {
+      "url": "https://www.wyomingmls.com/listing/images/property/wyo20176813k.jpg",
+    },
+  ],
+  "latitude": 42.852044,
+  "locale_code": "en",
+  "longitude": -106.28227,
+  "price_float": 33500,
+  "price_string": "$33,500",
+  "reference": "20176813",
+  "title": "Residential Property 20176813 - Wyoming MLS - Your Complete Source For Real Estate in Wyoming",
+  "year_construction": 2002,
+}
+`;
+
+exports[`Scraper validation > us_zillow scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "4836 Sicily Dr, Lake Elsinore, CA 92530",
+  "area_unit": "sqft",
+  "city": "Lake Elsinore",
+  "constructed_area": 2517,
+  "count_bathrooms": 3,
+  "count_bedrooms": 5,
+  "country": "USA",
+  "currency": "USD",
+  "description": "Zillow has 44 photos of this $685,900 5 beds, 3 baths, 2,517 Square Feet single family home located at 4836 Sicily Dr, Lake Elsinore, CA 92530 built in 2023. MLS #IG26033705. 3D Home Tour Available!",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://photos.zillowstatic.com/fp/973ededd2fb25c7e38cf0dd9344996a7-cc_ft_1536.jpg",
+    },
+  ],
+  "latitude": 33.69794,
+  "locale_code": "en",
+  "longitude": -117.37369,
+  "main_image_url": "https://photos.zillowstatic.com/fp/973ededd2fb25c7e38cf0dd9344996a7-cc_ft_1536.jpg",
+  "postal_code": "92530",
+  "price_float": 685900,
+  "price_string": "$685,900",
+  "property_type": "SingleFamily",
+  "reference": "456486259",
+  "region": "CA",
+  "street_address": "4836 Sicily Dr",
+  "title": "4836 Sicily Dr, Lake Elsinore, CA 92530",
+  "year_construction": 2023,
+}
+`;

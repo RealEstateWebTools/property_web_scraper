@@ -87,6 +87,13 @@ describe('Scraper validation', () => {
         });
       }
 
+      // Snapshot the full extraction output so any field — including ones not
+      // listed in `expected` — is caught if it silently changes or disappears.
+      // To regenerate: npx vitest run --update-snapshots
+      it('matches full extraction snapshot', () => {
+        expect(props).toMatchSnapshot();
+      });
+
       if (source === 'server-fetched') {
         it('documents degraded extraction', () => {
           const diag = result.diagnostics;
