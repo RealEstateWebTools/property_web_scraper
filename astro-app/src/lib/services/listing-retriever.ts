@@ -124,15 +124,17 @@ export async function retrieveListing(
     } else {
       try {
         const chain = new WhereChain(Listing as any, { import_url: importUrl });
-        listing = await chain.firstOrCreate();
+        listing = await chain.first() ?? null as any;
       } catch (e: any) {
-        // Firestore unavailable — use in-memory listing
         logActivity({
           level: 'warn',
           category: 'extraction',
-          message: `Firestore unavailable (${e.message}), using in-memory listing`,
+          message: `Firestore query failed (${e.message}), using in-memory listing`,
           sourceUrl: importUrl,
         });
+        listing = null as any;
+      }
+      if (!listing) {
         listing = new Listing();
         listing.assignAttributes({ import_url: importUrl });
       }
@@ -203,16 +205,7 @@ export async function retrieveListing(
           Listing.applyDiagnostics(listing, diagnostics);
         }
 
-        try {
-          await listing.save();
-        } catch (e: any) {
-          logActivity({
-            level: 'warn',
-            category: 'extraction',
-            message: `Firestore save failed (${e.message}), skipping persistence`,
-            sourceUrl: importUrl,
-          });
-        }
+        // Note: callers handle persistence with the correct ID
       }
     } else {
       logActivity({
