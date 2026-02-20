@@ -187,6 +187,17 @@ export async function addScrapeToHaul(
   return { haul, added: true, replaced };
 }
 
+export async function findExistingScrapeByUrl(
+  haulId: string,
+  url: string,
+): Promise<HaulScrape | undefined> {
+  const haul = await getHaul(haulId);
+  if (!haul) throw new Error('Haul not found');
+
+  const incomingKey = deduplicationKey(url);
+  return haul.scrapes.find((s) => s.url && deduplicationKey(s.url) === incomingKey);
+}
+
 export async function removeScrapeFromHaul(
   id: string,
   resultId: string,
