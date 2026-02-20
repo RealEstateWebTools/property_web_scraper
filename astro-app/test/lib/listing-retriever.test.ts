@@ -204,6 +204,49 @@ describe('retrieveListing', () => {
     });
   });
 
+  describe('persistence', () => {
+    it('does not auto-save new listings', async () => {
+      const html = loadFixture('rightmove_v2');
+      const result = await retrieveListing(
+        'https://www.rightmove.co.uk/properties/168908774',
+        html,
+      );
+      expect(result.success).toBe(true);
+      expect(result.retrievedListing).toBeDefined();
+      // Listing should have no ID — caller controls persistence
+      expect(result.retrievedListing!.id).toBe('');
+    });
+
+    it('preserves existing listing on dedup', async () => {
+      const url = 'https://www.rightmove.co.uk/properties/168908774';
+      const listing = new Listing();
+      listing.assignAttributes({ import_url: url, title: 'Original Title' });
+
+      const id = generateId();
+      await storeListing(id, listing);
+
+      const html = loadFixture('rightmove_v2');
+      const result = await retrieveListing(url, html);
+      expect(result.success).toBe(true);
+      // Should reuse existing listing and merge new data into it
+      expect(result.retrievedListing).toBeDefined();
+      expect(findListingByUrl(url)).toBe(id);
+    });
+
+    it('returns unsaved listing for caller to persist', async () => {
+      const html = loadFixture('rightmove_v2');
+      const result = await retrieveListing(
+        'https://www.rightmove.co.uk/properties/168908774',
+        html,
+      );
+      expect(result.success).toBe(true);
+      const listing = result.retrievedListing!;
+      // Listing has extracted data but no ID — caller decides when to save
+      expect(listing.title).toBeTruthy();
+      expect(listing.id).toBe('');
+    });
+  });
+
   describe('weighted diagnostics', () => {
     it('includes weightedExtractionRate', async () => {
       const html = loadFixture('rightmove_v2');

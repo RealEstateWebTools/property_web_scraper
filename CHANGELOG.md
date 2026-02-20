@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- Duplicate Firestore documents on manual extraction — `retrieveListing()` no longer saves internally; extract pages use `generateStableId(url)` for idempotent, URL-based document IDs
+
 ### Added
 - HTML content hash change detection: incoming HTML is fingerprinted (SHA-256, 16-char hex) and compared against the stored hash for the URL; unchanged pages short-circuit extraction and return the cached listing with `was_unchanged: true` in the API response
 - `html_hash` field added to `ScrapeRecord` for per-URL content change observability in scrape history
