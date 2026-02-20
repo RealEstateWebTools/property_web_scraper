@@ -25,14 +25,11 @@ const TEXT_FIELDS = new Set([
   'title', 'description', 'reference', 'price_string', 'currency',
   'address_string', 'street_address', 'street_number', 'street_name',
   'city', 'province', 'region', 'country', 'postal_code', 'locale_code', 'area_unit',
-  'title_es', 'description_es', 'title_de', 'description_de',
-  'title_fr', 'description_fr', 'title_it', 'description_it',
 ]);
 
-const DESCRIPTION_FIELDS = new Set([
-  'description', 'description_es', 'description_de',
-  'description_fr', 'description_it',
-]);
+// Only the primary description field gets an _html counterpart.
+// Language is conveyed by locale_code, not per-locale field variants.
+const DESCRIPTION_FIELDS = new Set(['description']);
 
 const URL_FIELDS = new Set(['main_image_url']);
 const URL_ARRAY_FIELDS = new Set(['related_urls']);

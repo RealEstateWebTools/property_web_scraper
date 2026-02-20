@@ -770,24 +770,30 @@ describe('Exporters', () => {
       expect(result).toContain('</surface_area>');
     });
 
-    it('includes multilingual title and desc elements', async () => {
+    it('uses locale_code to determine the language slot in title and desc', async () => {
       const listing = makeListing({
-        title: 'Modern Apartment',
-        title_es: 'Apartamento Moderno',
-        description: 'A great place',
-        description_fr: 'Un endroit formidable',
+        title: 'Apartamento Moderno en Madrid',
+        description: 'Un lugar estupendo',
+        locale_code: 'es',
       });
       const exporter = new KyeroExporter();
       const result = await exporter.export([listing]);
 
       expect(result).toContain('<title>');
-      expect(result).toContain('<en>Modern Apartment</en>');
-      expect(result).toContain('<es>Apartamento Moderno</es>');
+      expect(result).toContain('<es>Apartamento Moderno en Madrid</es>');
       expect(result).toContain('</title>');
       expect(result).toContain('<desc>');
-      expect(result).toContain('<en>A great place</en>');
-      expect(result).toContain('<fr>Un endroit formidable</fr>');
+      expect(result).toContain('<es>Un lugar estupendo</es>');
       expect(result).toContain('</desc>');
+    });
+
+    it('defaults to <en> slot when locale_code is absent or unrecognised', async () => {
+      const listing = makeListing({ title: 'Modern Apartment', description: 'A great place' });
+      const exporter = new KyeroExporter();
+      const result = await exporter.export([listing]);
+
+      expect(result).toContain('<en>Modern Apartment</en>');
+      expect(result).toContain('<en>A great place</en>');
     });
 
     it('normalizes property type', async () => {

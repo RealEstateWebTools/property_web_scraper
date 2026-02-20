@@ -118,14 +118,10 @@ describe('sanitizePropertyHash', () => {
     expect(result['description_html']).toBeUndefined();
   });
 
-  it('creates _html variants for all description locale fields', () => {
-    const html = '<p>Descripción</p>';
-    const hash = { description_es: html, description_de: html, description_fr: html, description_it: html };
+  it('strips HTML from locale_code (it is a text field)', () => {
+    const hash = { locale_code: '<b>es</b>' };
     const result = sanitizePropertyHash(hash);
-    expect(result['description_es_html']).toBe(html);
-    expect(result['description_de_html']).toBe(html);
-    expect(result['description_fr_html']).toBe(html);
-    expect(result['description_it_html']).toBe(html);
+    expect(result['locale_code']).toBe('es');
   });
 
   it('does not create title_html — only description fields get _html variants', () => {
