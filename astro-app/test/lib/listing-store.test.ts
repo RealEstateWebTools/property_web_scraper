@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   generateId,
+  generateStableId,
+  getListingByUrl,
   storeListing,
   getListing,
   storeDiagnostics,
@@ -41,6 +43,68 @@ describe('listing-store', () => {
     it('contains a dash separator', () => {
       const id = generateId();
       expect(id).toContain('-');
+    });
+  });
+
+  describe('generateStableId', () => {
+    it('returns a string of 12 hex characters', () => {
+      const id = generateStableId('https://www.rightmove.co.uk/properties/123');
+      expect(id).toMatch(/^[0-9a-f]{12}$/);
+    });
+
+    it('returns the same ID for the same URL', () => {
+      const a = generateStableId('https://www.rightmove.co.uk/properties/123');
+      const b = generateStableId('https://www.rightmove.co.uk/properties/123');
+      expect(a).toBe(b);
+    });
+
+    it('returns different IDs for different URLs', () => {
+      const a = generateStableId('https://www.rightmove.co.uk/properties/123');
+      const b = generateStableId('https://www.rightmove.co.uk/properties/456');
+      expect(a).not.toBe(b);
+    });
+
+    it('strips query params via deduplication key', () => {
+      const a = generateStableId('https://www.rightmove.co.uk/properties/123');
+      const b = generateStableId('https://www.rightmove.co.uk/properties/123?utm_source=google');
+      expect(a).toBe(b);
+    });
+  });
+
+  describe('getListingByUrl', () => {
+    it('finds a listing stored by URL', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({
+        title: 'By URL Test',
+        import_url: 'https://www.rightmove.co.uk/properties/789',
+      });
+      await storeListing(id, listing);
+
+      const result = await getListingByUrl('https://www.rightmove.co.uk/properties/789');
+      expect(result).toBeDefined();
+      expect(result!.id).toBe(id);
+      expect(result!.listing.title).toBe('By URL Test');
+    });
+
+    it('returns undefined for unknown URL', async () => {
+      const result = await getListingByUrl('https://unknown.example.com/nothing');
+      expect(result).toBeUndefined();
+    });
+
+    it('returns undefined after listing is deleted', async () => {
+      const id = generateId();
+      const listing = new Listing();
+      listing.assignAttributes({
+        title: 'Delete URL Test',
+        import_url: 'https://example.com/del-byurl',
+      });
+      await storeListing(id, listing);
+
+      await deleteListing(id);
+
+      const result = await getListingByUrl('https://example.com/del-byurl');
+      expect(result).toBeUndefined();
     });
   });
 
