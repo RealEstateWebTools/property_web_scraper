@@ -77,7 +77,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
   if (msg.type === 'CREATE_HAUL') {
     handleCreateHaul().then(sendResponse).catch(err => {
-      sendResponse({ success: false, error: { message: err.message } });
+      sendResponse({ success: false, error: { code: err.code || '', message: err.message } });
     });
     return true;
   }
@@ -134,13 +134,21 @@ async function handleExtraction({ url, html }) {
 }
 
 async function handleCreateHaul() {
-  const config = await chrome.storage.sync.get(['apiUrl']);
+  const config = await chrome.storage.sync.get(['apiUrl', 'apiKey']);
   const apiUrl = (config.apiUrl || 'https://property-web-scraper.pages.dev').replace(/\/+$/, '');
+  const apiKey = config.apiKey || '';
 
-  const response = await fetch(`${apiUrl}/ext/v1/hauls`, { method: 'POST' });
+  const headers = {};
+  if (apiKey) headers['X-Api-Key'] = apiKey;
+
+  const response = await fetch(`${apiUrl}/ext/v1/hauls`, { method: 'POST', headers });
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error: ${response.status}`);
+    const code = err.error?.code || '';
+    const message = err.error?.message || `API error: ${response.status}`;
+    const error = new Error(message);
+    error.code = code;
+    throw error;
   }
 
   const data = await response.json();

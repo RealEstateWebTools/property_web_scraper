@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="My Account — Property Web Scraper">
+
+<section class="max-w-lg mx-auto px-4 py-12">
+  <h1 class="text-2xl font-bold text-gray-900 mb-8">My Account</h1>
+
+  <!-- API Key card -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">API Key</h2>
+
+    <p class="text-sm text-gray-600 mb-4">
+      Your API key unlocks unlimited haul creation and is used to authenticate requests
+      from the Chrome extension and the API.
+    </p>
+
+    <div class="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-800 mb-4">
+      <strong>Don't have a key yet?</strong>
+      <a href="/signup" class="text-blue-600 hover:underline ml-1">Sign up to get one →</a>
+    </div>
+
+    <div class="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-800">
+      <strong>Lost your key?</strong> Sign up again with the same email — a new key will be added to your account.
+      <a href="/signup" class="text-blue-600 hover:underline ml-1">Sign up →</a>
+    </div>
+  </div>
+
+  <!-- Extension setup card -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Using the Chrome Extension</h2>
+    <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700">
+      <li>Open the extension popup and click the <strong>⚙️</strong> settings icon</li>
+      <li>Paste your API key into the <strong>API Key</strong> field</li>
+      <li>Click <strong>Save Settings</strong></li>
+      <li>You can now create unlimited hauls from the extension</li>
+    </ol>
+  </div>
+
+  <!-- Upgrade card -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Plan</h2>
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="font-semibold text-gray-900">Free</p>
+        <p class="text-sm text-gray-500">500 extractions/day · Unlimited hauls</p>
+      </div>
+      <a href="/pricing"
+        class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors no-underline">
+        Upgrade
+      </a>
+    </div>
+  </div>
+</section>
+
+</BaseLayout>

@@ -10,6 +10,7 @@ const states = {
   unsupported: $('#state-unsupported'),
   noKey: $('#state-no-key'),
   haulExpired: $('#state-haul-expired'),
+  limitReached: $('#state-limit-reached'),
   error: $('#state-error'),
   results: $('#state-results'),
 };
@@ -109,6 +110,13 @@ function showError(msg) {
   showState('error');
 }
 
+async function showLimitReached() {
+  const config = await chrome.storage.sync.get(['apiUrl']);
+  const apiUrl = (config.apiUrl || 'https://property-web-scraper.pages.dev').replace(/\/+$/, '');
+  $('#popup-signup-link').href = `${apiUrl}/signup`;
+  showState('limitReached');
+}
+
 $('#retry-btn').addEventListener('click', init);
 $('#try-anyway-btn').addEventListener('click', init);
 
@@ -126,7 +134,8 @@ $('#new-haul-btn').addEventListener('click', async () => {
 
   try {
     const result = await chrome.runtime.sendMessage({ type: 'CREATE_HAUL' });
-    if (!result?.haul_id) throw new Error('Failed to create haul');
+    if (result?.error?.code === 'HAUL_LIMIT_REACHED') { showLimitReached(); return; }
+    if (!result?.haul_id) throw new Error(result?.error?.message || 'Failed to create haul');
 
     await chrome.storage.sync.set({ haulId: result.haul_id });
     btn.textContent = 'Created! Retrying…';
@@ -171,7 +180,8 @@ $('#new-haul-btn-nokey').addEventListener('click', async () => {
 
   try {
     const result = await chrome.runtime.sendMessage({ type: 'CREATE_HAUL' });
-    if (!result?.haul_id) throw new Error('Failed to create haul');
+    if (result?.error?.code === 'HAUL_LIMIT_REACHED') { showLimitReached(); return; }
+    if (!result?.haul_id) throw new Error(result?.error?.message || 'Failed to create haul');
 
     await chrome.storage.sync.set({ haulId: result.haul_id });
     btn.textContent = 'Created! Retrying…';
