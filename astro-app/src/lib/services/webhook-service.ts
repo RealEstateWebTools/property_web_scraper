@@ -35,6 +35,9 @@ export interface WebhookDeliveryResult {
 
 // ─── Storage ─────────────────────────────────────────────────────
 
+/** Maximum number of webhook registrations to prevent unbounded KV growth. */
+export const MAX_WEBHOOKS = 20;
+
 let kv: any = null;
 const inMemoryStore = new Map<string, WebhookRegistration>();
 
@@ -75,6 +78,12 @@ export async function registerWebhook(
   events: WebhookEvent[],
   secret?: string,
 ): Promise<WebhookRegistration> {
+  // Enforce registration limit
+  const existing = await listWebhooks();
+  if (existing.length >= MAX_WEBHOOKS) {
+    throw new Error(`Webhook limit reached (${MAX_WEBHOOKS}/${MAX_WEBHOOKS})`);
+  }
+
   const registration: WebhookRegistration = {
     id: generateId(),
     url,

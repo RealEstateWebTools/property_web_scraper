@@ -48,6 +48,14 @@ export function getDailyLimit(tier: SubscriptionTier): number {
 let kv: any = null;
 const memStore = new Map<string, string>();
 
+/**
+ * In-memory cache for today's usage count per user.
+ * Avoids hitting KV on every quota check (the hot path).
+ * TTL: 60 seconds — stale reads are acceptable since quotas are soft limits.
+ */
+const usageCache = new Map<string, { count: number; expiresAt: number }>();
+const USAGE_CACHE_TTL_MS = 60_000;
+
 export function initUsageKV(kvNamespace: any): void {
   kv = kvNamespace ?? null;
 }
@@ -65,6 +73,7 @@ async function kvPut(key: string, value: string, options?: { expirationTtl?: num
 /** Clear all in-memory data. For testing only. */
 export function resetUsageMeter(): void {
   memStore.clear();
+  usageCache.clear();
 }
 
 // ─── Date helpers ───────────────────────────────────────────────
@@ -106,6 +115,12 @@ export async function recordUsage(userId: string): Promise<void> {
 
   // 90-day TTL so old usage data auto-expires
   await kvPut(key, JSON.stringify(record), { expirationTtl: 90 * 86400 });
+
+  // Update cache so the next getTodayUsage() is instant
+  usageCache.set(userId, {
+    count: record.extractions,
+    expiresAt: Date.now() + USAGE_CACHE_TTL_MS,
+  });
 }
 
 /**
@@ -131,12 +146,22 @@ export async function getUsage(userId: string, days = 30): Promise<DailyUsage[]>
 
 /**
  * Get today's usage count for a user.
+ * Uses an in-memory cache (60s TTL) to avoid KV reads on the hot path.
  */
 export async function getTodayUsage(userId: string): Promise<number> {
+  // Check cache first
+  const cached = usageCache.get(userId);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.count;
+  }
+
   const key = `usage:${userId}:${todayStr()}`;
   const json = await kvGet(key);
-  if (!json) return 0;
-  return JSON.parse(json).extractions;
+  const count = json ? JSON.parse(json).extractions : 0;
+
+  // Populate cache
+  usageCache.set(userId, { count, expiresAt: Date.now() + USAGE_CACHE_TTL_MS });
+  return count;
 }
 
 /**
