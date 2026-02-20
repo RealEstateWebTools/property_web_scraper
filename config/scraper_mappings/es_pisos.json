@@ -29,7 +29,7 @@
 
     },
     "title": {
-      "cssLocator": "title"
+      "cssLocator": "head > title"
     },
     "description": {
       "cssLocator": "meta[name='description']",
@@ -55,13 +55,13 @@
   ],
   "booleanFields": {
     "for_sale": {
-      "cssLocator": "title",
+      "cssLocator": "head > title",
       "evaluator": "include?",
       "evaluatorParam": "en venta",
       "caseInsensitive": true
     },
     "for_rent": {
-      "cssLocator": "title",
+      "cssLocator": "head > title",
       "evaluator": "include?",
       "evaluatorParam": "en alquiler",
       "caseInsensitive": true

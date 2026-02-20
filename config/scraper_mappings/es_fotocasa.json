@@ -74,7 +74,7 @@
       "cssLocator": "meta[property='og:title']",
       "cssAttr": "content",
       "fallbacks": [
-        { "cssLocator": "title" }
+        { "cssLocator": "head > title" }
       ]
     },
     "description": {

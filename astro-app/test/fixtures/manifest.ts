@@ -239,6 +239,7 @@ export const fixtures: FixtureEntry[] = [
     expected: {
       country: 'UK',
       currency: 'GBP',
+      title: '4 bedroom detached house for sale in Stephen Road, Headington, OX3',
       address_string: 'Stephen Road, Headington, OX3',
       region: 'England',
       price_string: '\u00A3695,000',

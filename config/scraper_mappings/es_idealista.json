@@ -50,7 +50,7 @@
       "cssLocator": ".main-info__title-main",
       "fallbacks": [
         { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
-        { "cssLocator": "title" }
+        { "cssLocator": "head > title" }
       ]
     },
     "price_string": {
