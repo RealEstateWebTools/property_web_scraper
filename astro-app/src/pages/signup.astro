@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Create Free Account — Property Web Scraper">
+
+<section class="max-w-lg mx-auto px-4 py-12">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+    <div class="bg-gradient-to-br from-blue-600 to-blue-700 px-8 py-8 text-white">
+      <h1 class="text-2xl font-bold mb-1">Create a free account</h1>
+      <p class="text-blue-100 text-sm">Get unlimited hauls and more with a free API key.</p>
+    </div>
+
+    <!-- Sign-up form -->
+    <div id="form-section" class="px-8 py-8">
+      <div class="mb-6">
+        <label for="email-input" class="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
+        <input
+          id="email-input"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+        />
+        <p id="email-error" class="text-red-600 text-xs mt-1 hidden"></p>
+      </div>
+
+      <button id="signup-btn"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl text-sm transition-colors cursor-pointer border-0">
+        Create Account & Get API Key
+      </button>
+
+      <p class="text-xs text-gray-400 mt-4 text-center">
+        No password needed. No credit card. Your API key is shown once — save it somewhere safe.
+      </p>
+    </div>
+
+    <!-- Success: show key -->
+    <div id="success-section" class="hidden px-8 py-8">
+      <div class="flex items-center gap-2 text-green-700 mb-4">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="font-semibold text-base">Account created!</span>
+      </div>
+
+      <p class="text-sm text-gray-600 mb-4">
+        Here is your API key. <strong>Save it now — it won't be shown again.</strong>
+      </p>
+
+      <div class="relative mb-4">
+        <code id="api-key-display"
+          class="block w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono text-gray-800 break-all pr-20">
+        </code>
+        <button id="copy-key-btn"
+          class="absolute right-2 top-1/2 -translate-y-1/2 text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition-colors border-0 cursor-pointer font-semibold">
+          Copy
+        </button>
+      </div>
+
+      <div class="bg-blue-50 rounded-xl p-4 text-sm text-blue-800 mb-6">
+        <p class="font-semibold mb-2">Next steps</p>
+        <ol class="list-decimal list-inside space-y-1 text-blue-700">
+          <li>Open the Chrome extension → Settings (⚙️ icon)</li>
+          <li>Paste your API key into the <strong>API Key</strong> field</li>
+          <li>Click <strong>Save Settings</strong></li>
+          <li>You can now create unlimited hauls</li>
+        </ol>
+      </div>
+
+      <div class="flex gap-3">
+        <a href="/hauls" class="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 px-4 rounded-xl text-sm transition-colors no-underline">
+          My Hauls
+        </a>
+        <a href="/account" class="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-colors no-underline">
+          My Account
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="text-center text-xs text-gray-400 mt-6">
+    Want more? See <a href="/pricing" class="text-blue-600 hover:underline">pricing plans</a> for higher quotas and features.
+  </p>
+</section>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', function () {
+  var emailInput = document.getElementById('email-input');
+  var emailError = document.getElementById('email-error');
+  var signupBtn = document.getElementById('signup-btn');
+  var formSection = document.getElementById('form-section');
+  var successSection = document.getElementById('success-section');
+  var apiKeyDisplay = document.getElementById('api-key-display');
+  var copyKeyBtn = document.getElementById('copy-key-btn');
+
+  signupBtn.addEventListener('click', async function () {
+    var email = emailInput.value.trim();
+    emailError.classList.add('hidden');
+
+    if (!email || !email.includes('@')) {
+      emailError.textContent = 'Please enter a valid email address.';
+      emailError.classList.remove('hidden');
+      return;
+    }
+
+    signupBtn.disabled = true;
+    signupBtn.textContent = 'Creating account…';
+
+    try {
+      var res = await fetch('/public_api/v1/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email }),
+      });
+      var data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error?.message || 'Something went wrong. Please try again.');
+      }
+
+      apiKeyDisplay.textContent = data.api_key || '';
+      formSection.classList.add('hidden');
+      successSection.classList.remove('hidden');
+    } catch (err) {
+      signupBtn.disabled = false;
+      signupBtn.textContent = 'Create Account & Get API Key';
+      emailError.textContent = err.message || 'Something went wrong. Please try again.';
+      emailError.classList.remove('hidden');
+    }
+  });
+
+  emailInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') signupBtn.click();
+  });
+
+  copyKeyBtn.addEventListener('click', function () {
+    var key = apiKeyDisplay.textContent.trim();
+    navigator.clipboard.writeText(key).then(function () {
+      copyKeyBtn.textContent = '✓ Copied';
+      setTimeout(function () { copyKeyBtn.textContent = 'Copy'; }, 2000);
+    });
+  });
+});
+</script>
+
+</BaseLayout>

@@ -13,6 +13,7 @@ export const ApiErrorCode = {
   PAYLOAD_TOO_LARGE: 'PAYLOAD_TOO_LARGE',
   UNSUPPORTED_CONTENT_TYPE: 'UNSUPPORTED_CONTENT_TYPE',
   FETCH_BLOCKED: 'FETCH_BLOCKED',
+  HAUL_LIMIT_REACHED: 'HAUL_LIMIT_REACHED',
 } as const;
 
 export type ApiErrorCodeValue = (typeof ApiErrorCode)[keyof typeof ApiErrorCode];
@@ -30,6 +31,7 @@ const HTTP_STATUS: Record<ApiErrorCodeValue, number> = {
   [ApiErrorCode.PAYLOAD_TOO_LARGE]: 413,
   [ApiErrorCode.UNSUPPORTED_CONTENT_TYPE]: 415,
   [ApiErrorCode.FETCH_BLOCKED]: 422,
+  [ApiErrorCode.HAUL_LIMIT_REACHED]: 402,
 };
 
 const VALIDATOR_CODE_MAP: Record<string, ApiErrorCodeValue> = {

@@ -5,6 +5,7 @@
 const $ = (sel) => document.querySelector(sel);
 const haulIdInput = $('#haul-id');
 const apiUrlInput = $('#api-url');
+const apiKeyInput = $('#api-key');
 const saveBtn = $('#save-btn');
 const createBtn = $('#create-btn');
 const statusEl = $('#status');
@@ -15,10 +16,15 @@ const scrapeCountEl = $('#scrape-count');
 const DEFAULT_URL = 'https://property-web-scraper.pages.dev';
 
 // Load saved settings
-chrome.storage.sync.get(['haulId', 'apiUrl'], (config) => {
+chrome.storage.sync.get(['haulId', 'apiUrl', 'apiKey'], (config) => {
   haulIdInput.value = config.haulId || '';
   apiUrlInput.value = config.apiUrl || DEFAULT_URL;
+  apiKeyInput.value = config.apiKey || '';
   if (config.haulId) showHaulLink(config.haulId, config.apiUrl);
+  // Update signup link to match configured API URL
+  const base = (config.apiUrl || DEFAULT_URL).replace(/\/+$/, '');
+  const signupLink = document.getElementById('signup-link');
+  if (signupLink) signupLink.href = `${base}/signup`;
 });
 
 // Save
@@ -44,7 +50,8 @@ saveBtn.addEventListener('click', () => {
     return;
   }
 
-  chrome.storage.sync.set({ haulId, apiUrl }, () => {
+  const apiKey = apiKeyInput.value.trim();
+  chrome.storage.sync.set({ haulId, apiUrl, apiKey }, () => {
     showStatus('Settings saved', 'success');
     showHaulLink(haulId, apiUrl);
   });

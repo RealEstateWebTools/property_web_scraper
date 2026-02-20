@@ -29,6 +29,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </p>
   </div>
 
+  <div id="limit-reached-banner" class="hidden bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-6">
+    <div class="flex items-start gap-3">
+      <span class="text-2xl">🔒</span>
+      <div>
+        <h3 class="font-semibold text-blue-900 mb-1">Free haul limit reached</h3>
+        <p class="text-sm text-blue-800 mb-3">
+          Anonymous visitors can create one free haul. Sign up for a free account to create unlimited hauls.
+        </p>
+        <a href="/signup" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg no-underline transition-colors">
+          Create Free Account →
+        </a>
+      </div>
+    </div>
+  </div>
+
   <div id="no-consent" class="hidden bg-amber-50 rounded-2xl p-8 text-center">
     <div class="text-4xl mb-3">🍪</div>
     <h3 class="font-semibold text-amber-900 mb-2">Functional cookies required</h3>
@@ -50,7 +65,15 @@ document.addEventListener('DOMContentLoaded', function() {
       try {
         var res = await fetch('/ext/v1/hauls', { method: 'POST' });
         var data = await res.json();
-        if (!res.ok) throw new Error(data.error?.message || 'Failed to create haul');
+        if (!res.ok) {
+          if (data.error?.code === 'HAUL_LIMIT_REACHED') {
+            createBtn.innerHTML = '<i class="bi bi-plus-lg"></i> New Haul';
+            createBtn.disabled = false;
+            document.getElementById('limit-reached-banner').classList.remove('hidden');
+            return;
+          }
+          throw new Error(data.error?.message || 'Failed to create haul');
+        }
         var haulId = data.haul_id;
         // Save to my-hauls in PwsStorage
         if (typeof window.PwsStorage !== 'undefined') {

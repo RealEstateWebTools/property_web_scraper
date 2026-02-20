@@ -2,61 +2,60 @@ import type { APIRoute } from 'astro';
 import { generateHaulId } from '@lib/services/haul-id.js';
 import { createHaul } from '@lib/services/haul-store.js';
 import { resolveKV } from '@lib/services/kv-resolver.js';
+import { authenticateApiKey } from '@lib/services/auth.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 
-// KV-backed rate limit for haul creation: 5 per hour per IP.
-// Falls back to in-memory if KV unavailable.
-const MAX_CREATES_PER_HOUR = 5;
-const RATE_LIMIT_WINDOW_S = 3600;
-const inMemoryTimestamps = new Map<string, number[]>();
-
-async function isRateLimited(ip: string, kv: any): Promise<boolean> {
-  const kvKey = `haul-rate:${ip}`;
-  const now = Date.now();
-
-  // Try KV first (cross-isolate)
-  if (kv) {
-    try {
-      const data = await kv.get(kvKey, 'json') as { count: number } | null;
-      const count = data?.count ?? 0;
-      if (count >= MAX_CREATES_PER_HOUR) return true;
-      await kv.put(kvKey, JSON.stringify({ count: count + 1 }), { expirationTtl: RATE_LIMIT_WINDOW_S });
-      return false;
-    } catch {
-      // KV failure — fall through to in-memory
-    }
-  }
-
-  // In-memory fallback (per-isolate, best effort)
-  const cutoff = now - RATE_LIMIT_WINDOW_S * 1000;
-  const timestamps = (inMemoryTimestamps.get(ip) || []).filter(t => t > cutoff);
-  inMemoryTimestamps.set(ip, timestamps);
-  if (timestamps.length >= MAX_CREATES_PER_HOUR) return true;
-  timestamps.push(now);
-  return false;
-}
+const FREE_HAUL_TTL_S = 30 * 24 * 60 * 60; // 30 days
 
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
 /**
- * POST /ext/v1/hauls — Create a new haul. No auth required.
+ * POST /ext/v1/hauls — Create a new haul.
+ *
+ * Anonymous users: limited to one haul per IP (tracked via free-haul:{ip} KV key).
+ * Authenticated users (valid X-Api-Key): unlimited hauls.
  */
 export const POST: APIRoute = async ({ request, locals }) => {
   const ip = request.headers.get('cf-connecting-ip')
     || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     || 'unknown';
 
-  const kvBinding = resolveKV(locals);
+  const kv = resolveKV(locals);
 
-  if (await isRateLimited(ip, kvBinding)) {
-    return errorResponse(ApiErrorCode.RATE_LIMITED, 'Too many hauls created. Try again later.', request);
+  // Determine whether request is authenticated
+  const auth = await authenticateApiKey(request);
+  const isAuthenticated = auth.authorized && auth.userId !== 'anonymous';
+
+  if (!isAuthenticated) {
+    // Anonymous: enforce one free haul per IP
+    if (kv) {
+      const freeHaulKey = `free-haul:${ip}`;
+      const existing = await kv.get(freeHaulKey, 'json') as { haulId: string } | null;
+      if (existing) {
+        return errorResponse(
+          ApiErrorCode.HAUL_LIMIT_REACHED,
+          'Sign up for a free account to create more hauls.',
+          request,
+        );
+      }
+
+      const id = generateHaulId();
+      const haul = await createHaul(id, ip);
+      await kv.put(freeHaulKey, JSON.stringify({ haulId: id, createdAt: new Date().toISOString() }), {
+        expirationTtl: FREE_HAUL_TTL_S,
+      });
+
+      return successResponse({ haul_id: haul.id, haul_url: `/haul/${haul.id}` }, request, 201);
+    }
+
+    // KV unavailable (local dev) — allow without gate
+    const id = generateHaulId();
+    const haul = await createHaul(id, ip);
+    return successResponse({ haul_id: haul.id, haul_url: `/haul/${haul.id}` }, request, 201);
   }
 
+  // Authenticated — create freely
   const id = generateHaulId();
   const haul = await createHaul(id, ip);
-
-  return successResponse({
-    haul_id: haul.id,
-    haul_url: `/haul/${haul.id}`,
-  }, request, 201);
+  return successResponse({ haul_id: haul.id, haul_url: `/haul/${haul.id}` }, request, 201);
 };
