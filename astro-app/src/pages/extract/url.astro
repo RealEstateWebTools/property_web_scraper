@@ -7,6 +7,7 @@ import { generateStableId, storeListing, storeDiagnostics } from '@lib/services/
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { screenUrl } from '@lib/services/url-screener.js';
+import { addToHaulAndRedirect } from '@lib/pages-helpers/astro-redirect-with-haul.js';
 
 const supportedSites = ['idealista.com', 'rightmove.co.uk', 'zoopla.co.uk', 'realtor.com', 'fotocasa.es', 'pisos.com', 'realestateindia.com'];
 
@@ -101,7 +102,7 @@ if (Astro.request.method === 'POST') {
     diagnostics: result.diagnostics,
   });
 
-  return Astro.redirect(`/extract/results/${id}`);
+  return addToHaulAndRedirect(Astro.request, id, result.retrievedListing, result.diagnostics);
 }
 ---
 <BaseLayout title="Extract by URL - Property Web Scraper">

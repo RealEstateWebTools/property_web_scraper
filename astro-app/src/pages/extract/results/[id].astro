@@ -504,6 +504,31 @@ document.addEventListener('DOMContentLoaded', () => {
     recent.unshift(summary);
     if (recent.length > 20) recent = recent.slice(0, 20);
     window.PwsStorage.set('functional:recent-extractions', recent);
+
+    // Auto-haul: if haul_id is in the URL, upsert into my-hauls
+    var haulId = new URLSearchParams(window.location.search).get('haul_id');
+    if (haulId) {
+      var myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+      var now = new Date();
+      var entry = {
+        id: haulId,
+        name: null,
+        scrapeCount: 1,
+        lastVisited: now.toISOString(),
+        expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+      var existingIdx = myHauls.findIndex(function(h) { return h.id === haulId; });
+      if (existingIdx !== -1) {
+        entry.name = myHauls[existingIdx].name;
+        entry.scrapeCount = (myHauls[existingIdx].scrapeCount || 0) + 1;
+        entry.expiresAt = myHauls[existingIdx].expiresAt || entry.expiresAt;
+        myHauls[existingIdx] = entry;
+      } else {
+        myHauls.unshift(entry);
+      }
+      if (myHauls.length > 20) myHauls = myHauls.slice(0, 20);
+      window.PwsStorage.set('functional:my-hauls', myHauls);
+    }
   } else {
     // Not-found state: try showing cached data
     var cached = window.PwsStorage.get('functional:result-cache:' + resultId);
