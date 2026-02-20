@@ -138,7 +138,9 @@ const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
       var firebaseAuth = auth.getAuth(firebaseApp);
 
       var cred = await auth.createUserWithEmailAndPassword(firebaseAuth, email, password);
-      await auth.sendEmailVerification(cred.user);
+      await auth.sendEmailVerification(cred.user, {
+        url: window.location.origin + '/verify-email',
+      });
 
       sentTo.textContent = email;
       formSection.classList.add('hidden');
