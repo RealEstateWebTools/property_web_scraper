@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import InfoCallout from '../../components/InfoCallout.astro';
 import { retrieveListing } from '@lib/services/listing-retriever.js';
 import { fetchHtml } from '@lib/services/html-fetcher.js';
-import { generateId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
+import { generateStableId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { screenUrl } from '@lib/services/url-screener.js';
@@ -74,7 +74,7 @@ if (Astro.request.method === 'POST') {
     return Astro.redirect(`/extract/error?reason=${reason}&url=${encodeURIComponent(importUrl)}&message=${encodeURIComponent(result.errorMessage || 'Unknown error')}`);
   }
 
-  const id = generateId();
+  const id = generateStableId(importUrl);
   await storeListing(id, result.retrievedListing);
   if (result.diagnostics) {
     await storeDiagnostics(id, result.diagnostics);
