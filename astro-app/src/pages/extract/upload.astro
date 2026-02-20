@@ -4,6 +4,7 @@ import { retrieveListing } from '@lib/services/listing-retriever.js';
 import { generateStableId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import { screenUrl } from '@lib/services/url-screener.js';
+import { addToHaulAndRedirect } from '@lib/pages-helpers/astro-redirect-with-haul.js';
 
 const prefillUrl = Astro.url.searchParams.get('url') || '';
 
@@ -62,7 +63,7 @@ if (Astro.request.method === 'POST') {
     diagnostics: result.diagnostics,
   });
 
-  return Astro.redirect(`/extract/results/${id}`);
+  return addToHaulAndRedirect(Astro.request, id, result.retrievedListing, result.diagnostics);
 }
 ---
 <BaseLayout title="Extract from File - Property Web Scraper">
