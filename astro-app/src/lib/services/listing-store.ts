@@ -268,23 +268,59 @@ export async function storeHtmlHash(url: string, hash: string, size: number): Pr
 }
 
 export async function deleteListing(id: string): Promise<void> {
+  // Remove URL index entry for this listing
+  const listing = store.get(id);
+  if (listing) {
+    const importUrl = (listing as any).import_url;
+    if (importUrl) {
+      urlIndex.delete(deduplicationKey(importUrl));
+    }
+  }
+
   store.delete(id);
   diagnosticsStore.delete(id);
   if (kv) {
     await kv.delete(`listing:${id}`);
     await kv.delete(`diagnostics:${id}`);
   }
+
+  // Delete from Firestore
+  try {
+    const existing = await Listing.find(id);
+    await existing.destroy();
+  } catch {
+    // Not in Firestore or already deleted — ignore
+  }
+
+  // Delete diagnostics from Firestore
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    await db.collection(`${prefix}diagnostics`).doc(id).delete();
+  } catch {
+    // Not in Firestore or already deleted — ignore
+  }
 }
  
 export async function updateListingVisibility(id: string, visibility: string): Promise<void> {
   const listing = await getListing(id);
-  if (listing) {
-    (listing as any).visibility = visibility;
-    (listing as any).manual_override = true;
-    store.set(id, listing);
-    if (kv) {
-      await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 86400 });
-    }
+  if (!listing) {
+    throw new Error(`Listing not found: ${id}`);
+  }
+
+  listing.visibility = visibility;
+  listing.manual_override = true;
+  store.set(id, listing);
+  if (kv) {
+    await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 86400 });
+  }
+
+  // Persist to Firestore
+  try {
+    listing.id = id;
+    await listing.save();
+  } catch (err) {
+    console.error('[ListingStore] Firestore visibility update failed:', (err as Error).message || err);
   }
 }
  

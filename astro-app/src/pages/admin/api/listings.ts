@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
-import { initKV, deleteListing, updateListingVisibility } from '@lib/services/listing-store.js';
+import { deleteListing, updateListingVisibility } from '@lib/services/listing-store.js';
 
 export const POST: APIRoute = async ({ request }) => {
   const auth = authenticateAdmin(request);
@@ -11,33 +11,47 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  // Ensure KV is initialized for the request
-  const env = (globalThis as any).process?.env || {}; // Fallback for local
-  const kv = (request as any).locals?.runtime?.env?.RESULTS;
-  // Note: Depending on middleware, initKV might already be called. 
-  // But we'll do it safely here if we can access the env.
-
   try {
     const body = await request.json();
     const { action, listingId, visibility } = body;
 
     if (!listingId) {
-      return new Response(JSON.stringify({ error: 'Missing listingId' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'Missing listingId' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     if (action === 'delete') {
       await deleteListing(listingId);
-      return new Response(JSON.stringify({ success: true, message: 'Listing deleted' }));
-    } 
-    
-    if (action === 'set_visibility') {
-      if (!visibility) return new Response(JSON.stringify({ error: 'Missing visibility' }), { status: 400 });
-      await updateListingVisibility(listingId, visibility);
-      return new Response(JSON.stringify({ success: true, message: `Visibility set to ${visibility}` }));
+      return new Response(JSON.stringify({ success: true, message: 'Listing deleted' }), {
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
-    return new Response(JSON.stringify({ error: 'Invalid action' }), { status: 400 });
+    if (action === 'set_visibility') {
+      if (!visibility) {
+        return new Response(JSON.stringify({ error: 'Missing visibility' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      await updateListingVisibility(listingId, visibility);
+      return new Response(JSON.stringify({ success: true, message: `Visibility set to ${visibility}` }), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    return new Response(JSON.stringify({ error: 'Invalid action' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (err: unknown) {
-    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), { status: 400 });
+    const message = err instanceof Error ? err.message : String(err);
+    const status = message.includes('not found') ? 404 : 400;
+    return new Response(JSON.stringify({ error: message }), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 };
