@@ -37,6 +37,7 @@ export interface ScrapeRecord {
   response_content_type?: string;
   html_size_bytes: number;
   html_size_kb: number;
+  html_hash?: string;   // 16-char SHA-256 hex of raw HTML
   extracted_fields?: number;
   extractable_fields?: number;
   extraction_rate?: number;
@@ -101,6 +102,7 @@ export interface RecordScrapeInput {
     responseContentType?: string;
   };
   diagnostics?: ExtractionDiagnostics;
+  html_hash?: string;
 }
 
 const SCRAPE_PREFIX = 'scrape-meta:';
@@ -179,6 +181,7 @@ export async function recordScrapeAndUpdatePortal(input: RecordScrapeInput): Pro
     ...(input.fetchContext?.responseContentType ? { response_content_type: input.fetchContext.responseContentType } : {}),
     html_size_bytes: htmlSize,
     html_size_kb: Math.round((htmlSize / 1024) * 100) / 100,
+    ...(input.html_hash ? { html_hash: input.html_hash } : {}),
     ...(typeof diagnostics?.populatedExtractableFields === 'number'
       ? { extracted_fields: diagnostics.populatedExtractableFields }
       : {}),

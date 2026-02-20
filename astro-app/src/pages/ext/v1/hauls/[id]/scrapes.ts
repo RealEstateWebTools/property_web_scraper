@@ -154,6 +154,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     haul_url: `/haul/${id}`,
     results_url: resultsUrl,
     was_existing_listing: extractionResult.wasExistingListing,
+    was_unchanged: extractionResult.wasUnchanged,
     replaced,
   }, request, 201);
 };

@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- HTML content hash change detection: incoming HTML is fingerprinted (SHA-256, 16-char hex) and compared against the stored hash for the URL; unchanged pages short-circuit extraction and return the cached listing with `was_unchanged: true` in the API response
+- `html_hash` field added to `ScrapeRecord` for per-URL content change observability in scrape history
+- `html-hash:{stableId}` KV key stores hash + size per URL (30-day TTL)
 - `description_html` field on `Listing` and `HaulScrape` — preserves the original HTML markup from scrapers (e.g. `<b>`, `<br />`, `<p>`) before tag-stripping; plain-text `description` is unchanged for all exporters and downstream consumers; listing detail page now renders the HTML version when available; haul endpoints include `description_html` capped at 1000 chars
 - `locale_code` now included in `Listing#asJson()` output — signals the language of `description` and `title` to API consumers
 - Non-English content strategy: single `description` field in the portal's native language, tagged with `locale_code` (e.g. `'es'`, `'de'`); per-locale duplicate fields (`description_es`, `title_de`, etc.) removed as dead code
