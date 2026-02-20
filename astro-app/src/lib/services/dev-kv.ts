@@ -7,7 +7,7 @@
  * Activated when DEV_KV_PERSIST is set. Data stored under astro-app/.kv-data/.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 interface StoredEntry {
@@ -67,6 +67,30 @@ export class DevKV {
     }
     return entry.value;
   }
+
+  async delete(key: string): Promise<void> {
+    const filePath = join(this.dir, safeFilename(key));
+    try { unlinkSync(filePath); } catch { /* file may not exist */ }
+  }
+
+  /** Remove all expired entries from disk. Call on startup to prevent stale data buildup. */
+  cleanup(): number {
+    let removed = 0;
+    const now = Date.now();
+    try {
+      for (const file of readdirSync(this.dir)) {
+        const filePath = join(this.dir, file);
+        try {
+          const entry: StoredEntry = JSON.parse(readFileSync(filePath, 'utf-8'));
+          if (entry.expiresAt && entry.expiresAt < now) {
+            unlinkSync(filePath);
+            removed++;
+          }
+        } catch { /* skip corrupt files */ }
+      }
+    } catch { /* dir may not exist */ }
+    return removed;
+  }
 }
 
 let instance: DevKV | null = null;
@@ -80,6 +104,10 @@ export function getDevKV(): DevKV | null {
   if (!enabled) return null;
   const dir = join(process.cwd(), '.kv-data');
   instance = new DevKV(dir);
+  const removed = instance.cleanup();
+  if (removed > 0) {
+    console.log(`[DevKV] Cleaned up ${removed} expired entries`);
+  }
   return instance;
 }
 

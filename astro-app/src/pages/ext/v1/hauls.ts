@@ -1,18 +1,36 @@
 import type { APIRoute } from 'astro';
 import { generateHaulId } from '@lib/services/haul-id.js';
-import { createHaul, initHaulKV } from '@lib/services/haul-store.js';
+import { createHaul } from '@lib/services/haul-store.js';
 import { resolveKV } from '@lib/services/kv-resolver.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 
-// Simple sliding-window rate limit for haul creation: 5 per hour per IP
-const ipTimestamps = new Map<string, number[]>();
+// KV-backed rate limit for haul creation: 5 per hour per IP.
+// Falls back to in-memory if KV unavailable.
 const MAX_CREATES_PER_HOUR = 5;
+const RATE_LIMIT_WINDOW_S = 3600;
+const inMemoryTimestamps = new Map<string, number[]>();
 
-function isRateLimited(ip: string): boolean {
+async function isRateLimited(ip: string, kv: any): Promise<boolean> {
+  const kvKey = `haul-rate:${ip}`;
   const now = Date.now();
-  const cutoff = now - 60 * 60 * 1000;
-  const timestamps = (ipTimestamps.get(ip) || []).filter(t => t > cutoff);
-  ipTimestamps.set(ip, timestamps);
+
+  // Try KV first (cross-isolate)
+  if (kv) {
+    try {
+      const data = await kv.get(kvKey, 'json') as { count: number } | null;
+      const count = data?.count ?? 0;
+      if (count >= MAX_CREATES_PER_HOUR) return true;
+      await kv.put(kvKey, JSON.stringify({ count: count + 1 }), { expirationTtl: RATE_LIMIT_WINDOW_S });
+      return false;
+    } catch {
+      // KV failure — fall through to in-memory
+    }
+  }
+
+  // In-memory fallback (per-isolate, best effort)
+  const cutoff = now - RATE_LIMIT_WINDOW_S * 1000;
+  const timestamps = (inMemoryTimestamps.get(ip) || []).filter(t => t > cutoff);
+  inMemoryTimestamps.set(ip, timestamps);
   if (timestamps.length >= MAX_CREATES_PER_HOUR) return true;
   timestamps.push(now);
   return false;
@@ -28,11 +46,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     || 'unknown';
 
-  if (isRateLimited(ip)) {
+  const kvBinding = resolveKV(locals);
+
+  if (await isRateLimited(ip, kvBinding)) {
     return errorResponse(ApiErrorCode.RATE_LIMITED, 'Too many hauls created. Try again later.', request);
   }
-
-  initHaulKV(resolveKV(locals));
 
   const id = generateHaulId();
   const haul = await createHaul(id, ip);

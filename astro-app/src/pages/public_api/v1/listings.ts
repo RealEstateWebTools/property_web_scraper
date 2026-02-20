@@ -18,7 +18,6 @@ import { detectListingType } from '@lib/extractor/listing-type-detector.js';
 import type { SplitSchema } from '@lib/extractor/schema-splitter.js';
 import type { PortalConfig } from '@lib/services/portal-registry.js';
 import { runExtraction, countAvailableFields, countExtractedFields } from '@lib/services/extraction-runner.js';
-import { resolveKV } from '@lib/services/kv-resolver.js';
 
 /**
  * Build PWB-formatted response from extraction result.
@@ -105,7 +104,7 @@ export const GET: APIRoute = async ({ request }) => {
   const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request, auth.tier, auth.userId, 'api');
+  const rateCheck = await checkRateLimit(request, auth.tier, auth.userId, 'api');
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   const url = new URL(request.url).searchParams.get('url');
@@ -194,7 +193,7 @@ export const GET: APIRoute = async ({ request }) => {
 /**
  * POST /public_api/v1/listings
  */
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/listings';
 
@@ -264,7 +263,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   // Rate limit with endpoint-specific multipliers (after body parsing)
   const endpointClass = html ? 'html_extract' as const : 'url_extract' as const;
-  const rateCheck = checkRateLimit(request, auth.tier, auth.userId, endpointClass);
+  const rateCheck = await checkRateLimit(request, auth.tier, auth.userId, endpointClass);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   if (!url) {
@@ -368,7 +367,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   if (html) {
     const apiSourceType = contentType.includes('multipart/form-data') ? 'api_multipart_html' as const : 'api_json_html' as const;
-    const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: apiSourceType, kvBinding: resolveKV(locals) });
+    const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: apiSourceType });
 
     if (extractionResult) {
       const { listing: extractedListing, resultId, resultsUrl, fieldsExtracted, fieldsAvailable, diagnostics, rawProps, splitSchema } = extractionResult;

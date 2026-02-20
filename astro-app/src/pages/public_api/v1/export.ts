@@ -67,7 +67,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
+  const rateCheck = await checkRateLimit(request, auth.tier, auth.userId);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   try {

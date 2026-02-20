@@ -87,7 +87,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   }
 
   // Run extraction
-  const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: 'manual_html', kvBinding: resolveKV(locals) });
+  const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: 'manual_html' });
   if (!extractionResult) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Extraction failed — no data could be extracted', request);
   }

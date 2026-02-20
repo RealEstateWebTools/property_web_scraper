@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { Listing } from '../models/listing.js';
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { deduplicationKey } from './url-canonicalizer.js';
+import { getClient, getCollectionPrefix } from '../firestore/client.js';
 
 /**
  * KV-backed store for extracted listings, with in-memory fallback.
@@ -15,6 +16,8 @@ const store = new Map<string, Listing>();
 const diagnosticsStore = new Map<string, ExtractionDiagnostics>();
 const urlIndex = new Map<string, string>();
 let counter = 0;
+/** When true, skip Firestore fallback for diagnostics (set by clearListingStore). */
+let _diagnosticsCleared = false;
 
 /** Call once per request with the RESULTS KV binding from Astro.locals.runtime.env */
 export function initKV(kvNamespace: any): void {
@@ -56,7 +59,7 @@ export async function storeListing(id: string, listing: Listing): Promise<void> 
     urlIndex.set(deduplicationKey(importUrl), id);
   }
   if (kv) {
-    await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 3600 });
+    await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 86400 });
   }
 }
 
@@ -104,24 +107,46 @@ export async function getListing(id: string): Promise<Listing | undefined> {
   }
 }
 
-export async function storeDiagnostics(id: string, diagnostics: ExtractionDiagnostics): Promise<void> {
-  diagnosticsStore.set(id, diagnostics);
-  if (kv) {
-    await kv.put(`diagnostics:${id}`, JSON.stringify(diagnostics), { expirationTtl: 3600 });
+// ─── Firestore helpers for diagnostics ──────────────────────────
+
+async function firestoreSaveDiagnostics(id: string, diagnostics: ExtractionDiagnostics): Promise<void> {
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const col = db.collection(`${prefix}diagnostics`);
+    await col.doc(id).set(JSON.parse(JSON.stringify(diagnostics)));
+  } catch (err) {
+    console.error('[ListingStore] Firestore diagnostics save failed:', (err as Error).message || err);
   }
 }
 
-export async function getDiagnostics(id: string): Promise<ExtractionDiagnostics | undefined> {
-  const cached = diagnosticsStore.get(id);
-  if (cached) return cached;
-  if (kv) {
-    const data = await kv.get(`diagnostics:${id}`, 'json') as ExtractionDiagnostics | null;
-    if (data) {
-      diagnosticsStore.set(id, data);
-      return data;
-    }
+async function firestoreGetDiagnostics(id: string): Promise<ExtractionDiagnostics | undefined> {
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const col = db.collection(`${prefix}diagnostics`);
+    const doc = await col.doc(id).get();
+    if (!doc.exists) return undefined;
+    return doc.data() as ExtractionDiagnostics;
+  } catch {
+    return undefined;
   }
-  // Reconstruct from Firestore listing's embedded diagnostic fields
+}
+
+export async function storeDiagnostics(id: string, diagnostics: ExtractionDiagnostics): Promise<void> {
+  _diagnosticsCleared = false;
+  diagnosticsStore.set(id, diagnostics);
+  if (kv) {
+    await kv.put(`diagnostics:${id}`, JSON.stringify(diagnostics), { expirationTtl: 86400 });
+  }
+  // Firestore write-through (fire-and-forget)
+  firestoreSaveDiagnostics(id, diagnostics).catch((err) => {
+    console.error('[ListingStore] Firestore diagnostics write-through failed:', (err as Error).message || err);
+  });
+}
+
+/** Tier 4: Lossy reconstruction from Firestore listing's embedded diagnostic fields. */
+async function reconstructDiagnosticsFromListing(id: string): Promise<ExtractionDiagnostics | undefined> {
   try {
     const listing = await Listing.find(id);
     if (listing.scraper_name) {
@@ -149,6 +174,38 @@ export async function getDiagnostics(id: string): Promise<ExtractionDiagnostics 
     // Listing not in Firestore either
   }
   return undefined;
+}
+
+export async function getDiagnostics(id: string): Promise<ExtractionDiagnostics | undefined> {
+  // Tier 1: in-memory cache
+  const cached = diagnosticsStore.get(id);
+  if (cached) return cached;
+
+  // Tier 2: KV
+  if (kv) {
+    const data = await kv.get(`diagnostics:${id}`, 'json') as ExtractionDiagnostics | null;
+    if (data) {
+      diagnosticsStore.set(id, data);
+      return data;
+    }
+  }
+
+  // Tier 3: Firestore diagnostics collection
+  // Skip if store was explicitly cleared (diagnostics written this session are stale)
+  if (!_diagnosticsCleared) {
+    const firestoreDiag = await firestoreGetDiagnostics(id);
+    if (firestoreDiag) {
+      diagnosticsStore.set(id, firestoreDiag);
+      // Repopulate KV for faster subsequent reads
+      if (kv) {
+        kv.put(`diagnostics:${id}`, JSON.stringify(firestoreDiag), { expirationTtl: 86400 }).catch(() => {});
+      }
+      return firestoreDiag;
+    }
+  }
+
+  // Tier 4: Lossy reconstruction from Firestore listing's embedded fields
+  return reconstructDiagnosticsFromListing(id);
 }
 
 export async function getAllListings(): Promise<Array<{ id: string; listing: Listing }>> {
@@ -204,7 +261,7 @@ export async function updateListingVisibility(id: string, visibility: string): P
     (listing as any).manual_override = true;
     store.set(id, listing);
     if (kv) {
-      await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 3600 });
+      await kv.put(`listing:${id}`, JSON.stringify(listing), { expirationTtl: 86400 });
     }
   }
 }
@@ -213,4 +270,5 @@ export function clearListingStore(): void {
   store.clear();
   diagnosticsStore.clear();
   urlIndex.clear();
+  _diagnosticsCleared = true;
 }
