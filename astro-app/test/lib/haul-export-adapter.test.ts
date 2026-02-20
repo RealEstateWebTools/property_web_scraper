@@ -28,6 +28,17 @@ function makeEnrichedScrape(overrides: Partial<HaulScrape> = {}): HaulScrape {
     for_rent: false,
     features: ['Garden', 'Parking', 'Central Heating'],
     description: 'A lovely property in London',
+    property_type: 'house',
+    property_subtype: 'detached',
+    tenure: 'freehold',
+    listing_status: 'active',
+    agent_name: 'Acme Estates',
+    agent_phone: '+44 20 1234 5678',
+    agent_email: 'info@acme.co.uk',
+    agent_logo_url: 'https://example.com/logo.png',
+    price_qualifier: 'guide_price',
+    floor_plan_urls: ['https://example.com/floor1.png'],
+    energy_certificate_grade: 'C',
     ...overrides,
   };
 }
@@ -70,6 +81,17 @@ describe('haul-export-adapter', () => {
       expect(listing.for_rent).toBe(false);
       expect(listing.features).toEqual(['Garden', 'Parking', 'Central Heating']);
       expect(listing.description).toBe('A lovely property in London');
+      expect(listing.property_type).toBe('house');
+      expect(listing.property_subtype).toBe('detached');
+      expect(listing.tenure).toBe('freehold');
+      expect(listing.listing_status).toBe('active');
+      expect(listing.agent_name).toBe('Acme Estates');
+      expect(listing.agent_phone).toBe('+44 20 1234 5678');
+      expect(listing.agent_email).toBe('info@acme.co.uk');
+      expect(listing.agent_logo_url).toBe('https://example.com/logo.png');
+      expect(listing.price_qualifier).toBe('guide_price');
+      expect(listing.floor_plan_urls).toEqual(['https://example.com/floor1.png']);
+      expect(listing.energy_certificate_grade).toBe('C');
     });
 
     it('handles a legacy scrape with missing enriched fields', () => {
@@ -86,6 +108,33 @@ describe('haul-export-adapter', () => {
       expect(listing.city).toBe('');
       expect(listing.features).toEqual([]);
       expect(listing.description).toBe('');
+      // New interoperability fields default to empty for legacy scrapes
+      expect(listing.property_type).toBe('');
+      expect(listing.property_subtype).toBe('');
+      expect(listing.tenure).toBe('');
+      expect(listing.listing_status).toBe('');
+      expect(listing.agent_name).toBe('');
+      expect(listing.agent_phone).toBe('');
+      expect(listing.agent_email).toBe('');
+      expect(listing.agent_logo_url).toBe('');
+      expect(listing.price_qualifier).toBe('');
+      expect(listing.floor_plan_urls).toEqual([]);
+      expect(listing.energy_certificate_grade).toBe('');
+    });
+
+    it('round-trips new interoperability fields through adapter', () => {
+      const scrape = makeEnrichedScrape({
+        property_type: 'apartment',
+        agent_name: 'Best Homes Ltd',
+        tenure: 'leasehold',
+        floor_plan_urls: ['https://example.com/fp1.png', 'https://example.com/fp2.png'],
+      });
+      const listing = haulScrapeToListing(scrape);
+
+      expect(listing.property_type).toBe('apartment');
+      expect(listing.agent_name).toBe('Best Homes Ltd');
+      expect(listing.tenure).toBe('leasehold');
+      expect(listing.floor_plan_urls).toEqual(['https://example.com/fp1.png', 'https://example.com/fp2.png']);
     });
   });
 

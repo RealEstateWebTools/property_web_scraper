@@ -87,7 +87,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   }
 
   // Run extraction
-  const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: 'manual_html' });
+  const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: 'manual_html', kvBinding: resolveKV(locals) });
   if (!extractionResult) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Extraction failed — no data could be extracted', request);
   }
@@ -123,6 +123,17 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     for_rent: listing.for_rent || undefined,
     features: listing.features?.length ? listing.features : undefined,
     description: listing.description ? listing.description.slice(0, 500) : undefined,
+    property_type: listing.property_type || undefined,
+    property_subtype: listing.property_subtype || undefined,
+    tenure: listing.tenure || undefined,
+    listing_status: listing.listing_status || undefined,
+    agent_name: listing.agent_name || undefined,
+    agent_phone: listing.agent_phone || undefined,
+    agent_email: listing.agent_email || undefined,
+    agent_logo_url: listing.agent_logo_url || undefined,
+    price_qualifier: listing.price_qualifier || undefined,
+    floor_plan_urls: listing.floor_plan_urls?.length ? listing.floor_plan_urls : undefined,
+    energy_certificate_grade: listing.energy_certificate_grade || undefined,
   };
 
   const { added, replaced } = await addScrapeToHaul(id, scrape);

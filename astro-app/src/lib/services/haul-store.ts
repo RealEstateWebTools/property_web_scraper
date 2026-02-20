@@ -31,6 +31,18 @@ export interface HaulScrape {
   for_rent?: boolean;
   features?: string[];
   description?: string;
+  // New interoperability fields
+  property_type?: string;
+  property_subtype?: string;
+  tenure?: string;
+  listing_status?: string;
+  agent_name?: string;
+  agent_phone?: string;
+  agent_email?: string;
+  agent_logo_url?: string;
+  price_qualifier?: string;
+  floor_plan_urls?: string[];
+  energy_certificate_grade?: string;
 }
 
 export interface Haul {

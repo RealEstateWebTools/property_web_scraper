@@ -29,6 +29,17 @@ export function haulScrapeToListing(scrape: HaulScrape): Listing {
   listing.for_rent = scrape.for_rent ?? false;
   listing.features = scrape.features ?? [];
   listing.description = scrape.description ?? '';
+  listing.property_type = scrape.property_type ?? '';
+  listing.property_subtype = scrape.property_subtype ?? '';
+  listing.tenure = scrape.tenure ?? '';
+  listing.listing_status = scrape.listing_status ?? '';
+  listing.agent_name = scrape.agent_name ?? '';
+  listing.agent_phone = scrape.agent_phone ?? '';
+  listing.agent_email = scrape.agent_email ?? '';
+  listing.agent_logo_url = scrape.agent_logo_url ?? '';
+  listing.price_qualifier = scrape.price_qualifier ?? '';
+  listing.floor_plan_urls = scrape.floor_plan_urls ?? [];
+  listing.energy_certificate_grade = scrape.energy_certificate_grade ?? '';
 
   return listing;
 }

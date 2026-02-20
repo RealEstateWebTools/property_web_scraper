@@ -9,6 +9,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <h1 class="text-2xl font-bold text-gray-900">📦 My Hauls</h1>
       <p class="text-sm text-gray-500 mt-1">Hauls you've visited, stored locally in your browser.</p>
     </div>
+    <button id="create-haul-btn" type="button"
+      class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 inline-flex items-center gap-1.5 cursor-pointer border-0">
+      <i class="bi bi-plus-lg"></i> New Haul
+    </button>
   </div>
 
   <div id="hauls-list"></div>
@@ -17,7 +21,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <div class="text-4xl mb-3">📦</div>
     <h3 class="font-semibold text-gray-700 mb-2">No hauls found</h3>
     <p class="text-gray-500 text-sm mb-4">
-      Hauls you visit will appear here. Create a haul using the
+      Create a haul using the button above, or collect listings with the
       <a href="/extension" class="text-blue-600 hover:underline">Chrome extension</a>.
     </p>
     <p class="text-xs text-gray-400">
@@ -37,6 +41,43 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <script is:inline>
 document.addEventListener('DOMContentLoaded', function() {
+  // Create Haul button
+  var createBtn = document.getElementById('create-haul-btn');
+  if (createBtn) {
+    createBtn.addEventListener('click', async function() {
+      createBtn.disabled = true;
+      createBtn.textContent = 'Creating...';
+      try {
+        var res = await fetch('/ext/v1/hauls', { method: 'POST' });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error?.message || 'Failed to create haul');
+        var haulId = data.haul_id;
+        // Save to my-hauls in PwsStorage
+        if (typeof window.PwsStorage !== 'undefined') {
+          var myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+          myHauls.unshift({
+            id: haulId,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            lastVisited: new Date().toISOString(),
+            scrapeCount: 0,
+            name: null,
+          });
+          window.PwsStorage.set('functional:my-hauls', myHauls);
+        }
+        window.location.href = '/haul/' + haulId;
+      } catch (err) {
+        createBtn.innerHTML = '<i class="bi bi-plus-lg"></i> New Haul';
+        createBtn.disabled = false;
+        // Show error inline
+        var errEl = document.createElement('span');
+        errEl.className = 'text-red-600 text-xs ml-2';
+        errEl.textContent = err.message || 'Failed to create haul';
+        createBtn.parentNode.appendChild(errEl);
+        setTimeout(function() { errEl.remove(); }, 4000);
+      }
+    });
+  }
+
   var listEl = document.getElementById('hauls-list');
   var emptyEl = document.getElementById('hauls-empty');
   var noConsentEl = document.getElementById('no-consent');

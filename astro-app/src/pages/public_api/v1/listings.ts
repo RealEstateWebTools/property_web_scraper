@@ -18,6 +18,7 @@ import { detectListingType } from '@lib/extractor/listing-type-detector.js';
 import type { SplitSchema } from '@lib/extractor/schema-splitter.js';
 import type { PortalConfig } from '@lib/services/portal-registry.js';
 import { runExtraction, countAvailableFields, countExtractedFields } from '@lib/services/extraction-runner.js';
+import { resolveKV } from '@lib/services/kv-resolver.js';
 
 /**
  * Build PWB-formatted response from extraction result.
@@ -193,7 +194,7 @@ export const GET: APIRoute = async ({ request }) => {
 /**
  * POST /public_api/v1/listings
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/listings';
 
@@ -367,7 +368,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (html) {
     const apiSourceType = contentType.includes('multipart/form-data') ? 'api_multipart_html' as const : 'api_json_html' as const;
-    const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: apiSourceType });
+    const extractionResult = await runExtraction({ html, url, scraperMapping, importHost, sourceType: apiSourceType, kvBinding: resolveKV(locals) });
 
     if (extractionResult) {
       const { listing: extractedListing, resultId, resultsUrl, fieldsExtracted, fieldsAvailable, diagnostics, rawProps, splitSchema } = extractionResult;
