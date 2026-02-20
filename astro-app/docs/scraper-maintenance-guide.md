@@ -326,6 +326,7 @@ capture-fixture [url]
 | Missing `cssCountId` | Cheerio concatenates ALL matched element texts. |
 | `<br>` handling | Cheerio converts `<br>` to `\n`, never `\r`. |
 | `defaultValues` types | Always produces strings, even `"true"` / `"false"`. |
+| Missing `locale_code` | Every mapping should set `locale_code` in `defaultValues` (e.g. `"es"`, `"en"`, `"en-AU"`). It signals the language of `title`/`description` to consumers (Kyero exporter, API clients). Omitting it means the Kyero exporter defaults to `<en>` regardless of actual language. |
 | Processing order | defaults -> images -> features -> int -> float -> text -> boolean |
 | `splitTextCharacter` with whitespace | Cheerio may add leading newlines/spaces in multi-line elements. Split on space can produce empty first elements. |
 | `stripString` scope | Runs after split, operates on the split fragment only. Removes first occurrence only. |

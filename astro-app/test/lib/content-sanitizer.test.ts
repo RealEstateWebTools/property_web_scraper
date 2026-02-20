@@ -72,6 +72,12 @@ describe('sanitizePropertyHash', () => {
     expect(result.features).toEqual(['Pool', 'Garden', 'Garage']);
   });
 
+  it('strips HTML from locale_code', () => {
+    const input = { locale_code: '<b>es</b>' };
+    const result = sanitizePropertyHash(input);
+    expect(result.locale_code).toBe('es');
+  });
+
   it('passes through non-text fields unchanged', () => {
     const input = {
       price_float: 250000,
