@@ -13,9 +13,6 @@ const TEXT_FIELDS = [
   'address_string', 'street_address', 'street_number', 'street_name',
   'city', 'province', 'region', 'country', 'postal_code', 'locale_code',
   'area_unit', 'property_type', 'energy_rating',
-  // Multi-language variants
-  'title_es', 'description_es', 'title_de', 'description_de',
-  'title_fr', 'description_fr', 'title_it', 'description_it',
 ];
 
 const URL_FIELDS = ['main_image_url'];

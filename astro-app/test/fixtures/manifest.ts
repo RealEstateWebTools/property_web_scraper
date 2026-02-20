@@ -139,6 +139,7 @@ export const fixtures: FixtureEntry[] = [
       main_image_url: 'https://static.fotocasa.es/images/ads/d38801fe-dbb4-4a8e-8365-f8e354a38b8a?rule=f_640x480_jpg_70',
       for_rent: false,
       for_sale: true,
+      locale_code: 'es',
     },
   },
   {
@@ -156,6 +157,7 @@ export const fixtures: FixtureEntry[] = [
       address_string: 'Goya (Distrito Salamanca. Madrid Capital)',
       for_sale: true,
       for_rent: false,
+      locale_code: 'es',
     },
   },
   {
@@ -174,6 +176,7 @@ export const fixtures: FixtureEntry[] = [
       for_rent: true,
       for_rent_long_term: true,
       for_sale: false,
+      locale_code: 'en',
     },
   },
   {
@@ -216,6 +219,7 @@ export const fixtures: FixtureEntry[] = [
       price_string: '$33,500',
       reference: '20176813',
       description: '350 N FOREST DR LOT #20  -  THIS HOME CAN BE MOVED  2002 16x66 3 bedroom 2 bathroom mobile home for sale. This mobile home is in immaculate condition and sits on a beautiful lot! The home includes a $2,000 shed, has a new $5,000 roof, fenced yard, fresh paint and has brand new beautiful flooring. This is a must see! Motivated Seller - bring your offer! Call Janet Reinhart 307-262-0361 for your private showing!',
+      locale_code: 'en',
     },
   },
 
@@ -229,6 +233,7 @@ export const fixtures: FixtureEntry[] = [
       currency: 'USD',
       price_string: '$349,900',
       description: 'Charming 4 bedroom home with modern updates throughout. Open floor plan with hardwood floors.',
+      locale_code: 'en',
     },
   },
 
@@ -255,6 +260,7 @@ export const fixtures: FixtureEntry[] = [
       main_image_url: 'https://media.rightmove.co.uk/property-photo/1ea796601/171844895/1ea796601ef4700b5cfa10c29a148d74.jpeg',
       for_sale: true,
       for_rent: false,
+      locale_code: 'en',
     },
   },
   {
@@ -279,6 +285,7 @@ export const fixtures: FixtureEntry[] = [
       title: 'Sandland Grove, Nantwich',
       description: '4 Bed Detached House For Sale In Sandland Grove, Nantwich. Cut through irrelevant listings with powerful filters and AI search.',
       main_image_url: 'https://jitty-cdn.com/cdn-cgi/image/w=1200,h=630,fit=cover/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBCSDRMMVJJPSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--96d8e238014408cf06777f75aa945bd1987552a3',
+      locale_code: 'en',
     },
   },
   {
@@ -302,6 +309,7 @@ export const fixtures: FixtureEntry[] = [
       main_image_url: 'https://lid.zoocdn.com/u/480/360/611ee8a15bb93510c3c3da707c92843b4f84d521.jpg',
       for_sale: true,
       for_rent: false,
+      locale_code: 'en',
     },
   },
   {
@@ -321,6 +329,7 @@ export const fixtures: FixtureEntry[] = [
       main_image_url: 'https://media.onthemarket.com/properties/16979647/1543454825/image-0-1024x1024.jpg',
       for_sale: true,
       for_rent: false,
+      locale_code: 'en',
     },
   },
   {
@@ -343,6 +352,7 @@ export const fixtures: FixtureEntry[] = [
       region: 'Meath',
       for_sale: true,
       for_rent: false,
+      locale_code: 'en',
     },
   },
   {
@@ -363,6 +373,7 @@ export const fixtures: FixtureEntry[] = [
       main_image_url: 'https://img4.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/c0/ac/cc/1382500227.jpg',
       for_sale: true,
       for_rent: false,
+      locale_code: 'es',
     },
   },
   {
@@ -374,6 +385,7 @@ export const fixtures: FixtureEntry[] = [
       // Only default values survive — proves server-side fetch is useless
       country: 'Spain',
       currency: 'EUR',
+      locale_code: 'es',
     },
   },
   {
@@ -407,6 +419,7 @@ export const fixtures: FixtureEntry[] = [
       main_image_url: 'https://bucket-api.domain.com.au/v1/bucket/image/2020615556_1_1_260218_045427-w1600-h1067',
       for_sale: true,
       for_rent: false,
+      locale_code: 'en-AU',
     },
   },
   {
