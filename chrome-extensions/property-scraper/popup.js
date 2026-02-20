@@ -31,15 +31,12 @@ function showState(name) {
 async function init() {
   showState('loading');
 
-  // Check haul ID
   const config = await chrome.storage.sync.get(['apiUrl', 'haulId']);
-  if (!config.haulId) {
-    showState('noKey');
-    return;
-  }
 
-  // Show history immediately (fire-and-forget)
-  renderHistory(config.haulId);
+  // Show history immediately if we have a haul (fire-and-forget)
+  if (config.haulId) {
+    renderHistory(config.haulId);
+  }
 
   // Get current tab
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -94,6 +91,11 @@ async function init() {
         showError(msg);
       }
       return;
+    }
+
+    // If the server returned a new haul_id, render its history
+    if (result.haul_id && !config.haulId) {
+      renderHistory(result.haul_id);
     }
 
     extractedData = result;
