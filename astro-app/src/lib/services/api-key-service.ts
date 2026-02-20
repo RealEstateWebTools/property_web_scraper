@@ -67,9 +67,18 @@ async function kvDelete(key: string): Promise<void> {
   memStore.delete(key);
 }
 
+/**
+ * In-memory cache for validated API keys.
+ * Avoids KV read on every authenticated request.
+ * TTL: 5 minutes — key revocations take up to 5 min to propagate.
+ */
+const validationCache = new Map<string, { result: ValidatedKey | null; expiresAt: number }>();
+const VALIDATION_CACHE_TTL_MS = 5 * 60 * 1000;
+
 /** Clear all in-memory data. For testing only. */
 export function resetApiKeyStore(): void {
   memStore.clear();
+  validationCache.clear();
 }
 
 // ─── Hashing ────────────────────────────────────────────────────
@@ -132,6 +141,7 @@ export async function generateApiKey(
  *
  * Hashes the input, looks up in KV, and returns user info if valid.
  * Returns null for invalid/revoked/missing keys.
+ * Results are cached in memory for 5 minutes to reduce KV reads.
  */
 export async function validateApiKey(rawKey: string): Promise<ValidatedKey | null> {
   if (!rawKey || !rawKey.startsWith('pws_live_')) {
@@ -139,17 +149,32 @@ export async function validateApiKey(rawKey: string): Promise<ValidatedKey | nul
   }
 
   const hash = await sha256(rawKey);
+
+  // Check cache first
+  const cached = validationCache.get(hash);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.result;
+  }
+
   const json = await kvGet(`apikey:${hash}`);
-  if (!json) return null;
+  if (!json) {
+    validationCache.set(hash, { result: null, expiresAt: Date.now() + VALIDATION_CACHE_TTL_MS });
+    return null;
+  }
 
   const record: ApiKeyRecord = JSON.parse(json);
-  if (!record.active) return null;
+  if (!record.active) {
+    validationCache.set(hash, { result: null, expiresAt: Date.now() + VALIDATION_CACHE_TTL_MS });
+    return null;
+  }
 
   // Get the user's current tier (not the tier stored on the key)
   const user = await getUser(record.userId);
   const tier = user?.tier ?? record.tier;
 
-  return { userId: record.userId, tier, label: record.label };
+  const result: ValidatedKey = { userId: record.userId, tier, label: record.label };
+  validationCache.set(hash, { result, expiresAt: Date.now() + VALIDATION_CACHE_TTL_MS });
+  return result;
 }
 
 // ─── Key revocation ─────────────────────────────────────────────
@@ -165,6 +190,9 @@ export async function revokeApiKey(keyHash: string): Promise<boolean> {
   const record: ApiKeyRecord = JSON.parse(json);
   record.active = false;
   await kvPut(`apikey:${keyHash}`, JSON.stringify(record));
+
+  // Invalidate validation cache for this key
+  validationCache.delete(keyHash);
   return true;
 }
 

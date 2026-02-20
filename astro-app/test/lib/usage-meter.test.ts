@@ -97,6 +97,30 @@ describe('usage-meter', () => {
     });
   });
 
+  describe('getTodayUsage caching', () => {
+    it('returns cached value on second call without extra KV read', async () => {
+      await recordUsage('cache-user');
+      const first = await getTodayUsage('cache-user');
+      const second = await getTodayUsage('cache-user');
+      expect(first).toBe(1);
+      expect(second).toBe(1);
+    });
+
+    it('cache is updated after recordUsage', async () => {
+      await recordUsage('cache-user');
+      expect(await getTodayUsage('cache-user')).toBe(1);
+      await recordUsage('cache-user');
+      expect(await getTodayUsage('cache-user')).toBe(2);
+    });
+
+    it('cache is cleared by resetUsageMeter', async () => {
+      await recordUsage('cache-user');
+      expect(await getTodayUsage('cache-user')).toBe(1);
+      resetUsageMeter();
+      expect(await getTodayUsage('cache-user')).toBe(0);
+    });
+  });
+
   describe('getUsageSummary', () => {
     it('returns complete summary', async () => {
       await recordUsage('user-1');

@@ -76,6 +76,44 @@ describe('api-key-service', () => {
     });
   });
 
+  describe('validation caching', () => {
+    it('returns cached result on repeated validation', async () => {
+      await createUser('cache-user', 'cache@test.com', 'pro');
+      const { rawKey } = await generateApiKey('cache-user');
+
+      const first = await validateApiKey(rawKey);
+      const second = await validateApiKey(rawKey);
+      expect(first).not.toBeNull();
+      expect(second).not.toBeNull();
+      expect(first!.userId).toBe(second!.userId);
+      expect(first!.tier).toBe('pro');
+    });
+
+    it('cache is cleared by resetApiKeyStore', async () => {
+      await createUser('cache-user', 'cache@test.com');
+      const { rawKey } = await generateApiKey('cache-user');
+
+      expect(await validateApiKey(rawKey)).not.toBeNull();
+      resetApiKeyStore();
+      // After reset, key data is gone so validation fails
+      expect(await validateApiKey(rawKey)).toBeNull();
+    });
+
+    it('revocation invalidates cache for that key', async () => {
+      await createUser('cache-user', 'cache@test.com');
+      const { rawKey, hash } = await generateApiKey('cache-user');
+
+      // Validate to populate cache
+      expect(await validateApiKey(rawKey)).not.toBeNull();
+
+      // Revoke
+      await revokeApiKey(hash);
+
+      // Should return null despite having been cached
+      expect(await validateApiKey(rawKey)).toBeNull();
+    });
+  });
+
   // ─── Key revocation ─────────────────────────────────────
 
   describe('revokeApiKey', () => {

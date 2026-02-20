@@ -10,6 +10,7 @@ import {
   getWebhook,
   clearWebhookStore,
   computeHmacSha256,
+  MAX_WEBHOOKS,
   type WebhookEvent,
 } from '../../src/lib/services/webhook-service.js';
 
@@ -43,6 +44,36 @@ describe('webhook registration', () => {
     const wh1 = await registerWebhook('https://a.com/hook', ['extraction.completed']);
     const wh2 = await registerWebhook('https://b.com/hook', ['extraction.completed']);
     expect(wh1.id).not.toBe(wh2.id);
+  });
+});
+
+describe('webhook registration limit', () => {
+  it('enforces MAX_WEBHOOKS limit', async () => {
+    for (let i = 0; i < MAX_WEBHOOKS; i++) {
+      await registerWebhook(`https://example.com/hook-${i}`, ['extraction.completed']);
+    }
+    const list = await listWebhooks();
+    expect(list).toHaveLength(MAX_WEBHOOKS);
+
+    // Next registration should throw
+    await expect(
+      registerWebhook('https://example.com/over-limit', ['extraction.completed']),
+    ).rejects.toThrow(`Webhook limit reached (${MAX_WEBHOOKS}/${MAX_WEBHOOKS})`);
+  });
+
+  it('allows registration after removing a webhook', async () => {
+    const webhooks = [];
+    for (let i = 0; i < MAX_WEBHOOKS; i++) {
+      webhooks.push(await registerWebhook(`https://example.com/hook-${i}`, ['extraction.completed']));
+    }
+
+    // Remove one
+    await removeWebhook(webhooks[0].id);
+
+    // Should now allow registration
+    const newWh = await registerWebhook('https://example.com/replacement', ['extraction.completed']);
+    expect(newWh.id).toMatch(/^wh_/);
+    expect(await listWebhooks()).toHaveLength(MAX_WEBHOOKS);
   });
 });
 
