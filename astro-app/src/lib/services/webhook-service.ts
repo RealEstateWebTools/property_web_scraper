@@ -43,6 +43,7 @@ const inMemoryStore = new Map<string, WebhookRegistration>();
 
 const KV_PREFIX = 'webhook:';
 const KV_INDEX = 'webhook-index';
+const KV_TTL_SECONDS = 90 * 24 * 60 * 60; // 90 days
 
 /**
  * Bind the KV namespace for persistent storage.
@@ -97,11 +98,11 @@ export async function registerWebhook(
 
   if (kv) {
     // Store individual webhook
-    await kv.put(`${KV_PREFIX}${registration.id}`, JSON.stringify(registration));
+    await kv.put(`${KV_PREFIX}${registration.id}`, JSON.stringify(registration), { expirationTtl: KV_TTL_SECONDS });
     // Update index
     const index = await getIndex();
     index.push(registration.id);
-    await kv.put(KV_INDEX, JSON.stringify(index));
+    await kv.put(KV_INDEX, JSON.stringify(index), { expirationTtl: KV_TTL_SECONDS });
   }
 
   return registration;

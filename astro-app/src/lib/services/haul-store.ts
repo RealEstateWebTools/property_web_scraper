@@ -1,9 +1,11 @@
 /**
- * KV-backed store for hauls, with in-memory fallback.
- * Follows the same pattern as listing-store.ts.
+ * KV-backed store for hauls, with in-memory cache and Firestore persistence.
+ * Read path: in-memory → KV → Firestore
+ * Write path: in-memory + KV + Firestore (fire-and-forget)
  */
 
 import { deduplicationKey } from './url-canonicalizer.js';
+import { getClient, getCollectionPrefix } from '../firestore/client.js';
 
 export interface HaulScrape {
   resultId: string;
@@ -76,6 +78,34 @@ function remainingTtlSeconds(haul: Haul): number {
   return Math.max(remaining, 60); // at least 60s
 }
 
+// ─── Firestore helpers ──────────────────────────────────────────
+
+async function firestoreSaveHaul(haul: Haul): Promise<void> {
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const col = db.collection(`${prefix}hauls`);
+    await col.doc(haul.id).set(JSON.parse(JSON.stringify(haul)));
+  } catch (err) {
+    console.error('[HaulStore] Firestore save failed:', (err as Error).message || err);
+  }
+}
+
+async function firestoreGetHaul(id: string): Promise<Haul | undefined> {
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const col = db.collection(`${prefix}hauls`);
+    const doc = await col.doc(id).get();
+    if (!doc.exists) return undefined;
+    return doc.data() as Haul;
+  } catch {
+    return undefined;
+  }
+}
+
+// ─── Public API ─────────────────────────────────────────────────
+
 export async function createHaul(id: string, creatorIp: string): Promise<Haul> {
   const now = new Date();
   const haul: Haul = {
@@ -89,14 +119,31 @@ export async function createHaul(id: string, creatorIp: string): Promise<Haul> {
   if (kv) {
     await kv.put(kvKey(id), JSON.stringify(haul), { expirationTtl: THIRTY_DAYS_S });
   }
+  firestoreSaveHaul(haul).catch(() => {});
   return haul;
 }
 
 export async function getHaul(id: string): Promise<Haul | undefined> {
+  // Tier 1: in-memory
   let haul = store.get(id);
+  // Tier 2: KV
   if (!haul && kv) {
     haul = await kv.get(kvKey(id), 'json') as Haul | null ?? undefined;
     if (haul) store.set(id, haul);
+  }
+  // Tier 3: Firestore
+  if (!haul) {
+    haul = await firestoreGetHaul(id);
+    if (haul) {
+      store.set(id, haul);
+      // Repopulate KV cache
+      if (kv) {
+        const ttl = remainingTtlSeconds(haul);
+        if (ttl > 60) {
+          kv.put(kvKey(id), JSON.stringify(haul), { expirationTtl: ttl }).catch(() => {});
+        }
+      }
+    }
   }
   if (!haul) return undefined;
   // Lazy expiry check
@@ -105,6 +152,14 @@ export async function getHaul(id: string): Promise<Haul | undefined> {
     return undefined;
   }
   return haul;
+}
+
+async function persistHaul(haul: Haul): Promise<void> {
+  store.set(haul.id, haul);
+  if (kv) {
+    await kv.put(kvKey(haul.id), JSON.stringify(haul), { expirationTtl: remainingTtlSeconds(haul) });
+  }
+  firestoreSaveHaul(haul).catch(() => {});
 }
 
 export async function addScrapeToHaul(
@@ -134,10 +189,7 @@ export async function addScrapeToHaul(
     haul.scrapes.push(scrape);
   }
 
-  store.set(id, haul);
-  if (kv) {
-    await kv.put(kvKey(id), JSON.stringify(haul), { expirationTtl: remainingTtlSeconds(haul) });
-  }
+  await persistHaul(haul);
   return { haul, added: true, replaced };
 }
 
@@ -152,10 +204,7 @@ export async function removeScrapeFromHaul(
   if (idx === -1) return { haul, removed: false };
 
   haul.scrapes.splice(idx, 1);
-  store.set(id, haul);
-  if (kv) {
-    await kv.put(kvKey(id), JSON.stringify(haul), { expirationTtl: remainingTtlSeconds(haul) });
-  }
+  await persistHaul(haul);
   return { haul, removed: true };
 }
 
@@ -173,9 +222,6 @@ export async function updateHaulMeta(
     haul.notes = meta.notes.slice(0, 500) || undefined;
   }
 
-  store.set(id, haul);
-  if (kv) {
-    await kv.put(kvKey(id), JSON.stringify(haul), { expirationTtl: remainingTtlSeconds(haul) });
-  }
+  await persistHaul(haul);
   return haul;
 }

@@ -23,7 +23,7 @@ export const GET: APIRoute = async ({ request }) => {
   const auth = await authenticateApiKey(request);
   if (!auth.authorized) return auth.errorResponse!;
 
-  const rateCheck = checkRateLimit(request, auth.tier, auth.userId);
+  const rateCheck = await checkRateLimit(request, auth.tier, auth.userId);
   if (!rateCheck.allowed) return rateCheck.errorResponse!;
 
   const params = new URL(request.url).searchParams;

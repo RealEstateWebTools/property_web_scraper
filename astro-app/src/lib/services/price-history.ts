@@ -1,11 +1,18 @@
 /**
- * price-history.ts — Historical price tracking via KV storage.
+ * price-history.ts — Historical price tracking via KV + Firestore.
  *
- * Stores timestamped extraction snapshots per listing URL.
- * Key patterns:
+ * Read path: in-memory → KV → Firestore
+ * Write path: in-memory + KV + Firestore (fire-and-forget)
+ *
+ * KV key patterns:
  *   history:{canonical}:{timestamp} → PriceSnapshot JSON
  *   history-idx:{canonical}         → string[] of timestamps
+ *
+ * Firestore collection: price_history/{canonical-hash}/snapshots/{timestamp}
  */
+
+import { getClient, getCollectionPrefix } from '../firestore/client.js';
+import { createHash } from 'node:crypto';
 
 // ─── Types ───────────────────────────────────────────────────────
 
@@ -75,6 +82,46 @@ export function canonicalizeUrl(url: string): string {
   }
 }
 
+/** Hash a canonical URL to a safe Firestore document ID */
+function canonicalHash(canonical: string): string {
+  return createHash('sha256').update(canonical).digest('hex').slice(0, 16);
+}
+
+// ─── Firestore helpers ──────────────────────────────────────────
+
+async function firestoreSaveSnapshot(canonical: string, snapshot: PriceSnapshot): Promise<void> {
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const docId = canonicalHash(canonical);
+    const col = db.collection(`${prefix}price_history`);
+    // Store snapshot as a field keyed by timestamp inside the document
+    const parentDoc = col.doc(docId);
+    const existing = await parentDoc.get();
+    const data = existing.exists ? (existing.data() as Record<string, unknown>) : {};
+    const snapshots = (data.snapshots as PriceSnapshot[] | undefined) || [];
+    snapshots.unshift(snapshot);
+    if (snapshots.length > MAX_HISTORY_ENTRIES) snapshots.length = MAX_HISTORY_ENTRIES;
+    await parentDoc.set({ canonical, url: canonical, snapshots, updatedAt: new Date().toISOString() });
+  } catch (err) {
+    console.error('[PriceHistory] Firestore save failed:', (err as Error).message || err);
+  }
+}
+
+async function firestoreGetSnapshots(canonical: string): Promise<PriceSnapshot[]> {
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const docId = canonicalHash(canonical);
+    const doc = await db.collection(`${prefix}price_history`).doc(docId).get();
+    if (!doc.exists) return [];
+    const data = doc.data() as Record<string, unknown>;
+    return (data.snapshots as PriceSnapshot[]) || [];
+  } catch {
+    return [];
+  }
+}
+
 // ─── Recording ───────────────────────────────────────────────────
 
 /**
@@ -129,6 +176,11 @@ export async function recordSnapshot(data: ExtractionData): Promise<PriceSnapsho
     inMemorySnapshots.set(canonical, list);
   }
 
+  // Persist to Firestore (fire-and-forget with logging)
+  firestoreSaveSnapshot(canonical, snapshot).catch((err) => {
+    console.error('[PriceHistory] Firestore background save failed:', (err as Error).message || err);
+  });
+
   return snapshot;
 }
 
@@ -153,6 +205,12 @@ export async function getHistory(url: string, limit?: number): Promise<HistoryRe
   } else {
     const list = inMemorySnapshots.get(canonical) || [];
     snapshots = limit ? list.slice(0, limit) : [...list];
+  }
+
+  // Tier 3: Firestore fallback if KV returned nothing
+  if (snapshots.length === 0) {
+    snapshots = await firestoreGetSnapshots(canonical);
+    if (limit && snapshots.length > limit) snapshots = snapshots.slice(0, limit);
   }
 
   return {

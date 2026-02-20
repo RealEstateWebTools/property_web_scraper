@@ -1,9 +1,11 @@
 import type { MiddlewareHandler } from 'astro';
 import { validateEnv } from '@lib/services/env-validator.js';
 import { corsPreflightResponse } from '@lib/services/api-response.js';
+import { initAllKV } from '@lib/services/kv-init.js';
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   validateEnv();
+  initAllKV(context.locals);
 
   const { method } = context.request;
   const url = new URL(context.request.url);

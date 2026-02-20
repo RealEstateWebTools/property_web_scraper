@@ -30,11 +30,22 @@ const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
 
 const WINDOW_MS = 60_000; // 1 minute
 
-/** In-memory per-minute sliding window (resets on deploy) */
+/** In-memory per-minute sliding window (best-effort burst protection) */
 const requestLog = new Map<string, number[]>();
 
-/** In-memory daily counters (resets on deploy — KV-backed version in usage-meter) */
+/**
+ * In-memory daily counters (fallback when KV unavailable).
+ * KV-backed counters are the primary source of truth for daily limits.
+ */
 const dailyCounters = new Map<string, { count: number; resetAt: number }>();
+
+// ─── KV handle ──────────────────────────────────────────────────
+
+let kv: any = null;
+
+export function initRateLimiterKV(kvNamespace: any): void {
+  kv = kvNamespace ?? null;
+}
 
 // ─── Helpers ────────────────────────────────────────────────────
 
@@ -58,11 +69,25 @@ function getClientKey(request: Request, userId?: string): string {
   return 'anonymous';
 }
 
-function getDailyCount(key: string): number {
+function todayDateStr(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+async function getDailyCount(key: string): Promise<number> {
+  // Try KV first (cross-isolate)
+  if (kv) {
+    try {
+      const kvKey = `ratelimit:${key}:${todayDateStr()}`;
+      const data = await kv.get(kvKey, 'json') as { count: number } | null;
+      if (data) return data.count;
+    } catch {
+      // KV failure — fall through to in-memory
+    }
+  }
+
+  // In-memory fallback
   const now = Date.now();
   const entry = dailyCounters.get(key);
-
-  // Reset at midnight UTC
   const midnightMs = new Date().setUTCHours(24, 0, 0, 0);
   if (!entry || now >= entry.resetAt) {
     dailyCounters.set(key, { count: 0, resetAt: midnightMs });
@@ -71,7 +96,22 @@ function getDailyCount(key: string): number {
   return entry.count;
 }
 
-function incrementDailyCount(key: string): void {
+async function incrementDailyCount(key: string): Promise<void> {
+  // KV: increment the daily counter
+  if (kv) {
+    try {
+      const kvKey = `ratelimit:${key}:${todayDateStr()}`;
+      const data = await kv.get(kvKey, 'json') as { count: number } | null;
+      const count = (data?.count ?? 0) + 1;
+      // TTL: expires at end of day (~86400s max)
+      const secondsUntilMidnight = Math.ceil((new Date().setUTCHours(24, 0, 0, 0) - Date.now()) / 1000);
+      await kv.put(kvKey, JSON.stringify({ count }), { expirationTtl: Math.max(secondsUntilMidnight, 60) });
+    } catch {
+      // KV failure — fall through to in-memory
+    }
+  }
+
+  // In-memory: always update (serves as local cache)
   const midnightMs = new Date().setUTCHours(24, 0, 0, 0);
   const entry = dailyCounters.get(key);
   if (!entry || Date.now() >= entry.resetAt) {
@@ -97,12 +137,12 @@ export interface RateLimitResult {
  * @param userId - User ID (from auth). Used as rate limit key.
  * @param endpoint - Endpoint class for per-endpoint multipliers.
  */
-export function checkRateLimit(
+export async function checkRateLimit(
   request: Request,
   tier?: string,
   userId?: string,
   endpoint?: EndpointClass,
-): RateLimitResult {
+): Promise<RateLimitResult> {
   const key = getClientKey(request, userId);
   const baseLimits = getLimitsForTier(tier);
   const mult = ENDPOINT_MULTIPLIERS[endpoint || 'default'];
@@ -112,7 +152,7 @@ export function checkRateLimit(
   };
   const now = Date.now();
 
-  // 1. Per-minute sliding window
+  // 1. Per-minute sliding window (in-memory, best-effort)
   const windowStart = now - WINDOW_MS;
   let timestamps = requestLog.get(key) || [];
   timestamps = timestamps.filter(t => t > windowStart);
@@ -134,8 +174,8 @@ export function checkRateLimit(
     };
   }
 
-  // 2. Daily quota
-  const dailyUsed = getDailyCount(key);
+  // 2. Daily quota (KV-backed)
+  const dailyUsed = await getDailyCount(key);
   if (limits.perDay !== Infinity && dailyUsed >= limits.perDay) {
     logRateLimit(key, 'daily-quota', request);
     return {
@@ -153,7 +193,7 @@ export function checkRateLimit(
   // Allow
   timestamps.push(now);
   requestLog.set(key, timestamps);
-  incrementDailyCount(key);
+  await incrementDailyCount(key);
   return { allowed: true };
 }
 

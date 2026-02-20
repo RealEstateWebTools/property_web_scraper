@@ -8,7 +8,7 @@ import { Listing } from '@lib/models/listing.js';
 import type { MergeDiff } from '@lib/models/listing.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { normalizePrice } from '@lib/extractor/price-normalizer.js';
-import { generateStableId, getListingByUrl, storeListing, storeDiagnostics, initKV } from '@lib/services/listing-store.js';
+import { generateStableId, getListingByUrl, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
 import { recordSnapshot } from '@lib/services/price-history.js';
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import type { ScrapeSourceType } from '@lib/services/scrape-metadata.js';
@@ -56,9 +56,8 @@ export async function runExtraction(opts: {
   scraperMapping: ScraperMapping;
   importHost: ImportHost;
   sourceType?: ScrapeSourceType;
-  kvBinding?: unknown;
 }): Promise<ExtractionResult | null> {
-  const { html, url, scraperMapping, importHost, sourceType, kvBinding } = opts;
+  const { html, url, scraperMapping, importHost, sourceType } = opts;
 
   const result = extractFromHtml({
     html,
@@ -100,7 +99,7 @@ export async function runExtraction(opts: {
   let mergeDiff: MergeDiff | undefined;
 
   try {
-    if (kvBinding !== undefined) initKV(kvBinding);
+    // KV is initialized by middleware (kv-init.ts) before this runs
     const existing = await getListingByUrl(url);
     if (existing) {
       // Merge incoming into existing
@@ -121,8 +120,9 @@ export async function runExtraction(opts: {
     if (result.diagnostics) {
       await storeDiagnostics(resultId, result.diagnostics);
     }
-    try { await listing.save(); } catch { /* Firestore unavailable */ }
-  } catch {
+    try { await listing.save(); } catch (err) { console.error('[ExtractionRunner] Firestore save failed:', (err as Error).message || err); }
+  } catch (outerErr) {
+    console.error('[ExtractionRunner] Listing store/dedup failed, using fallback:', (outerErr as Error).message || outerErr);
     // Fallback: use incoming as-is with stable ID
     listing = incoming;
     resultId = generateStableId(url);
@@ -135,8 +135,8 @@ export async function runExtraction(opts: {
       if (result.diagnostics) {
         await storeDiagnostics(resultId, result.diagnostics);
       }
-      try { await listing.save(); } catch { /* Firestore unavailable */ }
-    } catch { /* listing-store failure shouldn't affect API response */ }
+      try { await listing.save(); } catch (err) { console.error('[ExtractionRunner] Firestore save failed (fallback):', (err as Error).message || err); }
+    } catch (err) { console.error('[ExtractionRunner] Listing store failure (fallback):', (err as Error).message || err); }
   }
 
   // Record price snapshot (fire-and-forget)
@@ -149,7 +149,7 @@ export async function runExtraction(opts: {
     price_currency: rawProps.price_currency || rawProps.currency,
     quality_grade: result.diagnostics?.qualityGrade,
     title: rawProps.title,
-  }).catch(() => { /* price history failure shouldn't affect response */ });
+  }).catch((err) => { console.error('[ExtractionRunner] Price history recording failed:', err.message || err); });
 
   // Record scrape metadata (fire-and-forget)
   if (sourceType) {
@@ -161,7 +161,7 @@ export async function runExtraction(opts: {
       scraperName: importHost.scraper_name,
       portalSlug: importHost.slug,
       diagnostics: result.diagnostics,
-    }).catch(() => { /* scrape metadata failure shouldn't affect response */ });
+    }).catch((err) => { console.error('[ExtractionRunner] Scrape metadata recording failed:', err.message || err); });
   }
 
   return {
