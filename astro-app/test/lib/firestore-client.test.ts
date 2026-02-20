@@ -68,13 +68,11 @@ describe('Firestore Client', () => {
     });
   });
 
-  describe('fallback behavior', () => {
-    it('defaults to in-memory when no Firestore credentials are set', async () => {
+  describe('missing credentials', () => {
+    it('throws with a clear error when no Firestore credentials are set', async () => {
       resetClient();
-      // Without setting a client, getClient will create one based on env vars
       // In test environment, no GOOGLE_SERVICE_ACCOUNT_JSON is set
-      const client = await getClient();
-      expect(client).toBeInstanceOf(InMemoryFirestoreClient);
+      await expect(getClient()).rejects.toThrow('missing env vars');
     });
   });
 });

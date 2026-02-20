@@ -1,7 +1,7 @@
 /**
  * KV-backed store for hauls, with in-memory cache and Firestore persistence.
  * Read path: in-memory → KV → Firestore
- * Write path: in-memory + KV + Firestore (fire-and-forget)
+ * Write path: in-memory + KV + Firestore
  */
 
 import { deduplicationKey } from './url-canonicalizer.js';
@@ -83,27 +83,19 @@ function remainingTtlSeconds(haul: Haul): number {
 // ─── Firestore helpers ──────────────────────────────────────────
 
 async function firestoreSaveHaul(haul: Haul): Promise<void> {
-  try {
-    const db = await getClient();
-    const prefix = getCollectionPrefix();
-    const col = db.collection(`${prefix}hauls`);
-    await col.doc(haul.id).set(JSON.parse(JSON.stringify(haul)));
-  } catch (err) {
-    console.error('[HaulStore] Firestore save failed:', (err as Error).message || err);
-  }
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const col = db.collection(`${prefix}hauls`);
+  await col.doc(haul.id).set(JSON.parse(JSON.stringify(haul)));
 }
 
 async function firestoreGetHaul(id: string): Promise<Haul | undefined> {
-  try {
-    const db = await getClient();
-    const prefix = getCollectionPrefix();
-    const col = db.collection(`${prefix}hauls`);
-    const doc = await col.doc(id).get();
-    if (!doc.exists) return undefined;
-    return doc.data() as Haul;
-  } catch {
-    return undefined;
-  }
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const col = db.collection(`${prefix}hauls`);
+  const doc = await col.doc(id).get();
+  if (!doc.exists) return undefined;
+  return doc.data() as Haul;
 }
 
 // ─── Public API ─────────────────────────────────────────────────
@@ -121,7 +113,7 @@ export async function createHaul(id: string, creatorIp: string): Promise<Haul> {
   if (kv) {
     await kv.put(kvKey(id), JSON.stringify(haul), { expirationTtl: THIRTY_DAYS_S });
   }
-  firestoreSaveHaul(haul).catch(() => {});
+  await firestoreSaveHaul(haul);
   return haul;
 }
 
@@ -161,7 +153,7 @@ async function persistHaul(haul: Haul): Promise<void> {
   if (kv) {
     await kv.put(kvKey(haul.id), JSON.stringify(haul), { expirationTtl: remainingTtlSeconds(haul) });
   }
-  firestoreSaveHaul(haul).catch(() => {});
+  await firestoreSaveHaul(haul);
 }
 
 export async function addScrapeToHaul(
