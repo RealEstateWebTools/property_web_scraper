@@ -111,7 +111,9 @@ export abstract class BaseModel {
         this.id = docId;
         await col.doc(docId).set(data);
       } else {
-        const docRef = col.doc();
+        // Use existing id if already set (e.g. stable ID from extraction-runner),
+        // otherwise let Firestore auto-generate one.
+        const docRef = this.id ? col.doc(this.id) : col.doc();
         this.id = docRef.id;
         await docRef.set(data);
       }
