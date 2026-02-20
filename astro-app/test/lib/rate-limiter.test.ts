@@ -8,7 +8,7 @@ vi.mock('../../src/lib/services/activity-logger.js', () => ({
   logActivity: vi.fn(),
 }));
 
-import { checkRateLimit, resetRateLimiter, getTierLimits } from '../../src/lib/services/rate-limiter.js';
+import { checkRateLimit, resetRateLimiter, getTierLimits, getRateLimiterStats } from '../../src/lib/services/rate-limiter.js';
 
 function makeRequest(overrides: { apiKey?: string; ip?: string; url?: string } = {}): Request {
   const headers = new Headers();
@@ -187,5 +187,74 @@ describe('getTierLimits', () => {
     expect(getTierLimits('free').perDay).toBe(500);
     expect(getTierLimits('starter').perDay).toBe(5000);
     expect(getTierLimits('pro').perDay).toBe(25000);
+  });
+});
+
+describe('getRateLimiterStats', () => {
+  beforeEach(() => {
+    resetRateLimiter();
+  });
+
+  it('returns zero stats when no requests made', () => {
+    const stats = getRateLimiterStats();
+    expect(stats.activeClients).toBe(0);
+    expect(stats.totalRequests).toBe(0);
+  });
+
+  it('counts active clients and total requests', async () => {
+    await checkRateLimit(makeRequest(), 'free', 'user-stats-1');
+    await checkRateLimit(makeRequest(), 'free', 'user-stats-1');
+    await checkRateLimit(makeRequest(), 'free', 'user-stats-2');
+
+    const stats = getRateLimiterStats();
+    expect(stats.activeClients).toBe(2);
+    expect(stats.totalRequests).toBe(3);
+  });
+
+  it('only counts requests within the time window', async () => {
+    vi.useFakeTimers();
+    try {
+      await checkRateLimit(makeRequest(), 'free', 'user-stats-old');
+
+      // Advance past the 1-minute window
+      vi.advanceTimersByTime(61_000);
+
+      const stats = getRateLimiterStats();
+      expect(stats.activeClients).toBe(0);
+      expect(stats.totalRequests).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe('resetRateLimiter', () => {
+  beforeEach(() => {
+    resetRateLimiter();
+  });
+
+  it('clears all tracked requests', async () => {
+    await checkRateLimit(makeRequest(), 'free', 'user-reset-1');
+    await checkRateLimit(makeRequest(), 'free', 'user-reset-2');
+
+    let stats = getRateLimiterStats();
+    expect(stats.activeClients).toBe(2);
+
+    resetRateLimiter();
+
+    stats = getRateLimiterStats();
+    expect(stats.activeClients).toBe(0);
+    expect(stats.totalRequests).toBe(0);
+  });
+
+  it('allows previously blocked users to make requests again', async () => {
+    for (let i = 0; i < 30; i++) {
+      await checkRateLimit(makeRequest(), 'free', 'user-block-reset');
+    }
+    expect((await checkRateLimit(makeRequest(), 'free', 'user-block-reset')).allowed).toBe(false);
+
+    resetRateLimiter();
+
+    expect((await checkRateLimit(makeRequest(), 'free', 'user-block-reset')).allowed).toBe(true);
   });
 });

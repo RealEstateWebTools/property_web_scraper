@@ -49,4 +49,15 @@ describe('runtime-config', () => {
     updateRuntimeConfig({ maxRequests: 1000 });
     expect(getRuntimeConfig().maxRequests).toBe(1000);
   });
+
+  it('returns default homesToCompareUrl', () => {
+    const config = getRuntimeConfig();
+    expect(config.homesToCompareUrl).toBe('https://homestocompare.com');
+  });
+
+  it('homesToCompareUrl is restored on reset', () => {
+    const before = getRuntimeConfig().homesToCompareUrl;
+    resetRuntimeConfig();
+    expect(getRuntimeConfig().homesToCompareUrl).toBe(before);
+  });
 });
