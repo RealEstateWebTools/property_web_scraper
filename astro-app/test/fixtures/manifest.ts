@@ -261,6 +261,7 @@ export const fixtures: FixtureEntry[] = [
       reference: '456486259',
       year_construction: 2023,
       property_type: 'SingleFamily',
+      description: 'Zillow has 44 photos of this $685,900 5 beds, 3 baths, 2,517 Square Feet single family home located at 4836 Sicily Dr, Lake Elsinore, CA 92530 built in 2023. MLS #IG26033705. 3D Home Tour Available!',
       for_sale: true,
       for_rent: false,
     },
