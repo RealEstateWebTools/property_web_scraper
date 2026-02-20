@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `locale_code` now included in `Listing#asJson()` output — signals the language of `description` and `title` to API consumers
 - Non-English content strategy: single `description` field in the portal's native language, tagged with `locale_code` (e.g. `'es'`, `'de'`); per-locale duplicate fields (`description_es`, `title_de`, etc.) removed as dead code
 - Kyero XML exporter updated to use `locale_code` for the language slot in `<title>` and `<desc>` elements rather than hardcoding `<en>`
+- **BCP-47 locale normalization** — new `primaryLanguage()` utility (`src/lib/utils/locale.ts`) extracts the base language subtag from any BCP-47 locale code (`"de-DE"` → `"de"`, `"en-AU"` → `"en"`, `"zh-Hant-TW"` → `"zh"`); Kyero and Schema.org exporters now use this so regional variants (`de-DE`, `en-AU`) map to the correct language slot instead of silently falling back to `<en>`
+- **Schema.org `inLanguage`** — the Schema.org / JSON-LD exporter now emits `inLanguage` on each `RealEstateListing` node using `primaryLanguage(locale_code)`, enabling search engines to identify content language for all locales
+- **`locale_code` in haul persistence** — `HaulScrape` interface gains `locale_code?`; the field is now round-tripped through `/ext/v1/hauls/:id/scrapes`, `/ext/v1/hauls/:id/add-result`, and the haul-export-adapter so locale context is never lost when listings are stored and re-exported
 - Anonymous haul collections for Chrome extension — browse multiple listings, collect them into a shareable results page without login or API key
 - `POST /ext/v1/hauls`, `GET /ext/v1/hauls/:id`, `POST /ext/v1/hauls/:id/scrapes` endpoints
 - KV-backed haul store with in-memory fallback (`haul-store.ts`)

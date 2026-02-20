@@ -133,6 +133,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     price_qualifier: listing.price_qualifier || undefined,
     floor_plan_urls: listing.floor_plan_urls?.length ? listing.floor_plan_urls : undefined,
     energy_certificate_grade: listing.energy_certificate_grade || undefined,
+    locale_code: listing.locale_code || undefined,
   };
 
   const { added, replaced } = await addScrapeToHaul(id, scrape);

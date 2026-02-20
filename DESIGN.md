@@ -274,9 +274,12 @@ For `description`, the original HTML is first captured into `description_html` b
 The engine uses a **single-field + locale tag** model rather than per-locale field duplicates:
 
 - `description` and `title` hold content in whatever language the portal uses
-- `locale_code` (e.g. `'es'`, `'de'`, `'fr'`) signals the language to consumers
+- `locale_code` follows **BCP-47** format (e.g. `'es'`, `'de'`, `'en-AU'`, `'de-DE'`) — signals the language to consumers
 - Scraper mappings set `locale_code` via `defaultValues` for their portal
-- The Kyero XML exporter uses `locale_code` to place content in the correct `<title lang>` / `<desc lang>` slot
+- `primaryLanguage(localeCode)` in `src/lib/utils/locale.ts` extracts the base language subtag: `"de-DE"` → `"de"`, `"en-AU"` → `"en"`, `"zh-Hant-TW"` → `"zh"`
+- The **Kyero XML exporter** uses `primaryLanguage(locale_code)` to place content in the correct `<title lang>` / `<desc lang>` slot — falls back to `<en>` for languages outside Kyero's supported set (`en`, `es`, `de`, `fr`, `it`)
+- The **Schema.org exporter** emits `inLanguage` using `primaryLanguage(locale_code)` so search engines can identify the content language
+- `locale_code` is persisted through haul collections (`HaulScrape.locale_code`) and restored via the haul-export-adapter
 
 Per-locale duplicate fields (`description_es`, `title_de`, etc.) are not used — they added complexity without real-world coverage since no portal delivers a listing in two languages simultaneously.
 

@@ -139,6 +139,20 @@ describe('haul-export-adapter', () => {
       expect(listing.tenure).toBe('leasehold');
       expect(listing.floor_plan_urls).toEqual(['https://example.com/fp1.png', 'https://example.com/fp2.png']);
     });
+
+    it('maps locale_code from HaulScrape to Listing', () => {
+      const scrape = makeEnrichedScrape({ locale_code: 'de-DE' });
+      const listing = haulScrapeToListing(scrape);
+
+      expect(listing.locale_code).toBe('de-DE');
+    });
+
+    it('defaults locale_code to empty string when absent in scrape', () => {
+      const scrape = makeLegacyScrape();
+      const listing = haulScrapeToListing(scrape);
+
+      expect(listing.locale_code).toBe('');
+    });
   });
 
   describe('haulScrapesToListings', () => {
