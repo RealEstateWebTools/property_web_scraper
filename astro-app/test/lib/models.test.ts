@@ -73,14 +73,16 @@ describe('Models', () => {
       expect(json).not.toHaveProperty('import_history');
     });
 
-    it('asJson includes description_html', () => {
+    it('asJson includes description_html and locale_code', () => {
       const listing = new Listing();
-      listing.description = 'Plain text';
-      listing.description_html = '<p>Plain text</p>';
+      listing.description = 'Descripción de la propiedad';
+      listing.description_html = '<p>Descripción de la propiedad</p>';
+      listing.locale_code = 'es';
 
       const json = listing.asJson();
-      expect(json['description']).toBe('Plain text');
-      expect(json['description_html']).toBe('<p>Plain text</p>');
+      expect(json['description']).toBe('Descripción de la propiedad');
+      expect(json['description_html']).toBe('<p>Descripción de la propiedad</p>');
+      expect(json['locale_code']).toBe('es');
     });
   });
 

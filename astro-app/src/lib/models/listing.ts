@@ -40,19 +40,7 @@ export class Listing extends BaseModel {
     count_garages: { type: 'integer', default: 0 },
     energy_rating: { type: 'integer' },
     energy_performance: { type: 'float' },
-    title_es: { type: 'string' },
-    description_es: { type: 'string' },
-    title_de: { type: 'string' },
-    description_de: { type: 'string' },
-    title_fr: { type: 'string' },
-    description_fr: { type: 'string' },
-    title_it: { type: 'string' },
-    description_it: { type: 'string' },
     description_html: { type: 'string' },
-    description_es_html: { type: 'string' },
-    description_de_html: { type: 'string' },
-    description_fr_html: { type: 'string' },
-    description_it_html: { type: 'string' },
     furnished: { type: 'boolean', default: false },
     sold: { type: 'boolean', default: false },
     reserved: { type: 'boolean', default: false },
@@ -132,19 +120,7 @@ export class Listing extends BaseModel {
   count_garages = 0;
   energy_rating = 0;
   energy_performance = 0;
-  title_es = '';
-  description_es = '';
-  title_de = '';
-  description_de = '';
-  title_fr = '';
-  description_fr = '';
-  title_it = '';
-  description_it = '';
   description_html = '';
-  description_es_html = '';
-  description_de_html = '';
-  description_fr_html = '';
-  description_it_html = '';
   furnished = false;
   sold = false;
   reserved = false;
@@ -208,7 +184,7 @@ export class Listing extends BaseModel {
     return super.asJson([
       'import_url', 'reference', 'price_string', 'price_float',
       'price_cents', 'price_currency',
-      'title', 'description', 'description_html', 'area_unit', 'plot_area', 'constructed_area',
+      'title', 'description', 'description_html', 'locale_code', 'area_unit', 'plot_area', 'constructed_area',
       'year_construction', 'count_bedrooms', 'count_bathrooms',
       'count_toilets', 'count_garages', 'currency',
       'street_number', 'street_name', 'street_address', 'postal_code',
@@ -246,13 +222,7 @@ export class Listing extends BaseModel {
       'listing_status', 'price_qualifier',
     ]);
 
-    const PREFER_RICHER: Set<string> = new Set([
-      'description', 'description_html',
-      'description_es', 'description_es_html',
-      'description_de', 'description_de_html',
-      'description_fr', 'description_fr_html',
-      'description_it', 'description_it_html',
-    ]);
+    const PREFER_RICHER: Set<string> = new Set(['description', 'description_html']);
 
     const ARRAY_FIELDS: Set<string> = new Set([
       'image_urls', 'features', 'related_urls', 'floor_plan_urls',

@@ -21,7 +21,7 @@ function escapeXml(str: string): string {
     .replace(/'/g, '&apos;');
 }
 
-const LANGUAGE_SUFFIXES = ['en', 'es', 'de', 'fr', 'it'] as const;
+const KYERO_LANGUAGES = new Set(['en', 'es', 'de', 'fr', 'it']);
 
 export class KyeroExporter extends BaseExporter {
   protected format = 'kyero';
@@ -52,7 +52,10 @@ export class KyeroExporter extends BaseExporter {
   }
 
   private writePropertyElements(listing: Listing, lines: string[]): void {
-    const rec = listing as Record<string, unknown>;
+    // Determine language slot from locale_code; fall back to 'en'
+    const lang = (listing.locale_code && KYERO_LANGUAGES.has(listing.locale_code))
+      ? listing.locale_code
+      : 'en';
 
     // Core fields
     if (listing.reference) {
@@ -122,33 +125,16 @@ export class KyeroExporter extends BaseExporter {
       lines.push(`    <year_built>${listing.year_construction}</year_built>`);
     }
 
-    // Multilingual title/description
+    // Title and description in the listing's native language (per locale_code)
     lines.push('    <title>');
-    // Default title (English or main)
     if (listing.title) {
-      lines.push(`      <en>${escapeXml(listing.title)}</en>`);
-    }
-    for (const lang of LANGUAGE_SUFFIXES) {
-      if (lang === 'en') continue;
-      const titleField = `title_${lang}`;
-      const val = rec[titleField];
-      if (val && typeof val === 'string' && val.trim()) {
-        lines.push(`      <${lang}>${escapeXml(val)}</${lang}>`);
-      }
+      lines.push(`      <${lang}>${escapeXml(listing.title)}</${lang}>`);
     }
     lines.push('    </title>');
 
     lines.push('    <desc>');
     if (listing.description) {
-      lines.push(`      <en>${escapeXml(listing.description)}</en>`);
-    }
-    for (const lang of LANGUAGE_SUFFIXES) {
-      if (lang === 'en') continue;
-      const descField = `description_${lang}`;
-      const val = rec[descField];
-      if (val && typeof val === 'string' && val.trim()) {
-        lines.push(`      <${lang}>${escapeXml(val)}</${lang}>`);
-      }
+      lines.push(`      <${lang}>${escapeXml(listing.description)}</${lang}>`);
     }
     lines.push('    </desc>');
 

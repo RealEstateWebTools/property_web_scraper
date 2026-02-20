@@ -267,7 +267,18 @@ In-memory sliding window per API key or IP. 60 requests/minute default (configur
 
 Strips HTML tags from text fields, rejects `javascript:` and `data:` URI schemes, normalizes protocol-relative URLs.
 
-For description fields (`description`, `description_es`, `description_de`, `description_fr`, `description_it`), the original HTML is first captured into a parallel `_html` field (e.g. `description_html`) before stripping — only when the value actually contains HTML tags. This allows the listing detail page to render formatted HTML while exporters and downstream consumers continue to receive guaranteed plain text.
+For `description`, the original HTML is first captured into `description_html` before stripping — only when the value contains HTML tags. This lets the listing detail page render formatted HTML while exporters and downstream consumers receive guaranteed plain text.
+
+### Non-English content
+
+The engine uses a **single-field + locale tag** model rather than per-locale field duplicates:
+
+- `description` and `title` hold content in whatever language the portal uses
+- `locale_code` (e.g. `'es'`, `'de'`, `'fr'`) signals the language to consumers
+- Scraper mappings set `locale_code` via `defaultValues` for their portal
+- The Kyero XML exporter uses `locale_code` to place content in the correct `<title lang>` / `<desc lang>` slot
+
+Per-locale duplicate fields (`description_es`, `title_de`, etc.) are not used — they added complexity without real-world coverage since no portal delivers a listing in two languages simultaneously.
 
 ### Activity Logger (`activity-logger.ts`)
 

@@ -7,8 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
-- `description_html` field on `Listing` and `HaulScrape` — preserves the original HTML markup from scrapers (e.g. `<b>`, `<br />`, `<p>`) before tag-stripping; plain-text `description` is unchanged for all exporters and downstream consumers; listing detail page now renders the HTML version when available
-- `description_html` (and locale variants `description_es_html`, etc.) are populated automatically by `sanitizePropertyHash` whenever the source value contains HTML tags; haul endpoints include `description_html` capped at 1000 chars to avoid broken truncated markup
+- `description_html` field on `Listing` and `HaulScrape` — preserves the original HTML markup from scrapers (e.g. `<b>`, `<br />`, `<p>`) before tag-stripping; plain-text `description` is unchanged for all exporters and downstream consumers; listing detail page now renders the HTML version when available; haul endpoints include `description_html` capped at 1000 chars
+- `locale_code` now included in `Listing#asJson()` output — signals the language of `description` and `title` to API consumers
+- Non-English content strategy: single `description` field in the portal's native language, tagged with `locale_code` (e.g. `'es'`, `'de'`); per-locale duplicate fields (`description_es`, `title_de`, etc.) removed as dead code
+- Kyero XML exporter updated to use `locale_code` for the language slot in `<title>` and `<desc>` elements rather than hardcoding `<en>`
 - Anonymous haul collections for Chrome extension — browse multiple listings, collect them into a shareable results page without login or API key
 - `POST /ext/v1/hauls`, `GET /ext/v1/hauls/:id`, `POST /ext/v1/hauls/:id/scrapes` endpoints
 - KV-backed haul store with in-memory fallback (`haul-store.ts`)
