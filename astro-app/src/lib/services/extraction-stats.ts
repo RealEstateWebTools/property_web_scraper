@@ -19,6 +19,7 @@ export interface ExtractionSummary {
   meetsExpectation: boolean;
   criticalFieldsMissing?: string[];
   title: string;
+  reference: string;
   priceString: string;
   visibility: string;
   confidenceScore: number;
@@ -71,6 +72,7 @@ function listingToSummary(id: string, listing: Listing): ExtractionSummary | nul
     meetsExpectation: listing.meets_expectation,
     criticalFieldsMissing: listing.critical_fields_missing,
     title: listing.title || '',
+    reference: listing.reference || '',
     priceString: listing.price_string || '',
     visibility: listing.visibility || 'published',
     confidenceScore: listing.confidence_score ?? 1.0,
