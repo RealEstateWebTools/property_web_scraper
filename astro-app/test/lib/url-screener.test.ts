@@ -307,10 +307,10 @@ describe('url-screener', () => {
       expect(r.portalTier).toBe('experimental');
     });
 
-    it('allows seloger.com with experimental tier', () => {
+    it('allows seloger.com with core tier', () => {
       const r = screenUrl('https://www.seloger.com/detail/appartement/paris/12345.htm');
       expect(r.verdict).toBe('allowed');
-      expect(r.portalTier).toBe('experimental');
+      expect(r.portalTier).toBe('core');
     });
 
     it('allows immobiliare.it with experimental tier', () => {

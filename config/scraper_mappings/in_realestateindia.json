@@ -2,7 +2,7 @@
   "name": "in_realestateindia",
   "version": 1,
   "last_checked": "2026-02-20",
-  "expectedExtractionRate": 0.55,
+  "expectedExtractionRate": 0.70,
   "defaultValues": {
     "country": {
       "value": "India"
@@ -32,6 +32,18 @@
     }
   },
   "intFields": {
+    "count_bedrooms": {
+      "cssLocator": "p.w55.ofh",
+      "cssCountId": "0",
+      "splitTextCharacter": ",",
+      "splitTextArrayId": "0"
+    },
+    "count_bathrooms": {
+      "cssLocator": "p.w55.ofh",
+      "cssCountId": "0",
+      "splitTextCharacter": ",",
+      "splitTextArrayId": "1"
+    }
   },
   "textFields": {
     "title": {
@@ -45,10 +57,20 @@
     "price_string": {
       "cssLocator": "span.red",
       "cssCountId": "0"
+    },
+    "main_image_url": {
+      "cssLocator": "ul.imgSlider li:first-child img",
+      "cssAttr": "src"
+    },
+    "address_string": {
+      "cssLocator": "li[itemprop='itemListElement'] > a",
+      "cssCountId": "2"
     }
   },
-  "images": [
-  ],
+  "images": [{
+    "cssLocator": "ul.imgSlider img",
+    "cssAttr": "src"
+  }],
   "booleanFields": {
     "for_rent": {
       "cssLocator": "h1.xxxlarge",

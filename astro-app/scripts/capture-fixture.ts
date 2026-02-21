@@ -286,7 +286,7 @@ function runExtraction(
   // 4. Int fields
   if (mapping.intFields) {
     for (const [key, fieldMapping] of Object.entries(mapping.intFields)) {
-      const text = retrieveTargetText($, html, fieldMapping, uri);
+      const { text } = retrieveTargetText($, html, fieldMapping, uri);
       propertyHash[key] = parseInt(text.trim(), 10) || 0;
       fieldSources[key] = 'int';
     }
@@ -295,7 +295,7 @@ function runExtraction(
   // 5. Float fields
   if (mapping.floatFields) {
     for (const [key, fieldMapping] of Object.entries(mapping.floatFields)) {
-      let text = retrieveTargetText($, html, fieldMapping, uri);
+      let { text } = retrieveTargetText($, html, fieldMapping, uri);
       if (fieldMapping.stripPunct) {
         text = text.replace(/\./g, '').replace(/,/g, '');
       }
@@ -310,7 +310,7 @@ function runExtraction(
   // 6. Text fields
   if (mapping.textFields) {
     for (const [key, fieldMapping] of Object.entries(mapping.textFields)) {
-      const text = retrieveTargetText($, html, fieldMapping, uri);
+      const { text } = retrieveTargetText($, html, fieldMapping, uri);
       propertyHash[key] = text.trim();
       fieldSources[key] = 'text';
     }
@@ -319,7 +319,7 @@ function runExtraction(
   // 7. Boolean fields
   if (mapping.booleanFields) {
     for (const [key, fieldMapping] of Object.entries(mapping.booleanFields)) {
-      let text = retrieveTargetText($, html, fieldMapping, uri);
+      let { text } = retrieveTargetText($, html, fieldMapping, uri);
       let evaluatorParam = fieldMapping.evaluatorParam || '';
 
       if (fieldMapping.caseInsensitive) {

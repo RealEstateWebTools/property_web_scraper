@@ -267,6 +267,79 @@ exports[`Scraper validation > es_pisos scraper > matches full extraction snapsho
 }
 `;
 
+exports[`Scraper validation > fr_seloger scraper > matches full extraction snapshot 1`] = `
+{
+  "agent_name": "CASTELJAC IMMOBILIER",
+  "area_unit": "sqm",
+  "city": "Castelnau le Lez",
+  "constructed_area": 117,
+  "count_bedrooms": 3,
+  "country": "France",
+  "currency": "EUR",
+  "description": "Sur terrain de 750m² divisible, Maison de 117m² environ composée en rdc, d'une pièce à vivre avec cuisine ouverte de 43m², d'un wc, d'une buanderie et d'un grand garage. A l'étage, deux grandes chambres de 15m² dont une avec climatisation, une salle d'eau rénovée et un studio avec accès indépendant pouvant aisément se transformer en suite parentale. Chauffage au sol.
+Menuiseries extérieures à changer. Possibilité de détacher une parcelle constructible de 500m². Proximité des écoles (collège et Lycée), à 10min à pied du Tram et à 5min du Palais des sports. (4.17 % d'honoraires TTC à la charge de l'acquéreur.)",
+  "energy_certificate_grade": "C",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://mms.seloger.com/b/1/9/c/b19c8477-2ac7-4821-9f7c-24cc918e5a23.jpg?ci_seal=e03ca1eddf538765e1cba830479f68ce4e8011ef",
+    },
+    {
+      "url": "https://mms.seloger.com/6/a/f/5/6af54505-a5c2-4e43-a139-4f6b8fb73e37.jpg?ci_seal=85d816c41acb525e67021602cb253b0c948fefdd",
+    },
+    {
+      "url": "https://mms.seloger.com/d/d/3/5/dd3501eb-fd59-4497-85c9-53a4082f06bd.jpg?ci_seal=f6c8b6ed871c6a8695a9f3aa6df396a6cc69390b",
+    },
+    {
+      "url": "https://mms.seloger.com/a/b/2/0/ab20e275-be6c-458b-8bb8-64bb6827d0a4.jpg?ci_seal=b2458984ddd5868c8b23385f7cd2d14b77693cab",
+    },
+    {
+      "url": "https://mms.seloger.com/9/6/a/6/96a6e1cf-2790-4560-96e8-1fbdbcb73e09.jpg?ci_seal=6efc54b6a4ee2c5945163e562b12af3813ce7a8e",
+    },
+    {
+      "url": "https://mms.seloger.com/a/4/e/d/a4ed45dc-1013-4c51-b289-ac53340dd5bd.jpg?ci_seal=0c01a58b5ceab3f427349773654029b6af771452",
+    },
+    {
+      "url": "https://mms.seloger.com/f/b/2/5/fb25dc99-8e26-4557-b44c-ebad54f71788.jpg?ci_seal=1579f7a7f4824b4712721311017ac2ec81ac2444",
+    },
+    {
+      "url": "https://mms.seloger.com/4/5/b/2/45b20587-ee69-4857-920b-93b9fc17fdfc.jpg?ci_seal=47f6757caff6f63ba9c2b217666231f919bc47f3",
+    },
+    {
+      "url": "https://mms.seloger.com/6/1/3/1/6131837e-f6f2-4e7f-ae9f-1da63852039d.jpg?ci_seal=43e7ffcb747cd00e0aa4fa119089346d20812503",
+    },
+    {
+      "url": "https://mms.seloger.com/c/8/2/7/c8272d32-fcd6-4563-bcde-5a849268277c.jpg?ci_seal=f04413a118da6965b5b5dc85a1782816e5012ce6",
+    },
+    {
+      "url": "https://mms.seloger.com/d/9/9/d/d99d4cb4-7e6e-42fe-af40-66e61aff4633.jpg?ci_seal=c72379a3314c3bd044fc2d35a0fcf149d88bcc8c",
+    },
+    {
+      "url": "https://mms.seloger.com/1/e/6/f/1e6f9020-3a49-4867-8185-326022ac0660.jpg?ci_seal=99a46af7d48e523e756e8ca569803e717e222234",
+    },
+    {
+      "url": "https://mms.seloger.com/8/3/d/0/83d0605b-f1e9-4f94-baf6-38d3a94e15b4.jpg?ci_seal=09912f96b61d4e66f6e02a8a98df43151adea501",
+    },
+    {
+      "url": "https://mms.seloger.com/4/6/f/b/46fbea47-1bb2-44e9-8ca9-2edec4831555.jpg?ci_seal=d90050f43cb2d4f933970900a5fa21ced10af7a6",
+    },
+  ],
+  "locale_code": "fr",
+  "main_image_url": "https://mms.seloger.com/b/1/9/c/b19c8477-2ac7-4821-9f7c-24cc918e5a23.jpg?ci_seal=e03ca1eddf538765e1cba830479f68ce4e8011ef",
+  "plot_area": 750,
+  "postal_code": "34170",
+  "price_float": 570000,
+  "price_string": "570 000 €",
+  "property_type": "Maison",
+  "reference": "254287619",
+  "title": "Maison à vendre T4/F4 117 m² 570000 € Courtarelle-Cantagril-Muriers Castelnau-le-Lez (34170)",
+  "year_construction": 1990,
+}
+`;
+
 exports[`Scraper validation > ie_daft scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "12 The Avenue, Plunkett Hall, Dunboyne, Co. Meath, A86VW70",
@@ -411,7 +484,10 @@ Sunny south/west facing rear garden part laid to lawn with border of plants and 
 
 exports[`Scraper validation > in_realestateindia scraper > matches full extraction snapshot 1`] = `
 {
+  "address_string": "Andheri West Mumbai",
   "area_unit": "sqyd",
+  "count_bathrooms": 2,
+  "count_bedrooms": 2,
   "country": "India",
   "currency": "INR",
   "description": "Find detail of 2 BHK Flats & Apartments for Rent in Andheri West, Mumbai, Maharashtra (REI712907) posted by Vikas Estate Agency - on RealEstateIndia.com.",
@@ -419,9 +495,27 @@ exports[`Scraper validation > in_realestateindia scraper > matches full extracti
   "for_rent_long_term": true,
   "for_rent_short_term": "false",
   "for_sale": false,
+  "image_urls": [
+    {
+      "url": "https://dyimg2.realestateindia.com/prop_images/21437/712907_6.jpg",
+    },
+    {
+      "url": "https://dyimg2.realestateindia.com/prop_images/21437/712907_2.jpg",
+    },
+    {
+      "url": "https://dyimg2.realestateindia.com/prop_images/21437/712907_4.jpg",
+    },
+    {
+      "url": "https://dyimg2.realestateindia.com/prop_images/21437/712907_5.jpg",
+    },
+    {
+      "url": "https://dyimg2.realestateindia.com/prop_images/21437/712907_7.jpg",
+    },
+  ],
   "latitude": 0,
   "locale_code": "en",
   "longitude": 0,
+  "main_image_url": "https://dyimg2.realestateindia.com/prop_images/21437/712907_6.jpg",
   "price_float": 45000,
   "price_string": "45,000",
   "title": "2 BHK Flats & Apartments for Rent in Andheri West, Mumbai - 10000 Sq. Yards",

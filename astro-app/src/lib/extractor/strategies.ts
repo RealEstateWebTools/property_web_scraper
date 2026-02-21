@@ -138,8 +138,12 @@ export function getOrParseScriptJson($: cheerio.CheerioAPI, varName: string): un
   }
 
   // Strategy 2: Look for window.VAR = {...} or window.VAR = JSON.parse("...") assignment
+  // Supports both dot notation (window.VAR) and bracket notation (window["VAR"])
   if (result === undefined) {
-    const pattern = new RegExp(`(?:window\\.)?${varName}\\s*=\\s*`);
+    const escapedVar = varName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp(
+      `(?:window\\.${escapedVar}|window\\["${escapedVar}"\\]|window\\['${escapedVar}'\\]|${escapedVar})\\s*=\\s*`
+    );
 
     $('script').each((_i, el) => {
       if (result !== undefined) return;

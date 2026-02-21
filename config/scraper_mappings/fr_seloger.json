@@ -1,0 +1,112 @@
+[{
+  "name": "fr_seloger",
+  "expectedExtractionRate": 0.60,
+
+  // All rich data is in window["__UFRN_LIFECYCLE_SERVERREQUEST__"] = JSON.parse("...")
+  // Paths are relative to app_cldp.data.classified
+  // Note: address/coordinates are withheld when isAddressPublished = false (common)
+
+  "defaultValues": {
+    "country":            { "value": "France" },
+    "currency":           { "value": "EUR" },
+    "area_unit":          { "value": "sqm" },
+    "locale_code":        { "value": "fr" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+    "scriptJsonPath": "app_cldp.data.classified.sections.gallery.images",
+    "cssAttr": "url"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.legacyTracking.products.0.nb_bedrooms"
+    },
+    "year_construction": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.legacyTracking.products.0.year_of_construction"
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.sections.mortgage.price"
+    },
+    "constructed_area": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.legacyTracking.products.0.space"
+    },
+    "plot_area": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.advertising.tracking_config.surf_terrain"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content"
+    },
+    "description": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.sections.mainDescription.description"
+    },
+    "price_string": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.sections.hardFacts.price.formatted"
+    },
+    "reference": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.metadata.legacyId"
+    },
+    "city": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.tracking.av_city"
+    },
+    "postal_code": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.tracking.av_zip_code"
+    },
+    "property_type": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.rawData.propertyTypeLabel"
+    },
+    "energy_certificate_grade": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.tracking.av_energy_certificate"
+    },
+    "agent_name": {
+      "scriptJsonVar":  "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath": "app_cldp.data.classified.contactSections.contactCard.title"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar":   "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath":  "app_cldp.data.classified.rawData.distributionType",
+      "evaluator":       "==",
+      "evaluatorParam":  "BUY"
+    },
+    "for_rent": {
+      "scriptJsonVar":   "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath":  "app_cldp.data.classified.rawData.distributionType",
+      "evaluator":       "include?",
+      "evaluatorParam":  "RENT"
+    },
+    "for_rent_long_term": {
+      "scriptJsonVar":   "__UFRN_LIFECYCLE_SERVERREQUEST__",
+      "scriptJsonPath":  "app_cldp.data.classified.rawData.distributionType",
+      "evaluator":       "include?",
+      "evaluatorParam":  "RENT"
+    }
+  }
+}]
