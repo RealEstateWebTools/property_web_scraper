@@ -1,5 +1,7 @@
 [{
   "name": "generic_real_estate",
+  "version": 1,
+  "last_checked": "2026-02-20",
   "expectedExtractionRate": 0.30,
   "defaultValues": {
     "locale_code": {

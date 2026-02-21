@@ -11,6 +11,7 @@
  * Firestore collection: price_history/{canonical-hash}/snapshots/{timestamp}
  */
 
+import type { KVNamespace } from './kv-types.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
 import { createHash } from 'node:crypto';
 
@@ -52,7 +53,7 @@ export interface ExtractionData {
 
 // ─── Storage ─────────────────────────────────────────────────────
 
-let kv: any = null;
+let kv: KVNamespace | null = null;
 const inMemorySnapshots = new Map<string, PriceSnapshot[]>();
 
 const SNAP_PREFIX = 'history:';
@@ -63,7 +64,7 @@ const KV_TTL_SECONDS = 365 * 24 * 60 * 60; // 1 year
 /**
  * Bind the KV namespace for persistent storage.
  */
-export function initPriceHistoryKV(kvNamespace: any): void {
+export function initPriceHistoryKV(kvNamespace: KVNamespace | null): void {
   kv = kvNamespace ?? null;
 }
 
@@ -117,7 +118,8 @@ async function firestoreGetSnapshots(canonical: string): Promise<PriceSnapshot[]
     if (!doc.exists) return [];
     const data = doc.data() as Record<string, unknown>;
     return (data.snapshots as PriceSnapshot[]) || [];
-  } catch {
+  } catch (err) {
+    console.error('[PriceHistory] Firestore read failed:', (err as Error).message || err);
     return [];
   }
 }

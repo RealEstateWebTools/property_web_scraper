@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
-import { authenticateApiKey } from '@lib/services/auth.js';
+import { apiGuard } from '@lib/services/api-guard.js';
 import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
-import { checkRateLimit } from '@lib/services/rate-limiter.js';
 import { successResponse, corsPreflightResponse } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
 
@@ -10,11 +9,8 @@ export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request)
 export const GET: APIRoute = async ({ request }) => {
   const startTime = Date.now();
 
-  const auth = await authenticateApiKey(request);
-  if (!auth.authorized) return auth.errorResponse!;
-
-  const rateCheck = await checkRateLimit(request, auth.tier, auth.userId);
-  if (!rateCheck.allowed) return rateCheck.errorResponse!;
+  const guard = await apiGuard(request);
+  if (!guard.ok) return guard.response;
 
   // Deduplicate www/non-www hosts — keep only the canonical (www) version
   const seen = new Map<string, { host: string; scraper: string }>();

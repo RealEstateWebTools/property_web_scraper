@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { authenticateApiKey, validateUrlLength, MAX_HTML_SIZE } from '@lib/services/auth.js';
+import { apiGuard } from '@lib/services/api-guard.js';
 import { validateUrl } from '@lib/services/url-validator.js';
 import { findByName } from '@lib/extractor/mapping-loader.js';
 import { Listing } from '@lib/models/listing.js';
@@ -101,11 +102,9 @@ export const GET: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/listings';
 
-  const auth = await authenticateApiKey(request);
-  if (!auth.authorized) return auth.errorResponse!;
-
-  const rateCheck = await checkRateLimit(request, auth.tier, auth.userId, 'api');
-  if (!rateCheck.allowed) return rateCheck.errorResponse!;
+  const guard = await apiGuard(request, 'api');
+  if (!guard.ok) return guard.response;
+  const { auth } = guard;
 
   const url = new URL(request.url).searchParams.get('url');
   if (url) {

@@ -6,8 +6,7 @@
  */
 
 import type { APIRoute } from 'astro';
-import { authenticateApiKey } from '@lib/services/auth.js';
-import { checkRateLimit } from '@lib/services/rate-limiter.js';
+import { apiGuard } from '@lib/services/api-guard.js';
 import {
   errorResponse, successResponse, corsPreflightResponse,
   ApiErrorCode,
@@ -18,11 +17,9 @@ import type { SubscriptionTier } from '@lib/services/api-key-service.js';
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
 export const GET: APIRoute = async ({ request }) => {
-  const auth = await authenticateApiKey(request);
-  if (!auth.authorized) return auth.errorResponse!;
-
-  const rateCheck = await checkRateLimit(request, auth.tier, auth.userId);
-  if (!rateCheck.allowed) return rateCheck.errorResponse!;
+  const guard = await apiGuard(request);
+  if (!guard.ok) return guard.response;
+  const { auth } = guard;
 
   if (!auth.userId || auth.userId === 'anonymous') {
     return errorResponse(

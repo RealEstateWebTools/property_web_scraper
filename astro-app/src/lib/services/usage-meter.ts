@@ -12,6 +12,7 @@
  *   TTL: 90 days (auto-expires stale data)
  */
 
+import type { KVNamespace } from './kv-types.js';
 import type { SubscriptionTier } from './api-key-service.js';
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -45,7 +46,7 @@ export function getDailyLimit(tier: SubscriptionTier): number {
 
 // ─── KV handle ──────────────────────────────────────────────────
 
-let kv: any = null;
+let kv: KVNamespace | null = null;
 const memStore = new Map<string, string>();
 
 /**
@@ -56,7 +57,7 @@ const memStore = new Map<string, string>();
 const usageCache = new Map<string, { count: number; expiresAt: number }>();
 const USAGE_CACHE_TTL_MS = 60_000;
 
-export function initUsageKV(kvNamespace: any): void {
+export function initUsageKV(kvNamespace: KVNamespace | null): void {
   kv = kvNamespace ?? null;
 }
 

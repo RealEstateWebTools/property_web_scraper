@@ -5,6 +5,8 @@
  * Events: extraction.completed, extraction.failed
  */
 
+import type { KVNamespace } from './kv-types.js';
+
 // ─── Types ───────────────────────────────────────────────────────
 
 export type WebhookEvent = 'extraction.completed' | 'extraction.failed';
@@ -38,7 +40,7 @@ export interface WebhookDeliveryResult {
 /** Maximum number of webhook registrations to prevent unbounded KV growth. */
 export const MAX_WEBHOOKS = 20;
 
-let kv: any = null;
+let kv: KVNamespace | null = null;
 const inMemoryStore = new Map<string, WebhookRegistration>();
 
 const KV_PREFIX = 'webhook:';
@@ -49,7 +51,7 @@ const KV_TTL_SECONDS = 90 * 24 * 60 * 60; // 90 days
  * Bind the KV namespace for persistent storage.
  * Call once per request from Astro middleware.
  */
-export function initWebhookKV(kvNamespace: any): void {
+export function initWebhookKV(kvNamespace: KVNamespace | null): void {
   kv = kvNamespace ?? null;
 }
 

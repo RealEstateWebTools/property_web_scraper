@@ -3,6 +3,8 @@
  * Tracks export activity with KV-backed persistence and in-memory fallback.
  */
 
+import type { KVNamespace } from './kv-types.js';
+
 export interface ExportHistoryEntry {
   id: string;
   userId: string;
@@ -15,10 +17,10 @@ export interface ExportHistoryEntry {
 const HISTORY_TTL = 30 * 24 * 60 * 60; // 30 days in seconds
 const MAX_MEMORY_ENTRIES = 200;
 
-let kv: any = null;
+let kv: KVNamespace | null = null;
 const memoryStore: ExportHistoryEntry[] = [];
 
-export function initExportHistoryKV(kvNamespace: any): void {
+export function initExportHistoryKV(kvNamespace: KVNamespace | null): void {
   kv = kvNamespace ?? null;
 }
 
