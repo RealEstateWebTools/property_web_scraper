@@ -1,5 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getHaul } from '../lib/services/haul-store.js';
+import { parseCookie } from '../lib/services/web-haul-resolver.js';
+
+const cookieHeader = Astro.request.headers.get('cookie') || '';
+const cookieHaulId = parseCookie(cookieHeader, 'pws_haul_id');
+
+let activeHaul: Awaited<ReturnType<typeof getHaul>> | undefined;
+if (cookieHaulId) {
+  try {
+    activeHaul = await getHaul(cookieHaulId);
+  } catch {
+    // Firestore unavailable — fall through to client-side only
+  }
+}
 ---
 <BaseLayout title="My Hauls">
 
@@ -14,6 +28,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <i class="bi bi-plus-lg"></i> New Haul
     </button>
   </div>
+
+  {activeHaul && (
+    <div class="mb-6">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Active Haul</h2>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <a href={`/haul/${activeHaul.id}`} class="block bg-white rounded-xl shadow-sm border-2 border-blue-200 p-5 hover:shadow-md transition-shadow no-underline">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-semibold text-gray-900 text-sm truncate">
+              {activeHaul.name || `📦 ${activeHaul.id}`}
+            </h3>
+            <span class="text-xs text-blue-600 font-medium whitespace-nowrap ml-2">
+              {Math.max(0, Math.ceil((new Date(activeHaul.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}d left
+            </span>
+          </div>
+          <p class="text-xs text-gray-500">
+            {activeHaul.scrapes.length} scrape{activeHaul.scrapes.length !== 1 ? 's' : ''}
+          </p>
+          {!activeHaul.name && (
+            <p class="text-xs text-gray-400 font-mono mt-1 truncate">{activeHaul.id}</p>
+          )}
+        </a>
+      </div>
+    </div>
+  )}
 
   <div id="hauls-list"></div>
 
@@ -54,8 +92,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </div>
 </section>
 
-<script is:inline>
+<script is:inline define:vars={{ activeHaulId: activeHaul?.id ?? '' }}>
 document.addEventListener('DOMContentLoaded', function() {
+  var serverHaulId = activeHaulId;
+  var hasServerHaul = !!serverHaulId;
+
   // Create Haul button
   var createBtn = document.getElementById('create-haul-btn');
   if (createBtn) {
@@ -106,24 +147,27 @@ document.addEventListener('DOMContentLoaded', function() {
   var noConsentEl = document.getElementById('no-consent');
 
   if (typeof window.PwsStorage === 'undefined') {
-    if (noConsentEl) noConsentEl.classList.remove('hidden');
+    // Only show no-consent banner if there's no server-rendered haul
+    if (!hasServerHaul && noConsentEl) noConsentEl.classList.remove('hidden');
     return;
   }
 
   var myHauls = window.PwsStorage.get('functional:my-hauls');
   if (!myHauls || myHauls.length === 0) {
-    if (emptyEl) emptyEl.classList.remove('hidden');
+    if (!hasServerHaul && emptyEl) emptyEl.classList.remove('hidden');
     return;
   }
 
-  // Filter out expired hauls
+  // Filter out expired hauls and the server-rendered active haul (avoid duplicate)
   var now = new Date();
   myHauls = myHauls.filter(function(h) {
+    if (serverHaulId && h.id === serverHaulId) return false;
     return new Date(h.expiresAt) > now;
   });
 
   if (myHauls.length === 0) {
-    if (emptyEl) emptyEl.classList.remove('hidden');
+    // Don't show empty state if server already rendered the active haul
+    if (!hasServerHaul && emptyEl) emptyEl.classList.remove('hidden');
     return;
   }
 
@@ -132,7 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
     return new Date(b.lastVisited).getTime() - new Date(a.lastVisited).getTime();
   });
 
-  var html = '<div class="grid gap-4 sm:grid-cols-2">';
+  var heading = hasServerHaul ? '<h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Other Hauls</h2>' : '';
+  var html = heading + '<div class="grid gap-4 sm:grid-cols-2">';
   myHauls.forEach(function(h) {
     var daysLeft = Math.max(0, Math.ceil((new Date(h.expiresAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     var visited = new Date(h.lastVisited).toLocaleDateString();

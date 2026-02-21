@@ -45,7 +45,7 @@ export function setHaulCookie(haulId: string): string {
 }
 
 /** Parse a single cookie value by name from a Cookie header string. */
-function parseCookie(cookieHeader: string, name: string): string | undefined {
+export function parseCookie(cookieHeader: string, name: string): string | undefined {
   const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`));
   return match ? decodeURIComponent(match[1]) : undefined;
 }
