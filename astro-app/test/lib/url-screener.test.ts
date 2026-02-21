@@ -28,6 +28,46 @@ describe('url-screener', () => {
       const r = screenUrl('https://www.fotocasa.es/es/comprar/vivienda/madrid/calefaccion/12345678/d');
       expect(r.verdict).toBe('allowed');
     });
+
+    it('allows daft.ie for-sale listing', () => {
+      const r = screenUrl('https://www.daft.ie/for-sale/detached-house-12-the-avenue-plunkett-hall-dunboyne-co-meath/6477069');
+      expect(r.verdict).toBe('allowed');
+    });
+
+    it('allows daft.ie to-rent listing', () => {
+      const r = screenUrl('https://www.daft.ie/to-rent/apartment-15-the-square-tallaght-dublin/5123456');
+      expect(r.verdict).toBe('allowed');
+    });
+
+    it('allows onthemarket details page', () => {
+      const r = screenUrl('https://www.onthemarket.com/details/18663439/');
+      expect(r.verdict).toBe('allowed');
+    });
+
+    it('allows pisos.com listing', () => {
+      const r = screenUrl('https://www.pisos.com/comprar/piso-madrid_capital/12345/');
+      expect(r.verdict).toBe('allowed');
+    });
+
+    it('allows immobilienscout24 expose page', () => {
+      const r = screenUrl('https://www.immobilienscout24.de/expose/160531543');
+      expect(r.verdict).toBe('allowed');
+    });
+
+    it('allows domain.com.au listing', () => {
+      const r = screenUrl('https://www.domain.com.au/133-bethany-road-hoppers-crossing-vic-3029-2020615556');
+      expect(r.verdict).toBe('allowed');
+    });
+
+    it('allows realestate.com.au listing', () => {
+      const r = screenUrl('https://www.realestate.com.au/property-house-vic-tarneit-143160680');
+      expect(r.verdict).toBe('allowed');
+    });
+
+    it('allows funda.nl listing with full address', () => {
+      const r = screenUrl('https://www.funda.nl/koop/amsterdam/appartement-43082316-keizersgracht-100/');
+      expect(r.verdict).toBe('allowed');
+    });
   });
 
   describe('search_results — search/listing pages on known portals', () => {
@@ -64,6 +104,118 @@ describe('url-screener', () => {
     it('detects map-search pages', () => {
       const r = screenUrl('https://www.zoopla.co.uk/for-sale/map-search/');
       expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects zoopla to-rent search', () => {
+      const r = screenUrl('https://www.zoopla.co.uk/to-rent/flats/London/');
+      expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects daft.ie for-sale search', () => {
+      const r = screenUrl('https://www.daft.ie/for-sale/Dublin/');
+      expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects daft.ie to-rent search', () => {
+      const r = screenUrl('https://www.daft.ie/to-rent/Dublin/');
+      expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects onthemarket for-sale search', () => {
+      const r = screenUrl('https://www.onthemarket.com/for-sale/London/');
+      expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects immoscout24 search', () => {
+      const r = screenUrl('https://www.immobilienscout24.de/Suche/S-T/Wohnung-Mieten/Berlin/Berlin/');
+      expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects fotocasa search (alquilar)', () => {
+      const r = screenUrl('https://www.fotocasa.es/es/alquilar/viviendas/madrid/todas-las-zonas/l');
+      expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects seloger search (recherche)', () => {
+      const r = screenUrl('https://www.seloger.com/recherche/achat/paris/');
+      expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects funda search (listings terminal path)', () => {
+      const r = screenUrl('https://www.funda.nl/koop/amsterdam/listings');
+      expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects generic /properties/ terminal path', () => {
+      const r = screenUrl('https://jitty.com/properties/');
+      expect(r.verdict).toBe('search_results');
+    });
+
+    it('detects generic /properties terminal path (no trailing slash)', () => {
+      const r = screenUrl('https://jitty.com/properties');
+      expect(r.verdict).toBe('search_results');
+    });
+  });
+
+  describe('listing pages not falsely flagged as search_results', () => {
+    it('realestateindia listing with "for-sale" in path is not search', () => {
+      const r = screenUrl('https://www.realestateindia.com/property-detail/residential-property-for-sale-in-delhi-12345.htm');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('jitty listing with /properties/<id> is not search', () => {
+      const r = screenUrl('https://jitty.com/properties/rtI0BPlsWvEohngvc7HB');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('forsalebyowner listing with /listing/<id> is not search', () => {
+      const r = screenUrl('https://www.forsalebyowner.com/listing/12345');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('daft.ie for-sale listing is not search', () => {
+      const r = screenUrl('https://www.daft.ie/for-sale/detached-house-12-the-avenue-plunkett-hall-dunboyne-co-meath/6477069');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('daft.ie to-rent listing is not search', () => {
+      const r = screenUrl('https://www.daft.ie/to-rent/apartment-15-the-square-tallaght-dublin/5123456');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('zoopla for-sale details page is not search', () => {
+      const r = screenUrl('https://www.zoopla.co.uk/for-sale/details/12345678/');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('rightmove properties page is not search', () => {
+      const r = screenUrl('https://www.rightmove.co.uk/properties/168908774');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('onthemarket details page is not search', () => {
+      const r = screenUrl('https://www.onthemarket.com/details/18663439/');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('immoscout24 expose page is not search', () => {
+      const r = screenUrl('https://www.immobilienscout24.de/expose/160531543');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('funda listing page is not search', () => {
+      const r = screenUrl('https://www.funda.nl/koop/amsterdam/appartement-43082316-keizersgracht-100/');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('domain.com.au listing is not search', () => {
+      const r = screenUrl('https://www.domain.com.au/133-bethany-road-hoppers-crossing-vic-3029-2020615556');
+      expect(r.verdict).not.toBe('search_results');
+    });
+
+    it('realestate.com.au listing is not search', () => {
+      const r = screenUrl('https://www.realestate.com.au/property-house-vic-tarneit-143160680');
+      expect(r.verdict).not.toBe('search_results');
     });
   });
 

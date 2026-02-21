@@ -21,13 +21,15 @@ export interface ScreeningResult {
  * These are broad patterns that cover multiple portal conventions.
  */
 const SEARCH_PAGE_PATTERNS: RegExp[] = [
-  // Generic search/results paths
+  // Generic search/results paths (all portals)
   /\/(search|results|buscar|recherche|suche|ricerca)\b/i,
   /[?&](q|query|search|keyword)=/i,
 
-  // UK portals — match search index pages, not individual listings
-  // e.g. /for-sale/London.html but NOT /for-sale/details/12345/
-  // Also exclude daft.ie-style paths: /for-sale/<description>/<numeric-id>
+  // UK & Ireland portals (rightmove, zoopla, onthemarket, daft.ie)
+  // Match search index pages, not individual listings.
+  // Negative lookaheads exclude:
+  //   - zoopla detail pages: /for-sale/details/12345/
+  //   - daft.ie listing pages: /for-sale/<description>/<numeric-id>
   /\/find\.(html|htm)/i,
   /\/for-sale\/(?!details\/)(?![^/]+\/\d+\b)/i,
   /\/to-rent\/(?!details\/)(?![^/]+\/\d+\b)/i,
@@ -35,7 +37,8 @@ const SEARCH_PAGE_PATTERNS: RegExp[] = [
   /\/property-for-sale\//i,
   /\/property-to-rent\//i,
 
-  // Spanish portals — match listing index pages, not individual listings
+  // Spanish portals (idealista, fotocasa, pisos)
+  // Match listing index pages, not individual listings.
   // e.g. /venta-viviendas/madrid/ but NOT /comprar/vivienda/madrid/.../d
   /\/venta-viviendas\//i,
   /\/alquiler-viviendas\//i,
@@ -43,17 +46,21 @@ const SEARCH_PAGE_PATTERNS: RegExp[] = [
   /\/alquilar\//i,
   /\/en-venta\//i,
 
-  // German portals
+  // German portals (immobilienscout24)
+  // e.g. /Suche/S-T/Wohnung-Mieten/Berlin/ but NOT /expose/12345
   /\/Suche\//i,
   /\/wohnung-mieten\//i,
   /\/wohnung-kaufen\//i,
   /\/haus-kaufen\//i,
 
-  // French portals
+  // French portals (seloger)
+  // e.g. /annonces/achat/paris/ or /recherche/achat/paris/
   /\/annonces\//i,
   /\/recherche\//i,
 
-  // Generic listing patterns
+  // Generic terminal path patterns (jitty /properties, funda /listings, etc.)
+  // Only match when the path ENDS with /properties or /listing(s) — won't
+  // match /properties/<id> or /listing/<id> since those have more path segments
   /\/listings?\/?$/i,
   /\/properties\/?$/i,
   /\/map-search/i,
