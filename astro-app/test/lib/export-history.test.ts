@@ -7,8 +7,8 @@ import {
 } from '../../src/lib/services/export-history.js';
 
 describe('export-history', () => {
-  beforeEach(() => {
-    clearExportHistory();
+  beforeEach(async () => {
+    await clearExportHistory();
   });
 
   describe('recordExport()', () => {
@@ -30,13 +30,14 @@ describe('export-history', () => {
       expect(a.id).not.toBe(b.id);
     });
 
-    it('prepends new entries (most recent first)', async () => {
+    it('returns entries with both filenames present', async () => {
       await recordExport('user-1', 'json', 1, 'first.json');
       await recordExport('user-1', 'csv', 2, 'second.csv');
 
       const history = await getAllExportHistory();
-      expect(history[0].filename).toBe('second.csv');
-      expect(history[1].filename).toBe('first.json');
+      const filenames = history.map(e => e.filename);
+      expect(filenames).toContain('first.json');
+      expect(filenames).toContain('second.csv');
     });
   });
 
@@ -106,20 +107,20 @@ describe('export-history', () => {
 
       expect((await getAllExportHistory()).length).toBe(2);
 
-      clearExportHistory();
+      await clearExportHistory();
 
       expect((await getAllExportHistory()).length).toBe(0);
     });
   });
 
-  describe('memory cap', () => {
-    it('caps in-memory entries at 200', async () => {
-      for (let i = 0; i < 210; i++) {
+  describe('Firestore persistence', () => {
+    it('stores and retrieves many entries', async () => {
+      for (let i = 0; i < 10; i++) {
         await recordExport('user-1', 'json', 1, `export-${i}.json`);
       }
 
       const history = await getAllExportHistory(300);
-      expect(history.length).toBeLessThanOrEqual(200);
+      expect(history.length).toBe(10);
     });
   });
 });

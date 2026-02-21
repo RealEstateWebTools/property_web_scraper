@@ -1,19 +1,20 @@
 /**
  * Usage Metering Service
  *
- * Tracks per-user daily extraction counts in KV.
+ * Tracks per-user daily extraction counts in Firestore.
  * Used for:
  *   - Daily quota enforcement (Free: 500/day, Starter: 5K, Pro: 25K)
  *   - Usage reporting via /public_api/v1/usage endpoint
  *   - Admin dashboard analytics
  *
- * KV schema:
- *   "usage:{userId}:{YYYY-MM-DD}" → { extractions: number, lastUpdated: string }
- *   TTL: 90 days (auto-expires stale data)
+ * Firestore schema:
+ *   Collection: {prefix}daily_usage
+ *   Document ID: "{userId}:{YYYY-MM-DD}"
+ *   Fields: userId, date, extractions, lastUpdated
  */
 
-import type { KVNamespace } from './kv-types.js';
 import type { SubscriptionTier } from './api-key-service.js';
+import { getClient, getCollectionPrefix } from '../firestore/client.js';
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -44,37 +45,34 @@ export function getDailyLimit(tier: SubscriptionTier): number {
   return DAILY_LIMITS[tier] ?? DAILY_LIMITS.free;
 }
 
-// ─── KV handle ──────────────────────────────────────────────────
-
-let kv: KVNamespace | null = null;
-const memStore = new Map<string, string>();
+// ─── In-memory cache (60s TTL) ──────────────────────────────────
 
 /**
  * In-memory cache for today's usage count per user.
- * Avoids hitting KV on every quota check (the hot path).
+ * Avoids hitting Firestore on every quota check (the hot path).
  * TTL: 60 seconds — stale reads are acceptable since quotas are soft limits.
  */
 const usageCache = new Map<string, { count: number; expiresAt: number }>();
 const USAGE_CACHE_TTL_MS = 60_000;
 
-export function initUsageKV(kvNamespace: KVNamespace | null): void {
-  kv = kvNamespace ?? null;
-}
+/** In-memory fallback store (used when Firestore is unavailable). */
+const memStore = new Map<string, string>();
 
-async function kvGet(key: string): Promise<string | null> {
-  if (kv) return kv.get(key);
-  return memStore.get(key) ?? null;
-}
-
-async function kvPut(key: string, value: string, options?: { expirationTtl?: number }): Promise<void> {
-  if (kv) return kv.put(key, value, options);
-  memStore.set(key, value);
-}
-
-/** Clear all in-memory data. For testing only. */
-export function resetUsageMeter(): void {
+/** Clear all in-memory and Firestore data. For testing only. */
+export async function resetUsageMeter(): Promise<void> {
   memStore.clear();
   usageCache.clear();
+  // Clear Firestore state (for test environments)
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const snap = await db.collection(`${prefix}daily_usage`).get();
+    for (const doc of snap.docs) {
+      await doc.ref.delete();
+    }
+  } catch {
+    // Firestore unavailable — in-memory already cleared above
+  }
 }
 
 // ─── Date helpers ───────────────────────────────────────────────
@@ -94,6 +92,52 @@ function dateRange(days: number): string[] {
   return dates;
 }
 
+// ─── Firestore helpers ──────────────────────────────────────────
+
+async function firestoreGetUsage(userId: string, date: string): Promise<{ extractions: number; lastUpdated: string } | null> {
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const docId = `${userId}:${date}`;
+    const doc = await db.collection(`${prefix}daily_usage`).doc(docId).get();
+    if (!doc.exists) return null;
+    return doc.data() as { extractions: number; lastUpdated: string };
+  } catch {
+    return null;
+  }
+}
+
+async function firestoreIncrementUsage(userId: string, date: string): Promise<number> {
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const docId = `${userId}:${date}`;
+    const col = db.collection(`${prefix}daily_usage`);
+    const docRef = col.doc(docId);
+    const existing = await docRef.get();
+    const lastUpdated = new Date().toISOString();
+
+    if (existing.exists) {
+      const data = existing.data() as { extractions: number };
+      const newCount = (data.extractions || 0) + 1;
+      await docRef.set({ userId, date, extractions: newCount, lastUpdated });
+      return newCount;
+    } else {
+      await docRef.set({ userId, date, extractions: 1, lastUpdated });
+      return 1;
+    }
+  } catch {
+    // Firestore unavailable — use in-memory fallback
+    const key = `${userId}:${date}`;
+    const existing = memStore.get(key);
+    const record = existing ? JSON.parse(existing) : { extractions: 0 };
+    record.extractions++;
+    record.lastUpdated = new Date().toISOString();
+    memStore.set(key, JSON.stringify(record));
+    return record.extractions;
+  }
+}
+
 // ─── Core functions ─────────────────────────────────────────────
 
 /**
@@ -102,24 +146,11 @@ function dateRange(days: number): string[] {
  */
 export async function recordUsage(userId: string): Promise<void> {
   const date = todayStr();
-  const key = `usage:${userId}:${date}`;
-  const existing = await kvGet(key);
-
-  let record: { extractions: number; lastUpdated: string };
-  if (existing) {
-    record = JSON.parse(existing);
-    record.extractions++;
-  } else {
-    record = { extractions: 1, lastUpdated: '' };
-  }
-  record.lastUpdated = new Date().toISOString();
-
-  // 90-day TTL so old usage data auto-expires
-  await kvPut(key, JSON.stringify(record), { expirationTtl: 90 * 86400 });
+  const newCount = await firestoreIncrementUsage(userId, date);
 
   // Update cache so the next getTodayUsage() is instant
   usageCache.set(userId, {
-    count: record.extractions,
+    count: newCount,
     expiresAt: Date.now() + USAGE_CACHE_TTL_MS,
   });
 }
@@ -132,13 +163,19 @@ export async function getUsage(userId: string, days = 30): Promise<DailyUsage[]>
   const usage: DailyUsage[] = [];
 
   for (const date of dates) {
-    const key = `usage:${userId}:${date}`;
-    const json = await kvGet(key);
-    if (json) {
-      const record = JSON.parse(json);
+    const record = await firestoreGetUsage(userId, date);
+    if (record) {
       usage.push({ date, extractions: record.extractions, lastUpdated: record.lastUpdated });
     } else {
-      usage.push({ date, extractions: 0, lastUpdated: '' });
+      // Check in-memory fallback
+      const key = `${userId}:${date}`;
+      const memVal = memStore.get(key);
+      if (memVal) {
+        const parsed = JSON.parse(memVal);
+        usage.push({ date, extractions: parsed.extractions, lastUpdated: parsed.lastUpdated });
+      } else {
+        usage.push({ date, extractions: 0, lastUpdated: '' });
+      }
     }
   }
 
@@ -147,7 +184,7 @@ export async function getUsage(userId: string, days = 30): Promise<DailyUsage[]>
 
 /**
  * Get today's usage count for a user.
- * Uses an in-memory cache (60s TTL) to avoid KV reads on the hot path.
+ * Uses an in-memory cache (60s TTL) to avoid Firestore reads on the hot path.
  */
 export async function getTodayUsage(userId: string): Promise<number> {
   // Check cache first
@@ -156,9 +193,8 @@ export async function getTodayUsage(userId: string): Promise<number> {
     return cached.count;
   }
 
-  const key = `usage:${userId}:${todayStr()}`;
-  const json = await kvGet(key);
-  const count = json ? JSON.parse(json).extractions : 0;
+  const record = await firestoreGetUsage(userId, todayStr());
+  const count = record?.extractions ?? 0;
 
   // Populate cache
   usageCache.set(userId, { count, expiresAt: Date.now() + USAGE_CACHE_TTL_MS });

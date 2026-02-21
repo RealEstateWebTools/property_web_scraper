@@ -1,7 +1,7 @@
-import type { KVNamespace } from './kv-types.js';
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { logActivity } from './activity-logger.js';
 import { findPortalByName } from './portal-registry.js';
+import { getClient, getCollectionPrefix } from '../firestore/client.js';
 import {
   detectTechnologyStack,
   detectAntiScrapingSignals,
@@ -112,26 +112,63 @@ export interface RecordScrapeInput {
   html_hash?: string;
 }
 
-const SCRAPE_PREFIX = 'scrape-meta:';
-const LISTING_INDEX_PREFIX = 'scrape-meta:idx:listing:';
-const PORTAL_CURRENT_PREFIX = 'portal-meta:current:';
-const PORTAL_HISTORY_PREFIX = 'portal-meta:history:';
-const PORTAL_HISTORY_INDEX_PREFIX = 'portal-meta:idx:history:';
-
 const MAX_SCRAPES_PER_LISTING = 50;
 const MAX_PORTAL_HISTORY_ENTRIES = 100;
-const KV_TTL_SECONDS = 365 * 24 * 60 * 60; // 1 year
-
-let kv: KVNamespace | null = null;
 
 const inMemoryScrapes = new Map<string, ScrapeRecord>();
 const inMemoryListingIndex = new Map<string, string[]>();
 const inMemoryPortalCurrent = new Map<string, PortalProfileCurrent>();
 const inMemoryPortalHistory = new Map<string, PortalProfileHistoryEntry[]>();
 
-export function initScrapeMetadataKV(kvNamespace: KVNamespace | null): void {
-  kv = kvNamespace ?? null;
+// ─── Firestore helpers ──────────────────────────────────────────
+
+async function firestoreSaveScrape(scrape: ScrapeRecord): Promise<void> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  await db.collection(`${prefix}scrape_records`).doc(scrape.id).set(JSON.parse(JSON.stringify(scrape)));
 }
+
+async function firestoreGetScrape(id: string): Promise<ScrapeRecord | undefined> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const doc = await db.collection(`${prefix}scrape_records`).doc(id).get();
+  if (!doc.exists) return undefined;
+  return doc.data() as ScrapeRecord;
+}
+
+async function firestoreGetPortalProfile(portalSlug: string): Promise<PortalProfileCurrent | undefined> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const doc = await db.collection(`${prefix}portal_profiles`).doc(portalSlug).get();
+  if (!doc.exists) return undefined;
+  return doc.data() as PortalProfileCurrent;
+}
+
+async function firestoreSavePortalProfile(profile: PortalProfileCurrent): Promise<void> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  await db.collection(`${prefix}portal_profiles`).doc(profile.portal_slug).set(JSON.parse(JSON.stringify(profile)));
+}
+
+async function firestoreAppendPortalHistory(portalSlug: string, entry: PortalProfileHistoryEntry): Promise<void> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const docId = `${portalSlug}_${entry.archived_at}`;
+  await db.collection(`${prefix}portal_profile_history`).doc(docId).set(JSON.parse(JSON.stringify(entry)));
+}
+
+async function firestoreGetPortalHistory(portalSlug: string, limit: number): Promise<PortalProfileHistoryEntry[]> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const snapshot = await db.collection(`${prefix}portal_profile_history`)
+    .where('portal_slug', '==', portalSlug)
+    .get();
+  const entries = snapshot.docs.map(doc => doc.data() as PortalProfileHistoryEntry);
+  entries.sort((a, b) => b.archived_at.localeCompare(a.archived_at));
+  return entries.slice(0, limit);
+}
+
+// ─── Public API ─────────────────────────────────────────────────
 
 export async function recordScrapeAndUpdatePortal(input: RecordScrapeInput): Promise<ScrapeRecord> {
   const now = new Date().toISOString();
@@ -199,9 +236,19 @@ export async function recordScrapeAndUpdatePortal(input: RecordScrapeInput): Pro
     better_html_hint: betterHtmlHint,
   };
 
-  await persistScrape(scrape);
+  // Persist scrape record to Firestore (fire-and-forget from caller's perspective)
+  try {
+    await firestoreSaveScrape(scrape);
+  } catch {
+    inMemoryScrapes.set(scrape.id, scrape);
+  }
+
+  // Maintain in-memory listing index as well for fast lookups
   if (scrape.listing_id) {
-    await appendScrapeIndexForListing(scrape.listing_id, scrape.id);
+    const ids = (inMemoryListingIndex.get(scrape.listing_id) || []).slice();
+    ids.unshift(scrape.id);
+    if (ids.length > MAX_SCRAPES_PER_LISTING) ids.length = MAX_SCRAPES_PER_LISTING;
+    inMemoryListingIndex.set(scrape.listing_id, ids);
   }
 
   await updatePortalProfile(scrape);
@@ -209,92 +256,117 @@ export async function recordScrapeAndUpdatePortal(input: RecordScrapeInput): Pro
 }
 
 export async function getLatestScrapeForListing(listingId: string): Promise<ScrapeRecord | undefined> {
-  const ids = await getListingIndex(listingId);
-  if (ids.length === 0) return undefined;
-  return getScrape(ids[0]);
+  // Use in-memory index for ordering (newest first), fall back to Firestore for individual records
+  const ids = inMemoryListingIndex.get(listingId);
+  if (ids && ids.length > 0) {
+    const record = inMemoryScrapes.get(ids[0]);
+    if (record) return record;
+    // Try Firestore for the record if not in memory
+    try { return await firestoreGetScrape(ids[0]); } catch { /* fall through */ }
+  }
+  // No in-memory index: query Firestore and sort by id (which embeds timestamp)
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const snapshot = await db.collection(`${prefix}scrape_records`)
+      .where('listing_id', '==', listingId)
+      .get();
+    if (snapshot.docs.length === 0) return undefined;
+    const records = snapshot.docs.map(doc => doc.data() as ScrapeRecord);
+    records.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+    return records[0];
+  } catch {
+    return undefined;
+  }
 }
 
 export async function getScrapeHistoryForListing(listingId: string, limit = 10): Promise<ScrapeRecord[]> {
-  const ids = await getListingIndex(listingId);
-  const out: ScrapeRecord[] = [];
-  for (const id of ids.slice(0, limit)) {
-    const record = await getScrape(id);
-    if (record) out.push(record);
-  }
-  return out;
-}
-
-export async function getPortalProfile(portalSlug: string): Promise<PortalProfileCurrent | undefined> {
-  if (kv) {
-    const data = await kv.get(`${PORTAL_CURRENT_PREFIX}${portalSlug}`, 'json');
-    return (data || undefined) as PortalProfileCurrent | undefined;
-  }
-  return inMemoryPortalCurrent.get(portalSlug);
-}
-
-export async function getPortalProfileHistory(portalSlug: string, limit = 20): Promise<PortalProfileHistoryEntry[]> {
-  if (kv) {
-    const idx = await kv.get(`${PORTAL_HISTORY_INDEX_PREFIX}${portalSlug}`, 'json');
-    const ids = (idx || []) as string[];
-    const out: PortalProfileHistoryEntry[] = [];
-    for (const ts of ids.slice(0, limit)) {
-      const entry = await kv.get(`${PORTAL_HISTORY_PREFIX}${portalSlug}:${ts}`, 'json');
-      if (entry) out.push(entry as PortalProfileHistoryEntry);
+  // Use in-memory index for ordering (newest first)
+  const ids = inMemoryListingIndex.get(listingId);
+  if (ids && ids.length > 0) {
+    const out: ScrapeRecord[] = [];
+    for (const id of ids.slice(0, limit)) {
+      const record = inMemoryScrapes.get(id);
+      if (record) {
+        out.push(record);
+      } else {
+        try {
+          const fsRecord = await firestoreGetScrape(id);
+          if (fsRecord) out.push(fsRecord);
+        } catch { /* skip */ }
+      }
     }
     return out;
   }
-  return (inMemoryPortalHistory.get(portalSlug) || []).slice(0, limit);
+  // No in-memory index: query Firestore
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const snapshot = await db.collection(`${prefix}scrape_records`)
+      .where('listing_id', '==', listingId)
+      .get();
+    const records = snapshot.docs.map(doc => doc.data() as ScrapeRecord);
+    records.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+    return records.slice(0, limit);
+  } catch {
+    return [];
+  }
 }
 
-export function clearScrapeMetadata(): void {
+export async function getPortalProfile(portalSlug: string): Promise<PortalProfileCurrent | undefined> {
+  try {
+    return await firestoreGetPortalProfile(portalSlug);
+  } catch {
+    return inMemoryPortalCurrent.get(portalSlug);
+  }
+}
+
+export async function getPortalProfileHistory(portalSlug: string, limit = 20): Promise<PortalProfileHistoryEntry[]> {
+  try {
+    return await firestoreGetPortalHistory(portalSlug, limit);
+  } catch {
+    return (inMemoryPortalHistory.get(portalSlug) || []).slice(0, limit);
+  }
+}
+
+export async function clearScrapeMetadata(): Promise<void> {
   inMemoryScrapes.clear();
   inMemoryListingIndex.clear();
   inMemoryPortalCurrent.clear();
   inMemoryPortalHistory.clear();
+  // Clear Firestore state (for test environments)
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const clearCol = async (name: string) => {
+      const snap = await db.collection(`${prefix}${name}`).get();
+      for (const doc of snap.docs) {
+        await doc.ref.delete();
+      }
+    };
+    await Promise.all([
+      clearCol('scrape_records'),
+      clearCol('portal_profiles'),
+      clearCol('portal_profile_history'),
+    ]);
+  } catch {
+    // Firestore unavailable — in-memory already cleared above
+  }
 }
 
-async function getScrape(id: string): Promise<ScrapeRecord | undefined> {
-  if (kv) {
-    const data = await kv.get(`${SCRAPE_PREFIX}${id}`, 'json');
-    return (data || undefined) as ScrapeRecord | undefined;
-  }
-  return inMemoryScrapes.get(id);
-}
-
-async function persistScrape(scrape: ScrapeRecord): Promise<void> {
-  if (kv) {
-    await kv.put(`${SCRAPE_PREFIX}${scrape.id}`, JSON.stringify(scrape), { expirationTtl: KV_TTL_SECONDS });
-    return;
-  }
-  inMemoryScrapes.set(scrape.id, scrape);
-}
-
-async function getListingIndex(listingId: string): Promise<string[]> {
-  if (kv) {
-    const data = await kv.get(`${LISTING_INDEX_PREFIX}${listingId}`, 'json');
-    return ((data || []) as string[]).slice();
-  }
-  return (inMemoryListingIndex.get(listingId) || []).slice();
-}
-
-async function appendScrapeIndexForListing(listingId: string, scrapeId: string): Promise<void> {
-  const ids = await getListingIndex(listingId);
-  ids.unshift(scrapeId);
-  if (ids.length > MAX_SCRAPES_PER_LISTING) {
-    ids.length = MAX_SCRAPES_PER_LISTING;
-  }
-  if (kv) {
-    await kv.put(`${LISTING_INDEX_PREFIX}${listingId}`, JSON.stringify(ids), { expirationTtl: KV_TTL_SECONDS });
-    return;
-  }
-  inMemoryListingIndex.set(listingId, ids);
-}
+// ─── Private helpers ─────────────────────────────────────────────
 
 async function updatePortalProfile(scrape: ScrapeRecord): Promise<void> {
   const portalSlug = scrape.portal_slug || scrape.scraper_name;
   if (!portalSlug) return;
 
-  const current = await getPortalProfile(portalSlug);
+  let current: PortalProfileCurrent | undefined;
+  try {
+    current = await firestoreGetPortalProfile(portalSlug);
+  } catch {
+    current = inMemoryPortalCurrent.get(portalSlug);
+  }
+
   const now = new Date().toISOString();
   const signature = computeSignature(scrape);
 
@@ -395,33 +467,27 @@ async function updatePortalProfile(scrape: ScrapeRecord): Promise<void> {
 }
 
 async function persistPortalCurrent(portalSlug: string, profile: PortalProfileCurrent): Promise<void> {
-  if (kv) {
-    await kv.put(`${PORTAL_CURRENT_PREFIX}${portalSlug}`, JSON.stringify(profile), { expirationTtl: KV_TTL_SECONDS });
-    return;
-  }
   inMemoryPortalCurrent.set(portalSlug, profile);
+  try {
+    await firestoreSavePortalProfile(profile);
+  } catch {
+    // In-memory fallback already set above
+  }
 }
 
 async function appendPortalHistory(portalSlug: string, entry: PortalProfileHistoryEntry): Promise<void> {
-  if (kv) {
-    const idx = await kv.get(`${PORTAL_HISTORY_INDEX_PREFIX}${portalSlug}`, 'json');
-    const ids = ((idx || []) as string[]).slice();
-    const ts = entry.archived_at;
-    ids.unshift(ts);
-    if (ids.length > MAX_PORTAL_HISTORY_ENTRIES) {
-      ids.length = MAX_PORTAL_HISTORY_ENTRIES;
-    }
-    await kv.put(`${PORTAL_HISTORY_PREFIX}${portalSlug}:${ts}`, JSON.stringify(entry), { expirationTtl: KV_TTL_SECONDS });
-    await kv.put(`${PORTAL_HISTORY_INDEX_PREFIX}${portalSlug}`, JSON.stringify(ids), { expirationTtl: KV_TTL_SECONDS });
-    return;
-  }
-
   const current = inMemoryPortalHistory.get(portalSlug) || [];
   current.unshift(entry);
   if (current.length > MAX_PORTAL_HISTORY_ENTRIES) {
     current.length = MAX_PORTAL_HISTORY_ENTRIES;
   }
   inMemoryPortalHistory.set(portalSlug, current);
+
+  try {
+    await firestoreAppendPortalHistory(portalSlug, entry);
+  } catch {
+    // In-memory fallback already set above
+  }
 }
 
 function computeSignature(scrape: ScrapeRecord): string {

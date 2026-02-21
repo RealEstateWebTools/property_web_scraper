@@ -10,8 +10,8 @@ import {
 } from '../../src/lib/services/usage-meter.js';
 
 describe('usage-meter', () => {
-  beforeEach(() => {
-    resetUsageMeter();
+  beforeEach(async () => {
+    await resetUsageMeter();
   });
 
   describe('recordUsage', () => {
@@ -116,7 +116,7 @@ describe('usage-meter', () => {
     it('cache is cleared by resetUsageMeter', async () => {
       await recordUsage('cache-user');
       expect(await getTodayUsage('cache-user')).toBe(1);
-      resetUsageMeter();
+      await resetUsageMeter();
       expect(await getTodayUsage('cache-user')).toBe(0);
     });
   });

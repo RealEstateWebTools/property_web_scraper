@@ -10,8 +10,7 @@ import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { normalizePrice } from '@lib/extractor/price-normalizer.js';
 import { logActivity } from '@lib/services/activity-logger.js';
 import { recordDeadLetter } from '@lib/services/dead-letter.js';
-import { generateStableId, getListingByUrl, storeListing, storeDiagnostics, getDiagnostics, getHtmlHash, storeHtmlHash } from '@lib/services/listing-store.js';
-import { computeHtmlHash } from '@lib/utils/html-hash.js';
+import { generateStableId, getListingByUrl, storeListing, storeDiagnostics, getDiagnostics } from '@lib/services/listing-store.js';
 import { recordSnapshot } from '@lib/services/price-history.js';
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
 import type { ScrapeSourceType } from '@lib/services/scrape-metadata.js';
@@ -63,30 +62,6 @@ export async function runExtraction(opts: {
 }): Promise<ExtractionResult | null> {
   const { html, url, scraperMapping, importHost, sourceType } = opts;
 
-  // HTML change detection: skip redundant extraction when content is unchanged
-  const htmlHash = await computeHtmlHash(html);
-  const skipHashCheck = sourceType === 'result_html_update';
-
-  if (!skipHashCheck) {
-    const stored = await getHtmlHash(url);
-    if (stored && stored.size === html.length && stored.hash === htmlHash) {
-      const cached = await getListingByUrl(url);
-      if (cached) {
-        return {
-          listing: cached.listing,
-          resultId: cached.id,
-          resultsUrl: `/extract/results/${cached.id}`,
-          fieldsExtracted: 0,
-          fieldsAvailable: countAvailableFields(scraperMapping),
-          diagnostics: await getDiagnostics(cached.id),
-          rawProps: {},
-          wasExistingListing: true,
-          wasUnchanged: true,
-        };
-      }
-    }
-  }
-
   const result = extractFromHtml({
     html,
     sourceUrl: url,
@@ -127,7 +102,6 @@ export async function runExtraction(opts: {
   let mergeDiff: MergeDiff | undefined;
 
   try {
-    // KV is initialized by middleware (kv-init.ts) before this runs
     const existing = await getListingByUrl(url);
     if (existing) {
       // Merge incoming into existing
@@ -148,10 +122,6 @@ export async function runExtraction(opts: {
     if (result.diagnostics) {
       await storeDiagnostics(resultId, result.diagnostics);
     }
-    storeHtmlHash(url, htmlHash, html.length).catch((err) => {
-      logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] storeHtmlHash failed: ' + ((err as Error).message || err) });
-      recordDeadLetter({ source: 'kv_write', operation: `storeHtmlHash(${url})`, error: (err as Error).message || String(err), context: { url }, attempts: 1 }).catch(() => {});
-    });
     try { await listing.save(); } catch (err) { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Firestore save failed: ' + ((err as Error).message || err) }); }
   } catch (outerErr) {
     logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Listing store/dedup failed, using fallback: ' + ((outerErr as Error).message || outerErr) });
@@ -167,10 +137,6 @@ export async function runExtraction(opts: {
       if (result.diagnostics) {
         await storeDiagnostics(resultId, result.diagnostics);
       }
-      storeHtmlHash(url, htmlHash, html.length).catch((err) => {
-        logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] storeHtmlHash failed (fallback): ' + ((err as Error).message || err) });
-        recordDeadLetter({ source: 'kv_write', operation: `storeHtmlHash(${url})`, error: (err as Error).message || String(err), context: { url }, attempts: 1 }).catch(() => {});
-      });
       try { await listing.save(); } catch (err) { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Firestore save failed (fallback): ' + ((err as Error).message || err) }); }
     } catch (err) { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Listing store failure (fallback): ' + ((err as Error).message || err) }); }
   }
@@ -200,7 +166,6 @@ export async function runExtraction(opts: {
       scraperName: importHost.scraper_name,
       portalSlug: importHost.slug,
       diagnostics: result.diagnostics,
-      html_hash: htmlHash,
     }).catch((err) => {
       logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Scrape metadata recording failed: ' + (err.message || err) });
       recordDeadLetter({ source: 'scrape_metadata', operation: `recordScrapeAndUpdatePortal(${url})`, error: (err as Error).message || String(err), context: { url, listingId: resultId, sourceType }, attempts: 1 }).catch(() => {});

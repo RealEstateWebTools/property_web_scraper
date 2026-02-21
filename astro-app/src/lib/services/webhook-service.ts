@@ -1,13 +1,16 @@
 /**
  * webhook-service.ts — Webhook registration and firing.
  *
- * KV-backed registry with HMAC-SHA256 signature support.
+ * Firestore-backed registry with HMAC-SHA256 signature support.
  * Events: extraction.completed, extraction.failed
+ *
+ * Firestore collection: {prefix}webhooks
+ * Document ID: webhook.id (nanoid-style)
  */
 
-import type { KVNamespace } from './kv-types.js';
 import { logActivity } from './activity-logger.js';
 import { recordDeadLetter } from './dead-letter.js';
+import { getClient, getCollectionPrefix } from '../firestore/client.js';
 
 // ─── Types ───────────────────────────────────────────────────────
 
@@ -39,26 +42,44 @@ export interface WebhookDeliveryResult {
 
 // ─── Storage ─────────────────────────────────────────────────────
 
-/** Maximum number of webhook registrations to prevent unbounded KV growth. */
+/** Maximum number of webhook registrations to prevent unbounded growth. */
 export const MAX_WEBHOOKS = 20;
 
-let kv: KVNamespace | null = null;
 const inMemoryStore = new Map<string, WebhookRegistration>();
-
-const KV_PREFIX = 'webhook:';
-const KV_INDEX = 'webhook-index';
-const KV_TTL_SECONDS = 90 * 24 * 60 * 60; // 90 days
-
-/**
- * Bind the KV namespace for persistent storage.
- * Call once per request from Astro middleware.
- */
-export function initWebhookKV(kvNamespace: KVNamespace | null): void {
-  kv = kvNamespace ?? null;
-}
 
 function generateId(): string {
   return `wh_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// ─── Firestore helpers ────────────────────────────────────────────
+
+async function firestoreSaveWebhook(webhook: WebhookRegistration): Promise<void> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const col = db.collection(`${prefix}webhooks`);
+  await col.doc(webhook.id).set(JSON.parse(JSON.stringify(webhook)));
+}
+
+async function firestoreDeleteWebhook(id: string): Promise<void> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  await db.collection(`${prefix}webhooks`).doc(id).delete();
+}
+
+async function firestoreListWebhooks(): Promise<WebhookRegistration[]> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const col = db.collection(`${prefix}webhooks`);
+  const snapshot = await col.where('active', '==', true).get();
+  return snapshot.docs.map(doc => doc.data() as WebhookRegistration);
+}
+
+async function firestoreGetWebhook(id: string): Promise<WebhookRegistration | null> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const doc = await db.collection(`${prefix}webhooks`).doc(id).get();
+  if (!doc.exists) return null;
+  return doc.data() as WebhookRegistration;
 }
 
 // ─── HMAC Signing ────────────────────────────────────────────────
@@ -99,58 +120,36 @@ export async function registerWebhook(
   };
 
   inMemoryStore.set(registration.id, registration);
-
-  if (kv) {
-    // Store individual webhook
-    await kv.put(`${KV_PREFIX}${registration.id}`, JSON.stringify(registration), { expirationTtl: KV_TTL_SECONDS });
-    // Update index
-    const index = await getIndex();
-    index.push(registration.id);
-    await kv.put(KV_INDEX, JSON.stringify(index), { expirationTtl: KV_TTL_SECONDS });
-  }
+  await firestoreSaveWebhook(registration);
 
   return registration;
 }
 
 export async function removeWebhook(id: string): Promise<boolean> {
   const existed = inMemoryStore.delete(id);
-
-  if (kv) {
-    await kv.delete(`${KV_PREFIX}${id}`);
-    const index = await getIndex();
-    const filtered = index.filter((wid: string) => wid !== id);
-    await kv.put(KV_INDEX, JSON.stringify(filtered));
+  try {
+    await firestoreDeleteWebhook(id);
+  } catch (err) {
+    logActivity({ level: 'error', category: 'system', message: '[WebhookService] Firestore delete failed: ' + ((err as Error).message || err) });
   }
-
   return existed;
 }
 
 export async function listWebhooks(): Promise<WebhookRegistration[]> {
-  if (kv) {
-    const index = await getIndex();
-    const webhooks: WebhookRegistration[] = [];
-    for (const id of index) {
-      const data = await kv.get(`${KV_PREFIX}${id}`, 'json');
-      if (data) webhooks.push(data as WebhookRegistration);
-    }
-    return webhooks;
+  try {
+    return await firestoreListWebhooks();
+  } catch {
+    // Firestore unavailable — fall back to in-memory
+    return Array.from(inMemoryStore.values()).filter(w => w.active);
   }
-  return Array.from(inMemoryStore.values());
 }
 
 export async function getWebhook(id: string): Promise<WebhookRegistration | null> {
-  if (kv) {
-    return await kv.get(`${KV_PREFIX}${id}`, 'json') as WebhookRegistration | null;
+  try {
+    return await firestoreGetWebhook(id);
+  } catch {
+    return inMemoryStore.get(id) || null;
   }
-  return inMemoryStore.get(id) || null;
-}
-
-async function getIndex(): Promise<string[]> {
-  if (kv) {
-    const data = await kv.get(KV_INDEX, 'json');
-    return (data as string[]) || [];
-  }
-  return Array.from(inMemoryStore.keys());
 }
 
 // ─── Retry Configuration ─────────────────────────────────────────
@@ -294,8 +293,19 @@ export async function fireWebhooks(
 
 // ─── Test Helpers ────────────────────────────────────────────────
 
-export function clearWebhookStore(): void {
+export async function clearWebhookStore(): Promise<void> {
   inMemoryStore.clear();
+  // Clear Firestore state (for test environments)
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const snap = await db.collection(`${prefix}webhooks`).get();
+    for (const doc of snap.docs) {
+      await doc.ref.delete();
+    }
+  } catch {
+    // Firestore unavailable — in-memory already cleared above
+  }
 }
 
 export { computeHmacSha256 };

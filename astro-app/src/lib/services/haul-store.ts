@@ -1,10 +1,9 @@
 /**
- * KV-backed store for hauls, with in-memory cache and Firestore persistence.
- * Read path: in-memory → KV → Firestore
- * Write path: in-memory + KV + Firestore
+ * Firestore-backed store for hauls, with in-memory cache.
+ * Read path: in-memory → Firestore
+ * Write path: in-memory + Firestore
  */
 
-import type { KVNamespace } from './kv-types.js';
 import { deduplicationKey } from './url-canonicalizer.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
 
@@ -61,25 +60,9 @@ export interface Haul {
 }
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-const THIRTY_DAYS_S = 30 * 24 * 60 * 60;
 const MAX_SCRAPES = 20;
 
-let kv: KVNamespace | null = null;
 const store = new Map<string, Haul>();
-
-/** Call once per request with the RESULTS KV binding */
-export function initHaulKV(kvNamespace: KVNamespace | null): void {
-  kv = kvNamespace ?? null;
-}
-
-function kvKey(id: string): string {
-  return `haul:${id}`;
-}
-
-function remainingTtlSeconds(haul: Haul): number {
-  const remaining = Math.floor((new Date(haul.expiresAt).getTime() - Date.now()) / 1000);
-  return Math.max(remaining, 60); // at least 60s
-}
 
 // ─── Firestore helpers ──────────────────────────────────────────
 
@@ -111,9 +94,6 @@ export async function createHaul(id: string, creatorIp: string): Promise<Haul> {
     scrapes: [],
   };
   store.set(id, haul);
-  if (kv) {
-    await kv.put(kvKey(id), JSON.stringify(haul), { expirationTtl: THIRTY_DAYS_S });
-  }
   await firestoreSaveHaul(haul);
   return haul;
 }
@@ -121,23 +101,11 @@ export async function createHaul(id: string, creatorIp: string): Promise<Haul> {
 export async function getHaul(id: string): Promise<Haul | undefined> {
   // Tier 1: in-memory
   let haul = store.get(id);
-  // Tier 2: KV
-  if (!haul && kv) {
-    haul = await kv.get(kvKey(id), 'json') as Haul | null ?? undefined;
-    if (haul) store.set(id, haul);
-  }
-  // Tier 3: Firestore
+  // Tier 2: Firestore
   if (!haul) {
     haul = await firestoreGetHaul(id);
     if (haul) {
       store.set(id, haul);
-      // Repopulate KV cache
-      if (kv) {
-        const ttl = remainingTtlSeconds(haul);
-        if (ttl > 60) {
-          kv.put(kvKey(id), JSON.stringify(haul), { expirationTtl: ttl }).catch(() => {});
-        }
-      }
     }
   }
   if (!haul) return undefined;
@@ -151,9 +119,6 @@ export async function getHaul(id: string): Promise<Haul | undefined> {
 
 async function persistHaul(haul: Haul): Promise<void> {
   store.set(haul.id, haul);
-  if (kv) {
-    await kv.put(kvKey(haul.id), JSON.stringify(haul), { expirationTtl: remainingTtlSeconds(haul) });
-  }
   await firestoreSaveHaul(haul);
 }
 

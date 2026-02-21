@@ -1,9 +1,12 @@
 /**
  * Export History Service
- * Tracks export activity with KV-backed persistence and in-memory fallback.
+ * Tracks export activity with Firestore persistence and in-memory fallback.
+ *
+ * Firestore collection: {prefix}export_history
+ * Document ID: entry.id
  */
 
-import type { KVNamespace } from './kv-types.js';
+import { getClient, getCollectionPrefix } from '../firestore/client.js';
 
 export interface ExportHistoryEntry {
   id: string;
@@ -14,15 +17,9 @@ export interface ExportHistoryEntry {
   timestamp: number;
 }
 
-const HISTORY_TTL = 30 * 24 * 60 * 60; // 30 days in seconds
 const MAX_MEMORY_ENTRIES = 200;
 
-let kv: KVNamespace | null = null;
 const memoryStore: ExportHistoryEntry[] = [];
-
-export function initExportHistoryKV(kvNamespace: KVNamespace | null): void {
-  kv = kvNamespace ?? null;
-}
 
 function generateEntryId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
@@ -49,18 +46,13 @@ export async function recordExport(
     memoryStore.length = MAX_MEMORY_ENTRIES;
   }
 
-  // KV persistence
-  if (kv) {
-    const key = `export-history:${userId}:${entry.timestamp}`;
-    await kv.put(key, JSON.stringify(entry), { expirationTtl: HISTORY_TTL });
-
-    // Update user's history index
-    const indexKey = `export-history-index:${userId}`;
-    const existingIndex = await kv.get(indexKey, 'json') as string[] | null;
-    const index = existingIndex || [];
-    index.unshift(key);
-    if (index.length > MAX_MEMORY_ENTRIES) index.length = MAX_MEMORY_ENTRIES;
-    await kv.put(indexKey, JSON.stringify(index), { expirationTtl: HISTORY_TTL });
+  // Firestore persistence (fire-and-forget)
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    await db.collection(`${prefix}export_history`).doc(entry.id).set(JSON.parse(JSON.stringify(entry)));
+  } catch {
+    // Firestore unavailable — in-memory record still exists
   }
 
   return entry;
@@ -70,33 +62,44 @@ export async function getExportHistory(
   userId?: string,
   limit = 50,
 ): Promise<ExportHistoryEntry[]> {
-  // If KV is available and user specified, try KV first
-  if (kv && userId) {
-    const indexKey = `export-history-index:${userId}`;
-    const index = await kv.get(indexKey, 'json') as string[] | null;
-    if (index && index.length > 0) {
-      const entries: ExportHistoryEntry[] = [];
-      for (const key of index.slice(0, limit)) {
-        const entry = await kv.get(key, 'json') as ExportHistoryEntry | null;
-        if (entry) entries.push(entry);
-      }
-      return entries;
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const col = db.collection(`${prefix}export_history`);
+    let snapshot;
+    if (userId) {
+      snapshot = await col.where('userId', '==', userId).get();
+    } else {
+      snapshot = await col.get();
     }
+    const entries = snapshot.docs.map(doc => doc.data() as ExportHistoryEntry);
+    entries.sort((a, b) => b.timestamp - a.timestamp);
+    return entries.slice(0, limit);
+  } catch {
+    // Firestore unavailable — fall back to in-memory
+    let entries = memoryStore;
+    if (userId) {
+      entries = entries.filter(e => e.userId === userId);
+    }
+    return entries.slice(0, limit);
   }
-
-  // Fall back to in-memory store
-  let entries = memoryStore;
-  if (userId) {
-    entries = entries.filter(e => e.userId === userId);
-  }
-  return entries.slice(0, limit);
 }
 
 export async function getAllExportHistory(limit = 100): Promise<ExportHistoryEntry[]> {
-  // In-memory store has all users' entries combined
-  return memoryStore.slice(0, limit);
+  return getExportHistory(undefined, limit);
 }
 
-export function clearExportHistory(): void {
+export async function clearExportHistory(): Promise<void> {
   memoryStore.length = 0;
+  // Clear Firestore state (for test environments)
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const snap = await db.collection(`${prefix}export_history`).get();
+    for (const doc of snap.docs) {
+      await doc.ref.delete();
+    }
+  } catch {
+    // Firestore unavailable — in-memory already cleared above
+  }
 }
