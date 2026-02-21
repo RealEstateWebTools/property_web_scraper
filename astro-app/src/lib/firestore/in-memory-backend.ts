@@ -19,6 +19,15 @@ export function resetStore(): void {
   store.clear();
 }
 
+/** Clear one or more named collections while leaving others intact. */
+export function clearCollections(...names: string[]): void {
+  for (const name of names) {
+    if (store.has(name)) {
+      store.get(name)!.clear();
+    }
+  }
+}
+
 function getCollection(name: string): Map<string, DocData> {
   if (!store.has(name)) {
     store.set(name, new Map());

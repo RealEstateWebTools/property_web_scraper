@@ -43,11 +43,17 @@ export function canonicalizeUrl(url: string, stripTrailingSlash = false): string
 
 /**
  * Generate a deduplication key from a URL: hostname + pathname only.
+ * Trailing slashes on the pathname are stripped so that
+ * "/properties/123" and "/properties/123/" are treated as the same listing.
  */
 export function deduplicationKey(url: string): string {
   try {
     const parsed = new URL(url);
-    return parsed.hostname.toLowerCase() + parsed.pathname;
+    let pathname = parsed.pathname;
+    if (pathname !== '/' && pathname.endsWith('/')) {
+      pathname = pathname.slice(0, -1);
+    }
+    return parsed.hostname.toLowerCase() + pathname;
   } catch {
     return url;
   }

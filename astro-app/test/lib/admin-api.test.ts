@@ -52,15 +52,24 @@ async function createTestExtraction(
   diagOverrides: Partial<ExtractionDiagnostics> = {},
 ): Promise<string> {
   const id = generateId();
+  const diag = makeDiagnostics(diagOverrides);
   const listing = new Listing();
   listing.assignAttributes({
     title,
     price_string: '£500,000',
     import_url: importUrl,
     last_retrieved_at: new Date(),
+    // Embed diagnostic fields on the listing (matches what extraction-runner.ts does)
+    scraper_name: diag.scraperName,
+    quality_grade: diag.qualityGrade,
+    quality_label: diag.qualityLabel,
+    extraction_rate: diag.extractionRate,
+    extractable_fields: diag.extractableFields,
+    populated_extractable_fields: diag.populatedExtractableFields,
+    meets_expectation: diag.meetsExpectation,
   });
   await storeListing(id, listing);
-  await storeDiagnostics(id, makeDiagnostics(diagOverrides));
+  await storeDiagnostics(id, diag);
   return id;
 }
 
