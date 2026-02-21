@@ -12,6 +12,7 @@ export interface FieldMapping {
   flightDataPath?: string;
   scriptJsonPath?: string;
   scriptJsonVar?: string;
+  scriptJsonDeepParse?: boolean;
   jsonLdPath?: string;
   jsonLdType?: string;
   urlPathPart?: string;

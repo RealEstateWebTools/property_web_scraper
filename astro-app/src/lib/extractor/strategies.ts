@@ -282,6 +282,41 @@ export function getByDotPath(obj: unknown, dotPath: string): unknown {
 }
 
 /**
+ * Navigate a dot-path with automatic JSON.parse of stringified intermediate values.
+ * Used for sites like realestate.com.au where ArgonautExchange nests
+ * stringified JSON inside its object values.
+ */
+export function getByDotPathDeep(obj: unknown, dotPath: string): unknown {
+  let current = obj;
+  for (const seg of dotPath.split('.')) {
+    // Auto-parse stringified JSON values before navigating
+    if (typeof current === 'string') {
+      try {
+        current = JSON.parse(current);
+      } catch {
+        return undefined;
+      }
+    }
+    if (current === null || current === undefined || typeof current !== 'object') {
+      return undefined;
+    }
+    current = (current as Record<string, unknown>)[seg];
+  }
+  // Final value might also be a JSON string
+  if (typeof current === 'string') {
+    try {
+      const parsed = JSON.parse(current);
+      if (typeof parsed === 'object' && parsed !== null) {
+        current = parsed;
+      }
+    } catch {
+      // Not JSON, keep as string
+    }
+  }
+  return current;
+}
+
+/**
  * Single-mapping text retrieval combining all strategies.
  * Port of Ruby retrieve_target_text.
  */
@@ -310,7 +345,8 @@ function retrieveTargetTextSingle(
   // Script JSON path strategy (e.g. window.PAGE_MODEL, __NEXT_DATA__)
   if (mapping.scriptJsonPath && mapping.scriptJsonVar) {
     const parsed = getOrParseScriptJson($, mapping.scriptJsonVar);
-    const value = getByDotPath(parsed, mapping.scriptJsonPath);
+    const navigate = mapping.scriptJsonDeepParse ? getByDotPathDeep : getByDotPath;
+    const value = navigate(parsed, mapping.scriptJsonPath);
     if (value !== undefined) retrievedText = String(value);
   }
 
