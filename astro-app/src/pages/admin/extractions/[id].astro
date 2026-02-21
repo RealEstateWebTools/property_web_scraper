@@ -62,6 +62,12 @@ const colors = gradeColors[grade] || gradeColors.F;
           )}
         </>
       )}
+      {(listing as any).manual_override && (
+        <div class="flex items-center gap-2 bg-purple-50 border border-purple-200 text-purple-800 px-4 py-2 rounded-lg mb-2 text-sm">
+          <i class="bi bi-pencil-square"></i>
+          Manual override — fields have been manually edited
+        </div>
+      )}
       {diagnostics && !diagnostics.meetsExpectation && diagnostics.expectedExtractionRate != null && (
         <div class="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-lg mb-4 text-sm">
           <i class="bi bi-exclamation-triangle"></i>
@@ -90,6 +96,101 @@ const colors = gradeColors[grade] || gradeColors.F;
               <dt class="text-gray-500">Price</dt>
               <dd>{(listing as any).price_string || '—'}</dd>
             </dl>
+          </div>
+
+          {/* Edit Fields */}
+          <div class="bg-white rounded-lg shadow">
+            <button
+              id="toggle-edit"
+              type="button"
+              class="w-full flex items-center justify-between px-5 py-4 border-b border-gray-200 cursor-pointer bg-transparent hover:bg-gray-50 transition"
+            >
+              <h2 class="font-semibold flex items-center gap-2">
+                <i class="bi bi-pencil"></i> Edit Fields
+              </h2>
+              <i id="toggle-edit-icon" class="bi bi-chevron-down text-gray-400 transition-transform"></i>
+            </button>
+            <div id="edit-section" class="hidden px-5 py-4">
+              <form id="edit-fields-form" class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                {/* Text fields */}
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-title">Title</label>
+                  <input id="ef-title" name="title" type="text" value={(listing as any).title || ''} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-price_string">Price String</label>
+                  <input id="ef-price_string" name="price_string" type="text" value={(listing as any).price_string || ''} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-price_float">Price (numeric)</label>
+                  <input id="ef-price_float" name="price_float" type="number" step="any" value={(listing as any).price_float || 0} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-price_currency">Price Currency</label>
+                  <input id="ef-price_currency" name="price_currency" type="text" value={(listing as any).price_currency || ''} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-address_string">Address</label>
+                  <input id="ef-address_string" name="address_string" type="text" value={(listing as any).address_string || ''} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-city">City</label>
+                  <input id="ef-city" name="city" type="text" value={(listing as any).city || ''} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-region">Region</label>
+                  <input id="ef-region" name="region" type="text" value={(listing as any).region || ''} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-country">Country</label>
+                  <input id="ef-country" name="country" type="text" value={(listing as any).country || ''} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-postal_code">Postal Code</label>
+                  <input id="ef-postal_code" name="postal_code" type="text" value={(listing as any).postal_code || ''} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-property_type">Property Type</label>
+                  <input id="ef-property_type" name="property_type" type="text" value={(listing as any).property_type || ''} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                {/* Numeric fields */}
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-count_bedrooms">Bedrooms</label>
+                  <input id="ef-count_bedrooms" name="count_bedrooms" type="number" value={(listing as any).count_bedrooms || 0} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-count_bathrooms">Bathrooms</label>
+                  <input id="ef-count_bathrooms" name="count_bathrooms" type="number" step="any" value={(listing as any).count_bathrooms || 0} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-constructed_area">Constructed Area</label>
+                  <input id="ef-constructed_area" name="constructed_area" type="number" step="any" value={(listing as any).constructed_area || 0} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-plot_area">Plot Area</label>
+                  <input id="ef-plot_area" name="plot_area" type="number" step="any" value={(listing as any).plot_area || 0} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-latitude">Latitude</label>
+                  <input id="ef-latitude" name="latitude" type="number" step="any" value={(listing as any).latitude || 0} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-longitude">Longitude</label>
+                  <input id="ef-longitude" name="longitude" type="number" step="any" value={(listing as any).longitude || 0} class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                {/* Description - full width */}
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-medium text-gray-500 mb-1" for="ef-description">Description</label>
+                  <textarea id="ef-description" name="description" rows="3" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{(listing as any).description || ''}</textarea>
+                </div>
+              </form>
+              <div class="flex items-center gap-3 mt-4">
+                <button id="save-fields-btn" type="button" class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition">
+                  <i class="bi bi-check-lg mr-1"></i> Save Changes
+                </button>
+                <span id="edit-feedback" class="text-sm hidden"></span>
+              </div>
+            </div>
           </div>
 
           {/* Field Traces table */}
@@ -240,4 +341,69 @@ const colors = gradeColors[grade] || gradeColors.F;
       </div>
     </>
   )}
+  <script define:vars={{ listingId: id }}>
+    // Toggle edit section
+    const toggleBtn = document.getElementById('toggle-edit');
+    const editSection = document.getElementById('edit-section');
+    const toggleIcon = document.getElementById('toggle-edit-icon');
+    if (toggleBtn && editSection && toggleIcon) {
+      toggleBtn.addEventListener('click', () => {
+        const hidden = editSection.classList.toggle('hidden');
+        toggleIcon.style.transform = hidden ? '' : 'rotate(180deg)';
+      });
+    }
+
+    // Save fields
+    const saveBtn = document.getElementById('save-fields-btn');
+    const feedback = document.getElementById('edit-feedback');
+    const form = document.getElementById('edit-fields-form');
+    if (saveBtn && feedback && form) {
+      saveBtn.addEventListener('click', async () => {
+        const numericFields = new Set([
+          'price_float', 'count_bedrooms', 'count_bathrooms',
+          'constructed_area', 'plot_area', 'latitude', 'longitude',
+        ]);
+        const fields = {};
+        const inputs = form.querySelectorAll('input, textarea');
+        for (const input of inputs) {
+          const name = input.getAttribute('name');
+          if (!name) continue;
+          if (numericFields.has(name)) {
+            fields[name] = parseFloat(input.value) || 0;
+          } else {
+            fields[name] = input.value;
+          }
+        }
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        feedback.classList.add('hidden');
+
+        try {
+          const res = await fetch('/admin/api/listings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'update_fields', listingId, fields }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            feedback.textContent = `Updated ${data.updated.length} field(s)`;
+            feedback.className = 'text-sm text-green-600';
+            feedback.classList.remove('hidden');
+          } else {
+            feedback.textContent = data.error || 'Save failed';
+            feedback.className = 'text-sm text-red-600';
+            feedback.classList.remove('hidden');
+          }
+        } catch (err) {
+          feedback.textContent = 'Network error: ' + (err instanceof Error ? err.message : String(err));
+          feedback.className = 'text-sm text-red-600';
+          feedback.classList.remove('hidden');
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<i class="bi bi-check-lg mr-1"></i> Save Changes';
+        }
+      });
+    }
+  </script>
 </AdminLayout>

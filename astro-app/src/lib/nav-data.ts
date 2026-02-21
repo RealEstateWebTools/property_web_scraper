@@ -29,6 +29,7 @@ export const ADMIN_NAV_LINKS: NavLink[] = [
   { label: 'Audit Log', href: '/admin/audit-log', icon: 'bi-shield-check', activePage: 'audit-log' },
   { label: 'Trends', href: '/admin/scraper-trends', icon: 'bi-graph-up-arrow', activePage: 'scraper-trends' },
   { label: 'Retention', href: '/admin/retention', icon: 'bi-clock-history', activePage: 'retention' },
+  { label: 'Hauls', href: '/admin/hauls', icon: 'bi-box-seam', activePage: 'hauls' },
   { label: 'AI Map', href: '/admin/ai-map', icon: 'bi-magic', activePage: 'ai-map' },
 ];
 

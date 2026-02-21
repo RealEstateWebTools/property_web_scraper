@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
-import { deleteListing, updateListingVisibility } from '@lib/services/listing-store.js';
+import { deleteListing, updateListingVisibility, updateListingFields } from '@lib/services/listing-store.js';
 
 export const POST: APIRoute = async ({ request }) => {
   const auth = authenticateAdmin(request);
@@ -25,6 +25,20 @@ export const POST: APIRoute = async ({ request }) => {
     if (action === 'delete') {
       await deleteListing(listingId);
       return new Response(JSON.stringify({ success: true, message: 'Listing deleted' }), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (action === 'update_fields') {
+      const { fields } = body;
+      if (!fields || typeof fields !== 'object' || Object.keys(fields).length === 0) {
+        return new Response(JSON.stringify({ error: 'Missing or empty fields object' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      await updateListingFields(listingId, fields);
+      return new Response(JSON.stringify({ success: true, updated: Object.keys(fields) }), {
         headers: { 'Content-Type': 'application/json' },
       });
     }

@@ -248,6 +248,27 @@ export async function deleteListing(id: string): Promise<void> {
   }
 }
 
+export async function updateListingFields(id: string, fields: Record<string, unknown>): Promise<Listing> {
+  const listing = await getListing(id);
+  if (!listing) {
+    throw new Error(`Listing not found: ${id}`);
+  }
+
+  listing.assignAttributes(fields);
+  listing.manual_override = true;
+  store.set(id, listing);
+
+  // Persist to Firestore
+  try {
+    listing.id = id;
+    await listing.save();
+  } catch (err) {
+    logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore field update failed: ' + ((err as Error).message || err) });
+  }
+
+  return listing;
+}
+
 export async function updateListingVisibility(id: string, visibility: string): Promise<void> {
   const listing = await getListing(id);
   if (!listing) {

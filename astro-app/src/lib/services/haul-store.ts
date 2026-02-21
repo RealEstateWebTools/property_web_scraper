@@ -179,6 +179,51 @@ export async function removeScrapeFromHaul(
   return { haul, removed: true };
 }
 
+export async function getAllHauls(): Promise<Haul[]> {
+  const results: Haul[] = [];
+  const seenIds = new Set<string>();
+  const now = Date.now();
+
+  // Firestore first
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const col = db.collection(`${prefix}hauls`);
+    const snapshot = await col.get();
+    for (const doc of snapshot.docs) {
+      const haul = doc.data() as Haul;
+      if (new Date(haul.expiresAt).getTime() < now) continue;
+      results.push(haul);
+      seenIds.add(doc.id);
+      store.set(doc.id, haul);
+    }
+  } catch {
+    // Firestore unavailable — fall through to in-memory
+  }
+
+  // Merge in-memory entries not yet in Firestore
+  for (const [id, haul] of store.entries()) {
+    if (seenIds.has(id)) continue;
+    if (new Date(haul.expiresAt).getTime() < now) continue;
+    results.push(haul);
+  }
+
+  // Sort by createdAt descending
+  results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return results;
+}
+
+export async function deleteHaul(id: string): Promise<void> {
+  store.delete(id);
+  try {
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    await db.collection(`${prefix}hauls`).doc(id).delete();
+  } catch {
+    // Not in Firestore or already deleted — ignore
+  }
+}
+
 export async function updateHaulMeta(
   id: string,
   meta: { name?: string; notes?: string },

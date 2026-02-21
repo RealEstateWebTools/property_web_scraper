@@ -1,0 +1,286 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+---
+<AdminLayout title="Hauls — Admin" activePage="hauls">
+  <h1 class="text-2xl font-bold mb-2">Haul Management</h1>
+  <p class="text-sm text-gray-500 mb-6">View and manage all hauls across all users.</p>
+
+  <!-- Loading -->
+  <div id="loading" class="text-center py-12">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
+    <p class="mt-3 text-sm text-gray-500">Loading hauls...</p>
+  </div>
+
+  <!-- Summary cards -->
+  <div id="summary" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Total Hauls</p>
+      <p class="text-2xl font-bold" id="total-hauls">—</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Total Scrapes</p>
+      <p class="text-2xl font-bold" id="total-scrapes">—</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Expiring Soon (3 days)</p>
+      <p class="text-2xl font-bold text-amber-600" id="expiring-soon">—</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div id="search-bar" class="hidden mb-4">
+    <input
+      id="search-input"
+      type="text"
+      placeholder="Search by haul ID or name..."
+      class="w-full sm:w-80 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+
+  <!-- Results table -->
+  <div id="results" class="hidden bg-white rounded-lg shadow">
+    <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="font-semibold">All Hauls</h2>
+      <button
+        id="refresh-btn"
+        class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition"
+      >
+        Refresh
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-200">
+            <th class="py-2 px-5 font-medium cursor-pointer hover:text-gray-700" data-sort="id">ID</th>
+            <th class="py-2 px-5 font-medium cursor-pointer hover:text-gray-700" data-sort="name">Name</th>
+            <th class="py-2 px-5 font-medium cursor-pointer hover:text-gray-700" data-sort="scrapeCount">Scrapes</th>
+            <th class="py-2 px-5 font-medium">Creator IP</th>
+            <th class="py-2 px-5 font-medium cursor-pointer hover:text-gray-700" data-sort="createdAt">Created</th>
+            <th class="py-2 px-5 font-medium cursor-pointer hover:text-gray-700" data-sort="expiresAt">Expires</th>
+            <th class="py-2 px-5 font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="results-body">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="empty-state" class="hidden bg-gray-50 rounded-lg p-8 text-center">
+    <p class="text-gray-500">No hauls found.</p>
+  </div>
+
+  <!-- Error -->
+  <div id="error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm mt-4">
+  </div>
+
+  <script>
+    interface HaulItem {
+      id: string;
+      name: string | null;
+      scrapeCount: number;
+      creatorIp: string;
+      createdAt: string;
+      expiresAt: string;
+    }
+
+    let allHauls: HaulItem[] = [];
+    let sortKey = 'createdAt';
+    let sortAsc = false;
+
+    function renderTable(hauls: HaulItem[]) {
+      const bodyEl = document.getElementById('results-body')!;
+      bodyEl.innerHTML = '';
+
+      for (const h of hauls) {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-gray-100 hover:bg-gray-50';
+
+        // ID
+        const tdId = document.createElement('td');
+        tdId.className = 'py-2 px-5 font-mono text-xs';
+        tdId.textContent = h.id;
+        tr.appendChild(tdId);
+
+        // Name
+        const tdName = document.createElement('td');
+        tdName.className = 'py-2 px-5';
+        tdName.textContent = h.name || '—';
+        tr.appendChild(tdName);
+
+        // Scrapes
+        const tdScrapes = document.createElement('td');
+        tdScrapes.className = 'py-2 px-5';
+        tdScrapes.textContent = String(h.scrapeCount);
+        tr.appendChild(tdScrapes);
+
+        // Creator IP
+        const tdIp = document.createElement('td');
+        tdIp.className = 'py-2 px-5 text-gray-500 font-mono text-xs';
+        tdIp.textContent = h.creatorIp;
+        tr.appendChild(tdIp);
+
+        // Created
+        const tdCreated = document.createElement('td');
+        tdCreated.className = 'py-2 px-5 text-gray-600';
+        tdCreated.textContent = new Date(h.createdAt).toLocaleDateString();
+        tr.appendChild(tdCreated);
+
+        // Expires
+        const tdExpires = document.createElement('td');
+        tdExpires.className = 'py-2 px-5';
+        const daysLeft = Math.ceil((new Date(h.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+        if (daysLeft <= 3) {
+          tdExpires.innerHTML = `<span class="text-amber-600 font-medium">${daysLeft}d left</span>`;
+        } else {
+          tdExpires.textContent = new Date(h.expiresAt).toLocaleDateString();
+        }
+        tr.appendChild(tdExpires);
+
+        // Actions
+        const tdActions = document.createElement('td');
+        tdActions.className = 'py-2 px-5';
+        tdActions.innerHTML = `
+          <a href="/haul/${h.id}" class="text-blue-600 hover:underline no-underline text-xs mr-3">
+            <i class="bi bi-eye"></i> View
+          </a>
+          <button class="text-red-600 hover:text-red-800 text-xs cursor-pointer border-0 bg-transparent delete-haul-btn" data-id="${h.id}">
+            <i class="bi bi-trash"></i> Delete
+          </button>
+        `;
+        tr.appendChild(tdActions);
+
+        bodyEl.appendChild(tr);
+      }
+
+      // Attach delete handlers
+      for (const btn of bodyEl.querySelectorAll('.delete-haul-btn')) {
+        btn.addEventListener('click', async (e) => {
+          const haulId = (e.currentTarget as HTMLElement).dataset.id!;
+          if (!confirm(`Delete haul ${haulId}? This cannot be undone.`)) return;
+          try {
+            const res = await fetch('/admin/api/hauls', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'delete', haulId }),
+            });
+            const data = await res.json();
+            if (data.success) {
+              loadHauls();
+            } else {
+              alert(data.error || 'Delete failed');
+            }
+          } catch (err) {
+            alert('Network error');
+          }
+        });
+      }
+    }
+
+    function sortHauls(hauls: HaulItem[]): HaulItem[] {
+      return [...hauls].sort((a, b) => {
+        let av: string | number = (a as any)[sortKey] ?? '';
+        let bv: string | number = (b as any)[sortKey] ?? '';
+        if (sortKey === 'createdAt' || sortKey === 'expiresAt') {
+          av = new Date(av as string).getTime();
+          bv = new Date(bv as string).getTime();
+        }
+        if (typeof av === 'string') av = av.toLowerCase();
+        if (typeof bv === 'string') bv = bv.toLowerCase();
+        if (av < bv) return sortAsc ? -1 : 1;
+        if (av > bv) return sortAsc ? 1 : -1;
+        return 0;
+      });
+    }
+
+    function filterAndRender() {
+      const query = (document.getElementById('search-input') as HTMLInputElement)?.value.toLowerCase() || '';
+      let filtered = allHauls;
+      if (query) {
+        filtered = allHauls.filter(
+          (h) => h.id.toLowerCase().includes(query) || (h.name || '').toLowerCase().includes(query),
+        );
+      }
+      renderTable(sortHauls(filtered));
+    }
+
+    async function loadHauls() {
+      const loadingEl = document.getElementById('loading')!;
+      const summaryEl = document.getElementById('summary')!;
+      const searchBar = document.getElementById('search-bar')!;
+      const resultsEl = document.getElementById('results')!;
+      const emptyEl = document.getElementById('empty-state')!;
+      const errorEl = document.getElementById('error')!;
+
+      loadingEl.classList.remove('hidden');
+      summaryEl.classList.add('hidden');
+      searchBar.classList.add('hidden');
+      resultsEl.classList.add('hidden');
+      emptyEl.classList.add('hidden');
+      errorEl.classList.add('hidden');
+
+      try {
+        const res = await fetch('/admin/api/hauls');
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({ error: 'Request failed' }));
+          errorEl.textContent = data.error || `HTTP ${res.status}`;
+          errorEl.classList.remove('hidden');
+          loadingEl.classList.add('hidden');
+          return;
+        }
+
+        const data = await res.json();
+        allHauls = data.hauls || [];
+
+        // Summary
+        document.getElementById('total-hauls')!.textContent = String(data.total);
+        document.getElementById('total-scrapes')!.textContent = String(data.totalScrapes);
+        document.getElementById('expiring-soon')!.textContent = String(data.expiringSoon);
+
+        loadingEl.classList.add('hidden');
+        summaryEl.classList.remove('hidden');
+
+        if (allHauls.length === 0) {
+          emptyEl.classList.remove('hidden');
+        } else {
+          searchBar.classList.remove('hidden');
+          resultsEl.classList.remove('hidden');
+          filterAndRender();
+        }
+      } catch (err) {
+        errorEl.textContent = 'Network error: ' + (err instanceof Error ? err.message : String(err));
+        errorEl.classList.remove('hidden');
+        loadingEl.classList.add('hidden');
+      }
+    }
+
+    // Sort headers
+    document.querySelectorAll('th[data-sort]').forEach((th) => {
+      th.addEventListener('click', () => {
+        const key = (th as HTMLElement).dataset.sort!;
+        if (sortKey === key) {
+          sortAsc = !sortAsc;
+        } else {
+          sortKey = key;
+          sortAsc = true;
+        }
+        filterAndRender();
+      });
+    });
+
+    // Search
+    document.getElementById('search-input')?.addEventListener('input', filterAndRender);
+
+    // Load on page ready
+    loadHauls();
+
+    // Refresh button
+    document.getElementById('refresh-btn')?.addEventListener('click', loadHauls);
+  </script>
+</AdminLayout>
