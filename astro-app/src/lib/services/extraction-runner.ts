@@ -8,6 +8,7 @@ import { Listing } from '@lib/models/listing.js';
 import type { MergeDiff } from '@lib/models/listing.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { normalizePrice } from '@lib/extractor/price-normalizer.js';
+import { logActivity } from '@lib/services/activity-logger.js';
 import { generateStableId, getListingByUrl, storeListing, storeDiagnostics, getDiagnostics, getHtmlHash, storeHtmlHash } from '@lib/services/listing-store.js';
 import { computeHtmlHash } from '@lib/utils/html-hash.js';
 import { recordSnapshot } from '@lib/services/price-history.js';
@@ -147,9 +148,9 @@ export async function runExtraction(opts: {
       await storeDiagnostics(resultId, result.diagnostics);
     }
     storeHtmlHash(url, htmlHash, html.length).catch(() => {});
-    try { await listing.save(); } catch (err) { console.error('[ExtractionRunner] Firestore save failed:', (err as Error).message || err); }
+    try { await listing.save(); } catch (err) { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Firestore save failed: ' + ((err as Error).message || err) }); }
   } catch (outerErr) {
-    console.error('[ExtractionRunner] Listing store/dedup failed, using fallback:', (outerErr as Error).message || outerErr);
+    logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Listing store/dedup failed, using fallback: ' + ((outerErr as Error).message || outerErr) });
     // Fallback: use incoming as-is with stable ID
     listing = incoming;
     resultId = generateStableId(url);
@@ -163,8 +164,8 @@ export async function runExtraction(opts: {
         await storeDiagnostics(resultId, result.diagnostics);
       }
       storeHtmlHash(url, htmlHash, html.length).catch(() => {});
-      try { await listing.save(); } catch (err) { console.error('[ExtractionRunner] Firestore save failed (fallback):', (err as Error).message || err); }
-    } catch (err) { console.error('[ExtractionRunner] Listing store failure (fallback):', (err as Error).message || err); }
+      try { await listing.save(); } catch (err) { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Firestore save failed (fallback): ' + ((err as Error).message || err) }); }
+    } catch (err) { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Listing store failure (fallback): ' + ((err as Error).message || err) }); }
   }
 
   // Record price snapshot (fire-and-forget)
@@ -177,7 +178,7 @@ export async function runExtraction(opts: {
     price_currency: rawProps.price_currency || rawProps.currency,
     quality_grade: result.diagnostics?.qualityGrade,
     title: rawProps.title,
-  }).catch((err) => { console.error('[ExtractionRunner] Price history recording failed:', err.message || err); });
+  }).catch((err) => { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Price history recording failed: ' + (err.message || err) }); });
 
   // Record scrape metadata (fire-and-forget)
   if (sourceType) {
@@ -190,7 +191,7 @@ export async function runExtraction(opts: {
       portalSlug: importHost.slug,
       diagnostics: result.diagnostics,
       html_hash: htmlHash,
-    }).catch((err) => { console.error('[ExtractionRunner] Scrape metadata recording failed:', err.message || err); });
+    }).catch((err) => { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Scrape metadata recording failed: ' + (err.message || err) }); });
   }
 
   return {
