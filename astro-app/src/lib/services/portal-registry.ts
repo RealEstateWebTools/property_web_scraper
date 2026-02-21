@@ -330,6 +330,20 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
+  ae_bayut: {
+    scraperName: 'ae_bayut',
+    slug: 'ae_bayut',
+    hosts: ['www.bayut.com', 'bayut.com'],
+    country: 'AE',
+    currency: 'AED',
+    localeCode: 'en-AE',
+    areaUnit: 'sqft',
+    contentSource: 'json-ld',
+    supportTier: 'core',
+    expectedExtractionRate: 0.80,
+    stripTrailingSlash: false,
+    requiresJsRendering: false,
+  },
 };
 
 /**

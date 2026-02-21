@@ -92,6 +92,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'funda.nl': 'nl_funda',
   'www.immobiliare.it': 'it_immobiliare',
   'immobiliare.it': 'it_immobiliare',
+  'www.bayut.com': 'ae_bayut',
+  'bayut.com': 'ae_bayut',
 };
 
 const HELP_TEXT = `

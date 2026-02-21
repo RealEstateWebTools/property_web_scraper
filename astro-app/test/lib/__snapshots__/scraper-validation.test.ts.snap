@@ -1,5 +1,149 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Scraper validation > ae_bayut scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Maldives 1, DAMAC Islands, Dubai",
+  "agent_name": "Sumair Saleem",
+  "area_unit": "sqft",
+  "city": "Dubai",
+  "constructed_area": 2207,
+  "count_bathrooms": 5,
+  "count_bedrooms": 4,
+  "country": "United Arab Emirates",
+  "currency": "AED",
+  "description": "Damac Island 2 by Damac – Luxurious 4-Bedroom VillaDiscover the pinnacle of island-inspired luxury at Damac Island 2 by Damac, featuring stunning 4-bedroom villas set within an exclusive waterfront community designed for refined coastal living. Every residence is thoughtfully crafted with modern architecture, elegant interiors, and direct access to world-class leisure and lifestyle amenities. Property Highlights:4 Bedroom VillaExclusive Waterfront LivingPremium DeveloperSpacious LayoutModern FinishingHandover Q2 2028Prime Location:Dubai Marina – 20 minsPalm Jumeirah – 25 minsDowntown Dubai – 30 minsSheikh Zayed Road AccessDubai HarbourJBR & Bluewater's NearbyAmenities:Private Beach AccessInfinity PoolsMarina WalkWaterfront PromenadeFitness CenterKids Play ZoneLush LandscapesRetail & Dining OutletsContact Hills Field Real Estate today to secure your 4-bedroom townhouse in Damac Island 2, and embrace a lifestyle defined by elegance, exclusivity, and unmatched waterfront luxury.",
+  "district": "DAMAC Islands",
+  "features": [
+    "Swimming Pool",
+    "Sauna",
+    "Electricity Backup",
+    "Centrally Air-Conditioned",
+    "Central Heating",
+    "Electricity Backup",
+    "Centrally Air-Conditioned",
+    "Central Heating",
+    "Double Glazed Windows",
+    "Storage Areas",
+    "First Aid Medical Center",
+    "Gym or Health Club",
+    "Facilities for Disabled",
+    "Swimming Pool",
+    "Sauna",
+    "Day Care Center",
+    "Kids Play Area",
+    "Lawn or Garden",
+    "Barbeque Area",
+    "Cafeteria or Canteen",
+    "Waste Disposal",
+    "Maintenance Staff",
+    "Cleaning Services",
+    "Security Staff",
+    "CCTV Security",
+    "Broadband Internet",
+    "Satellite/Cable TV",
+    "Intercom",
+    "ATM Facility",
+    "24 Hours Concierge",
+    "Pets Allowed",
+    "Freehold",
+  ],
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://images.bayut.com/thumbnails/822811718-400x300.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811718-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811719-400x300.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811720-400x300.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811721-400x300.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811718-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811719-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811720-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811721-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811722-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811723-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811724-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811725-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811726-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811727-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811728-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811729-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811730-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822811731-800x600.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/794579217-120x90.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/822089642-400x300.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/819352878-400x300.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/815654673-400x300.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/794579217-240x180.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/778107423-400x300.jpeg",
+    },
+    {
+      "url": "https://images.bayut.com/thumbnails/793481511-240x180.jpeg",
+    },
+  ],
+  "latitude": 25.022766621227,
+  "locale_code": "en",
+  "longitude": 55.299646621192,
+  "main_image_url": "https://images.bayut.com/thumbnails/822811718-400x300.jpeg",
+  "plot_area": 1770,
+  "price_float": 2520000,
+  "price_string": "2,520,000",
+  "property_type": "Villa",
+  "reference": "Bayut - 106968-ypOCZd",
+  "title": "Special Offer | Prime Unit | Single Row | Golden Visa | 1% Monthly | Bayut.com",
+}
+`;
+
 exports[`Scraper validation > au_domain scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "133 Bethany Road, Hoppers Crossing VIC 3029",
