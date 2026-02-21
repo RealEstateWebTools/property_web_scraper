@@ -21,26 +21,36 @@
     },
     "intFields": {
       "count_bedrooms": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.generalFeatures.bedrooms.value",
+        "scriptJsonDeepParse": true
       },
       "count_bathrooms": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.generalFeatures.bathrooms.value",
+        "scriptJsonDeepParse": true
+      },
+      "count_parking": {
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.generalFeatures.parkingSpaces.value",
+        "scriptJsonDeepParse": true
       }
     },
     "floatFields": {
-      "price_float": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
-      },
       "latitude": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.address.display.geocode.latitude",
+        "scriptJsonDeepParse": true
       },
       "longitude": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.address.display.geocode.longitude",
+        "scriptJsonDeepParse": true
+      },
+      "land_area": {
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.propertySizes.land.displayValue",
+        "scriptJsonDeepParse": true
       }
     },
     "textFields": {
@@ -50,9 +60,6 @@
           {
             "cssLocator": "meta[property='og:title']",
             "cssAttr": "content"
-          },
-          {
-            "cssLocator": "h1"
           }
         ]
       },
@@ -67,21 +74,69 @@
         ]
       },
       "address_string": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.address.display.fullAddress",
+        "scriptJsonDeepParse": true
+      },
+      "postal_code": {
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.address.postcode",
+        "scriptJsonDeepParse": true
+      },
+      "city": {
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.address.suburb",
+        "scriptJsonDeepParse": true
+      },
+      "region": {
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.address.state",
+        "scriptJsonDeepParse": true
+      },
+      "reference": {
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.id",
+        "scriptJsonDeepParse": true
+      },
+      "property_type": {
+        "scriptJsonVar": "ArgonautExchange",
+        "scriptJsonPath": "resi-property_listing-experience-web.urqlClientCache.0.data.details.listing.propertyType.display",
+        "scriptJsonDeepParse": true
       },
       "main_image_url": {
         "cssLocator": "meta[property='og:image']",
         "cssAttr": "content"
+      },
+      "price_string": {
+        "scriptRegEx": "\"marketing_price_range\"\\s*:\\s*\"([^\"]+)\""
       }
     },
-    "images": [],
+    "images": [
+      {
+        "cssLocator": "meta[property='og:image']",
+        "cssAttr": "content"
+      }
+    ],
     "booleanFields": {
       "for_sale": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH",
+        "cssLocator": "head > title",
         "evaluator": "include?",
-        "evaluatorParam": "sale"
+        "evaluatorParam": "for sale",
+        "caseInsensitive": true,
+        "fallbacks": [
+          {
+            "cssLocator": "meta[property='og:url']",
+            "cssAttr": "content",
+            "evaluator": "include?",
+            "evaluatorParam": "property-"
+          }
+        ]
+      },
+      "for_rent": {
+        "cssLocator": "head > title",
+        "evaluator": "include?",
+        "evaluatorParam": "for rent",
+        "caseInsensitive": true
       }
     }
   }

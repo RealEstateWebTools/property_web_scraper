@@ -21,38 +21,72 @@
     },
     "intFields": {
       "count_bedrooms": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_noRooms"
       },
       "count_bathrooms": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_noBathRooms"
+      },
+      "year_construction": {
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_yearConstructed"
       }
     },
     "floatFields": {
       "price_float": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_purchasePrice",
+        "fallbacks": [
+          {
+            "scriptJsonVar": "keyValues",
+            "scriptJsonPath": "obj_totalRent"
+          },
+          {
+            "scriptJsonVar": "keyValues",
+            "scriptJsonPath": "obj_baseRent"
+          }
+        ]
+      },
+      "constructed_area": {
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_livingSpace"
+      },
+      "land_area": {
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_plotArea"
       },
       "latitude": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "mapConfig",
+        "scriptJsonPath": "center.lat",
+        "fallbacks": [
+          {
+            "cssLocator": "meta[property='og:latitude']",
+            "cssAttr": "content"
+          }
+        ]
       },
       "longitude": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "scriptJsonVar": "mapConfig",
+        "scriptJsonPath": "center.lng",
+        "fallbacks": [
+          {
+            "cssLocator": "meta[property='og:longitude']",
+            "cssAttr": "content"
+          }
+        ]
       }
     },
     "textFields": {
       "title": {
-        "cssLocator": "head > title",
+        "cssLocator": "h1#expose-title",
         "fallbacks": [
+          {
+            "cssLocator": "head > title"
+          },
           {
             "cssLocator": "meta[property='og:title']",
             "cssAttr": "content"
-          },
-          {
-            "cssLocator": "h1"
           }
         ]
       },
@@ -67,21 +101,61 @@
         ]
       },
       "address_string": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH"
+        "cssLocator": "span.zip-region-and-country",
+        "fallbacks": [
+          {
+            "cssLocator": "div.address-block span"
+          }
+        ]
+      },
+      "postal_code": {
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_zipCode"
+      },
+      "city": {
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_city"
+      },
+      "region": {
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_regio1"
+      },
+      "reference": {
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_scoutId"
       },
       "main_image_url": {
         "cssLocator": "meta[property='og:image']",
         "cssAttr": "content"
+      },
+      "price_string": {
+        "cssLocator": "div.is24qa-kaufpreis-main.is24-value",
+        "fallbacks": [
+          {
+            "cssLocator": "div.is24qa-kaltmiete-main.is24-value"
+          },
+          {
+            "cssLocator": "div.is24qa-warmmiete-main.is24-value"
+          }
+        ]
       }
     },
-    "images": [],
+    "images": [
+      {
+        "cssLocator": "meta[property='og:image']",
+        "cssAttr": "content"
+      }
+    ],
     "booleanFields": {
       "for_sale": {
-        "scriptJsonVar": "TODO_VAR",
-        "scriptJsonPath": "TODO_PATH",
-        "evaluator": "include?",
-        "evaluatorParam": "sale"
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_purchasePrice",
+        "evaluator": "to_i_gt_0"
+      },
+      "for_rent": {
+        "scriptJsonVar": "keyValues",
+        "scriptJsonPath": "obj_totalRent",
+        "evaluator": "to_i_gt_0"
       }
     }
   }

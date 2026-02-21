@@ -39,6 +39,73 @@ exports[`Scraper validation > au_domain scraper > matches full extraction snapsh
 }
 `;
 
+exports[`Scraper validation > au_realestate scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "28 Chantelle Parade, Tarneit, Vic 3029",
+  "area_unit": "sqmt",
+  "city": "Tarneit",
+  "count_bathrooms": 2,
+  "count_bedrooms": 4,
+  "count_parking": 2,
+  "country": "AU",
+  "currency": "AUD",
+  "description": "4 bedroom house for Sale at 28 Chantelle Parade, Tarneit VIC 3029. View property photos, floor plans, local school catchments and lots more on realestate.com.au. 143160680",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://i2.au.reastatic.net/800x600/d8d3607342abc123/image.jpg",
+    },
+  ],
+  "land_area": 336,
+  "latitude": -37.85273,
+  "locale_code": "en-AU",
+  "longitude": 144.66333,
+  "main_image_url": "https://i2.au.reastatic.net/800x600/d8d3607342abc123/image.jpg",
+  "postal_code": "3029",
+  "price_string": ""marketing_price_range":"014S"",
+  "property_type": "House",
+  "reference": "143160680",
+  "region": "Vic",
+  "title": "28 Chantelle Parade, Tarneit VIC 3029 - House for Sale",
+}
+`;
+
+exports[`Scraper validation > de_immoscout scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "10115 Berlin (Mitte), Friedrichstrasse",
+  "area_unit": "sqmt",
+  "city": "Berlin",
+  "constructed_area": 85,
+  "count_bathrooms": 1,
+  "count_bedrooms": 3,
+  "country": "DE",
+  "currency": "EUR",
+  "description": "Wunderbare 3-Zimmer-Wohnung in zentraler Lage von Berlin Mitte mit Balkon und Einbaukueche.",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://pictures.immobilienscout24.de/listings/abc123-0.jpg/ORIG/legacy_thumbnail/420x315/format/webp/quality/50",
+    },
+  ],
+  "land_area": 0,
+  "latitude": 52.52437,
+  "locale_code": "de-DE",
+  "longitude": 13.38886,
+  "main_image_url": "https://pictures.immobilienscout24.de/listings/abc123-0.jpg/ORIG/legacy_thumbnail/420x315/format/webp/quality/50",
+  "postal_code": "10115",
+  "price_float": 349000,
+  "price_string": "349.000 €",
+  "reference": "160531543",
+  "region": "Berlin",
+  "title": "3 Zimmer Etagenwohnung zum Kauf in Berlin Mitte",
+  "year_construction": 1998,
+}
+`;
+
 exports[`Scraper validation > es_fotocasa scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "",
