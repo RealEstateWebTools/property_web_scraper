@@ -1,0 +1,113 @@
+[{
+  "name": "nl_funda",
+  "version": 1,
+  "last_checked": "2026-02-21",
+  "expectedExtractionRate": 0.70,
+  "defaultValues": {
+    "country": { "value": "Netherlands" },
+    "currency": { "value": "EUR" },
+    "area_unit": { "value": "sqm" },
+    "locale_code": { "value": "nl" }
+  },
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price"
+    },
+    "latitude": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "mapCenter.lat"
+    },
+    "longitude": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "mapCenter.lng"
+    },
+    "constructed_area": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "listing.livingArea"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "listing.bedrooms"
+    },
+    "count_bathrooms": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "listing.bathrooms"
+    },
+    "year_construction": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "listing.yearBuilt"
+    }
+  },
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": ".object-description-body",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "postal_code": {
+      "jsonLdPath": "address.postalCode"
+    },
+    "price_string": {
+      "cssLocator": ".object-header__price",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "listing.propertyType"
+    },
+    "reference": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "listing.reference"
+    }
+  },
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "listing.status",
+      "evaluator": "include?",
+      "evaluatorParam": "koop",
+      "caseInsensitive": true
+    },
+    "for_rent": {
+      "scriptJsonVar": "fundaData",
+      "scriptJsonPath": "listing.status",
+      "evaluator": "include?",
+      "evaluatorParam": "huur",
+      "caseInsensitive": true
+    }
+  },
+  "images": [
+    {
+      "cssLocator": ".media-viewer img[data-lazy]",
+      "cssAttr": "data-lazy"
+    }
+  ]
+}]

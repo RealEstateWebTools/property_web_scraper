@@ -1,0 +1,108 @@
+[{
+  "name": "us_redfin",
+  "version": 1,
+  "last_checked": "2026-02-21",
+  "expectedExtractionRate": 0.75,
+  "defaultValues": {
+    "country": { "value": "USA" },
+    "currency": { "value": "USD" },
+    "area_unit": { "value": "sqft" },
+    "locale_code": { "value": "en" },
+    "for_rent_short_term": { "value": "false" }
+  },
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price"
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value"
+    }
+  },
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": "div[data-rf-test-id='abp-beds'] .statsValue" }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": "div[data-rf-test-id='abp-baths'] .statsValue" }
+      ]
+    }
+  },
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "meta[name='description']", "cssAttr": "content" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": "div.street-address" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "postal_code": {
+      "jsonLdPath": "address.postalCode"
+    },
+    "price_string": {
+      "cssLocator": "div[data-rf-test-id='abp-price'] div"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "jsonLdPath": "photo" }
+      ]
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    }
+  },
+  "booleanFields": {
+    "for_sale": {
+      "jsonLdPath": "offers.availability",
+      "evaluator": "include?",
+      "evaluatorParam": "InStock",
+      "caseInsensitive": true
+    },
+    "for_rent": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "evaluator": "include?",
+      "evaluatorParam": "for rent",
+      "caseInsensitive": true
+    }
+  },
+  "images": [
+    {
+      "jsonLdPath": "photo",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:image']", "cssAttr": "content" }
+      ]
+    }
+  ]
+}]
