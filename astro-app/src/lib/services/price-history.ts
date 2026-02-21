@@ -1,17 +1,14 @@
 /**
- * price-history.ts — Historical price tracking via KV + Firestore.
+ * price-history.ts — Historical price tracking via Firestore.
  *
- * Read path: in-memory → KV → Firestore
- * Write path: in-memory + KV + Firestore (fire-and-forget)
+ * Read path: in-memory → Firestore
+ * Write path: in-memory + Firestore (fire-and-forget)
  *
- * KV key patterns:
- *   history:{canonical}:{timestamp} → PriceSnapshot JSON
- *   history-idx:{canonical}         → string[] of timestamps
- *
- * Firestore collection: price_history/{canonical-hash}/snapshots/{timestamp}
+ * Firestore collection: {prefix}price_history
+ * Document ID: canonicalHash(url) (SHA-256)
+ * Fields: canonical, url, snapshots[], updatedAt
  */
 
-import type { KVNamespace } from './kv-types.js';
 import { logActivity } from './activity-logger.js';
 import { recordDeadLetter } from './dead-letter.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
@@ -55,20 +52,9 @@ export interface ExtractionData {
 
 // ─── Storage ─────────────────────────────────────────────────────
 
-let kv: KVNamespace | null = null;
 const inMemorySnapshots = new Map<string, PriceSnapshot[]>();
 
-const SNAP_PREFIX = 'history:';
-const IDX_PREFIX = 'history-idx:';
 const MAX_HISTORY_ENTRIES = 100;
-const KV_TTL_SECONDS = 365 * 24 * 60 * 60; // 1 year
-
-/**
- * Bind the KV namespace for persistent storage.
- */
-export function initPriceHistoryKV(kvNamespace: KVNamespace | null): void {
-  kv = kvNamespace ?? null;
-}
 
 /**
  * Canonicalize a URL for consistent keying.
@@ -159,26 +145,11 @@ export async function recordSnapshot(data: ExtractionData): Promise<PriceSnapsho
     }
   }
 
-  if (kv) {
-    // Store snapshot
-    await kv.put(
-      `${SNAP_PREFIX}${canonical}:${timestamp}`,
-      JSON.stringify(snapshot),
-      { expirationTtl: KV_TTL_SECONDS },
-    );
-
-    // Update index
-    const index = await getIndex(canonical);
-    index.unshift(timestamp); // Newest first
-    if (index.length > MAX_HISTORY_ENTRIES) index.length = MAX_HISTORY_ENTRIES;
-    await kv.put(`${IDX_PREFIX}${canonical}`, JSON.stringify(index), { expirationTtl: KV_TTL_SECONDS });
-  } else {
-    // In-memory fallback
-    const list = inMemorySnapshots.get(canonical) || [];
-    list.unshift(snapshot);
-    if (list.length > MAX_HISTORY_ENTRIES) list.length = MAX_HISTORY_ENTRIES;
-    inMemorySnapshots.set(canonical, list);
-  }
+  // In-memory store
+  const list = inMemorySnapshots.get(canonical) || [];
+  list.unshift(snapshot);
+  if (list.length > MAX_HISTORY_ENTRIES) list.length = MAX_HISTORY_ENTRIES;
+  inMemorySnapshots.set(canonical, list);
 
   // Persist to Firestore (fire-and-forget with logging)
   firestoreSaveSnapshot(canonical, snapshot).catch((err) => {
@@ -203,26 +174,16 @@ export async function recordSnapshot(data: ExtractionData): Promise<PriceSnapsho
 export async function getHistory(url: string, limit?: number): Promise<HistoryResult> {
   const canonical = canonicalizeUrl(url);
 
-  let snapshots: PriceSnapshot[];
-
-  if (kv) {
-    const index = await getIndex(canonical);
-    const sliced = limit ? index.slice(0, limit) : index;
-    snapshots = [];
-    for (const ts of sliced) {
-      const snap = await kv.get(`${SNAP_PREFIX}${canonical}:${ts}`, 'json');
-      if (snap) snapshots.push(snap as PriceSnapshot);
-    }
-  } else {
-    const list = inMemorySnapshots.get(canonical) || [];
-    snapshots = limit ? list.slice(0, limit) : [...list];
+  // Tier 1: in-memory
+  const memList = inMemorySnapshots.get(canonical);
+  if (memList && memList.length > 0) {
+    const snapshots = limit ? memList.slice(0, limit) : [...memList];
+    return { url, snapshot_count: snapshots.length, snapshots };
   }
 
-  // Tier 3: Firestore fallback if KV returned nothing
-  if (snapshots.length === 0) {
-    snapshots = await firestoreGetSnapshots(canonical);
-    if (limit && snapshots.length > limit) snapshots = snapshots.slice(0, limit);
-  }
+  // Tier 2: Firestore
+  let snapshots = await firestoreGetSnapshots(canonical);
+  if (limit && snapshots.length > limit) snapshots = snapshots.slice(0, limit);
 
   return {
     url,
@@ -259,16 +220,6 @@ export async function getPriceChanges(url: string): Promise<PriceChange[]> {
   }
 
   return changes;
-}
-
-// ─── Helpers ─────────────────────────────────────────────────────
-
-async function getIndex(canonical: string): Promise<string[]> {
-  if (kv) {
-    const data = await kv.get(`${IDX_PREFIX}${canonical}`, 'json');
-    return (data as string[]) || [];
-  }
-  return []; // In-memory store doesn't use separate index
 }
 
 /**

@@ -18,8 +18,8 @@ import {
 } from '../../src/lib/services/webhook-service.js';
 import { resetDeadLetterStore, getDeadLetters } from '../../src/lib/services/dead-letter.js';
 
-beforeEach(() => {
-  clearWebhookStore();
+beforeEach(async () => {
+  await clearWebhookStore();
   resetDeadLetterStore();
 });
 
@@ -155,7 +155,7 @@ describe('clearWebhookStore', () => {
   it('clears all webhooks', async () => {
     await registerWebhook('https://a.com', ['extraction.completed']);
     await registerWebhook('https://b.com', ['extraction.failed']);
-    clearWebhookStore();
+    await clearWebhookStore();
     expect(await listWebhooks()).toHaveLength(0);
   });
 });

@@ -27,9 +27,10 @@ const SEARCH_PAGE_PATTERNS: RegExp[] = [
 
   // UK portals — match search index pages, not individual listings
   // e.g. /for-sale/London.html but NOT /for-sale/details/12345/
+  // Also exclude daft.ie-style paths: /for-sale/<description>/<numeric-id>
   /\/find\.(html|htm)/i,
-  /\/for-sale\/(?!details\/)/i,
-  /\/to-rent\/(?!details\/)/i,
+  /\/for-sale\/(?!details\/)(?![^/]+\/\d+\b)/i,
+  /\/to-rent\/(?!details\/)(?![^/]+\/\d+\b)/i,
   /\/house-prices/i,
   /\/property-for-sale\//i,
   /\/property-to-rent\//i,

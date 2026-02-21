@@ -10,10 +10,7 @@ import {
   getAllListings,
   getStoreStats,
   clearListingStore,
-  initKV,
   findListingByUrl,
-  getHtmlHash,
-  storeHtmlHash,
   deleteListing,
   updateListingVisibility,
 } from '../../src/lib/services/listing-store.js';
@@ -486,85 +483,6 @@ describe('listing-store', () => {
       expect(diag!.populatedExtractableFields).toBe(17);
       expect(diag!.meetsExpectation).toBe(true);
       expect(diag!.confidenceScore).toBe(0.95);
-    });
-  });
-
-  describe('initKV', () => {
-    it('accepts null without crashing', () => {
-      expect(() => initKV(null)).not.toThrow();
-    });
-
-    it('accepts undefined without crashing', () => {
-      expect(() => initKV(undefined)).not.toThrow();
-    });
-
-    it('works with a mock KV namespace', async () => {
-      const kvData = new Map<string, string>();
-      const mockKV = {
-        put: async (key: string, value: string, _opts?: any) => { kvData.set(key, value); },
-        get: async (key: string, _type?: string) => {
-          const val = kvData.get(key);
-          return val ? JSON.parse(val) : null;
-        },
-      };
-
-      initKV(mockKV);
-
-      const id = generateId();
-      const listing = new Listing();
-      listing.assignAttributes({ title: 'KV Test' });
-      await storeListing(id, listing);
-
-      // Verify KV was called
-      expect(kvData.has(`listing:${id}`)).toBe(true);
-
-      // Reset KV to null for other tests
-      initKV(null);
-    });
-  });
-
-  describe('getHtmlHash / storeHtmlHash', () => {
-    it('getHtmlHash returns null when nothing stored', async () => {
-      initKV(null);
-      const result = await getHtmlHash('https://example.com/properties/1');
-      expect(result).toBeNull();
-    });
-
-    it('getHtmlHash returns null when kv is null', async () => {
-      initKV(null);
-      const result = await getHtmlHash('https://example.com/properties/1');
-      expect(result).toBeNull();
-    });
-
-    it('storeHtmlHash is a no-op when kv is null', async () => {
-      initKV(null);
-      // Should not throw
-      await expect(storeHtmlHash('https://example.com/properties/1', 'abc123def456abcd', 1024)).resolves.toBeUndefined();
-    });
-
-    it('storeHtmlHash / getHtmlHash round-trip stores hash and size', async () => {
-      const kvData = new Map<string, string>();
-      const mockKV = {
-        put: async (key: string, value: string, _opts?: any) => { kvData.set(key, value); },
-        get: async (key: string, _type?: string) => {
-          const val = kvData.get(key);
-          return val ? JSON.parse(val) : null;
-        },
-      };
-      initKV(mockKV);
-
-      const url = 'https://www.rightmove.co.uk/properties/999';
-      const hash = 'aabbccddeeff0011';
-      const size = 42000;
-
-      await storeHtmlHash(url, hash, size);
-      const entry = await getHtmlHash(url);
-
-      expect(entry).not.toBeNull();
-      expect(entry!.hash).toBe(hash);
-      expect(entry!.size).toBe(size);
-
-      initKV(null);
     });
   });
 

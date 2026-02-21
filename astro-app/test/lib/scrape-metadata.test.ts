@@ -22,8 +22,8 @@ function makeInput(overrides: Partial<RecordScrapeInput> = {}): RecordScrapeInpu
 }
 
 describe('scrape-metadata', () => {
-  beforeEach(() => {
-    clearScrapeMetadata();
+  beforeEach(async () => {
+    await clearScrapeMetadata();
   });
 
   describe('recordScrapeAndUpdatePortal', () => {
@@ -285,9 +285,9 @@ describe('scrape-metadata', () => {
   });
 
   describe('clearScrapeMetadata', () => {
-    it('resets all in-memory stores', async () => {
+    it('resets all stores', async () => {
       await recordScrapeAndUpdatePortal(makeInput());
-      clearScrapeMetadata();
+      await clearScrapeMetadata();
 
       expect(await getLatestScrapeForListing('listing-1')).toBeUndefined();
       expect(await getPortalProfile('rightmove')).toBeUndefined();

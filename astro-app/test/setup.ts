@@ -36,8 +36,19 @@ beforeAll(async () => {
 });
 
 afterEach(() => {
-  // Clear listings/diagnostics between tests while preserving import_hosts
-  clearCollections('listings', 'diagnostics');
+  // Clear collections between tests while preserving import_hosts
+  clearCollections(
+    'listings',
+    'diagnostics',
+    'webhooks',
+    'export_history',
+    'daily_usage',
+    'scrape_records',
+    'portal_profiles',
+    'portal_profile_history',
+    'price_history',
+    'hauls',
+  );
 });
 
 afterAll(() => {
