@@ -42,7 +42,7 @@ export function buildHaulScrapeFromListing(
     import_host_slug: listing.import_host_slug || importHostSlug,
     for_sale: listing.for_sale || undefined,
     for_rent: listing.for_rent || undefined,
-    features: listing.features?.length ? listing.features : undefined,
+    features: listing.features?.length ? listing.features.slice(0, 30) : undefined,
     description: listing.description ? String(listing.description).slice(0, 500) : undefined,
     description_html: (listing.description_html && listing.description_html.length <= 1000)
       ? listing.description_html : undefined,
@@ -55,7 +55,7 @@ export function buildHaulScrapeFromListing(
     agent_email: listing.agent_email || undefined,
     agent_logo_url: listing.agent_logo_url || undefined,
     price_qualifier: listing.price_qualifier || undefined,
-    floor_plan_urls: listing.floor_plan_urls?.length ? listing.floor_plan_urls : undefined,
+    floor_plan_urls: listing.floor_plan_urls?.length ? listing.floor_plan_urls.slice(0, 10) : undefined,
     energy_certificate_grade: listing.energy_certificate_grade || undefined,
     locale_code: listing.locale_code || undefined,
   };
