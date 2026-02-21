@@ -152,7 +152,12 @@ if (Astro.request.method === 'POST') {
           </button>
         </form>
 
-        <div class="mt-5 pt-4 border-t border-gray-100 text-center">
+        <p class="mt-3 text-xs text-gray-400 text-center">
+          Extracted data is provided as-is. Verify details directly with the source site.
+          By using this service you agree to our <a href="/terms" class="underline hover:text-gray-600">Terms of Service</a>.
+        </p>
+
+        <div class="mt-4 pt-4 border-t border-gray-100 text-center">
           <small class="text-gray-400 block mb-2">Works with these sites and any site with a configured mapping:</small>
           {supportedSites.map((site) => (
             <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs mx-0.5 my-0.5">{site}</span>
