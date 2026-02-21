@@ -2,7 +2,7 @@
 
 ## Overview
 
-PropertyWebScraper is an HTML-first extraction engine built with **Astro 5 SSR** and deployed on **Cloudflare Pages**. Given fully-rendered HTML and a source URL, it applies configurable JSON mappings to extract structured property data — title, price, coordinates, images, and 70+ fields across 17 portals.
+PropertyWebScraper is an HTML-first extraction engine built with **Astro 5 SSR** and deployed on **Cloudflare Pages**. Given fully-rendered HTML and a source URL, it applies configurable JSON mappings to extract structured property data — title, price, coordinates, images, and 70+ fields across 22 portals.
 
 No browser automation or JS rendering happens inside the engine. Callers (Chrome extension, Puppeteer, curl) provide the HTML.
 
@@ -236,7 +236,7 @@ API key is passed via `X-Api-Key` header or `api_key` query parameter.
 
 ### Portal Registry (`portal-registry.ts`)
 
-Centralized config for all 17 supported portals. Each entry defines country, currency, locale, area unit, content source type (html/script-json/json-ld/flight-data), and JS rendering requirements. The URL validator derives its host map from this registry.
+Centralized config for all 22 supported portals. Each entry defines country, currency, locale, area unit, content source type (html/script-json/json-ld/flight-data), and JS rendering requirements. The URL validator derives its host map from this registry.
 
 ### Quality Scoring (`quality-scorer.ts`)
 

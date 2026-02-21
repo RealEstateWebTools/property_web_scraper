@@ -194,6 +194,7 @@ Push your branch and open a PR. Your PR should include:
 - The mapping JSON file (`config/scraper_mappings/<name>.json`)
 - The HTML fixture (`astro-app/test/fixtures/<name>.html`)
 - The manifest entry in `manifest.ts`
+- The hostname entry in `url-validator.ts`
 - The hostname entry in `capture-fixture.ts`
 
 ## Tips for Writing Good Mappings
