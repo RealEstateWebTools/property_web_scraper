@@ -82,7 +82,7 @@ async function getDailyCount(key: string): Promise<number> {
       const data = await kv.get(kvKey, 'json') as { count: number } | null;
       if (data) return data.count;
     } catch (err) {
-      console.error('[RateLimiter] KV read failed:', (err as Error).message || err);
+      logActivity({ level: 'error', category: 'system', message: '[RateLimiter] KV read failed: ' + ((err as Error).message || err) });
     }
   }
 
@@ -108,7 +108,7 @@ async function incrementDailyCount(key: string): Promise<void> {
       const secondsUntilMidnight = Math.ceil((new Date().setUTCHours(24, 0, 0, 0) - Date.now()) / 1000);
       await kv.put(kvKey, JSON.stringify({ count }), { expirationTtl: Math.max(secondsUntilMidnight, 60) });
     } catch (err) {
-      console.error('[RateLimiter] KV write failed:', (err as Error).message || err);
+      logActivity({ level: 'error', category: 'system', message: '[RateLimiter] KV write failed: ' + ((err as Error).message || err) });
     }
   }
 

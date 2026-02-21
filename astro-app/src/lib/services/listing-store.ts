@@ -3,6 +3,7 @@ import { Listing } from '../models/listing.js';
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { deduplicationKey } from './url-canonicalizer.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
+import { logActivity } from './activity-logger.js';
 import type { KVNamespace } from './kv-types.js';
 
 /**
@@ -104,7 +105,7 @@ export async function getListing(id: string): Promise<Listing | undefined> {
     store.set(id, listing);
     return listing;
   } catch (err) {
-    console.error('[ListingStore] Firestore lookup failed for', id, ':', (err as Error).message || err);
+    logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore lookup failed for ' + id + ': ' + ((err as Error).message || err) });
     return undefined;
   }
 }
@@ -118,7 +119,7 @@ async function firestoreSaveDiagnostics(id: string, diagnostics: ExtractionDiagn
     const col = db.collection(`${prefix}diagnostics`);
     await col.doc(id).set(JSON.parse(JSON.stringify(diagnostics)));
   } catch (err) {
-    console.error('[ListingStore] Firestore diagnostics save failed:', (err as Error).message || err);
+    logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore diagnostics save failed: ' + ((err as Error).message || err) });
   }
 }
 
@@ -131,7 +132,7 @@ async function firestoreGetDiagnostics(id: string): Promise<ExtractionDiagnostic
     if (!doc.exists) return undefined;
     return doc.data() as ExtractionDiagnostics;
   } catch (err) {
-    console.error('[ListingStore] Firestore diagnostics read failed for', id, ':', (err as Error).message || err);
+    logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore diagnostics read failed for ' + id + ': ' + ((err as Error).message || err) });
     return undefined;
   }
 }
@@ -144,7 +145,7 @@ export async function storeDiagnostics(id: string, diagnostics: ExtractionDiagno
   }
   // Firestore write-through (fire-and-forget)
   firestoreSaveDiagnostics(id, diagnostics).catch((err) => {
-    console.error('[ListingStore] Firestore diagnostics write-through failed:', (err as Error).message || err);
+    logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore diagnostics write-through failed: ' + ((err as Error).message || err) });
   });
 }
 
@@ -174,7 +175,7 @@ async function reconstructDiagnosticsFromListing(id: string): Promise<Extraction
       return diag;
     }
   } catch (err) {
-    console.error('[ListingStore] Firestore diagnostics reconstruction failed for', id, ':', (err as Error).message || err);
+    logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore diagnostics reconstruction failed for ' + id + ': ' + ((err as Error).message || err) });
   }
   return undefined;
 }
@@ -323,7 +324,7 @@ export async function updateListingVisibility(id: string, visibility: string): P
     listing.id = id;
     await listing.save();
   } catch (err) {
-    console.error('[ListingStore] Firestore visibility update failed:', (err as Error).message || err);
+    logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore visibility update failed: ' + ((err as Error).message || err) });
   }
 }
  

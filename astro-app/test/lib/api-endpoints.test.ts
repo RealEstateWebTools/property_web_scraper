@@ -149,19 +149,22 @@ describe('GET /public_api/v1/health', () => {
     vi.clearAllMocks();
   });
 
-  it('returns ok status with scraper count', async () => {
+  it('returns status with scraper count and subsystem checks', async () => {
     const { GET } = await import('../../src/pages/public_api/v1/health.js');
 
     const request = mockRequest('/public_api/v1/health');
-    const response = await GET({ request, url: new URL(request.url) } as any);
+    const response = await GET({ request, url: new URL(request.url), locals: {} } as any);
 
     expect(response.status).toBe(200);
 
     const body = await parseJson(response);
     expect(body.success).toBe(true);
-    expect(body.status).toBe('ok');
+    expect(['ok', 'degraded']).toContain(body.status);
     expect(body.scrapers_loaded).toBe(3);
-    expect(body.storage).toBe('in_memory');
+    expect(body.checks).toBeDefined();
+    expect(body.checks.kv).toHaveProperty('available');
+    expect(body.checks.firestore).toHaveProperty('connected');
+    expect(body.checks.firestore).toHaveProperty('backend');
   });
 
   it('does not require authentication', async () => {
@@ -170,7 +173,7 @@ describe('GET /public_api/v1/health', () => {
 
     // health endpoint does not call apiGuard — verify by checking it was not called
     const request = mockRequest('/public_api/v1/health');
-    await GET({ request, url: new URL(request.url) } as any);
+    await GET({ request, url: new URL(request.url), locals: {} } as any);
 
     expect(apiGuard).not.toHaveBeenCalled();
   });

@@ -12,6 +12,7 @@
  */
 
 import type { KVNamespace } from './kv-types.js';
+import { logActivity } from './activity-logger.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
 import { createHash } from 'node:crypto';
 
@@ -105,7 +106,7 @@ async function firestoreSaveSnapshot(canonical: string, snapshot: PriceSnapshot)
     if (snapshots.length > MAX_HISTORY_ENTRIES) snapshots.length = MAX_HISTORY_ENTRIES;
     await parentDoc.set({ canonical, url: canonical, snapshots, updatedAt: new Date().toISOString() });
   } catch (err) {
-    console.error('[PriceHistory] Firestore save failed:', (err as Error).message || err);
+    logActivity({ level: 'error', category: 'system', message: '[PriceHistory] Firestore save failed: ' + ((err as Error).message || err) });
   }
 }
 
@@ -119,7 +120,7 @@ async function firestoreGetSnapshots(canonical: string): Promise<PriceSnapshot[]
     const data = doc.data() as Record<string, unknown>;
     return (data.snapshots as PriceSnapshot[]) || [];
   } catch (err) {
-    console.error('[PriceHistory] Firestore read failed:', (err as Error).message || err);
+    logActivity({ level: 'error', category: 'system', message: '[PriceHistory] Firestore read failed: ' + ((err as Error).message || err) });
     return [];
   }
 }
@@ -180,7 +181,7 @@ export async function recordSnapshot(data: ExtractionData): Promise<PriceSnapsho
 
   // Persist to Firestore (fire-and-forget with logging)
   firestoreSaveSnapshot(canonical, snapshot).catch((err) => {
-    console.error('[PriceHistory] Firestore background save failed:', (err as Error).message || err);
+    logActivity({ level: 'error', category: 'system', message: '[PriceHistory] Firestore background save failed: ' + ((err as Error).message || err) });
   });
 
   return snapshot;

@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Security
+- XSS fix: `description_html` output is now sanitized to prevent script injection
+- Admin query-parameter authentication removed in favour of `apiGuard()` middleware
+- Content-Security-Policy header added to all responses
+
+### Added
+- `apiGuard()` helper for consistent API authentication and authorization
+- `KVNamespace` type interface (`kv-types.ts`) for portable KV abstraction
+- `html-analysis.ts` content provenance extraction (JSON-LD, script vars, bot detection)
+- Exporter test suite (200 tests) covering Kyero XML, Schema.org JSON-LD, CSV, and JSON outputs
+- API endpoint test suite (49 tests) for public API, haul, and admin routes
+- MCP bridge exponential backoff with jitter for reconnection reliability
+- Scraper mapping `version` and `last_checked` metadata fields
+- Health endpoint now probes KV and Firestore connectivity (`/public_api/v1/health`)
+
+### Changed
+- Catch blocks in service layer now use structured `logActivity()` instead of raw `console.error`
+
 ### Fixed
 - Duplicate Firestore documents on manual extraction — `retrieveListing()` no longer saves internally; extract pages use `generateStableId(url)` for idempotent, URL-based document IDs
 
