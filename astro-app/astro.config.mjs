@@ -5,6 +5,11 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   output: 'server',
   adapter: cloudflare(),
+  redirects: {
+    // Firebase email action handler — Astro cannot route paths starting with _,
+    // so we redirect Firebase's standard /__/auth/action URL to our handler page.
+    '/__/auth/action': '/auth/action',
+  },
   vite: {
     plugins: [
       tailwindcss(),
