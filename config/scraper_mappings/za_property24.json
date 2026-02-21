@@ -1,0 +1,97 @@
+[{
+  "name": "za_property24",
+  "expectedExtractionRate": 0.80,
+
+  // Primary: JSON-LD @graph[0] (RealEstateListing)
+  // Secondary: p24_* CSS class selectors
+  // Note: no jsonLdType filter — @graph wrapper means top-level @type is absent
+
+  "defaultValues": {
+    "country":            { "value": "South Africa" },
+    "currency":           { "value": "ZAR" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "en-ZA" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "[data-image-url]",
+    "cssAttr": "data-image-url"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "@graph.0.about.numberOfBedrooms"
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "@graph.0.about.numberOfBathroomsTotal"
+    },
+    "count_parking": {
+      "cssLocator": "li[title='Parking Spaces'] > span"
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "@graph.0.offers.priceSpecification.price"
+    },
+    "plot_area": {
+      "cssLocator": "li.p24_size[title='Erf Size'] span",
+      "modifiers": ["digitsOnly"]
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content"
+    },
+    "description": {
+      "cssLocator": ".js_expandedText.p24_expandedText"
+    },
+    "price_string": {
+      "cssLocator": ".p24_price",
+      "cssCountId": "0"
+    },
+    "reference": {
+      "urlPathPart": "6"
+    },
+    "city": {
+      "jsonLdPath": "@graph.0.about.address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "@graph.0.about.address.addressRegion"
+    },
+    "property_type": {
+      "jsonLdPath": "@graph.0.about.@type"
+    },
+    "agent_name": {
+      "jsonLdPath": "@graph.0.offers.offeredBy.name"
+    },
+    "agent_company": {
+      "jsonLdPath": "@graph.0.offers.offeredBy.worksFor.name"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "sale"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    }
+  }
+}]

@@ -1567,3 +1567,128 @@ exports[`Scraper validation > us_zillow scraper > matches full extraction snapsh
   "year_construction": 2023,
 }
 `;
+
+exports[`Scraper validation > za_property24 scraper > matches full extraction snapshot 1`] = `
+{
+  "agent_company": "Magnum Properties",
+  "agent_name": "Gavin Bloy",
+  "area_unit": "sqmt",
+  "city": "Prestbury",
+  "count_bathrooms": 2,
+  "count_bedrooms": 4,
+  "count_parking": 2,
+  "country": "South Africa",
+  "currency": "ZAR",
+  "description": "If peace and quiet are important to you then this home is well worth your attention. Not only is it situated near the end of a cul-de-sac, but it’s also a pan-handle property set back from the road. The sight and sound of the birds in the surrounding trees will be your closest neighbours. That this home has been happily occupied by the same person for over 42 years speaks volumes. A tiled, under cover patio is the perfect spot for that early morning cup of coffee as you enjoy the peace and quiet, broken only by the sounds of nature. The spacious, tiled lounge which has an airconditioner, is accessed through double doors leading from the patio. There is a separate dining room which adjoins the open-plan kitchen. The large kitchen has an eye-level oven and hob, an abundance of fitted cabinets, ample space for appliances and a double sink.
+            There are 4 bedrooms, all with built-in cupboards and tiled floors. The main bedroom has a full en-suite bathroom with a shower and a corner bath. The 2nd bathroom has a bath, toilet and basin. There is also a large tiled and covered patio leading off the kitchen which provides very useful space for many different purposes. Vehicles can be parked in the separate double garage.
+            A unique home with a lot on offer!!",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://images.prop24.com/374420431",
+    },
+    {
+      "url": "https://images.prop24.com/374420431/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420434/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420438/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420457/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420432/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420430/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420433/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420435/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420436/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420437/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420439/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420440/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420441/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420442/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420443/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420444/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420445/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420446/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420447/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420448/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420449/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420450/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420451/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420452/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420453/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420454/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420455/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420456/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420458/Ensure1280x720",
+    },
+    {
+      "url": "https://images.prop24.com/374420459/Ensure1280x720",
+    },
+  ],
+  "locale_code": "en-ZA",
+  "main_image_url": "https://images.prop24.com/374420431",
+  "plot_area": 1596,
+  "price_float": 1395000,
+  "price_string": "R 1 395 000",
+  "property_type": "House",
+  "reference": "116951069",
+  "region": "KwaZulu Natal",
+  "title": "4 Bedroom House for sale in Prestbury - Pietermaritzburg - Property24",
+}
+`;
