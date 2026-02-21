@@ -95,13 +95,21 @@ function truncate(str: string, len: number): string {
 
   <!-- Summary row -->
   <div class="flex items-center justify-between text-sm text-gray-600 mb-4">
-    <div>
-      Showing {extractions.length} of {totalCount}
-      {extractions.length > 0 && (
-        <span class="ml-2">
-          — A: {gradeCounts.A}, B: {gradeCounts.B}, C: {gradeCounts.C}, F: {gradeCounts.F}
-        </span>
-      )}
+    <div class="flex items-center gap-3">
+      <div>
+        Showing {extractions.length} of {totalCount}
+        {extractions.length > 0 && (
+          <span class="ml-2">
+            — A: {gradeCounts.A}, B: {gradeCounts.B}, C: {gradeCounts.C}, F: {gradeCounts.F}
+          </span>
+        )}
+      </div>
+      <button
+        id="delete-selected-btn"
+        class="hidden px-3 py-1.5 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 transition"
+      >
+        <i class="bi bi-trash"></i> Delete Selected (<span id="selected-count">0</span>)
+      </button>
     </div>
     {extractions.length > 0 && (
       <div class="pws-bulk-export relative inline-block">
@@ -133,27 +141,43 @@ function truncate(str: string, len: number): string {
       {extractions.length === 0 ? (
         <div class="p-8 text-center text-gray-400 text-sm">No extractions found</div>
       ) : (
-        <table class="w-full text-sm">
+        <table class="w-full text-sm" id="extractions-table">
           <thead>
             <tr class="text-left text-gray-500 border-b border-gray-200">
-              <th class="py-2 px-4 font-medium">Time</th>
-              <th class="py-2 px-4 font-medium">Source URL</th>
-              <th class="py-2 px-4 font-medium">Scraper</th>
-              <th class="py-2 px-4 font-medium">Quality</th>
-              <th class="py-2 px-4 font-medium">Confidence</th>
-              <th class="py-2 px-4 font-medium">Status</th>
-              <th class="py-2 px-4 font-medium">Rate</th>
-              <th class="py-2 px-4 font-medium">Fields</th>
-              <th class="py-2 px-4 font-medium">Title</th>
+              <th class="py-2 px-4 w-8">
+                <input type="checkbox" id="select-all" class="cursor-pointer" title="Select all" />
+              </th>
+              <th class="py-2 px-4 font-medium cursor-pointer select-none hover:text-gray-700" data-sort="time">Time <span class="sort-icon text-[10px]"></span></th>
+              <th class="py-2 px-4 font-medium cursor-pointer select-none hover:text-gray-700" data-sort="reference">Reference <span class="sort-icon text-[10px]"></span></th>
+              <th class="py-2 px-4 font-medium cursor-pointer select-none hover:text-gray-700" data-sort="scraper">Scraper <span class="sort-icon text-[10px]"></span></th>
+              <th class="py-2 px-4 font-medium cursor-pointer select-none hover:text-gray-700" data-sort="quality">Quality <span class="sort-icon text-[10px]"></span></th>
+              <th class="py-2 px-4 font-medium cursor-pointer select-none hover:text-gray-700" data-sort="confidence">Confidence <span class="sort-icon text-[10px]"></span></th>
+              <th class="py-2 px-4 font-medium cursor-pointer select-none hover:text-gray-700" data-sort="status">Status <span class="sort-icon text-[10px]"></span></th>
+              <th class="py-2 px-4 font-medium cursor-pointer select-none hover:text-gray-700" data-sort="rate">Rate <span class="sort-icon text-[10px]"></span></th>
+              <th class="py-2 px-4 font-medium cursor-pointer select-none hover:text-gray-700" data-sort="fields">Fields <span class="sort-icon text-[10px]"></span></th>
+              <th class="py-2 px-4 font-medium cursor-pointer select-none hover:text-gray-700" data-sort="title">Title <span class="sort-icon text-[10px]"></span></th>
               <th class="py-2 px-4 font-medium"></th>
             </tr>
           </thead>
           <tbody>
             {extractions.map((ext) => (
-              <tr class="border-b border-gray-100 hover:bg-gray-50" data-listing-id={ext.id}>
+              <tr class="border-b border-gray-100 hover:bg-gray-50" data-listing-id={ext.id}
+                data-sort-time={ext.timestamp}
+                data-sort-reference={ext.reference || ext.sourceUrl}
+                data-sort-scraper={ext.scraperName}
+                data-sort-quality={ext.qualityGrade}
+                data-sort-confidence={ext.confidenceScore}
+                data-sort-status={ext.visibility}
+                data-sort-rate={ext.extractionRate}
+                data-sort-fields={ext.populatedExtractableFields}
+                data-sort-title={ext.title}
+              >
+                <td class="py-2 px-4">
+                  <input type="checkbox" class="row-checkbox cursor-pointer" data-id={ext.id} />
+                </td>
                 <td class="py-2 px-4 text-xs text-gray-500 whitespace-nowrap">{timeAgo(ext.timestamp)}</td>
                 <td class="py-2 px-4 text-xs max-w-[200px] truncate" title={ext.sourceUrl}>
-                  {truncate(ext.sourceUrl, 40)}
+                  {ext.reference ? ext.reference : <span class="text-gray-400">{truncate(ext.sourceUrl, 40)}</span>}
                 </td>
                 <td class="py-2 px-4 font-mono text-xs">{ext.scraperName}</td>
                 <td class="py-2 px-4"><QualityBadge grade={ext.qualityGrade} /></td>
@@ -191,10 +215,10 @@ function truncate(str: string, len: number): string {
                       </button>
                       <div class="hidden group-hover:block absolute right-0 mt-0 w-32 bg-white shadow-lg border border-gray-100 rounded-md py-1 z-30">
                         {['published', 'pending', 'hidden', 'spam'].map(v => (
-                          <button 
-                            class="w-full text-left px-3 py-1.5 text-[10px] font-medium hover:bg-gray-50 border-0 bg-transparent cursor-pointer disabled:opacity-50" 
-                            data-action="set_visibility" 
-                            data-id={ext.id} 
+                          <button
+                            class="w-full text-left px-3 py-1.5 text-[10px] font-medium hover:bg-gray-50 border-0 bg-transparent cursor-pointer disabled:opacity-50"
+                            data-action="set_visibility"
+                            data-id={ext.id}
                             data-visibility={v}
                             disabled={ext.visibility === v}
                           >
@@ -218,6 +242,8 @@ function truncate(str: string, len: number): string {
 
   <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
+
+    // ── Bulk export ──────────────────────────────────────────────────────────
     const toggle = document.querySelector('[data-bulk-export-toggle]');
     const menu = document.querySelector('[data-bulk-export-menu]');
     if (toggle && menu) {
@@ -260,7 +286,6 @@ function truncate(str: string, len: number): string {
           console.error('Bulk export error:', e);
         }
         menu.classList.add('hidden');
-        // Restore button labels
         document.querySelectorAll('[data-bulk-format]').forEach(b => {
           const fmt = b.getAttribute('data-bulk-format');
           const icons = { json: 'bi-braces text-blue-600', csv: 'bi-file-earmark-spreadsheet text-green-600', geojson: 'bi-geo-alt text-orange-600' };
@@ -269,8 +294,99 @@ function truncate(str: string, len: number): string {
         });
       });
     });
- 
-    // Individual Actions
+
+    // ── Checkboxes & Delete Selected ────────────────────────────────────────
+    const selectAll = document.getElementById('select-all');
+    const deleteBtn = document.getElementById('delete-selected-btn');
+    const selectedCount = document.getElementById('selected-count');
+
+    function updateDeleteButton() {
+      const checked = document.querySelectorAll('.row-checkbox:checked');
+      const n = checked.length;
+      if (deleteBtn) {
+        deleteBtn.classList.toggle('hidden', n === 0);
+        if (selectedCount) selectedCount.textContent = String(n);
+      }
+    }
+
+    if (selectAll) {
+      selectAll.addEventListener('change', () => {
+        document.querySelectorAll('.row-checkbox').forEach(cb => {
+          cb.checked = selectAll.checked;
+        });
+        updateDeleteButton();
+      });
+    }
+
+    document.querySelectorAll('.row-checkbox').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const all = document.querySelectorAll('.row-checkbox');
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        if (selectAll) selectAll.indeterminate = checked.length > 0 && checked.length < all.length;
+        if (selectAll) selectAll.checked = checked.length === all.length;
+        updateDeleteButton();
+      });
+    });
+
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', async () => {
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        const ids = Array.from(checked).map(cb => cb.getAttribute('data-id')).filter(Boolean);
+        if (ids.length === 0) return;
+        if (!confirm(`Delete ${ids.length} extraction${ids.length > 1 ? 's' : ''}?`)) return;
+
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = 'Deleting...';
+
+        await Promise.all(ids.map(id =>
+          fetch('/admin/api/listings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'delete', listingId: id }),
+          })
+        ));
+
+        window.location.reload();
+      });
+    }
+
+    // ── Column sorting ───────────────────────────────────────────────────────
+    let sortCol = null;
+    let sortDir = 1; // 1 = asc, -1 = desc
+
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.getAttribute('data-sort');
+        if (sortCol === col) {
+          sortDir = -sortDir;
+        } else {
+          sortCol = col;
+          sortDir = 1;
+        }
+
+        // Update sort icons
+        document.querySelectorAll('th[data-sort]').forEach(h => {
+          h.querySelector('.sort-icon').textContent = '';
+        });
+        th.querySelector('.sort-icon').textContent = sortDir === 1 ? ' ▲' : ' ▼';
+
+        const tbody = document.querySelector('#extractions-table tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a, b) => {
+          const av = a.getAttribute(`data-sort-${col}`) || '';
+          const bv = b.getAttribute(`data-sort-${col}`) || '';
+          const an = parseFloat(av);
+          const bn = parseFloat(bv);
+          if (!isNaN(an) && !isNaN(bn)) return (an - bn) * sortDir;
+          return av.localeCompare(bv) * sortDir;
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+      });
+    });
+
+    // ── Individual actions ───────────────────────────────────────────────────
     document.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const action = btn.getAttribute('data-action');
