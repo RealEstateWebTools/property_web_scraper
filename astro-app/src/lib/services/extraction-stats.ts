@@ -55,21 +55,18 @@ function emptyGradeDistribution(): Record<QualityGrade, number> {
 }
 
 function listingToSummary(id: string, listing: Listing): ExtractionSummary | null {
-  // Skip listings without diagnostic data
-  if (!listing.scraper_name && !listing.quality_grade) return null;
-
   return {
     id,
     timestamp: listing.last_retrieved_at?.getTime?.() || parseInt(id.split('-')[0], 36),
-    scraperName: listing.scraper_name,
+    scraperName: listing.scraper_name || '',
     sourceUrl: listing.import_url || '',
     qualityGrade: (listing.quality_grade || 'F') as QualityGrade,
     qualityLabel: listing.quality_label || '',
-    extractionRate: listing.extraction_rate,
+    extractionRate: listing.extraction_rate || 0,
     weightedExtractionRate: listing.weighted_extraction_rate,
-    populatedExtractableFields: listing.populated_extractable_fields,
-    extractableFields: listing.extractable_fields,
-    meetsExpectation: listing.meets_expectation,
+    populatedExtractableFields: listing.populated_extractable_fields || 0,
+    extractableFields: listing.extractable_fields || 0,
+    meetsExpectation: listing.meets_expectation || false,
     criticalFieldsMissing: listing.critical_fields_missing,
     title: listing.title || '',
     reference: listing.reference || '',
