@@ -6,6 +6,8 @@
  */
 
 import type { KVNamespace } from './kv-types.js';
+import { logActivity } from './activity-logger.js';
+import { recordDeadLetter } from './dead-letter.js';
 
 // ─── Types ───────────────────────────────────────────────────────
 
@@ -151,11 +153,30 @@ async function getIndex(): Promise<string[]> {
   return Array.from(inMemoryStore.keys());
 }
 
+// ─── Retry Configuration ─────────────────────────────────────────
+
+const MAX_RETRIES = 2; // 3 total attempts
+const BACKOFF_MS = [500, 1000];
+const RETRYABLE_STATUS_CODES = new Set([429, 500, 502, 503, 504]);
+
+function isRetryableStatus(status: number): boolean {
+  return RETRYABLE_STATUS_CODES.has(status);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Exported for testing
+export { MAX_RETRIES, BACKOFF_MS };
+
 // ─── Webhook Delivery ────────────────────────────────────────────
 
 /**
  * Fire webhooks for a specific event.
- * Returns delivery results for each matching webhook.
+ * Each webhook delivery is retried up to MAX_RETRIES times with exponential
+ * backoff on transient failures (network errors, 429, 5xx).
+ * After all retries are exhausted, a dead-letter entry is recorded.
  */
 export async function fireWebhooks(
   event: WebhookEvent,
@@ -177,44 +198,87 @@ export async function fireWebhooks(
   const results = await Promise.allSettled(
     matching.map(async (webhook): Promise<WebhookDeliveryResult> => {
       const startTime = Date.now();
-      try {
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-          'User-Agent': 'PropertyWebScraper-Webhook/1.0',
-          'X-Webhook-Event': event,
-          'X-Webhook-Id': webhook.id,
-        };
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'User-Agent': 'PropertyWebScraper-Webhook/1.0',
+        'X-Webhook-Event': event,
+        'X-Webhook-Id': webhook.id,
+      };
 
-        // HMAC signature if secret is configured
-        if (webhook.secret) {
-          const signature = await computeHmacSha256(payloadJson, webhook.secret);
-          headers['X-Webhook-Signature'] = `sha256=${signature}`;
+      if (webhook.secret) {
+        const signature = await computeHmacSha256(payloadJson, webhook.secret);
+        headers['X-Webhook-Signature'] = `sha256=${signature}`;
+      }
+
+      let lastError: string | undefined;
+      let lastStatusCode: number | null = null;
+
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        if (attempt > 0) {
+          logActivity({
+            level: 'warn',
+            category: 'system',
+            message: `[Webhook] Retry ${attempt}/${MAX_RETRIES} for ${webhook.url} (previous: ${lastStatusCode ?? lastError})`,
+          });
+          await sleep(BACKOFF_MS[attempt - 1]);
         }
 
-        const response = await fetch(webhook.url, {
-          method: 'POST',
-          headers,
-          body: payloadJson,
-          signal: AbortSignal.timeout(10000), // 10s timeout
-        });
+        try {
+          const response = await fetch(webhook.url, {
+            method: 'POST',
+            headers,
+            body: payloadJson,
+            signal: AbortSignal.timeout(10000),
+          });
 
-        return {
-          webhookId: webhook.id,
-          url: webhook.url,
-          statusCode: response.status,
-          success: response.status >= 200 && response.status < 300,
-          durationMs: Date.now() - startTime,
-        };
-      } catch (err: any) {
-        return {
-          webhookId: webhook.id,
-          url: webhook.url,
-          statusCode: null,
-          success: false,
-          error: err.message || 'Unknown error',
-          durationMs: Date.now() - startTime,
-        };
+          lastStatusCode = response.status;
+
+          if (response.status >= 200 && response.status < 300) {
+            return {
+              webhookId: webhook.id,
+              url: webhook.url,
+              statusCode: response.status,
+              success: true,
+              durationMs: Date.now() - startTime,
+            };
+          }
+
+          // Non-retryable client error (4xx except 429)
+          if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+            return {
+              webhookId: webhook.id,
+              url: webhook.url,
+              statusCode: response.status,
+              success: false,
+              error: `HTTP ${response.status}`,
+              durationMs: Date.now() - startTime,
+            };
+          }
+
+          lastError = `HTTP ${response.status}`;
+        } catch (err: any) {
+          lastStatusCode = null;
+          lastError = err.message || 'Unknown error';
+        }
       }
+
+      // All retries exhausted — record dead-letter
+      recordDeadLetter({
+        source: 'webhook',
+        operation: `POST ${webhook.url}`,
+        error: lastError || 'Unknown error',
+        context: { webhookId: webhook.id, event, statusCode: lastStatusCode },
+        attempts: MAX_RETRIES + 1,
+      }).catch(() => {}); // DLQ write itself is best-effort
+
+      return {
+        webhookId: webhook.id,
+        url: webhook.url,
+        statusCode: lastStatusCode,
+        success: false,
+        error: lastError,
+        durationMs: Date.now() - startTime,
+      };
     }),
   );
 

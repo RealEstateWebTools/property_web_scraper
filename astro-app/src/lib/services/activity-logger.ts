@@ -7,7 +7,7 @@
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 
 export type LogLevel = 'info' | 'warn' | 'error';
-export type LogCategory = 'api_request' | 'extraction' | 'auth' | 'rate_limit' | 'system';
+export type LogCategory = 'api_request' | 'extraction' | 'auth' | 'rate_limit' | 'system' | 'quality';
 
 export interface LogEntry {
   id: string;
@@ -124,7 +124,7 @@ export function queryLogs(query: LogQuery = {}): LogQueryResult {
 export function getLogStats(): LogStats {
   const byLevel: Record<LogLevel, number> = { info: 0, warn: 0, error: 0 };
   const byCategory: Record<LogCategory, number> = {
-    api_request: 0, extraction: 0, auth: 0, rate_limit: 0, system: 0,
+    api_request: 0, extraction: 0, auth: 0, rate_limit: 0, system: 0, quality: 0,
   };
   let oldest: number | null = null;
   let newest: number | null = null;

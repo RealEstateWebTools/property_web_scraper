@@ -11,6 +11,7 @@ import {
   ApiErrorCode, mapValidatorError,
 } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
+import { recordDeadLetter } from '@lib/services/dead-letter.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { fireWebhooks } from '@lib/services/webhook-service.js';
 import { recordUsage } from '@lib/services/usage-meter.js';
@@ -425,13 +426,19 @@ export const POST: APIRoute = async ({ request }) => {
         fields_extracted: fieldsExtracted,
         fields_available: fieldsAvailable,
         properties: rawProps,
-      }).catch(() => { /* webhook delivery failure shouldn't affect API response */ });
+      }).catch((err) => {
+        logActivity({ level: 'error', category: 'system', message: '[Listings] Webhook delivery failed: ' + ((err as Error).message || err) });
+        recordDeadLetter({ source: 'webhook', operation: `fireWebhooks(${url})`, error: (err as Error).message || String(err), context: { url, event: 'extraction.completed' }, attempts: 1 }).catch(() => {});
+      });
 
       // Price history and scrape metadata now handled by runExtraction
 
       // Record usage for billing/quota (fire-and-forget)
       if (auth.userId) {
-        recordUsage(auth.userId).catch(() => { /* usage recording failure shouldn't affect API response */ });
+        recordUsage(auth.userId).catch((err) => {
+          logActivity({ level: 'error', category: 'system', message: '[Listings] Usage recording failed: ' + ((err as Error).message || err) });
+          recordDeadLetter({ source: 'usage', operation: `recordUsage(${auth.userId})`, error: (err as Error).message || String(err), context: { userId: auth.userId, url }, attempts: 1 }).catch(() => {});
+        });
       }
     }
   }

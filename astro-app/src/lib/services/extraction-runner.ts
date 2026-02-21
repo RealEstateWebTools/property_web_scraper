@@ -9,6 +9,7 @@ import type { MergeDiff } from '@lib/models/listing.js';
 import { findPortalByHost } from '@lib/services/portal-registry.js';
 import { normalizePrice } from '@lib/extractor/price-normalizer.js';
 import { logActivity } from '@lib/services/activity-logger.js';
+import { recordDeadLetter } from '@lib/services/dead-letter.js';
 import { generateStableId, getListingByUrl, storeListing, storeDiagnostics, getDiagnostics, getHtmlHash, storeHtmlHash } from '@lib/services/listing-store.js';
 import { computeHtmlHash } from '@lib/utils/html-hash.js';
 import { recordSnapshot } from '@lib/services/price-history.js';
@@ -147,7 +148,10 @@ export async function runExtraction(opts: {
     if (result.diagnostics) {
       await storeDiagnostics(resultId, result.diagnostics);
     }
-    storeHtmlHash(url, htmlHash, html.length).catch(() => {});
+    storeHtmlHash(url, htmlHash, html.length).catch((err) => {
+      logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] storeHtmlHash failed: ' + ((err as Error).message || err) });
+      recordDeadLetter({ source: 'kv_write', operation: `storeHtmlHash(${url})`, error: (err as Error).message || String(err), context: { url }, attempts: 1 }).catch(() => {});
+    });
     try { await listing.save(); } catch (err) { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Firestore save failed: ' + ((err as Error).message || err) }); }
   } catch (outerErr) {
     logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Listing store/dedup failed, using fallback: ' + ((outerErr as Error).message || outerErr) });
@@ -163,7 +167,10 @@ export async function runExtraction(opts: {
       if (result.diagnostics) {
         await storeDiagnostics(resultId, result.diagnostics);
       }
-      storeHtmlHash(url, htmlHash, html.length).catch(() => {});
+      storeHtmlHash(url, htmlHash, html.length).catch((err) => {
+        logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] storeHtmlHash failed (fallback): ' + ((err as Error).message || err) });
+        recordDeadLetter({ source: 'kv_write', operation: `storeHtmlHash(${url})`, error: (err as Error).message || String(err), context: { url }, attempts: 1 }).catch(() => {});
+      });
       try { await listing.save(); } catch (err) { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Firestore save failed (fallback): ' + ((err as Error).message || err) }); }
     } catch (err) { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Listing store failure (fallback): ' + ((err as Error).message || err) }); }
   }
@@ -178,7 +185,10 @@ export async function runExtraction(opts: {
     price_currency: rawProps.price_currency || rawProps.currency,
     quality_grade: result.diagnostics?.qualityGrade,
     title: rawProps.title,
-  }).catch((err) => { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Price history recording failed: ' + (err.message || err) }); });
+  }).catch((err) => {
+    logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Price history recording failed: ' + (err.message || err) });
+    recordDeadLetter({ source: 'price_history', operation: `recordSnapshot(${url})`, error: (err as Error).message || String(err), context: { url, scraper: importHost.scraper_name }, attempts: 1 }).catch(() => {});
+  });
 
   // Record scrape metadata (fire-and-forget)
   if (sourceType) {
@@ -191,7 +201,10 @@ export async function runExtraction(opts: {
       portalSlug: importHost.slug,
       diagnostics: result.diagnostics,
       html_hash: htmlHash,
-    }).catch((err) => { logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Scrape metadata recording failed: ' + (err.message || err) }); });
+    }).catch((err) => {
+      logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Scrape metadata recording failed: ' + (err.message || err) });
+      recordDeadLetter({ source: 'scrape_metadata', operation: `recordScrapeAndUpdatePortal(${url})`, error: (err as Error).message || String(err), context: { url, listingId: resultId, sourceType }, attempts: 1 }).catch(() => {});
+    });
   }
 
   return {
