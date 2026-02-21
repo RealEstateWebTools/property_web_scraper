@@ -13,7 +13,7 @@
   "intFields": {
     "count_bedrooms": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.initialReduxState.property.bedroomsText"
+      "scriptJsonPath": "props.initialReduxState.property.bedrooms"
     },
     "count_bathrooms": {
       "scriptJsonVar": "__NEXT_DATA__",
@@ -75,7 +75,7 @@
     },
     "tenure": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.initialReduxState.property.tenure"
+      "scriptJsonPath": "props.initialReduxState.property.keyInfo.0.value"
     }
   },
   "images": [{
@@ -97,9 +97,9 @@
     },
     "for_rent": {
       "scriptJsonVar": "__NEXT_DATA__",
-      "scriptJsonPath": "props.initialReduxState.property.forSale",
+      "scriptJsonPath": "props.initialReduxState.property.toRent",
       "evaluator": "==",
-      "evaluatorParam": "false"
+      "evaluatorParam": "true"
     }
   }
 }]
