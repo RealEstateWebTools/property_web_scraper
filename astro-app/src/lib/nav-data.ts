@@ -9,7 +9,6 @@ export interface NavLink {
 export const PUBLIC_NAV_LINKS: NavLink[] = [
   { label: 'Extract', href: '/extract/url' },
   { label: 'Guides', href: '/docs/get-html' },
-  { label: 'Listings', href: '/listings' },
   { label: 'Sites', href: '/sites' },
   { label: 'API', href: '/docs/api' },
   { label: 'My Hauls', href: '/hauls', icon: 'bi-box-seam' },
