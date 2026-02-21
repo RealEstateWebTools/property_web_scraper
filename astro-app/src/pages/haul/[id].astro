@@ -94,6 +94,9 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
                 <a href={`/ext/v1/hauls/${id}/export?format=json`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
                   <i class="bi bi-braces text-blue-600 mr-1.5"></i> JSON
                 </a>
+                <a href={`/ext/v1/hauls/${id}/export?format=json&inline=1`} target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                  <i class="bi bi-box-arrow-up-right text-blue-600 mr-1.5"></i> View JSON
+                </a>
                 <a href={`/ext/v1/hauls/${id}/export?format=geojson`} class={`block px-4 py-2 text-sm no-underline ${summary && summary.scrapesWithGeo > 0 ? 'text-gray-700 hover:bg-gray-50' : 'text-gray-300 pointer-events-none'}`}>
                   <i class="bi bi-geo-alt text-orange-600 mr-1.5"></i> GeoJSON
                 </a>
