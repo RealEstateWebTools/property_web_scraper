@@ -107,6 +107,16 @@ test.describe('/auth/action?mode=recoverEmail', () => {
   });
 });
 
+test.describe('/__/auth/action redirect', () => {
+  test('redirects to /auth/action preserving query params', async ({ page }) => {
+    // Playwright follows the 302 automatically; we verify we end on the right page
+    // with params intact (resetPassword shows its form without Firebase).
+    await page.goto('/__/auth/action?mode=resetPassword&oobCode=fake_redirect_test');
+    await expect(page).toHaveURL(/\/auth\/action\?.*mode=resetPassword/);
+    await expect(page.locator('#reset-section')).toBeVisible({ timeout: 5000 });
+  });
+});
+
 test.describe('/auth/action — page structure', () => {
   test('has correct document title', async ({ page }) => {
     await page.goto('/auth/action');

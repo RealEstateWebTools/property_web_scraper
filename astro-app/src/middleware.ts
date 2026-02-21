@@ -11,6 +11,14 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
   const origin = context.request.headers.get('origin');
 
+  // Firebase email action links point to /__/auth/action. Astro's file router
+  // ignores _-prefixed paths, so we redirect here — preserving all query params.
+  if (url.pathname === '/__/auth/action') {
+    const dest = new URL(url);
+    dest.pathname = '/auth/action';
+    return Response.redirect(dest.toString(), 302);
+  }
+
   console.log(`[Middleware] ${method} ${url.pathname} (origin: ${origin || 'none'})`);
 
   // Handle CORS preflight for API routes
