@@ -144,6 +144,151 @@ exports[`Scraper validation > ae_bayut scraper > matches full extraction snapsho
 }
 `;
 
+exports[`Scraper validation > ae_propertyfinder scraper > matches full extraction snapshot 1`] = `
+{
+  "agent_company": "haus & haus",
+  "agent_name": "Jamie Hemingway",
+  "area_unit": "sqft",
+  "city": "Dubai",
+  "constructed_area": 3323,
+  "count_bathrooms": 4,
+  "count_bedrooms": 3,
+  "country": "United Arab Emirates",
+  "currency": "AED",
+  "description": "All bathrooms upgraded with travertine style walls and black accessories 
+Brand new fully integrated kitchen 
+Built in hob with extractor fan - induction 
+Full floor to ceiling shelving unit for glasses & crockery 
+Professionally landscaped with lush greenery including banana trees, coconut palms, Washingtonias, frangipanis, bougainvilleas, and lemon trees, supported by a full 
+irrigation system.
+Outdoor areas illuminated with cabled lighting on a timer, LED strips on steps, and boundary lights matching the house.
+Fully equipped BBQ area featuring a Boretti Ibrido Top Gas/Charcoal BBQ, outdoor fridge, and a built-in bar with seating for eight. Complete with a wine cooler and 
+custom furniture, including a round dining table with a lazy Susan.
+Bali-designed sunbeds, a cozy seating area with a sofa, chairs, and coffee table, all set within a serene, lush environment.
+Custom-built pergola with recessed ceiling, integrated fan, and 12 spotlights for ambiance.
+Bathrooms upgraded with travertine-style walls, black accessories, and floating toilets.
+Glass staircase with floating LED steps and a dramatic chandelier.
+Luxurious master suite with a 9m walk-in wardrobe and dedicated vanity area.
+haus & haus is delighted to welcome this magnificent, fully renovated and extended 3 bedroom plus maids villa to the sales market. With a complete renovation internally and externally, this is by far and away the most impressive villa of its type to come to the sales market.
+
+Features and upgrades include:
+All bathrooms upgraded with travertine style walls and black accessories 
+Brand new fully integrated kitchen 
+Built in hob with extractor fan - induction 
+Full floor to ceiling shelving unit for glasses & crockery 
+Professionally landscaped with lush greenery including banana trees, coconut palms, Washingtonias, frangipanis, bougainvilleas, and lemon trees, supported by a full 
+irrigation system.
+Outdoor areas illuminated with cabled lighting on a timer, LED strips on steps, and boundary lights matching the house.
+Fully equipped BBQ area featuring a Boretti Ibrido Top Gas/Charcoal BBQ, outdoor fridge, and a built-in bar with seating for eight. Complete with a wine cooler.",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/2664f67f-39fd-4940-9542-e856fded3311/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/a3ffa52d-a0e6-41ff-875d-44221a5db39f/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/810902ed-f55b-4693-8d4e-3be4377793e2/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/03786934-d9c5-48ad-854f-dcb84d5c45fa/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/e9c74384-607d-44ae-9282-0bea835359b7/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/98281ef3-1a87-4801-a6d7-fa8fc21e7a64/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/b079d856-798b-4e2a-9585-58d5c7090bbf/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/8a0fccc1-4c62-4ca2-962b-41795e5378ff/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/cc4d5d65-641f-433d-8f5c-c102d03d63f9/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/1204179d-a93a-4ce7-9dc0-ab2fcead48a8/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/3ba2cf06-e9dc-488a-9b90-96fca93e5f44/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/0062f958-380e-4219-95fd-1eaba46b9dd6/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/b22a3edd-c4a6-4526-933d-a3ad739dff81/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/f6af7127-bb32-4a56-a108-4af955243d21/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/b1d76436-6975-47de-8262-445448303021/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/6c506933-8641-4075-ad0d-277089f5389c/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/5375e0b7-a87d-4c03-a8fd-697a51ac7703/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/a535335d-51d9-42c3-8935-d0d5f2280b61/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/078a7be1-6074-4355-ab64-6ce85b0e4b12/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/2c0a2421-feea-443e-ba31-bd3915c8f11e/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/23523375-dc83-41c3-a78d-218570a11025/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/156150cf-9498-4298-8e25-c7c1c670f850/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/560a6afe-048a-4322-a95b-ca638bfd6cbe/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/9c23da3e-2a2d-4f8d-9510-077dba5f04f5/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/06b80fe8-1cd9-458d-b6fa-63585a82bcd3/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/3ed71576-f990-4971-ba0b-05328e84506e/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/4c28398d-05d2-4763-bc2b-3cd52049b9d5/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/e2e6d670-bba9-4e9c-b58d-29bf9c11c403/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/2ee4426b-7368-40a8-bcc7-30a9b7bc9b71/668x452.jpg",
+    },
+    {
+      "url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/3a97d580-62f2-4fe0-88a1-af91825158a2/668x452.jpg",
+    },
+  ],
+  "latitude": 25.093286514282227,
+  "locale_code": "en-AE",
+  "longitude": 55.24822235107422,
+  "main_image_url": "https://static.shared.propertyfinder.ae/media/images/listing/NH3VD7XSFK67ZP24WFFD635MPR/2664f67f-39fd-4940-9542-e856fded3311/668x452.jpg",
+  "price_float": 12000000,
+  "price_string": "12,000,000 AED",
+  "property_type": "Villa",
+  "reference": "ADM231368",
+  "region": "Dubai Hills Estate",
+  "title": "Sale in Sidra Villas I: Exclusive | Fully Renovated | Fully Furnished | Property Finder",
+}
+`;
+
 exports[`Scraper validation > au_domain scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "133 Bethany Road, Hoppers Crossing VIC 3029",

@@ -100,6 +100,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'property24.com': 'za_property24',
   'www.inmuebles24.com': 'mx_inmuebles24',
   'inmuebles24.com': 'mx_inmuebles24',
+  'www.propertyfinder.ae': 'ae_propertyfinder',
+  'propertyfinder.ae': 'ae_propertyfinder',
 };
 
 const HELP_TEXT = `

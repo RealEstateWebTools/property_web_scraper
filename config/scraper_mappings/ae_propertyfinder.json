@@ -1,0 +1,113 @@
+[{
+  "name": "ae_propertyfinder",
+  "expectedExtractionRate": 0.85,
+
+  // All property data in __NEXT_DATA__ at props.pageProps.propertyResult.property
+  // price_string from CSS (no formatted string in JSON data)
+  // for_sale/for_rent determined by URL path segment 3: "buy" or "rent"
+
+  "defaultValues": {
+    "country":            { "value": "United Arab Emirates" },
+    "currency":           { "value": "AED" },
+    "area_unit":          { "value": "sqft" },
+    "locale_code":        { "value": "en-AE" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "scriptJsonVar":  "__NEXT_DATA__",
+    "scriptJsonPath": "props.pageProps.propertyResult.property.images.property",
+    "cssAttr": "medium"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.bedrooms"
+    },
+    "count_bathrooms": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.bathrooms"
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.price.value"
+    },
+    "constructed_area": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.size.value"
+    },
+    "latitude": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.location.coordinates.lat"
+    },
+    "longitude": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.location.coordinates.lon"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content"
+    },
+    "description": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.description"
+    },
+    "price_string": {
+      "cssLocator": "[class*='navigator__price']",
+      "cssCountId": "0"
+    },
+    "reference": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.reference"
+    },
+    "city": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.location_tree.0.name"
+    },
+    "region": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.location_tree.1.name"
+    },
+    "property_type": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.property_type"
+    },
+    "agent_name": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.agent.name"
+    },
+    "agent_company": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.propertyResult.property.broker.name"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "3",
+      "evaluator":      "include?",
+      "evaluatorParam": "buy"
+    },
+    "for_rent": {
+      "urlPathPart": "3",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "3",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    }
+  }
+}]
