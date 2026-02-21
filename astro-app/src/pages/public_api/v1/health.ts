@@ -4,14 +4,16 @@ import { successResponse } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
 import { resolveKV } from '@lib/services/kv-resolver.js';
 import { getStorageStatus } from '@lib/firestore/client.js';
+import { getDeadLetterCount } from '@lib/services/dead-letter.js';
 
 export const GET: APIRoute = async ({ request, locals }) => {
   const startTime = Date.now();
 
-  // Run KV and Firestore probes in parallel
-  const [kvCheck, firestoreCheck] = await Promise.all([
+  // Run KV, Firestore, and DLQ probes in parallel
+  const [kvCheck, firestoreCheck, dlqCount] = await Promise.all([
     probeKV(locals),
     Promise.resolve(probeFirestore()),
+    getDeadLetterCount().catch(() => 0),
   ]);
 
   const allAvailable = kvCheck.available && firestoreCheck.connected;
@@ -23,6 +25,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     checks: {
       kv: kvCheck,
       firestore: firestoreCheck,
+      dead_letters: { count: dlqCount },
     },
   }, request);
 

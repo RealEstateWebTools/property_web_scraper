@@ -1,21 +1,26 @@
 /**
- * Tests for webhook-service — registration, HMAC signing, and event filtering.
+ * Tests for webhook-service — registration, HMAC signing, event filtering, and retry logic.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
 import {
   registerWebhook,
   removeWebhook,
   listWebhooks,
   getWebhook,
+  fireWebhooks,
   clearWebhookStore,
   computeHmacSha256,
   MAX_WEBHOOKS,
+  MAX_RETRIES,
+  BACKOFF_MS,
   type WebhookEvent,
 } from '../../src/lib/services/webhook-service.js';
+import { resetDeadLetterStore, getDeadLetters } from '../../src/lib/services/dead-letter.js';
 
 beforeEach(() => {
   clearWebhookStore();
+  resetDeadLetterStore();
 });
 
 describe('webhook registration', () => {
@@ -152,5 +157,99 @@ describe('clearWebhookStore', () => {
     await registerWebhook('https://b.com', ['extraction.failed']);
     clearWebhookStore();
     expect(await listWebhooks()).toHaveLength(0);
+  });
+});
+
+describe('webhook delivery retry', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+  });
+
+  afterAll(() => {
+    vi.useRealTimers();
+  });
+
+  it('retries on 503 and succeeds on second attempt', async () => {
+    await registerWebhook('https://hook.test/retry', ['extraction.completed']);
+
+    let callCount = 0;
+    vi.stubGlobal('fetch', async () => {
+      callCount++;
+      if (callCount === 1) {
+        return { status: 503 };
+      }
+      return { status: 200 };
+    });
+
+    const results = await fireWebhooks('extraction.completed', { test: true });
+    expect(results).toHaveLength(1);
+    expect(results[0].success).toBe(true);
+    expect(results[0].statusCode).toBe(200);
+    expect(callCount).toBe(2);
+
+    vi.unstubAllGlobals();
+  });
+
+  it('records dead-letter after all retries exhausted', async () => {
+    await registerWebhook('https://hook.test/fail', ['extraction.completed']);
+
+    vi.stubGlobal('fetch', async () => {
+      return { status: 503 };
+    });
+
+    const results = await fireWebhooks('extraction.completed', { test: true });
+    expect(results).toHaveLength(1);
+    expect(results[0].success).toBe(false);
+    expect(results[0].statusCode).toBe(503);
+
+    // Allow DLQ write to complete (it's fire-and-forget inside fireWebhooks)
+    await vi.advanceTimersByTimeAsync(100);
+
+    const dlq = await getDeadLetters();
+    expect(dlq.length).toBeGreaterThanOrEqual(1);
+    expect(dlq[0].source).toBe('webhook');
+    expect(dlq[0].operation).toContain('hook.test/fail');
+
+    vi.unstubAllGlobals();
+  });
+
+  it('does not retry on 400 (non-retryable)', async () => {
+    await registerWebhook('https://hook.test/bad', ['extraction.completed']);
+
+    let callCount = 0;
+    vi.stubGlobal('fetch', async () => {
+      callCount++;
+      return { status: 400 };
+    });
+
+    const results = await fireWebhooks('extraction.completed', { test: true });
+    expect(results).toHaveLength(1);
+    expect(results[0].success).toBe(false);
+    expect(results[0].statusCode).toBe(400);
+    expect(callCount).toBe(1); // Only one attempt, no retry
+
+    vi.unstubAllGlobals();
+  });
+
+  it('retries on network error and records dead-letter on exhaustion', async () => {
+    await registerWebhook('https://hook.test/network', ['extraction.completed']);
+
+    vi.stubGlobal('fetch', async () => {
+      throw new Error('fetch failed');
+    });
+
+    const results = await fireWebhooks('extraction.completed', { data: 1 });
+    expect(results).toHaveLength(1);
+    expect(results[0].success).toBe(false);
+    expect(results[0].statusCode).toBeNull();
+    expect(results[0].error).toBe('fetch failed');
+
+    await vi.advanceTimersByTimeAsync(100);
+
+    const dlq = await getDeadLetters();
+    expect(dlq.length).toBeGreaterThanOrEqual(1);
+    expect(dlq[0].source).toBe('webhook');
+
+    vi.unstubAllGlobals();
   });
 });

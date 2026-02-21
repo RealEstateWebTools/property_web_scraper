@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- Webhook delivery retry with exponential backoff (500ms, 1s) — retries on network errors, 429, and 5xx; max 2 retries (3 total attempts)
+- KV-backed dead-letter queue (`dead-letter.ts`) — captures fire-and-forget failures from webhooks, Firestore writes, price history, scrape metadata, and usage recording; 30-day TTL, FIFO eviction at 500 entries
+- Dead-letter count exposed in health endpoint (`/public_api/v1/health` → `checks.dead_letters.count`)
+- `'quality'` added to `LogCategory` type union to match existing usage in `scrape-metadata.ts`
+
 ### Security
 - XSS fix: `description_html` output is now sanitized to prevent script injection
 - Admin query-parameter authentication removed in favour of `apiGuard()` middleware

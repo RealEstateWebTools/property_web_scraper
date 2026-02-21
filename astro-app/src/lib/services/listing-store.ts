@@ -4,6 +4,7 @@ import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { deduplicationKey } from './url-canonicalizer.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
 import { logActivity } from './activity-logger.js';
+import { recordDeadLetter } from './dead-letter.js';
 import type { KVNamespace } from './kv-types.js';
 
 /**
@@ -146,6 +147,13 @@ export async function storeDiagnostics(id: string, diagnostics: ExtractionDiagno
   // Firestore write-through (fire-and-forget)
   firestoreSaveDiagnostics(id, diagnostics).catch((err) => {
     logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore diagnostics write-through failed: ' + ((err as Error).message || err) });
+    recordDeadLetter({
+      source: 'firestore_diagnostics',
+      operation: `diagnostics.save(${id})`,
+      error: (err as Error).message || String(err),
+      context: { id },
+      attempts: 1,
+    }).catch(() => {});
   });
 }
 

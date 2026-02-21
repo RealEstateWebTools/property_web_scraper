@@ -13,6 +13,7 @@
 
 import type { KVNamespace } from './kv-types.js';
 import { logActivity } from './activity-logger.js';
+import { recordDeadLetter } from './dead-letter.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
 import { createHash } from 'node:crypto';
 
@@ -182,6 +183,13 @@ export async function recordSnapshot(data: ExtractionData): Promise<PriceSnapsho
   // Persist to Firestore (fire-and-forget with logging)
   firestoreSaveSnapshot(canonical, snapshot).catch((err) => {
     logActivity({ level: 'error', category: 'system', message: '[PriceHistory] Firestore background save failed: ' + ((err as Error).message || err) });
+    recordDeadLetter({
+      source: 'firestore_write',
+      operation: `priceHistory.save(${canonical})`,
+      error: (err as Error).message || String(err),
+      context: { canonical, url: data.url, snapshot },
+      attempts: 1,
+    }).catch(() => {});
   });
 
   return snapshot;
