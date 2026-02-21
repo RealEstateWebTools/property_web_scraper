@@ -84,6 +84,12 @@ const HOSTNAME_MAP: Record<string, string> = {
   'realestate.com.au': 'au_realestate',
   'www.zillow.com': 'us_zillow',
   'zillow.com': 'us_zillow',
+  'www.redfin.com': 'us_redfin',
+  'redfin.com': 'us_redfin',
+  'www.trulia.com': 'us_trulia',
+  'trulia.com': 'us_trulia',
+  'www.funda.nl': 'nl_funda',
+  'funda.nl': 'nl_funda',
 };
 
 const HELP_TEXT = `

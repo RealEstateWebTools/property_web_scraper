@@ -131,22 +131,22 @@ describe('url-screener', () => {
       expect(r.portalTier).toBe('experimental');
     });
 
-    it('allows Redfin with experimental tier', () => {
+    it('allows Redfin with core tier', () => {
       const r = screenUrl('https://www.redfin.com/CA/San-Francisco/123-Main-St/home/12345');
       expect(r.verdict).toBe('allowed');
-      expect(r.portalTier).toBe('experimental');
+      expect(r.portalTier).toBe('core');
     });
 
-    it('allows Trulia with experimental tier', () => {
+    it('allows Trulia with core tier', () => {
       const r = screenUrl('https://www.trulia.com/home/123-main-st-city-st-12345');
       expect(r.verdict).toBe('allowed');
-      expect(r.portalTier).toBe('experimental');
+      expect(r.portalTier).toBe('core');
     });
 
-    it('allows funda.nl with experimental tier', () => {
+    it('allows funda.nl with core tier', () => {
       const r = screenUrl('https://www.funda.nl/koop/amsterdam/huis-12345/');
       expect(r.verdict).toBe('allowed');
-      expect(r.portalTier).toBe('experimental');
+      expect(r.portalTier).toBe('core');
     });
 
     it('allows hemnet.se with experimental tier', () => {

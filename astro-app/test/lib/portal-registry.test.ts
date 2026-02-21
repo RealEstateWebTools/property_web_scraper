@@ -108,11 +108,11 @@ describe('portal-registry', () => {
       expect(portal!.country).toBe('IE');
     });
 
-    it('finds redfin with generic_real_estate scraper', () => {
+    it('finds redfin with dedicated scraper', () => {
       const portal = findPortalByHost('www.redfin.com');
       expect(portal).toBeDefined();
-      expect(portal!.scraperName).toBe('generic_real_estate');
-      expect(portal!.supportTier).toBe('experimental');
+      expect(portal!.scraperName).toBe('us_redfin');
+      expect(portal!.supportTier).toBe('core');
       expect(portal!.country).toBe('US');
     });
 
@@ -123,10 +123,11 @@ describe('portal-registry', () => {
       expect(portal!.supportTier).toBe('experimental');
     });
 
-    it('finds funda.nl with generic_real_estate scraper', () => {
+    it('finds funda.nl with dedicated scraper', () => {
       const portal = findPortalByHost('www.funda.nl');
       expect(portal).toBeDefined();
-      expect(portal!.scraperName).toBe('generic_real_estate');
+      expect(portal!.scraperName).toBe('nl_funda');
+      expect(portal!.supportTier).toBe('core');
       expect(portal!.country).toBe('NL');
     });
 

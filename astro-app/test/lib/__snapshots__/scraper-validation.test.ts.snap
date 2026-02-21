@@ -428,6 +428,42 @@ exports[`Scraper validation > in_realestateindia scraper > matches full extracti
 }
 `;
 
+exports[`Scraper validation > nl_funda scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Keizersgracht 100",
+  "area_unit": "sqm",
+  "city": "Amsterdam",
+  "constructed_area": 95,
+  "count_bathrooms": 1,
+  "count_bedrooms": 2,
+  "country": "Netherlands",
+  "currency": "EUR",
+  "description": "Prachtig appartement aan de Keizersgracht in het hart van Amsterdam. Woonoppervlakte van 95 m2 met 2 slaapkamers.",
+  "for_rent": false,
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://cloud.funda.nl/valentina_media/180/561/123_groot.jpg",
+    },
+    {
+      "url": "https://cloud.funda.nl/valentina_media/180/561/124_groot.jpg",
+    },
+  ],
+  "latitude": 52.3676,
+  "locale_code": "nl",
+  "longitude": 4.8914,
+  "main_image_url": "https://cloud.funda.nl/valentina_media/180/561/123_groot.jpg",
+  "postal_code": "1015 AA",
+  "price_float": 595000,
+  "price_string": "€ 595.000 k.k.",
+  "property_type": "Appartement",
+  "reference": "43082316",
+  "region": "Noord-Holland",
+  "title": "Keizersgracht 100 te Amsterdam",
+  "year_construction": 1890,
+}
+`;
+
 exports[`Scraper validation > uk_jitty scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "Sandland Grove, Nantwich",
@@ -856,6 +892,72 @@ exports[`Scraper validation > us_realtor scraper > matches full extraction snaps
   "reference": "2034151800",
   "region": "CA",
   "title": "2200 Pacific Ave Unit 1B",
+}
+`;
+
+exports[`Scraper validation > us_redfin scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "123 Main St",
+  "area_unit": "sqft",
+  "city": "San Francisco",
+  "constructed_area": 1500,
+  "count_bathrooms": 2,
+  "count_bedrooms": 3,
+  "country": "USA",
+  "currency": "USD",
+  "description": "3 beds, 2 baths, 1500 sqft house located at 123 Main St, San Francisco, CA 94105. View details, photos, and more.",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://ssl.cdn-redfin.com/photo/123/bigphoto/456/main.jpg",
+    },
+  ],
+  "latitude": 37.7897,
+  "locale_code": "en",
+  "longitude": -122.3942,
+  "main_image_url": "https://ssl.cdn-redfin.com/photo/123/bigphoto/456/main.jpg",
+  "postal_code": "94105",
+  "price_float": 1250000,
+  "price_string": "$1,250,000",
+  "property_type": "SingleFamilyResidence",
+  "region": "CA",
+  "title": "123 Main St, San Francisco, CA 94105 | Redfin",
+}
+`;
+
+exports[`Scraper validation > us_trulia scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "456 Oak Ave",
+  "area_unit": "sqft",
+  "city": "Los Angeles",
+  "constructed_area": 2200,
+  "count_bathrooms": 3,
+  "count_bedrooms": 4,
+  "country": "USA",
+  "currency": "USD",
+  "description": "Beautiful 4 bedroom home with spacious backyard and updated kitchen. Located in a quiet neighborhood with easy freeway access.",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://static.trulia-cdn.com/pictures/thumbs_5/ps.123/456-Oak-Ave.jpg",
+    },
+  ],
+  "latitude": 33.9425,
+  "locale_code": "en",
+  "longitude": -118.2551,
+  "main_image_url": "https://static.trulia-cdn.com/pictures/thumbs_5/ps.123/456-Oak-Ave.jpg",
+  "postal_code": "90001",
+  "price_float": 875000,
+  "price_string": "$875,000",
+  "property_type": "SingleFamily",
+  "reference": "98765432",
+  "region": "CA",
+  "title": "456 Oak Ave, Los Angeles, CA 90001 | Trulia",
+  "year_construction": 1985,
 }
 `;
 
