@@ -1,8 +1,8 @@
 [{
   "name": "pt_idealista",
-  "version": 1,
-  "last_checked": "2026-02-20",
-  "expectedExtractionRate": 0.90,
+  "version": 2,
+  "last_checked": "2026-02-21",
+  "expectedExtractionRate": 0.75,
   "defaultValues": {
     "country": { "value": "Portugal" },
     "area_unit": { "value": "sqm" },
@@ -12,67 +12,58 @@
   },
   "intFields": {
     "count_bedrooms": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.rooms"
+      "cssLocator": ".details-property_features li",
+      "cssCountId": "1",
+      "modifiers": ["digitsOnly"]
     },
     "count_bathrooms": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.bathrooms"
+      "cssLocator": ".details-property_features li",
+      "cssCountId": "2"
     },
     "constructed_area": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.constructedArea"
+      "cssLocator": ".details-property_features li",
+      "cssCountId": "0"
     }
   },
   "floatFields": {
     "price_float": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.price"
-    },
-    "latitude": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.ubication.latitude"
-    },
-    "longitude": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.ubication.longitude"
+      "scriptRegEx": "(?<=price:\\s)[\\d.]+",
+      "fallbacks": [
+        { "scriptRegEx": "(?<=initialPrice:\\s)\\d+" },
+        { "cssLocator": ".info-data-price .txt-bold" }
+      ]
     }
   },
   "textFields": {
     "reference": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.id"
-    },
-    "title": {
-      "cssLocator": "head > title",
+      "cssLocator": "input[name='adId']",
+      "cssAttr": "value",
       "fallbacks": [
-        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
-        { "cssLocator": "h1" }
+        { "scriptRegEx": "(?<=propertyId:\\s)\\d+" }
       ]
     },
+    "title": {
+      "cssLocator": ".main-info__title-main",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" },
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "price_string": {
+      "cssLocator": ".info-data-price"
+    },
     "description": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.description",
+      "cssLocator": ".adCommentsLanguage",
       "fallbacks": [
         { "cssLocator": "meta[property='og:description']", "cssAttr": "content" },
         { "cssLocator": "meta[name='description']", "cssAttr": "content" }
       ]
     },
     "address_string": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.address"
-    },
-    "postal_code": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.zipCode"
-    },
-    "city": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.municipality"
-    },
-    "region": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.district"
+      "cssLocator": ".main-info__title-minor",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" }
+      ]
     },
     "main_image_url": {
       "cssLocator": "meta[property='og:image']",
@@ -83,20 +74,17 @@
     }
   },
   "images": [{
-    "scriptJsonVar": "__INITIAL_STATE__",
-    "scriptJsonPath": "detail.adDetail.multimedia.images",
-    "cssAttr": "url"
+    "cssLocator": "meta[property='og:image']",
+    "cssAttr": "content"
   }],
   "booleanFields": {
     "for_sale": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.operation",
+      "scriptRegEx": "(?<=operation:\\s*')[^']+",
       "evaluator": "include?",
       "evaluatorParam": "sale"
     },
     "for_rent": {
-      "scriptJsonVar": "__INITIAL_STATE__",
-      "scriptJsonPath": "detail.adDetail.operation",
+      "scriptRegEx": "(?<=operation:\\s*')[^']+",
       "evaluator": "include?",
       "evaluatorParam": "rent"
     }

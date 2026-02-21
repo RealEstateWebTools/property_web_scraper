@@ -558,6 +558,37 @@ exports[`Scraper validation > nl_funda scraper > matches full extraction snapsho
 }
 `;
 
+exports[`Scraper validation > pt_idealista scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Bairro Azul - Parque Eduardo VII, Avenidas Novas",
+  "area_unit": "sqm",
+  "constructed_area": 71,
+  "count_bathrooms": 1,
+  "count_bedrooms": 1,
+  "country": "Portugal",
+  "currency": "EUR",
+  "description": "Venha realizar o sonho de viver no centro de Lisboa, numa das zonas mais emblemáticas de Lisboa, junto ao "El Corte Inglés".
+
+Apartamento T1 com boas áreas, magnífico terraço de 52 m2, estacionamento e arrecadação.
+
+Para além da excelente localização, o apartamento destaca-se pelo magnífico terraço de 52m2, com orientação solar nascente, proporcionando uma grande luminosidade a todo o apartamento.",
+  "for_rent": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://img4.idealista.pt/blur/WEB_DETAIL/0/id.pro.pt.image.master/a9/e1/28/307678187.jpg",
+    },
+  ],
+  "locale_code": "pt",
+  "main_image_url": "https://img4.idealista.pt/blur/WEB_DETAIL/0/id.pro.pt.image.master/a9/e1/28/307678187.jpg",
+  "price_float": 785000,
+  "price_string": "785.000 €",
+  "reference": "34211347",
+  "title": "Apartamento t1 à venda na Avenida António Augusto de Aguiar, 29",
+}
+`;
+
 exports[`Scraper validation > uk_jitty scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "Sandland Grove, Nantwich",
