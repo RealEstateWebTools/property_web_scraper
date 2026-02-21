@@ -1,0 +1,134 @@
+[{
+  "name": "be_immoweb",
+  "expectedExtractionRate": 0.80,
+
+  // All property data is in window.classified = {...}
+  // Paths are relative to the classified object
+
+  "defaultValues": {
+    "country":            { "value": "Belgium" },
+    "currency":           { "value": "EUR" },
+    "area_unit":          { "value": "sqm" },
+    "locale_code":        { "value": "en" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "scriptJsonVar":  "classified",
+    "scriptJsonPath": "media.pictures",
+    "cssAttr": "largeUrl"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.bedroomCount"
+    },
+    "count_bathrooms": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.bathroomCount"
+    },
+    "year_construction": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.building.constructionYear"
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "price.mainValue"
+    },
+    "constructed_area": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.netHabitableSurface"
+    },
+    "plot_area": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.land.surface"
+    },
+    "latitude": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.location.latitude"
+    },
+    "longitude": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.location.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content"
+    },
+    "description": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.alternativeDescriptions.en",
+      "fallbacks": [{
+        "scriptJsonVar":  "classified",
+        "scriptJsonPath": "property.alternativeDescriptions.fr"
+      }, {
+        "scriptJsonVar":  "classified",
+        "scriptJsonPath": "property.alternativeDescriptions.nl"
+      }]
+    },
+    "price_string": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "price.mainDisplayPrice"
+    },
+    "reference": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "id"
+    },
+    "city": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.location.locality"
+    },
+    "postal_code": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.location.postalCode"
+    },
+    "region": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.location.province"
+    },
+    "property_type": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "property.type"
+    },
+    "energy_certificate_grade": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "transaction.certificates.epcScore"
+    },
+    "agent_name": {
+      "scriptJsonVar":  "classified",
+      "scriptJsonPath": "customers.0.name"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar":   "classified",
+      "scriptJsonPath":  "transaction.type",
+      "evaluator":       "include?",
+      "evaluatorParam":  "SALE"
+    },
+    "for_rent": {
+      "scriptJsonVar":   "classified",
+      "scriptJsonPath":  "transaction.type",
+      "evaluator":       "include?",
+      "evaluatorParam":  "RENT"
+    },
+    "for_rent_long_term": {
+      "scriptJsonVar":   "classified",
+      "scriptJsonPath":  "transaction.type",
+      "evaluator":       "include?",
+      "evaluatorParam":  "RENT"
+    }
+  }
+}]

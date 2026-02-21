@@ -94,6 +94,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'immobiliare.it': 'it_immobiliare',
   'www.bayut.com': 'ae_bayut',
   'bayut.com': 'ae_bayut',
+  'www.immoweb.be': 'be_immoweb',
+  'immoweb.be': 'be_immoweb',
 };
 
 const HELP_TEXT = `

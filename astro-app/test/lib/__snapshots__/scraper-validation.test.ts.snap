@@ -216,6 +216,112 @@ exports[`Scraper validation > au_realestate scraper > matches full extraction sn
 }
 `;
 
+exports[`Scraper validation > be_immoweb scraper > matches full extraction snapshot 1`] = `
+{
+  "agent_name": "DB Properties",
+  "area_unit": "sqm",
+  "city": "Braine-le-Château",
+  "constructed_area": 176,
+  "count_bathrooms": 1,
+  "count_bedrooms": 4,
+  "country": "Belgium",
+  "currency": "EUR",
+  "description": "L’agence DB Properties a le grand plaisir de vous présenter cette superbe villa 4 chambres, nichée sur un terrain de +/- 18 a 37 ca, au cœur d’un quartier résidentiel prisé où il fait bon vivre. Véritable havre de paix dans un environnement rural, ce cadre calme et verdoyant séduit par son atmosphère sereine, tout en bénéficiant d’une situation idéale, à proximité immédiate des grands axes, des commodités et des transports. Un équilibre parfait entre tranquillité et praticité.
+La propriété se compose comme suit : hall d’entrée accueillant invitant à la découverte, garage, wc séparé, lumineux salon / salle à manger propice aux moments de partage, cuisine ouverte conviviale, espace buanderie, atelier et sauna, pour des instants de détente absolue à domicile.
+À l’étage : hall de nuit, salle de bain, 4 chambres confortables, véritables cocons de douceur, ainsi qu’un dressing fonctionnel.
+Sous combles : grenier non aménageable de 30 m², offrant un espace de rangement appréciable.
+Extérieur : une agréable terrasse et un magnifique jardin arboré, véritable écrin de verdure, agrémenté d’une piscine ronde hors sol, idéale pour savourer les beaux jours en toute intimité. Carport deux voitures et nombreuses places de stationnement complètent cet espace extérieur généreux.
+Techniques : C.c. mazout (citerne 2900 L), pompe à chaleur, panneaux solaires, poêle à pellets, citerne d’eau de pluie, châssis double vitrage, raccordement aux égouts,..
+Électricité conforme ! Aucun travaux à prévoir",
+  "energy_certificate_grade": "C",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/facd278601667f95e5036200b6dd2658.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/2b64ffc6ea089d366d2ce30a49a7d11b.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/57c1e1e7bc287f53abfe25c0778e169d.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/628f6e9e3c7bef12b0e2b0ed7f7b6275.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/887c7c6fb66c95da51c1d32ed010fefc.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/4dcde573241a67a67d9469b513103bf4.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/6b7749166ddfecfea38e1fbfc9d5fc6e.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/ca93643e5af8327e710460325eff6ced.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/d9c30a06ad605c428f85019ab5fb9375.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/ceadfcb8b87bf297056b0df3468d7d7e.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/e52b2b6b5daf07475576693e8f177234.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/067c8312994b822f8564dbd6c0c79ac1.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/5f6706912b56540c6276ed2393589d5e.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/4427f58ca78749714c4c3462ef022c9d.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/850a9cb4a66ebf6519e1e6877f2efa09.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/44f598c0381422a1e83e7accc1101e23.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/aa5ab1805394ed16e725d4dd1322761c.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/31020efd79d12f0fff1f2e9866354cdf.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/315416b69a41123d5e191c188716427d.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/3f3cb37b78f86c49dacdf635cbae00ec.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/9c386aeb5602f12f74a7bad317fedf8b.jpg",
+    },
+    {
+      "url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/635bbc6920c5ba4cee5d9e626a041dac.jpg",
+    },
+  ],
+  "latitude": 0,
+  "locale_code": "en",
+  "longitude": 0,
+  "main_image_url": "https://media-resize.immowebstatic.be/classifieds/01ab7ea8-00fa-40af-8161-d038ddace39f/736x736/facd278601667f95e5036200b6dd2658.jpg",
+  "plot_area": 1837,
+  "postal_code": "1440",
+  "price_float": 749000,
+  "price_string": "€749,000",
+  "property_type": "HOUSE",
+  "reference": "21317238",
+  "region": "Walloon Brabant",
+  "title": "House for sale in Braine-le-Château - €749,000 - 4 bedrooms - 176m² - Immoweb",
+  "year_construction": 1997,
+}
+`;
+
 exports[`Scraper validation > de_immoscout scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "10115 Berlin (Mitte), Friedrichstrasse",
