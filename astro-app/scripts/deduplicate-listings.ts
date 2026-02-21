@@ -43,22 +43,34 @@ if (DRY_RUN) {
   console.log('   Pass --execute to perform the actual deletions.\n');
 }
 
-// ── Load .dev.vars if present ────────────────────────────────────────────────
+// ── Load env files (.env, .env.local, .dev.vars) ─────────────────────────────
+// Handles single-quoted and double-quoted multi-line values, e.g.:
+//   GOOGLE_SERVICE_ACCOUNT_JSON='{
+//     "type": "service_account", ...
+//   }'
 
-function loadDevVars(): void {
-  const path = resolve(__dirname, '..', '.dev.vars');
-  if (!existsSync(path)) return;
-  for (const line of readFileSync(path, 'utf-8').split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const eq = trimmed.indexOf('=');
-    if (eq === -1) continue;
-    const key = trimmed.slice(0, eq).trim();
-    const val = trimmed.slice(eq + 1).trim();
+function loadEnvFile(filePath: string): void {
+  if (!existsSync(filePath)) return;
+  const content = readFileSync(filePath, 'utf-8');
+  // Match: KEY=<value> where value is single-quoted, double-quoted, or unquoted single-line
+  const re = /^([A-Za-z_][A-Za-z0-9_]*)=((?:'[\s\S]*?'|"[\s\S]*?"|[^\n]*))/gm;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(content)) !== null) {
+    const key = match[1];
+    let val = match[2];
+    // Strip surrounding quotes
+    if ((val.startsWith("'") && val.endsWith("'")) ||
+        (val.startsWith('"') && val.endsWith('"'))) {
+      val = val.slice(1, -1);
+    }
     if (key && val && !process.env[key]) process.env[key] = val;
   }
 }
-loadDevVars();
+
+const root = resolve(__dirname, '..');
+loadEnvFile(resolve(root, '.env'));
+loadEnvFile(resolve(root, '.env.local'));
+loadEnvFile(resolve(root, '.dev.vars'));
 
 // ── Credentials ───────────────────────────────────────────────────────────────
 
