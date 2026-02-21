@@ -1,8 +1,11 @@
 import { errorResponse, ApiErrorCode } from './api-response.js';
 import { getRuntimeConfig } from './runtime-config.js';
 import { logActivity } from './activity-logger.js';
+import { getClient, getCollectionPrefix } from '../firestore/client.js';
 import type { SubscriptionTier } from './api-key-service.js';
 import type { KVNamespace } from './kv-types.js';
+
+const RL_COLLECTION = 'rate_limit_daily';
 
 // ─── Endpoint classes & multipliers ─────────────────────────────
 
@@ -74,6 +77,27 @@ function todayDateStr(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+async function firestoreGetDaily(key: string, date: string): Promise<number | null> {
+  try {
+    const db = await getClient();
+    const docId = `${key}:${date}`;
+    const doc = await db.collection(`${getCollectionPrefix()}${RL_COLLECTION}`).doc(docId).get();
+    if (!doc.exists) return null;
+    return (doc.data() as { count: number }).count ?? null;
+  } catch { return null; }
+}
+
+async function firestoreIncrementDaily(key: string, date: string): Promise<void> {
+  try {
+    const db = await getClient();
+    const docId = `${key}:${date}`;
+    const docRef = db.collection(`${getCollectionPrefix()}${RL_COLLECTION}`).doc(docId);
+    const existing = await docRef.get();
+    const count = existing.exists ? ((existing.data() as { count: number }).count || 0) + 1 : 1;
+    await docRef.set({ clientKey: key, date, count, lastUpdated: new Date().toISOString() });
+  } catch { /* Firestore unavailable — in-memory handles it */ }
+}
+
 async function getDailyCount(key: string): Promise<number> {
   // Try KV first (cross-isolate)
   if (kv) {
@@ -84,6 +108,12 @@ async function getDailyCount(key: string): Promise<number> {
     } catch (err) {
       logActivity({ level: 'error', category: 'system', message: '[RateLimiter] KV read failed: ' + ((err as Error).message || err) });
     }
+  }
+
+  // Firestore fallback (persistent across restarts, used when KV unavailable)
+  if (!kv) {
+    const fsCount = await firestoreGetDaily(key, todayDateStr());
+    if (fsCount !== null) return fsCount;
   }
 
   // In-memory fallback
@@ -110,6 +140,11 @@ async function incrementDailyCount(key: string): Promise<void> {
     } catch (err) {
       logActivity({ level: 'error', category: 'system', message: '[RateLimiter] KV write failed: ' + ((err as Error).message || err) });
     }
+  }
+
+  // Firestore fallback (persistent across restarts, used when KV unavailable)
+  if (!kv) {
+    await firestoreIncrementDaily(key, todayDateStr());
   }
 
   // In-memory: always update (serves as local cache)

@@ -48,6 +48,7 @@ afterEach(() => {
     'portal_profile_history',
     'price_history',
     'hauls',
+    'rate_limit_daily',
   );
 });
 

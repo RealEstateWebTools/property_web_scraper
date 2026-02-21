@@ -8,7 +8,8 @@ vi.mock('../../src/lib/services/activity-logger.js', () => ({
   logActivity: vi.fn(),
 }));
 
-import { checkRateLimit, resetRateLimiter, getTierLimits, getRateLimiterStats } from '../../src/lib/services/rate-limiter.js';
+import { checkRateLimit, resetRateLimiter, getTierLimits, getRateLimiterStats, initRateLimiterKV } from '../../src/lib/services/rate-limiter.js';
+import { getClient, getCollectionPrefix } from '../../src/lib/firestore/client.js';
 
 function makeRequest(overrides: { apiKey?: string; ip?: string; url?: string } = {}): Request {
   const headers = new Headers();
@@ -256,5 +257,55 @@ describe('resetRateLimiter', () => {
     resetRateLimiter();
 
     expect((await checkRateLimit(makeRequest(), 'free', 'user-block-reset')).allowed).toBe(true);
+  });
+});
+
+describe('Firestore daily fallback', () => {
+  beforeEach(() => {
+    resetRateLimiter();
+    // Ensure KV is null so Firestore fallback is used
+    initRateLimiterKV(null);
+  });
+
+  it('persists daily count to Firestore across in-memory resets', async () => {
+    // Make 5 requests — these write to Firestore
+    for (let i = 0; i < 5; i++) {
+      await checkRateLimit(makeRequest(), 'free', 'user-fs-persist');
+    }
+
+    // Clear in-memory state (simulates a restart)
+    resetRateLimiter();
+
+    // Make one more request — Firestore should report 5 existing + this new one = 6
+    await checkRateLimit(makeRequest(), 'free', 'user-fs-persist');
+
+    // Verify Firestore has the count
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const date = new Date().toISOString().slice(0, 10);
+    const docId = `user:user-fs-persist:${date}`;
+    const doc = await db.collection(`${prefix}rate_limit_daily`).doc(docId).get();
+    expect(doc.exists).toBe(true);
+    expect((doc.data() as { count: number }).count).toBe(6);
+  });
+
+  it('still enforces daily limit after in-memory reset when Firestore retains count', async () => {
+    // Use a low custom tier isn't possible — use free tier with 500/day limit
+    // Write 500 entries directly to Firestore to simulate a filled quota
+    const db = await getClient();
+    const prefix = getCollectionPrefix();
+    const date = new Date().toISOString().slice(0, 10);
+    const docId = `user:user-fs-limit:${date}`;
+    await db.collection(`${prefix}rate_limit_daily`).doc(docId).set({
+      clientKey: 'user:user-fs-limit',
+      date,
+      count: 500,
+      lastUpdated: new Date().toISOString(),
+    });
+
+    // In-memory is empty after reset — but Firestore has 500
+    const result = await checkRateLimit(makeRequest(), 'free', 'user-fs-limit');
+    expect(result.allowed).toBe(false);
+    expect(result.errorResponse).toBeDefined();
   });
 });
