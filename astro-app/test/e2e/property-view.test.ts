@@ -8,10 +8,10 @@ test.describe('Listing detail page', () => {
   });
 
   test('extracted listing is accessible via /listings/:id', async ({ page }) => {
-    // First, extract a listing via the HTML form
+    // First, extract a listing via the HTML form (use small rightmove_v2 fixture)
     await page.goto('/extract/html');
-    await page.locator('#import_url').fill('https://www.idealista.com/inmueble/38604738/');
-    await page.locator('#html_input').fill(loadFixture('idealista_2018_01'));
+    await page.locator('#import_url').fill('https://www.rightmove.co.uk/properties/168908774');
+    await page.locator('#html_input').fill(loadFixture('rightmove_v2'));
     await page.locator('button[type="submit"]').click();
 
     await expect(page).toHaveURL(/\/extract\/results\//, { timeout: 30000 });
