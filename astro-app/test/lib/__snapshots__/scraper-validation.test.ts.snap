@@ -522,6 +522,107 @@ exports[`Scraper validation > in_realestateindia scraper > matches full extracti
 }
 `;
 
+exports[`Scraper validation > it_immobiliare scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "Via Antonio Aldini, 20",
+  "area_unit": "sqm",
+  "city": "Milano",
+  "constructed_area": 80,
+  "count_bedrooms": 1,
+  "count_rooms": 3,
+  "country": "Italy",
+  "currency": "EUR",
+  "description": "Appartamento su Due Piani in Vendita in Via Aldini - Milano
+
+Caratteristiche principali dell'immobile: 
+Superficie totale: 80 metri quadri, suddivisi in un bilocale luminoso e ben distribuito al piano terra e una spaziosa taverna al piano inferiore.
+Zona giorno: Ampio soggiorno con angolo cottura open space, perfetto per momenti di relax e intrattenimento.
+Camera da letto: dotata di un ampio armadio e un'ampia finestra.
+Taverna: Un ambiente versatile, ideale come zona notte aggiuntiva, studio o sala hobby.
+Bagno: Moderno e funzionale, completo di sanitari di design e box doccia.
+
+Dotazioni e dettagli:
+- Impianto di riscaldamento autonomo per un controllo ottimale dei consumi.
+- Infissi di alta qualità per un ottimo isolamento termico e acustico.
+- Vicinanza a servizi essenziali, come supermercati, scuole, fermate dei mezzi pubblici e aree verdi.
+
+Posizione:
+Via Aldini è una zona tranquilla e ben collegata, a pochi minuti dal centro di Milano e dalle principali vie di comunicazione. Ideale per chi desidera vivere in un contesto residenziale senza rinunciare alla comodità dei servizi urbani.
+
+Opportunità: 
+Questo immobile rappresenta un'occasione imperdibile per chi cerca un bilocale arredato, spazioso e versatile, con basse spese condominiali con taverna annessa all'appartamento.
+Alla taverna si accede tramite una comoda scala interna.
+
+Non perdere l'opportunità di acquistare questo immobile con arredamento incluso! 
+
+Per ulteriori informazioni o per concordare una visita, non esitate a contattare il nostro consulente.",
+  "energy_certificate_grade": "E",
+  "features": [
+    "Esposizione doppia",
+    "Fibra ottica",
+    "Infissi esterni in vetro / PVC",
+    "Porta blindata",
+    "Taverna",
+  ],
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://pwm.im-cdn.it/image/1804731801/m-c.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804731801/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804731853/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804731917/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804731993/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804732053/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804732131/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804732201/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804732281/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804732375/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804732461/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804732545/xxl.jpg",
+    },
+    {
+      "url": "https://pwm.im-cdn.it/image/1804732633/xxl.jpg",
+    },
+  ],
+  "latitude": 45.5128,
+  "locale_code": "it",
+  "longitude": 9.1361,
+  "main_image_url": "https://pwm.im-cdn.it/image/1804731801/m-c.jpg",
+  "price_float": 200000,
+  "price_string": "€ 200.000",
+  "property_type": "Appartamento",
+  "reference": "124116385",
+  "region": "Lombardia",
+  "title": "Trilocale via Antonio Aldini, 20, Quarto Oggiaro, Milano",
+  "year_construction": 1960,
+}
+`;
+
 exports[`Scraper validation > nl_funda scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "Keizersgracht 100",

@@ -90,6 +90,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'trulia.com': 'us_trulia',
   'www.funda.nl': 'nl_funda',
   'funda.nl': 'nl_funda',
+  'www.immobiliare.it': 'it_immobiliare',
+  'immobiliare.it': 'it_immobiliare',
 };
 
 const HELP_TEXT = `

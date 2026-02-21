@@ -22,11 +22,18 @@ export function extractImages(
     const value = getByDotPath(parsed, mapping.scriptJsonPath);
     if (Array.isArray(value)) {
       const attrKey = mapping.cssAttr || mapping.xmlAttr || 'url';
+      const usesDotPath = attrKey.includes('.');
       for (const item of value) {
         if (typeof item === 'string') {
           retrieved.push(item);
-        } else if (typeof item === 'object' && item !== null && attrKey in item) {
-          retrieved.push(String((item as Record<string, unknown>)[attrKey]));
+        } else if (typeof item === 'object' && item !== null) {
+          // Support dot-path traversal (e.g. "urls.large") for nested structures
+          const resolved = usesDotPath
+            ? getByDotPath(item, attrKey)
+            : (item as Record<string, unknown>)[attrKey];
+          if (resolved !== undefined && resolved !== null) {
+            retrieved.push(String(resolved));
+          }
         }
       }
     }

@@ -1,0 +1,128 @@
+[{
+  "name": "it_immobiliare",
+  "expectedExtractionRate": 0.80,
+
+  // All data is in <script id="__NEXT_DATA__"> JSON
+  // Paths are relative to props.pageProps.detailData
+
+  "defaultValues": {
+    "country":            { "value": "Italy" },
+    "currency":           { "value": "EUR" },
+    "area_unit":          { "value": "sqm" },
+    "locale_code":        { "value": "it" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "scriptJsonVar":  "__NEXT_DATA__",
+    "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.multimedia.photos",
+    "cssAttr": "urls.large"
+  }],
+
+  "features": [{
+    "scriptJsonVar":  "__NEXT_DATA__",
+    "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.features"
+  }],
+
+  "intFields": {
+    "count_rooms": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.rooms"
+    },
+    "count_bedrooms": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.bedRoomsNumber"
+    },
+    "year_construction": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.buildingYear"
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.price.value"
+    },
+    "constructed_area": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.surfaceValue"
+    },
+    "latitude": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.location.latitude"
+    },
+    "longitude": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.location.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.seo.title",
+      "fallbacks": [{
+        "cssLocator": "meta[property='og:title']",
+        "cssAttr": "content"
+      }]
+    },
+    "description": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.description"
+    },
+    "price_string": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.price.formattedValue"
+    },
+    "reference": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.id"
+    },
+    "address_string": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.location.address"
+    },
+    "city": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.location.city"
+    },
+    "region": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.location.region"
+    },
+    "property_type": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.typology.name"
+    },
+    "energy_certificate_grade": {
+      "scriptJsonVar":  "__NEXT_DATA__",
+      "scriptJsonPath": "props.pageProps.detailData.realEstate.properties.0.energy.class.name"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "scriptJsonVar":   "__NEXT_DATA__",
+      "scriptJsonPath":  "props.pageProps.detailData.realEstate.contract",
+      "evaluator":       "==",
+      "evaluatorParam":  "sale"
+    },
+    "for_rent": {
+      "scriptJsonVar":   "__NEXT_DATA__",
+      "scriptJsonPath":  "props.pageProps.detailData.realEstate.contract",
+      "evaluator":       "include?",
+      "evaluatorParam":  "rent"
+    },
+    "for_rent_long_term": {
+      "scriptJsonVar":   "__NEXT_DATA__",
+      "scriptJsonPath":  "props.pageProps.detailData.realEstate.contract",
+      "evaluator":       "include?",
+      "evaluatorParam":  "rent"
+    }
+  }
+}]

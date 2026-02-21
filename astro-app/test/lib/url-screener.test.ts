@@ -313,10 +313,10 @@ describe('url-screener', () => {
       expect(r.portalTier).toBe('core');
     });
 
-    it('allows immobiliare.it with experimental tier', () => {
+    it('allows immobiliare.it with core tier', () => {
       const r = screenUrl('https://www.immobiliare.it/annunci/12345/');
       expect(r.verdict).toBe('allowed');
-      expect(r.portalTier).toBe('experimental');
+      expect(r.portalTier).toBe('core');
     });
   });
 
