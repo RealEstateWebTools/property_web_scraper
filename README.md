@@ -6,7 +6,7 @@
 
 **From the team behind [PropertyWebBuilder](https://github.com/etewiah/property_web_builder)** — the open-source real estate platform.
 
-A real estate listing extraction API and Chrome extension. Given a property listing URL (or pre-rendered HTML), it returns structured data: title, price, coordinates, images, and 70+ fields across 17 supported portals in 8 countries.
+A real estate listing extraction API and Chrome extension. Given a property listing URL (or pre-rendered HTML), it returns structured data: title, price, coordinates, images, and 70+ fields across 22 supported portals in 12 countries.
 
 Built with [Astro](https://astro.build/) (SSR mode), TypeScript, and [Cheerio](https://cheerio.js.org/).
 
@@ -15,13 +15,19 @@ Built with [Astro](https://astro.build/) (SSR mode), TypeScript, and [Cheerio](h
 | Country | Portals |
 |---------|---------|
 | 🇬🇧 UK | Rightmove, Zoopla, OnTheMarket, Jitty |
-| 🇪🇸 Spain | Idealista, Fotocasa, Pisos.com |
-| 🇵🇹 Portugal | Idealista PT |
-| 🇮🇪 Ireland | Daft.ie |
-| 🇺🇸 USA | Realtor.com, ForSaleByOwner, MLSListings, WyomingMLS |
-| 🇮🇳 India | RealEstateIndia |
-| 🇩🇪 Germany | ImmobilienScout24 |
+| 🇺🇸 USA | Realtor.com, Redfin, Trulia, ForSaleByOwner, Zillow† |
 | 🇦🇺 Australia | Domain, RealEstate.com.au |
+| 🇪🇸 Spain | Idealista, Fotocasa, Pisos.com |
+| 🇩🇪 Germany | ImmobilienScout24 |
+| 🇳🇱 Netherlands | Funda |
+| 🇮🇪 Ireland | Daft.ie |
+| 🇵🇹 Portugal | Idealista PT |
+| 🇮🇳 India | RealEstateIndia |
+| 🇸🇪 Sweden | Hemnet† |
+| 🇫🇷 France | SeLoger† |
+| 🇮🇹 Italy | Immobiliare.it† |
+
+† experimental — lower extraction rate
 
 Portal count is derived from the `PORTAL_REGISTRY` in `astro-app/src/lib/services/portal-registry.ts` (single source of truth).
 
