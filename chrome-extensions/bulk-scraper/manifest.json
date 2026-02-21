@@ -1,0 +1,69 @@
+{
+  "manifest_version": 3,
+  "name": "Property Bulk Scraper",
+  "version": "1.0.0",
+  "description": "Capture all listings from a search results page in one click",
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "host_permissions": [
+    "https://scraper.propertywebbuilder.com/*",
+    "https://property-web-scraper.pages.dev/*",
+    "*://*.rightmove.co.uk/*",
+    "*://*.zoopla.co.uk/*",
+    "*://*.onthemarket.com/*",
+    "*://*.idealista.com/*",
+    "*://*.idealista.pt/*",
+    "*://*.fotocasa.es/*",
+    "*://*.pisos.com/*",
+    "*://*.daft.ie/*",
+    "*://*.realtor.com/*",
+    "*://*.realestateindia.com/*",
+    "*://*.forsalebyowner.com/*",
+    "*://*.jitty.com/*",
+    "*://*.immobilienscout24.de/*",
+    "*://*.seloger.com/*",
+    "*://*.leboncoin.fr/*",
+    "*://*.domain.com.au/*",
+    "*://*.realestate.com.au/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.rightmove.co.uk/*",
+        "*://*.zoopla.co.uk/*",
+        "*://*.onthemarket.com/*",
+        "*://*.idealista.com/*",
+        "*://*.idealista.pt/*",
+        "*://*.fotocasa.es/*",
+        "*://*.pisos.com/*",
+        "*://*.daft.ie/*",
+        "*://*.realtor.com/*",
+        "*://*.realestateindia.com/*",
+        "*://*.forsalebyowner.com/*",
+        "*://*.jitty.com/*",
+        "*://*.immobilienscout24.de/*",
+        "*://*.seloger.com/*",
+        "*://*.leboncoin.fr/*",
+        "*://*.domain.com.au/*",
+        "*://*.realestate.com.au/*"
+      ],
+      "js": ["content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

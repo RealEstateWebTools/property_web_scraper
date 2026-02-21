@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=400" />
+  <title>Property Bulk Scraper</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <img src="icons/icon-48.png" alt="" class="header-icon" />
+      <h1 class="header-title">Bulk Scraper</h1>
+    </div>
+  </header>
+
+  <!-- State: idle (scanning in progress) -->
+  <div id="state-idle" class="state">
+    <div class="spinner"></div>
+    <p class="state-text">Scanning page for listings…</p>
+  </div>
+
+  <!-- State: not-search (unsupported page or no listings found) -->
+  <div id="state-not-search" class="state hidden">
+    <div class="state-icon">🔍</div>
+    <p class="state-text">No listings found on this page</p>
+    <p class="state-sub">Navigate to a search results page on a supported portal.</p>
+  </div>
+
+  <!-- State: no-haul (haulId not configured) -->
+  <div id="state-no-haul" class="state hidden">
+    <div class="state-icon">📦</div>
+    <p class="state-text">No haul configured</p>
+    <p class="state-sub">Open the Property Web Scraper extension to create or select a haul first.</p>
+  </div>
+
+  <!-- State: found (listings discovered, awaiting click) -->
+  <div id="state-found" class="state hidden">
+    <div class="state-icon">🏠</div>
+    <p class="state-text">Found <span id="found-count">0</span> listings</p>
+    <p id="found-host" class="state-sub"></p>
+    <button id="capture-all-btn" class="btn btn-primary btn-large">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+        <polyline points="17 6 23 6 23 12"/>
+      </svg>
+      Capture All
+    </button>
+  </div>
+
+  <!-- State: running (batch in progress) -->
+  <div id="state-running" class="state-running hidden">
+    <div class="running-header">
+      <span class="state-text">Capturing listings…</span>
+      <button id="cancel-btn" class="btn btn-secondary btn-sm">Cancel</button>
+    </div>
+    <div class="progress-wrap">
+      <progress id="batch-progress" max="100" value="0"></progress>
+      <span id="progress-label" class="progress-label">0 / 0</span>
+    </div>
+    <ul id="results-list" class="results-list"></ul>
+  </div>
+
+  <!-- State: complete (batch finished) -->
+  <div id="state-complete" class="state hidden">
+    <div class="state-icon">✅</div>
+    <p id="complete-summary" class="state-text"></p>
+    <a id="view-haul-btn" href="#" target="_blank" class="btn btn-primary">
+      View Haul
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+    </a>
+    <button id="new-batch-btn" class="btn btn-secondary">Scan Again</button>
+  </div>
+
+  <!-- State: error -->
+  <div id="state-error" class="state hidden">
+    <div class="state-icon">⚠️</div>
+    <p id="error-message" class="state-text">Something went wrong</p>
+    <button id="retry-btn" class="btn btn-primary">Retry</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
