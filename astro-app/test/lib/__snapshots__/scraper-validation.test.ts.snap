@@ -467,6 +467,126 @@ Techniques : C.c. mazout (citerne 2900 L), pompe à chaleur, panneaux solaires, 
 }
 `;
 
+exports[`Scraper validation > br_zapimoveis scraper > matches full extraction snapshot 1`] = `
+{
+  "agent_company": "Orcioli Realizando Sonhos",
+  "area_unit": "sqmt",
+  "city": "São Paulo",
+  "constructed_area": 47,
+  "count_bathrooms": 1,
+  "count_bedrooms": 2,
+  "count_parking": 1,
+  "country": "Brazil",
+  "currency": "BRL",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/4983214b4c7a6909562e4c0587a388c7/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=614x297",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/4983214b4c7a6909562e4c0587a388c7/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/4983214b4c7a6909562e4c0587a388c7/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/4983214b4c7a6909562e4c0587a388c7/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/00a5ff550acf8dc47a3a1c597e98c95d/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/00a5ff550acf8dc47a3a1c597e98c95d/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/00a5ff550acf8dc47a3a1c597e98c95d/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/1fca5c116593287ccf5d0e01122856f9/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1fca5c116593287ccf5d0e01122856f9/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1fca5c116593287ccf5d0e01122856f9/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/cc92bfc44638290a9cddbdb5adf2ac72/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/cc92bfc44638290a9cddbdb5adf2ac72/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/cc92bfc44638290a9cddbdb5adf2ac72/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/111f5e027027db85f6d6163bd2d41080/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/111f5e027027db85f6d6163bd2d41080/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/111f5e027027db85f6d6163bd2d41080/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/fd7b394832142712d64b4e50d92ab200/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/fd7b394832142712d64b4e50d92ab200/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/fd7b394832142712d64b4e50d92ab200/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/1ecb65648c33d1efe1babca5e17ba97d/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1ecb65648c33d1efe1babca5e17ba97d/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1ecb65648c33d1efe1babca5e17ba97d/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/020f662908d2582318ffc10a3c52f593/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/020f662908d2582318ffc10a3c52f593/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/020f662908d2582318ffc10a3c52f593/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/ac837a3bc0ba369c9d8b8633d9cda340/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/ac837a3bc0ba369c9d8b8633d9cda340/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/ac837a3bc0ba369c9d8b8633d9cda340/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/12f1be17465945d19f1457c23c08bff3/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/12f1be17465945d19f1457c23c08bff3/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/12f1be17465945d19f1457c23c08bff3/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/9f2c98d54abc2c52199844d9e7a8555d/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/9f2c98d54abc2c52199844d9e7a8555d/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/9f2c98d54abc2c52199844d9e7a8555d/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/ea1c82304af0c8a00b5cb5c2ed1bcf28/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/ea1c82304af0c8a00b5cb5c2ed1bcf28/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/ea1c82304af0c8a00b5cb5c2ed1bcf28/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/269a15f643626e96b672efc108dc1f87/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/269a15f643626e96b672efc108dc1f87/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/269a15f643626e96b672efc108dc1f87/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/5f698ae1062ae8426257e5c2173766b8/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/5f698ae1062ae8426257e5c2173766b8/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/5f698ae1062ae8426257e5c2173766b8/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/1c7fcf5b1fe59da1ee7bcbb1aa95ec0a/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1c7fcf5b1fe59da1ee7bcbb1aa95ec0a/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1c7fcf5b1fe59da1ee7bcbb1aa95ec0a/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/bbb98540fe5ffbc29a3a731e53e7b662/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/bbb98540fe5ffbc29a3a731e53e7b662/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/bbb98540fe5ffbc29a3a731e53e7b662/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/1153c9bc3ece1545e1221b8ee7373888/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1153c9bc3ece1545e1221b8ee7373888/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1153c9bc3ece1545e1221b8ee7373888/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/5397305054f6d0fe77143ec9de57b778/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/5397305054f6d0fe77143ec9de57b778/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/5397305054f6d0fe77143ec9de57b778/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/a69e905d283c0e1069a0951e5789b346/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/a69e905d283c0e1069a0951e5789b346/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/a69e905d283c0e1069a0951e5789b346/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/0fa486a1289da4d2ae7d8ef2693ffba1/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/0fa486a1289da4d2ae7d8ef2693ffba1/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/0fa486a1289da4d2ae7d8ef2693ffba1/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/1e9de24341abaa3b3fa7a5b572ed9666/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1e9de24341abaa3b3fa7a5b572ed9666/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/1e9de24341abaa3b3fa7a5b572ed9666/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/9b949c76e5d8577efdfe1c4cba11e7d8/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/9b949c76e5d8577efdfe1c4cba11e7d8/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/9b949c76e5d8577efdfe1c4cba11e7d8/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/7b27aec067cd708c8d3f946b334ed14a/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/7b27aec067cd708c8d3f946b334ed14a/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/7b27aec067cd708c8d3f946b334ed14a/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/721464d089de57ad890daf8eded7bba0/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/721464d089de57ad890daf8eded7bba0/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/721464d089de57ad890daf8eded7bba0/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/9588e180f3f6426124fb57701049a857/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/9588e180f3f6426124fb57701049a857/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/9588e180f3f6426124fb57701049a857/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/aa0b0fdecc763e317debdb02dddd617e/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/aa0b0fdecc763e317debdb02dddd617e/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/aa0b0fdecc763e317debdb02dddd617e/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/aba639e45603fbcd6fe83e59fd61116e/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/aba639e45603fbcd6fe83e59fd61116e/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/aba639e45603fbcd6fe83e59fd61116e/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/bfa16ad39b698d8f2ffbcc891f8e2268/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=200x200&seo=false%20340w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/bfa16ad39b698d8f2ffbcc891f8e2268/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=crop&dimension=614x297&seo=false%20768w,%20https://resizedimgs.zapimoveis.com.br/img/vr-listing/bfa16ad39b698d8f2ffbcc891f8e2268/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=870x707&seo=false%201080w",
+    },
+    {
+      "url": "https://assets-portal-cms.olx.com.br/Banner_ZAP_312x138_1_3585469496.webp",
+    },
+  ],
+  "latitude": -23.581232,
+  "locale_code": "pt-BR",
+  "longitude": -46.5615,
+  "main_image_url": "https://resizedimgs.zapimoveis.com.br/img/vr-listing/4983214b4c7a6909562e4c0587a388c7/apartamento-com-2-quartos-a-venda-47m-no-vila-ema-sao-paulo.webp?action=fit-in&dimension=614x297",
+  "neighborhood": "Vila Ema",
+  "price_float": 437500,
+  "price_string": "R$ 437.500",
+  "reference": "2870981622",
+  "region": "Zona Leste",
+  "title": "Apartamento com 2 quartos e com piscina, 47 m² na Zona Leste em Vila Ema, São Paulo - ZAP Imóveis",
+}
+`;
+
 exports[`Scraper validation > de_immoscout scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "10115 Berlin (Mitte), Friedrichstrasse",

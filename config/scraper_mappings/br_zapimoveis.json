@@ -1,0 +1,40 @@
+[{
+  "name": "br_zapimoveis",
+  "expectedExtractionRate": 0.80,
+  "defaultValues": {
+    "country": { "value": "Brazil" },
+    "currency": { "value": "BRL" },
+    "area_unit": { "value": "sqmt" },
+    "locale_code": { "value": "pt-BR" },
+    "for_rent_short_term": { "value": "false" }
+  },
+  "images": [
+    { "cssLocator": "picture source", "cssAttr": "srcset", "split": " " }
+  ],
+  "intFields": {
+    "count_bedrooms": { "scriptRegEx": "(?<=com )\\d+(?= quartos)" },
+    "count_bathrooms": { "scriptRegEx": "(?<=bathrooms.{5})\\d+" },
+    "count_parking": { "scriptRegEx": "(?<=parkingSpaces.{5})\\d+" }
+  },
+  "floatFields": {
+    "price_float": { "jsonLdType": "Product", "jsonLdPath": "offers.price" },
+    "constructed_area": { "scriptRegEx": "\\d+(?= m²)" },
+    "latitude": { "scriptRegEx": "(?<=\\\\\"lat\\\\\":)[-\\d.]+" },
+    "longitude": { "scriptRegEx": "(?<=\\\\\"lon\\\\\":)[-\\d.]+" }
+  },
+  "textFields": {
+    "title": { "cssLocator": "meta[name='og:title']", "cssAttr": "content" },
+    "price_string": { "cssLocator": ".price-info__values-sale .value-item__value", "cssCountId": "0" },
+    "reference": { "jsonLdType": "Product", "jsonLdPath": "sku" },
+    "city": { "scriptRegEx": "(?<=à venda em )[^\"}]+" },
+    "region": { "jsonLdType": "BreadcrumbList", "jsonLdPath": "itemListElement.4.item.name" },
+    "neighborhood": { "jsonLdType": "BreadcrumbList", "jsonLdPath": "itemListElement.5.item.name" },
+    "agent_company": { "cssLocator": ".carousel-advertiser-info__account p" },
+    "main_image_url": { "cssLocator": "meta[name='og:image']", "cssAttr": "content" }
+  },
+  "booleanFields": {
+    "for_sale": { "urlPathPart": "2", "evaluator": "include?", "evaluatorParam": "venda" },
+    "for_rent": { "urlPathPart": "2", "evaluator": "include?", "evaluatorParam": "aluguel" },
+    "for_rent_long_term": { "urlPathPart": "2", "evaluator": "include?", "evaluatorParam": "aluguel" }
+  }
+}]

@@ -400,6 +400,20 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     stripTrailingSlash: false,
     requiresJsRendering: false,
   },
+  br_zapimoveis: {
+    scraperName: 'br_zapimoveis',
+    slug: 'br_zapimoveis',
+    hosts: ['www.zapimoveis.com.br', 'zapimoveis.com.br'],
+    country: 'BR',
+    currency: 'BRL',
+    localeCode: 'pt-BR',
+    areaUnit: 'sqmt',
+    contentSource: 'html',
+    supportTier: 'core',
+    expectedExtractionRate: 0.80,
+    stripTrailingSlash: false,
+    requiresJsRendering: false,
+  },
 };
 
 /**
