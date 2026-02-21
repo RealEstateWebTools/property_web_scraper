@@ -125,6 +125,52 @@ const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
     return;
   }
 
+  // resetPassword: show the form immediately — Firebase is only needed on submit.
+  if (mode === 'resetPassword') {
+    pageTitle.textContent = 'Reset password';
+    pageSubtitle.textContent = 'Choose a new password for your account.';
+    loadingSection.classList.add('hidden');
+    resetSection.classList.remove('hidden');
+
+    resetBtn.addEventListener('click', async function () {
+      resetError.classList.add('hidden');
+      var newPw = document.getElementById('new-password').value;
+      var confirmPw = document.getElementById('confirm-password').value;
+
+      if (!newPw || newPw.length < 8) {
+        resetError.textContent = 'Password must be at least 8 characters.';
+        resetError.classList.remove('hidden');
+        return;
+      }
+      if (newPw !== confirmPw) {
+        resetError.textContent = 'Passwords do not match.';
+        resetError.classList.remove('hidden');
+        return;
+      }
+
+      resetBtn.disabled = true;
+      resetBtn.textContent = 'Saving…';
+
+      try {
+        var baseUrl = 'https://www.gstatic.com/firebasejs/11.3.1/';
+        var app = await import(baseUrl + 'firebase-app.js');
+        var auth = await import(baseUrl + 'firebase-auth.js');
+        var firebaseApp = app.initializeApp({ apiKey: apiKey, authDomain: authDomain });
+        var firebaseAuth = auth.getAuth(firebaseApp);
+        await auth.confirmPasswordReset(firebaseAuth, oobCode, newPw);
+        showSuccess('Password updated! You can now sign in.', '/login');
+      } catch (err) {
+        resetBtn.disabled = false;
+        resetBtn.textContent = 'Set New Password';
+        resetError.textContent = err.message || 'Failed to reset password.';
+        resetError.classList.remove('hidden');
+      }
+    });
+
+    return;
+  }
+
+  // All other modes require Firebase upfront.
   async function run() {
     var baseUrl = 'https://www.gstatic.com/firebasejs/11.3.1/';
     var app = await import(baseUrl + 'firebase-app.js');
@@ -143,45 +189,13 @@ const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
       var user = firebaseAuth.currentUser;
       if (user) await user.reload();
 
-      showSuccess('Email verified!', continueUrl);
+      // Append ?welcome=1 so the account page can show a first-time banner
+      var sep = continueUrl.includes('?') ? '&' : '?';
+      var dest = continueUrl + sep + 'welcome=1';
+
+      showSuccess('Email verified!', dest);
       // Auto-redirect after 2 seconds
-      setTimeout(function () { window.location.href = continueUrl; }, 2000);
-
-    } else if (mode === 'resetPassword') {
-      pageTitle.textContent = 'Reset password';
-      pageSubtitle.textContent = 'Choose a new password for your account.';
-      loadingSection.classList.add('hidden');
-      resetSection.classList.remove('hidden');
-
-      resetBtn.addEventListener('click', async function () {
-        resetError.classList.add('hidden');
-        var newPw = document.getElementById('new-password').value;
-        var confirmPw = document.getElementById('confirm-password').value;
-
-        if (!newPw || newPw.length < 8) {
-          resetError.textContent = 'Password must be at least 8 characters.';
-          resetError.classList.remove('hidden');
-          return;
-        }
-        if (newPw !== confirmPw) {
-          resetError.textContent = 'Passwords do not match.';
-          resetError.classList.remove('hidden');
-          return;
-        }
-
-        resetBtn.disabled = true;
-        resetBtn.textContent = 'Saving…';
-
-        try {
-          await auth.confirmPasswordReset(firebaseAuth, oobCode, newPw);
-          showSuccess('Password updated! You can now sign in.', '/login');
-        } catch (err) {
-          resetBtn.disabled = false;
-          resetBtn.textContent = 'Set New Password';
-          resetError.textContent = err.message || 'Failed to reset password.';
-          resetError.classList.remove('hidden');
-        }
-      });
+      setTimeout(function () { window.location.href = dest; }, 2000);
 
     } else if (mode === 'recoverEmail') {
       pageTitle.textContent = 'Recovering email…';
