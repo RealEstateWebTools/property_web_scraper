@@ -1,4 +1,4 @@
-import { InMemoryFirestoreClient, resetStore } from '../src/lib/firestore/in-memory-backend.js';
+import { InMemoryFirestoreClient, resetStore, clearCollections } from '../src/lib/firestore/in-memory-backend.js';
 import { setClient } from '../src/lib/firestore/client.js';
 import { clearCache } from '../src/lib/extractor/mapping-loader.js';
 import { ImportHost } from '../src/lib/models/import-host.js';
@@ -36,9 +36,8 @@ beforeAll(async () => {
 });
 
 afterEach(() => {
-  // Clear listings between tests (keep import_hosts)
-  const store = (inMemoryClient as any);
-  // Only clear listings collection to preserve import_hosts
+  // Clear listings/diagnostics between tests while preserving import_hosts
+  clearCollections('listings', 'diagnostics');
 });
 
 afterAll(() => {

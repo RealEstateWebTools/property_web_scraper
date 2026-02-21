@@ -43,15 +43,26 @@ async function storeTestListing(
   diagOverrides: Partial<ExtractionDiagnostics> = {},
 ): Promise<string> {
   const id = generateId();
+  const diag = makeDiagnostics({ scraperName, ...diagOverrides });
   const listing = new Listing();
   listing.assignAttributes({
     title,
     price_string: priceString,
     import_url: importUrl,
     last_retrieved_at: new Date(),
+    // Embed diagnostic fields on the listing (matches what extraction-runner.ts does)
+    scraper_name: diag.scraperName,
+    quality_grade: diag.qualityGrade,
+    quality_label: diag.qualityLabel,
+    extraction_rate: diag.extractionRate,
+    weighted_extraction_rate: diag.weightedExtractionRate,
+    extractable_fields: diag.extractableFields,
+    populated_extractable_fields: diag.populatedExtractableFields,
+    meets_expectation: diag.meetsExpectation,
+    critical_fields_missing: diag.criticalFieldsMissing,
   });
   await storeListing(id, listing);
-  await storeDiagnostics(id, makeDiagnostics({ scraperName, ...diagOverrides }));
+  await storeDiagnostics(id, diag);
   return id;
 }
 
@@ -114,14 +125,17 @@ describe('extraction-stats', () => {
       expect(result[0].criticalFieldsMissing).toEqual(['title', 'price_string']);
     });
 
-    it('skips listings without diagnostics', async () => {
+    it('includes listings without diagnostics (shows everything)', async () => {
       const id = generateId();
       const listing = new Listing();
       listing.assignAttributes({ title: 'No diag' });
       await storeListing(id, listing);
 
       const result = await getRecentExtractions();
-      expect(result).toHaveLength(0);
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('No diag');
+      expect(result[0].scraperName).toBe('');
+      expect(result[0].qualityGrade).toBe('F');
     });
   });
 

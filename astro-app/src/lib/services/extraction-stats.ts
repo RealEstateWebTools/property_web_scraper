@@ -1,6 +1,7 @@
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import type { QualityGrade } from '../extractor/quality-scorer.js';
 import { getAllListings, getAllDiagnostics } from './listing-store.js';
+import { deduplicationKey } from './url-canonicalizer.js';
 import { Listing } from '../models/listing.js';
 import { allMappingNames, findByName } from '../extractor/mapping-loader.js';
 import { LOCAL_HOST_MAP } from './url-validator.js';
@@ -134,8 +135,22 @@ export async function getRecentExtractions(limit = 100): Promise<ExtractionSumma
     });
   }
 
-  summaries.sort((a, b) => b.timestamp - a.timestamp);
-  return summaries.slice(0, limit);
+  // URL-level dedup: keep only the most recent entry per canonical URL.
+  // This is the last-mile safety net against multiple Firestore documents
+  // or in-memory entries that map to the same property (e.g. dynamic IDs
+  // coexisting with stable IDs, or concurrent writes during KV inconsistency).
+  const seenUrls = new Map<string, ExtractionSummary>();
+  for (const s of summaries) {
+    const key = s.sourceUrl ? deduplicationKey(s.sourceUrl) : s.id;
+    const existing = seenUrls.get(key);
+    if (!existing || s.timestamp > existing.timestamp) {
+      seenUrls.set(key, s);
+    }
+  }
+
+  const deduped = Array.from(seenUrls.values());
+  deduped.sort((a, b) => b.timestamp - a.timestamp);
+  return deduped.slice(0, limit);
 }
 
 export async function getScraperStats(name: string): Promise<ScraperStats> {
