@@ -14,7 +14,8 @@
     "capture-fixture": "tsx scripts/capture-fixture.ts",
     "create-scraper": "tsx scripts/create-scraper.ts",
     "contract-test": "tsx scripts/contract-test.ts",
-    "stale-check": "tsx scripts/stale-check.ts"
+    "stale-check": "tsx scripts/stale-check.ts",
+    "deduplicate-listings": "tsx scripts/deduplicate-listings.ts"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
