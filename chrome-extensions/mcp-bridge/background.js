@@ -9,6 +9,12 @@ const WS_URL = 'ws://localhost:17824';
 let ws = null;
 let wsConnected = false;
 
+// Exponential backoff: starts at 1s, doubles each retry, caps at 30s.
+// Resets to initial delay on successful connection.
+const BACKOFF_INITIAL_MS = 1000;
+const BACKOFF_MAX_MS = 30000;
+let reconnectDelay = BACKOFF_INITIAL_MS;
+
 function connectWebSocket() {
   if (ws && ws.readyState <= 1) return; // CONNECTING or OPEN
 
@@ -17,13 +23,14 @@ function connectWebSocket() {
   } catch {
     ws = null;
     wsConnected = false;
-    setTimeout(connectWebSocket, 5000);
+    scheduleReconnect();
     return;
   }
 
   ws.onopen = () => {
     console.log('[MCP Bridge] Connected to MCP server');
     wsConnected = true;
+    reconnectDelay = BACKOFF_INITIAL_MS; // reset backoff on success
     sendTabUpdate();
   };
 
@@ -31,7 +38,7 @@ function connectWebSocket() {
     console.log('[MCP Bridge] Disconnected from MCP server');
     ws = null;
     wsConnected = false;
-    setTimeout(connectWebSocket, 5000);
+    scheduleReconnect();
   };
 
   ws.onerror = () => {
@@ -50,6 +57,12 @@ function connectWebSocket() {
       await handleCaptureRequest();
     }
   };
+}
+
+function scheduleReconnect() {
+  console.log(`[MCP Bridge] Reconnecting in ${reconnectDelay / 1000}s`);
+  setTimeout(connectWebSocket, reconnectDelay);
+  reconnectDelay = Math.min(reconnectDelay * 2, BACKOFF_MAX_MS);
 }
 
 // ─── Capture handling ────────────────────────────────────────

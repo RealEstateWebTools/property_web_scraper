@@ -9,6 +9,8 @@
  *   "user:{userId}"       → UserRecord
  */
 
+import type { KVNamespace } from './kv-types.js';
+
 // ─── Types ──────────────────────────────────────────────────────
 
 export interface ApiKeyRecord {
@@ -43,12 +45,12 @@ export interface ValidatedKey {
 
 // ─── KV handle ──────────────────────────────────────────────────
 
-let kv: any = null;
+let kv: KVNamespace | null = null;
 
 /** In-memory fallback for dev/testing when KV is unavailable. */
 const memStore = new Map<string, string>();
 
-export function initUsersKV(kvNamespace: any): void {
+export function initUsersKV(kvNamespace: KVNamespace | null): void {
   kv = kvNamespace ?? null;
 }
 

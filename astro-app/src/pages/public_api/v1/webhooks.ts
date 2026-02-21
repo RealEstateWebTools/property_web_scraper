@@ -7,8 +7,7 @@
  */
 
 import type { APIRoute } from 'astro';
-import { authenticateApiKey } from '@lib/services/auth.js';
-import { checkRateLimit } from '@lib/services/rate-limiter.js';
+import { apiGuard } from '@lib/services/api-guard.js';
 import {
   errorResponse, successResponse, corsPreflightResponse,
   ApiErrorCode,
@@ -34,11 +33,8 @@ export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/webhooks';
 
-  const auth = await authenticateApiKey(request);
-  if (!auth.authorized) return auth.errorResponse!;
-
-  const rateCheck = await checkRateLimit(request, auth.tier, auth.userId);
-  if (!rateCheck.allowed) return rateCheck.errorResponse!;
+  const guard = await apiGuard(request);
+  if (!guard.ok) return guard.response;
 
   let body: { url?: string; events?: string[]; secret?: string };
   try {
@@ -105,8 +101,8 @@ export const POST: APIRoute = async ({ request }) => {
  * GET /public_api/v1/webhooks — List registered webhooks.
  */
 export const GET: APIRoute = async ({ request }) => {
-  const auth = await authenticateApiKey(request);
-  if (!auth.authorized) return auth.errorResponse!;
+  const guard = await apiGuard(request);
+  if (!guard.ok) return guard.response;
 
   const webhooks = await listWebhooks();
 
@@ -126,8 +122,8 @@ export const DELETE: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/webhooks';
 
-  const auth = await authenticateApiKey(request);
-  if (!auth.authorized) return auth.errorResponse!;
+  const guard = await apiGuard(request);
+  if (!guard.ok) return guard.response;
 
   const id = new URL(request.url).searchParams.get('id');
   if (!id) {

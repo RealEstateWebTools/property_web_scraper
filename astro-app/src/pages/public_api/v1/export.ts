@@ -5,9 +5,8 @@
  */
 
 import type { APIRoute } from 'astro';
-import { authenticateApiKey } from '@lib/services/auth.js';
+import { apiGuard } from '@lib/services/api-guard.js';
 import { getListing } from '@lib/services/listing-store.js';
-import { checkRateLimit } from '@lib/services/rate-limiter.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
 import { getExportService } from '@lib/services/export-service.js';
@@ -24,8 +23,8 @@ export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request)
  * Returns available export formats and metadata
  */
 export const GET: APIRoute = async ({ url, request }) => {
-  const auth = await authenticateApiKey(request);
-  if (!auth.authorized) return auth.errorResponse!;
+  const guard = await apiGuard(request);
+  if (!guard.ok) return guard.response;
 
   if (url.searchParams.has('formats')) {
     const includeUnderDev = url.searchParams.get('all') === 'true';
@@ -60,11 +59,8 @@ export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = '/public_api/v1/export';
 
-  const auth = await authenticateApiKey(request);
-  if (!auth.authorized) return auth.errorResponse!;
-
-  const rateCheck = await checkRateLimit(request, auth.tier, auth.userId);
-  if (!rateCheck.allowed) return rateCheck.errorResponse!;
+  const guard = await apiGuard(request);
+  if (!guard.ok) return guard.response;
 
   try {
     const body = await request.json();

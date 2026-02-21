@@ -49,6 +49,8 @@ export interface PortalMetadata {
 
 export interface ScraperMapping {
   name: string;
+  version?: number;
+  last_checked?: string;
   defaultValues?: Record<string, FieldMapping>;
   textFields?: Record<string, FieldMapping>;
   intFields?: Record<string, FieldMapping>;

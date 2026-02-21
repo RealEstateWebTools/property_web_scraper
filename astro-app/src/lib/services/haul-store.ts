@@ -4,6 +4,7 @@
  * Write path: in-memory + KV + Firestore
  */
 
+import type { KVNamespace } from './kv-types.js';
 import { deduplicationKey } from './url-canonicalizer.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
 
@@ -63,11 +64,11 @@ const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 const THIRTY_DAYS_S = 30 * 24 * 60 * 60;
 const MAX_SCRAPES = 20;
 
-let kv: any = null;
+let kv: KVNamespace | null = null;
 const store = new Map<string, Haul>();
 
 /** Call once per request with the RESULTS KV binding */
-export function initHaulKV(kvNamespace: any): void {
+export function initHaulKV(kvNamespace: KVNamespace | null): void {
   kv = kvNamespace ?? null;
 }
 

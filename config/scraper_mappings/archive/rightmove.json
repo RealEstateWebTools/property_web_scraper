@@ -1,6 +1,8 @@
 [
 {
   "name": "rightmove",
+  "version": 1,
+  "last_checked": "2026-02-20",
   "expectedExtractionRate": 0.90,
   "defaultValues":
   {

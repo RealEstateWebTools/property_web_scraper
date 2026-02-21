@@ -2,6 +2,7 @@ import { errorResponse, ApiErrorCode } from './api-response.js';
 import { getRuntimeConfig } from './runtime-config.js';
 import { logActivity } from './activity-logger.js';
 import type { SubscriptionTier } from './api-key-service.js';
+import type { KVNamespace } from './kv-types.js';
 
 // ─── Endpoint classes & multipliers ─────────────────────────────
 
@@ -41,9 +42,9 @@ const dailyCounters = new Map<string, { count: number; resetAt: number }>();
 
 // ─── KV handle ──────────────────────────────────────────────────
 
-let kv: any = null;
+let kv: KVNamespace | null = null;
 
-export function initRateLimiterKV(kvNamespace: any): void {
+export function initRateLimiterKV(kvNamespace: KVNamespace | null): void {
   kv = kvNamespace ?? null;
 }
 
@@ -80,8 +81,8 @@ async function getDailyCount(key: string): Promise<number> {
       const kvKey = `ratelimit:${key}:${todayDateStr()}`;
       const data = await kv.get(kvKey, 'json') as { count: number } | null;
       if (data) return data.count;
-    } catch {
-      // KV failure — fall through to in-memory
+    } catch (err) {
+      console.error('[RateLimiter] KV read failed:', (err as Error).message || err);
     }
   }
 
@@ -106,8 +107,8 @@ async function incrementDailyCount(key: string): Promise<void> {
       // TTL: expires at end of day (~86400s max)
       const secondsUntilMidnight = Math.ceil((new Date().setUTCHours(24, 0, 0, 0) - Date.now()) / 1000);
       await kv.put(kvKey, JSON.stringify({ count }), { expirationTtl: Math.max(secondsUntilMidnight, 60) });
-    } catch {
-      // KV failure — fall through to in-memory
+    } catch (err) {
+      console.error('[RateLimiter] KV write failed:', (err as Error).message || err);
     }
   }
 

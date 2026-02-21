@@ -3,6 +3,7 @@ import { Listing } from '../models/listing.js';
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { deduplicationKey } from './url-canonicalizer.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
+import type { KVNamespace } from './kv-types.js';
 
 /**
  * KV-backed store for extracted listings, with in-memory fallback.
@@ -11,7 +12,7 @@ import { getClient, getCollectionPrefix } from '../firestore/client.js';
  * KV provides cross-isolate persistence.
  */
 
-let kv: any = null;
+let kv: KVNamespace | null = null;
 const store = new Map<string, Listing>();
 const diagnosticsStore = new Map<string, ExtractionDiagnostics>();
 const urlIndex = new Map<string, string>();
@@ -20,7 +21,7 @@ let counter = 0;
 let _diagnosticsCleared = false;
 
 /** Call once per request with the RESULTS KV binding from Astro.locals.runtime.env */
-export function initKV(kvNamespace: any): void {
+export function initKV(kvNamespace: KVNamespace | null): void {
   kv = kvNamespace ?? null;
 }
 
@@ -102,7 +103,8 @@ export async function getListing(id: string): Promise<Listing | undefined> {
     const listing = await Listing.find(id);
     store.set(id, listing);
     return listing;
-  } catch {
+  } catch (err) {
+    console.error('[ListingStore] Firestore lookup failed for', id, ':', (err as Error).message || err);
     return undefined;
   }
 }
@@ -128,7 +130,8 @@ async function firestoreGetDiagnostics(id: string): Promise<ExtractionDiagnostic
     const doc = await col.doc(id).get();
     if (!doc.exists) return undefined;
     return doc.data() as ExtractionDiagnostics;
-  } catch {
+  } catch (err) {
+    console.error('[ListingStore] Firestore diagnostics read failed for', id, ':', (err as Error).message || err);
     return undefined;
   }
 }
@@ -170,8 +173,8 @@ async function reconstructDiagnosticsFromListing(id: string): Promise<Extraction
       diagnosticsStore.set(id, diag);
       return diag;
     }
-  } catch {
-    // Listing not in Firestore either
+  } catch (err) {
+    console.error('[ListingStore] Firestore diagnostics reconstruction failed for', id, ':', (err as Error).message || err);
   }
   return undefined;
 }

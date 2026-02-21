@@ -5,9 +5,10 @@
  */
 
 import { getDevKV } from './dev-kv.js';
+import type { KVNamespace } from './kv-types.js';
 
-export function resolveKV(locals: unknown): any {
-  const runtime = (locals as any)?.runtime?.env?.RESULTS;
-  if (runtime) return runtime;
+export function resolveKV(locals: unknown): KVNamespace | null {
+  const runtime = (locals as Record<string, any>)?.runtime?.env?.RESULTS;
+  if (runtime) return runtime as KVNamespace;
   return getDevKV();
 }

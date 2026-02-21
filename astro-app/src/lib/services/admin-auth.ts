@@ -34,7 +34,6 @@ export function authenticateAdmin(request: Request): AdminAuthResult {
 
   const providedKey =
     request.headers.get('X-Admin-Key') ||
-    new URL(request.url).searchParams.get('admin_key') ||
     parseCookie(request.headers.get('cookie') || '', 'pws_admin_key') ||
     '';
 

@@ -15,6 +15,18 @@ const TEXT_FIELDS = [
   'area_unit', 'property_type', 'energy_rating',
 ];
 
+/** Fields that may contain intentional HTML but must be sanitized to safe tags only. */
+const HTML_FIELDS = ['description_html'];
+
+/** Allowlist for HTML fields — only safe formatting tags, no scripts/events. */
+const SAFE_HTML_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: ['p', 'br', 'b', 'strong', 'i', 'em', 'u', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'a'],
+  allowedAttributes: {
+    'a': ['href', 'target', 'rel'],
+  },
+  allowedSchemes: ['http', 'https'],
+};
+
 const URL_FIELDS = ['main_image_url'];
 const URL_ARRAY_FIELDS = ['related_urls'];
 const SAFE_SCHEMES = ['http:', 'https:'];
@@ -84,6 +96,14 @@ export function sanitizePropertyHash(
     const value = sanitized[field];
     if (typeof value === 'string') {
       sanitized[field] = stripHtml(value);
+    }
+  }
+
+  // Sanitize HTML fields — allow safe formatting tags only (no scripts/events)
+  for (const field of HTML_FIELDS) {
+    const value = sanitized[field];
+    if (typeof value === 'string') {
+      sanitized[field] = sanitizeHtml(value, SAFE_HTML_OPTIONS);
     }
   }
 
