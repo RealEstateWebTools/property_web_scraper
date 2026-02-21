@@ -1,0 +1,287 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+---
+<AdminLayout title="Webhooks — Admin" activePage="webhooks">
+  <h1 class="text-2xl font-bold mb-2">Webhook Management</h1>
+  <p class="text-sm text-gray-500 mb-6">Register webhooks to receive notifications for extraction events. Max 20 webhooks.</p>
+
+  <!-- Loading -->
+  <div id="loading" class="text-center py-12">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
+    <p class="mt-3 text-sm text-gray-500">Loading webhooks...</p>
+  </div>
+
+  <!-- Summary + Create form -->
+  <div id="top-section" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Stats -->
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Registered Webhooks</p>
+      <p class="text-2xl font-bold"><span id="webhook-count">—</span> <span class="text-sm font-normal text-gray-400">/ 20</span></p>
+    </div>
+
+    <!-- Create form -->
+    <div class="lg:col-span-2 bg-white rounded-lg shadow p-5">
+      <h2 class="font-semibold mb-3">Register New Webhook</h2>
+      <form id="create-form" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1" for="wh-url">Endpoint URL</label>
+          <input id="wh-url" type="url" required placeholder="https://example.com/webhook"
+            class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Events</label>
+          <div class="flex items-center gap-4">
+            <label class="flex items-center gap-1.5 text-sm">
+              <input type="checkbox" name="events" value="extraction.completed" checked class="rounded" />
+              extraction.completed
+            </label>
+            <label class="flex items-center gap-1.5 text-sm">
+              <input type="checkbox" name="events" value="extraction.failed" class="rounded" />
+              extraction.failed
+            </label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1" for="wh-secret">Signing Secret <span class="text-gray-400">(optional)</span></label>
+          <input id="wh-secret" type="text" placeholder="HMAC-SHA256 secret"
+            class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition">
+            <i class="bi bi-plus-lg mr-1"></i> Register
+          </button>
+          <span id="create-feedback" class="text-sm hidden"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Webhooks table -->
+  <div id="results" class="hidden bg-white rounded-lg shadow">
+    <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="font-semibold">Registered Webhooks</h2>
+      <button
+        id="refresh-btn"
+        class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition"
+      >
+        Refresh
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-200">
+            <th class="py-2 px-5 font-medium">ID</th>
+            <th class="py-2 px-5 font-medium">URL</th>
+            <th class="py-2 px-5 font-medium">Events</th>
+            <th class="py-2 px-5 font-medium">Secret</th>
+            <th class="py-2 px-5 font-medium">Created</th>
+            <th class="py-2 px-5 font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="results-body">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="empty-state" class="hidden bg-gray-50 rounded-lg p-8 text-center">
+    <p class="text-gray-500">No webhooks registered. Use the form above to create one.</p>
+  </div>
+
+  <!-- Error -->
+  <div id="error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm mt-4">
+  </div>
+
+  <script>
+    interface WebhookItem {
+      id: string;
+      url: string;
+      events: string[];
+      active: boolean;
+      createdAt: string;
+      hasSecret: boolean;
+    }
+
+    function renderTable(webhooks: WebhookItem[]) {
+      const bodyEl = document.getElementById('results-body')!;
+      bodyEl.innerHTML = '';
+
+      for (const w of webhooks) {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-gray-100 hover:bg-gray-50';
+
+        // ID
+        const tdId = document.createElement('td');
+        tdId.className = 'py-2 px-5 font-mono text-xs';
+        tdId.textContent = w.id;
+        tr.appendChild(tdId);
+
+        // URL
+        const tdUrl = document.createElement('td');
+        tdUrl.className = 'py-2 px-5 max-w-[300px] truncate';
+        tdUrl.textContent = w.url;
+        tdUrl.title = w.url;
+        tr.appendChild(tdUrl);
+
+        // Events
+        const tdEvents = document.createElement('td');
+        tdEvents.className = 'py-2 px-5';
+        tdEvents.innerHTML = w.events
+          .map((e) => `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 mr-1">${e}</span>`)
+          .join('');
+        tr.appendChild(tdEvents);
+
+        // Secret
+        const tdSecret = document.createElement('td');
+        tdSecret.className = 'py-2 px-5';
+        tdSecret.innerHTML = w.hasSecret
+          ? '<span class="text-green-600 text-xs"><i class="bi bi-lock-fill"></i> Yes</span>'
+          : '<span class="text-gray-400 text-xs">No</span>';
+        tr.appendChild(tdSecret);
+
+        // Created
+        const tdCreated = document.createElement('td');
+        tdCreated.className = 'py-2 px-5 text-gray-600';
+        tdCreated.textContent = new Date(w.createdAt).toLocaleDateString();
+        tr.appendChild(tdCreated);
+
+        // Actions
+        const tdActions = document.createElement('td');
+        tdActions.className = 'py-2 px-5';
+        tdActions.innerHTML = `
+          <button class="text-red-600 hover:text-red-800 text-xs cursor-pointer border-0 bg-transparent delete-btn" data-id="${w.id}">
+            <i class="bi bi-trash"></i> Delete
+          </button>
+        `;
+        tr.appendChild(tdActions);
+
+        bodyEl.appendChild(tr);
+      }
+
+      // Delete handlers
+      for (const btn of bodyEl.querySelectorAll('.delete-btn')) {
+        btn.addEventListener('click', async (ev) => {
+          const webhookId = (ev.currentTarget as HTMLElement).dataset.id!;
+          if (!confirm(`Delete webhook ${webhookId}?`)) return;
+          try {
+            const res = await fetch('/admin/api/webhooks', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'delete', webhookId }),
+            });
+            const data = await res.json();
+            if (data.success) loadWebhooks();
+            else alert(data.error || 'Delete failed');
+          } catch {
+            alert('Network error');
+          }
+        });
+      }
+    }
+
+    async function loadWebhooks() {
+      const loadingEl = document.getElementById('loading')!;
+      const topSection = document.getElementById('top-section')!;
+      const resultsEl = document.getElementById('results')!;
+      const emptyEl = document.getElementById('empty-state')!;
+      const errorEl = document.getElementById('error')!;
+
+      loadingEl.classList.remove('hidden');
+      topSection.classList.add('hidden');
+      resultsEl.classList.add('hidden');
+      emptyEl.classList.add('hidden');
+      errorEl.classList.add('hidden');
+
+      try {
+        const res = await fetch('/admin/api/webhooks');
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({ error: 'Request failed' }));
+          errorEl.textContent = data.error || `HTTP ${res.status}`;
+          errorEl.classList.remove('hidden');
+          loadingEl.classList.add('hidden');
+          return;
+        }
+
+        const data = await res.json();
+        const webhooks: WebhookItem[] = data.webhooks || [];
+
+        document.getElementById('webhook-count')!.textContent = String(data.total);
+
+        loadingEl.classList.add('hidden');
+        topSection.classList.remove('hidden');
+
+        if (webhooks.length === 0) {
+          emptyEl.classList.remove('hidden');
+        } else {
+          resultsEl.classList.remove('hidden');
+          renderTable(webhooks);
+        }
+      } catch (err) {
+        errorEl.textContent = 'Network error: ' + (err instanceof Error ? err.message : String(err));
+        errorEl.classList.remove('hidden');
+        loadingEl.classList.add('hidden');
+      }
+    }
+
+    // Create form
+    document.getElementById('create-form')?.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const feedback = document.getElementById('create-feedback')!;
+      const urlInput = document.getElementById('wh-url') as HTMLInputElement;
+      const secretInput = document.getElementById('wh-secret') as HTMLInputElement;
+      const checkboxes = document.querySelectorAll<HTMLInputElement>('input[name="events"]:checked');
+
+      const events = Array.from(checkboxes).map((cb) => cb.value);
+      if (events.length === 0) {
+        feedback.textContent = 'Select at least one event';
+        feedback.className = 'text-sm text-red-600';
+        feedback.classList.remove('hidden');
+        return;
+      }
+
+      feedback.classList.add('hidden');
+
+      try {
+        const res = await fetch('/admin/api/webhooks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'create',
+            url: urlInput.value,
+            events,
+            secret: secretInput.value || undefined,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          urlInput.value = '';
+          secretInput.value = '';
+          feedback.textContent = `Webhook ${data.webhook.id} created`;
+          feedback.className = 'text-sm text-green-600';
+          feedback.classList.remove('hidden');
+          loadWebhooks();
+        } else {
+          feedback.textContent = data.error || 'Creation failed';
+          feedback.className = 'text-sm text-red-600';
+          feedback.classList.remove('hidden');
+        }
+      } catch (err) {
+        feedback.textContent = 'Network error';
+        feedback.className = 'text-sm text-red-600';
+        feedback.classList.remove('hidden');
+      }
+    });
+
+    // Load on page ready
+    loadWebhooks();
+
+    // Refresh button
+    document.getElementById('refresh-btn')?.addEventListener('click', loadWebhooks);
+  </script>
+</AdminLayout>

@@ -12,6 +12,7 @@ export const PUBLIC_NAV_LINKS: NavLink[] = [
   { label: 'Sites', href: '/sites' },
   { label: 'API', href: '/docs/api' },
   { label: 'My Hauls', href: '/hauls', icon: 'bi-box-seam' },
+  { label: 'Dashboard', href: '/dashboard', icon: 'bi-speedometer2' },
   { label: 'Extension', href: '/extension', icon: 'bi-puzzle' },
   { label: 'Admin', href: '/admin', icon: 'bi-gear' },
   { label: 'GitHub', href: 'https://github.com/RealEstateWebTools/property_web_scraper', icon: 'bi-github', external: true },
@@ -30,6 +31,8 @@ export const ADMIN_NAV_LINKS: NavLink[] = [
   { label: 'Trends', href: '/admin/scraper-trends', icon: 'bi-graph-up-arrow', activePage: 'scraper-trends' },
   { label: 'Retention', href: '/admin/retention', icon: 'bi-clock-history', activePage: 'retention' },
   { label: 'Hauls', href: '/admin/hauls', icon: 'bi-box-seam', activePage: 'hauls' },
+  { label: 'Dead Letters', href: '/admin/dead-letters', icon: 'bi-exclamation-triangle', activePage: 'dead-letters' },
+  { label: 'Webhooks', href: '/admin/webhooks', icon: 'bi-broadcast', activePage: 'webhooks' },
   { label: 'AI Map', href: '/admin/ai-map', icon: 'bi-magic', activePage: 'ai-map' },
 ];
 

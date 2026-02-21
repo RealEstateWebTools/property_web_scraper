@@ -1,0 +1,267 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const fbApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
+const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
+---
+<BaseLayout title="Dashboard — Property Web Scraper">
+
+<div id="fb-config" data-api-key={fbApiKey} data-auth-domain={fbAuthDomain} class="hidden"></div>
+
+<section class="max-w-5xl mx-auto px-4 py-8">
+
+  <!-- Loading state -->
+  <div id="loading-section" class="text-center py-12 text-gray-400 text-sm">
+    Loading...
+  </div>
+
+  <!-- Signed-out state -->
+  <div id="signed-out-section" class="hidden">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center max-w-md mx-auto">
+      <h1 class="text-2xl font-bold text-gray-900 mb-3">Dashboard</h1>
+      <p class="text-gray-600 mb-6">Sign in to view your personalized dashboard with recent extractions and hauls.</p>
+      <a href="/login"
+        class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl text-sm transition-colors no-underline">
+        Sign In
+      </a>
+      <p class="text-xs text-gray-400 mt-4">
+        No account yet? <a href="/register" class="text-blue-600 hover:underline">Create one</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Dashboard (authenticated) -->
+  <div id="dashboard-section" class="hidden">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p class="text-sm text-gray-500 mt-1">Welcome back, <span id="user-name" class="font-medium"></span></p>
+      </div>
+      <a href="/extract/url"
+        class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 inline-flex items-center gap-1.5 no-underline">
+        <i class="bi bi-plus-lg"></i> New Extraction
+      </a>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <p class="text-sm text-gray-500">Recent Extractions</p>
+        <p class="text-2xl font-bold" id="extraction-count">0</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <p class="text-sm text-gray-500">My Hauls</p>
+        <p class="text-2xl font-bold" id="haul-count">0</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <p class="text-sm text-gray-500">Total Scrapes</p>
+        <p class="text-2xl font-bold" id="scrape-count">0</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Recent extractions -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="font-semibold text-gray-900">Recent Extractions</h2>
+          <a href="/extract/url" class="text-xs text-blue-600 hover:underline no-underline">Extract new</a>
+        </div>
+        <div id="extractions-list" class="divide-y divide-gray-50">
+          <div class="px-5 py-8 text-center text-gray-400 text-sm" id="extractions-empty">
+            No recent extractions. <a href="/extract/url" class="text-blue-600 hover:underline">Start one</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- My hauls -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="font-semibold text-gray-900">My Hauls</h2>
+          <a href="/hauls" class="text-xs text-blue-600 hover:underline no-underline">View all</a>
+        </div>
+        <div id="hauls-list" class="divide-y divide-gray-50">
+          <div class="px-5 py-8 text-center text-gray-400 text-sm" id="hauls-empty">
+            No hauls yet. <a href="/hauls" class="text-blue-600 hover:underline">Create one</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick links -->
+    <div class="mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <h2 class="font-semibold text-gray-900 mb-3">Quick Links</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <a href="/extract/url" class="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 no-underline p-2 rounded-lg hover:bg-gray-50 transition">
+          <i class="bi bi-link-45deg text-gray-400"></i> Extract by URL
+        </a>
+        <a href="/extract/html" class="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 no-underline p-2 rounded-lg hover:bg-gray-50 transition">
+          <i class="bi bi-code-slash text-gray-400"></i> Paste HTML
+        </a>
+        <a href="/sites" class="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 no-underline p-2 rounded-lg hover:bg-gray-50 transition">
+          <i class="bi bi-globe text-gray-400"></i> Supported Sites
+        </a>
+        <a href="/account" class="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 no-underline p-2 rounded-lg hover:bg-gray-50 transition">
+          <i class="bi bi-key text-gray-400"></i> API Key
+        </a>
+        <a href="/docs/api" class="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 no-underline p-2 rounded-lg hover:bg-gray-50 transition">
+          <i class="bi bi-book text-gray-400"></i> API Docs
+        </a>
+        <a href="/extension" class="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 no-underline p-2 rounded-lg hover:bg-gray-50 transition">
+          <i class="bi bi-puzzle text-gray-400"></i> Extension
+        </a>
+        <a href="/docs/get-html" class="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 no-underline p-2 rounded-lg hover:bg-gray-50 transition">
+          <i class="bi bi-question-circle text-gray-400"></i> Guides
+        </a>
+        <a href="/pricing" class="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 no-underline p-2 rounded-lg hover:bg-gray-50 transition">
+          <i class="bi bi-credit-card text-gray-400"></i> Pricing
+        </a>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script is:inline>
+(function () {
+  var cfg = document.getElementById('fb-config');
+  var apiKey = cfg && cfg.dataset.apiKey;
+  var authDomain = cfg && cfg.dataset.authDomain;
+
+  var firebaseAuth = null;
+  var authModule = null;
+
+  function showSection(id) {
+    ['loading-section', 'signed-out-section', 'dashboard-section'].forEach(function (s) {
+      document.getElementById(s).classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function populateDashboard(user) {
+    // User name
+    var nameEl = document.getElementById('user-name');
+    nameEl.textContent = user.email;
+
+    // Recent extractions from PwsStorage
+    var recentExtractions = [];
+    if (typeof window.PwsStorage !== 'undefined') {
+      recentExtractions = window.PwsStorage.get('functional:recent-extractions') || [];
+    }
+
+    document.getElementById('extraction-count').textContent = String(recentExtractions.length);
+
+    var extractionsList = document.getElementById('extractions-list');
+    var extractionsEmpty = document.getElementById('extractions-empty');
+
+    if (recentExtractions.length > 0) {
+      extractionsEmpty.classList.add('hidden');
+      var html = '';
+      // Show up to 8 most recent
+      var shown = recentExtractions.slice(0, 8);
+      for (var i = 0; i < shown.length; i++) {
+        var e = shown[i];
+        var title = e.title || e.url || 'Untitled';
+        var grade = e.grade || '?';
+        var gradeColor = grade === 'A' ? 'bg-green-100 text-green-700'
+          : grade === 'B' ? 'bg-blue-100 text-blue-700'
+          : grade === 'C' ? 'bg-amber-100 text-amber-700'
+          : 'bg-red-100 text-red-700';
+        var resultId = e.resultId || e.id || '';
+        var href = resultId ? '/extract/results/' + resultId : '#';
+
+        html += '<a href="' + href + '" class="block px-5 py-3 hover:bg-gray-50 transition no-underline">';
+        html += '<div class="flex items-center justify-between">';
+        html += '<p class="text-sm text-gray-800 truncate flex-1 mr-3">' + title + '</p>';
+        html += '<span class="inline-block px-2 py-0.5 rounded text-xs font-semibold ' + gradeColor + '">' + grade + '</span>';
+        html += '</div>';
+        if (e.price) {
+          html += '<p class="text-xs text-gray-400 mt-0.5">' + e.price + '</p>';
+        }
+        html += '</a>';
+      }
+      extractionsList.innerHTML = html + (extractionsEmpty.outerHTML);
+    }
+
+    // My hauls from PwsStorage
+    var myHauls = [];
+    if (typeof window.PwsStorage !== 'undefined') {
+      myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+    }
+
+    // Filter expired
+    var now = new Date();
+    myHauls = myHauls.filter(function(h) {
+      return new Date(h.expiresAt) > now;
+    });
+
+    // Sort by lastVisited
+    myHauls.sort(function(a, b) {
+      return new Date(b.lastVisited).getTime() - new Date(a.lastVisited).getTime();
+    });
+
+    document.getElementById('haul-count').textContent = String(myHauls.length);
+
+    var totalScrapes = 0;
+    for (var j = 0; j < myHauls.length; j++) {
+      totalScrapes += (myHauls[j].scrapeCount || 0);
+    }
+    document.getElementById('scrape-count').textContent = String(totalScrapes);
+
+    var haulsList = document.getElementById('hauls-list');
+    var haulsEmpty = document.getElementById('hauls-empty');
+
+    if (myHauls.length > 0) {
+      haulsEmpty.classList.add('hidden');
+      var haulHtml = '';
+      var haulShown = myHauls.slice(0, 6);
+      for (var k = 0; k < haulShown.length; k++) {
+        var h = haulShown[k];
+        var daysLeft = Math.max(0, Math.ceil((new Date(h.expiresAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+        var name = h.name || h.id;
+
+        haulHtml += '<a href="/haul/' + h.id + '" class="block px-5 py-3 hover:bg-gray-50 transition no-underline">';
+        haulHtml += '<div class="flex items-center justify-between">';
+        haulHtml += '<p class="text-sm text-gray-800 truncate flex-1 mr-3">' + name + '</p>';
+        haulHtml += '<span class="text-xs text-gray-400 whitespace-nowrap">' + (h.scrapeCount || 0) + ' scrapes</span>';
+        haulHtml += '</div>';
+        haulHtml += '<p class="text-xs text-gray-400 mt-0.5">' + daysLeft + ' days left</p>';
+        haulHtml += '</a>';
+      }
+      haulsList.innerHTML = haulHtml + (haulsEmpty.outerHTML);
+    }
+  }
+
+  async function init() {
+    if (!apiKey || !authDomain) {
+      showSection('signed-out-section');
+      return;
+    }
+
+    var baseUrl = 'https://www.gstatic.com/firebasejs/11.3.1/';
+    var app = await import(baseUrl + 'firebase-app.js');
+    authModule = await import(baseUrl + 'firebase-auth.js');
+
+    var firebaseApp = app.initializeApp({ apiKey: apiKey, authDomain: authDomain });
+    firebaseAuth = authModule.getAuth(firebaseApp);
+
+    authModule.onAuthStateChanged(firebaseAuth, function (user) {
+      if (!user) {
+        showSection('signed-out-section');
+        return;
+      }
+      if (!user.emailVerified) {
+        window.location.href = '/verify-email';
+        return;
+      }
+      showSection('dashboard-section');
+      populateDashboard(user);
+    });
+  }
+
+  init().catch(function (err) {
+    console.error('Firebase init failed:', err);
+    showSection('signed-out-section');
+  });
+})();
+</script>
+
+</BaseLayout>
