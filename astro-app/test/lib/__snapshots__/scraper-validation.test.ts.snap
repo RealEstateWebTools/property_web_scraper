@@ -873,6 +873,54 @@ Per ulteriori informazioni o per concordare una visita, non esitate a contattare
 }
 `;
 
+exports[`Scraper validation > mx_inmuebles24 scraper > matches full extraction snapshot 1`] = `
+{
+  "agent_company": "Rome Remates",
+  "area_unit": "sqmt",
+  "city": "Benito Juárez",
+  "constructed_area": 110,
+  "count_bathrooms": 0,
+  "count_bedrooms": 2,
+  "count_parking": 2,
+  "country": "Mexico",
+  "currency": "MXN",
+  "description": "REMATE BANCARIO, Departamento en excelente ubicación, y exclusiva Zona DEL VALLE NORTE cerca de plazas comerciales, escuelas, hospitales, ...Del Valle Norte",
+  "for_rent": false,
+  "for_rent_long_term": false,
+  "for_rent_short_term": "false",
+  "for_sale": true,
+  "image_urls": [
+    {
+      "url": "https://img10.naventcdn.com/avisos/18/01/45/69/22/12/720x532/1547210214.jpg?isFirstImage=true",
+    },
+    {
+      "url": "https://img10.naventcdn.com/avisos/resize/18/01/45/69/22/12/1200x1200/1547210214.jpg?isFirstImage=true",
+    },
+    {
+      "url": "https://img10.naventcdn.com/avisos/18/01/45/69/22/12/360x266/1547210217.jpg",
+    },
+    {
+      "url": "https://img10.naventcdn.com/avisos/18/01/45/69/22/12/360x266/1547210216.jpg",
+    },
+    {
+      "url": "https://img10.naventcdn.com/avisos/18/01/45/69/22/12/360x266/1547210219.jpg",
+    },
+    {
+      "url": "https://img10.naventcdn.com/avisos/18/01/45/69/22/12/360x266/1547210212.jpg",
+    },
+  ],
+  "locale_code": "es-MX",
+  "main_image_url": "https://img10.naventcdn.com/avisos/18/01/45/69/22/12/720x532/1547210214.jpg?isFirstImage=true",
+  "plot_area": 110,
+  "price_float": 1500000,
+  "price_string": "MN 1,500,000",
+  "property_type": "Apartment",
+  "reference": "145692212",
+  "region": "Del Valle Norte",
+  "title": "Remato Departamento en del Valle Norte, Benito Juarez, Ciudad de México - Inmuebles24",
+}
+`;
+
 exports[`Scraper validation > nl_funda scraper > matches full extraction snapshot 1`] = `
 {
   "address_string": "Keizersgracht 100",

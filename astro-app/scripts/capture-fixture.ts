@@ -98,6 +98,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'immoweb.be': 'be_immoweb',
   'www.property24.com': 'za_property24',
   'property24.com': 'za_property24',
+  'www.inmuebles24.com': 'mx_inmuebles24',
+  'inmuebles24.com': 'mx_inmuebles24',
 };
 
 const HELP_TEXT = `

@@ -1,0 +1,99 @@
+[{
+  "name": "mx_inmuebles24",
+  "expectedExtractionRate": 0.80,
+
+  // Data is in an inline `avisoInfo` JS object and JSON-LD (@type: Apartment)
+  // CFT codes: CFT2=bedrooms, CFT3=bathrooms, CFT7=parking, CFT100=lot m², CFT101=built m²
+  // icon names: dormitorio=bedrooms, cochera=parking, scubierta=built area, stotal=lot area
+  // scriptRegEx returns match[0] (full match) — patterns use lookahead/lookbehind for value-only extraction
+
+  "defaultValues": {
+    "country":            { "value": "Mexico" },
+    "currency":           { "value": "MXN" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "es-MX" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[class*='imageGrid-module__imgProperty']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "scriptRegEx": "\\d+(?=\",\"icon\":\"dormitorio\")"
+    },
+    "count_bathrooms": {
+      "scriptRegEx": "\\d+(?=\",\"icon\":\"bano\")"
+    },
+    "count_parking": {
+      "scriptRegEx": "\\d+(?=\",\"icon\":\"cochera\")"
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "scriptRegEx": "(?<=\"amount\":)\\d+"
+    },
+    "constructed_area": {
+      "scriptRegEx": "\\d+(?=\",\"icon\":\"scubierta\")"
+    },
+    "plot_area": {
+      "scriptRegEx": "\\d+(?=\",\"icon\":\"stotal\")"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content"
+    },
+    "description": {
+      "jsonLdType": "Apartment",
+      "jsonLdPath": "description"
+    },
+    "price_string": {
+      "scriptRegEx": "(?<='price': ')[^']+"
+    },
+    "reference": {
+      "scriptRegEx": "(?<=postingId = \")\\d+"
+    },
+    "city": {
+      "scriptRegEx": "(?<='ciudad': ')[^']+"
+    },
+    "region": {
+      "jsonLdType": "Apartment",
+      "jsonLdPath": "address.addressRegion"
+    },
+    "property_type": {
+      "jsonLdType": "Apartment",
+      "jsonLdPath": "@type"
+    },
+    "agent_company": {
+      "scriptRegEx": "(?<=\"name\":\")[^\"]+(?=\",\"url\":\"/inmobiliarias/)"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "clasificado"
+    },
+    "for_rent": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "en-renta"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "en-renta"
+    }
+  }
+}]
