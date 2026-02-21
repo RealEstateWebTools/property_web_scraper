@@ -1,0 +1,154 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+import { queryAuditLog, getAuditLogStats } from '@lib/services/audit-log.js';
+import type { LogLevel, LogCategory } from '@lib/services/activity-logger.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+
+const url = new URL(Astro.request.url);
+const level = url.searchParams.get('level') as LogLevel | null;
+const category = url.searchParams.get('category') as LogCategory | null;
+const scraperName = url.searchParams.get('scraper') || '';
+const search = url.searchParams.get('search') || '';
+
+const result = await queryAuditLog({
+  level: level || undefined,
+  category: category || undefined,
+  scraperName: scraperName || undefined,
+  search: search || undefined,
+  limit: 100,
+});
+const stats = await getAuditLogStats();
+
+function formatTime(ts: number): string {
+  const diff = Date.now() - ts;
+  if (diff < 60_000) return `${Math.floor(diff / 1000)}s ago`;
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  return new Date(ts).toLocaleDateString();
+}
+
+function levelBadge(lvl: string): string {
+  switch (lvl) {
+    case 'error': return 'bg-red-100 text-red-700';
+    case 'warn': return 'bg-yellow-100 text-yellow-700';
+    default: return 'bg-blue-100 text-blue-700';
+  }
+}
+---
+<AdminLayout title="Audit Log — Admin" activePage="audit-log">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Audit Log</h1>
+    <span class="text-sm text-gray-500">{stats.totalEntries} persisted entries</span>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-lg shadow mb-6 p-4">
+    <form method="GET" class="flex flex-wrap items-end gap-3">
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Search</label>
+        <input
+          type="text"
+          name="search"
+          value={search}
+          placeholder="Search messages, URLs, errors..."
+          class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Level</label>
+        <select name="level" class="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">All</option>
+          <option value="info" selected={level === 'info'}>Info</option>
+          <option value="warn" selected={level === 'warn'}>Warning</option>
+          <option value="error" selected={level === 'error'}>Error</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Category</label>
+        <select name="category" class="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">All</option>
+          <option value="extraction" selected={category === 'extraction'}>Extraction</option>
+          <option value="quality" selected={category === 'quality'}>Quality</option>
+          <option value="system" selected={category === 'system'}>System</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Scraper</label>
+        <input
+          type="text"
+          name="scraper"
+          value={scraperName}
+          placeholder="e.g. uk_rightmove"
+          class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition">
+        Filter
+      </button>
+      <a href="/admin/audit-log" class="px-4 py-2 bg-gray-200 text-gray-700 rounded text-sm font-medium hover:bg-gray-300 transition no-underline">
+        Clear
+      </a>
+    </form>
+  </div>
+
+  <!-- Level summary -->
+  <div class="flex gap-4 mb-4 text-sm">
+    <span class="text-blue-600 font-medium">{stats.byLevel.info} info</span>
+    <span class="text-yellow-600 font-medium">{stats.byLevel.warn} warn</span>
+    <span class="text-red-600 font-medium">{stats.byLevel.error} error</span>
+    <span class="text-gray-400">|</span>
+    <span class="text-gray-500">Showing {result.entries.length} of {result.total} filtered</span>
+  </div>
+
+  <!-- Audit table -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-200">
+            <th class="py-2 px-3 font-medium">Time</th>
+            <th class="py-2 px-3 font-medium">Level</th>
+            <th class="py-2 px-3 font-medium">Category</th>
+            <th class="py-2 px-3 font-medium">Scraper</th>
+            <th class="py-2 px-3 font-medium">Message</th>
+            <th class="py-2 px-3 font-medium">Fields</th>
+          </tr>
+        </thead>
+        <tbody>
+          {result.entries.map((entry) => (
+            <tr class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="py-2 px-3 text-gray-500 whitespace-nowrap">{formatTime(entry.timestamp)}</td>
+              <td class="py-2 px-3">
+                <span class={`inline-block px-2 py-0.5 rounded text-xs font-medium ${levelBadge(entry.level)}`}>
+                  {entry.level}
+                </span>
+              </td>
+              <td class="py-2 px-3 text-gray-500">{entry.category}</td>
+              <td class="py-2 px-3 font-mono text-xs">{entry.scraperName || '—'}</td>
+              <td class="py-2 px-3 max-w-md truncate">{entry.message}</td>
+              <td class="py-2 px-3 text-gray-500 whitespace-nowrap">
+                {entry.fieldsFound != null && entry.fieldsAvailable != null
+                  ? `${entry.fieldsFound}/${entry.fieldsAvailable}`
+                  : '—'}
+              </td>
+            </tr>
+          ))}
+          {result.entries.length === 0 && (
+            <tr>
+              <td colspan="6" class="py-8 text-center text-gray-400">
+                No audit entries
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="mt-4 text-xs text-gray-400">
+    Audit log persists extraction, quality, and system events to Firestore. API request and rate limit events are excluded for volume control.
+  </p>
+</AdminLayout>

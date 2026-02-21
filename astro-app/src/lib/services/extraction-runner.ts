@@ -17,6 +17,7 @@ import type { ScrapeSourceType } from '@lib/services/scrape-metadata.js';
 import type { ScraperMapping } from '@lib/extractor/mapping-loader.js';
 import type { ExtractionDiagnostics } from '@lib/extractor/html-extractor.js';
 import type { ImportHost } from '@lib/models/import-host.js';
+import { recordHealthSnapshot } from '@lib/services/scraper-health-trends.js';
 
 export function countAvailableFields(mapping: ScraperMapping): number {
   let count = 0;
@@ -169,6 +170,13 @@ export async function runExtraction(opts: {
     }).catch((err) => {
       logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Scrape metadata recording failed: ' + (err.message || err) });
       recordDeadLetter({ source: 'scrape_metadata', operation: `recordScrapeAndUpdatePortal(${url})`, error: (err as Error).message || String(err), context: { url, listingId: resultId, sourceType }, attempts: 1 }).catch(() => {});
+    });
+  }
+
+  // Record scraper health snapshot (fire-and-forget)
+  if (result.diagnostics) {
+    recordHealthSnapshot(result.diagnostics, url).catch((err) => {
+      logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Health snapshot recording failed: ' + (err.message || err) });
     });
   }
 

@@ -26,6 +26,9 @@ export const ADMIN_NAV_LINKS: NavLink[] = [
   { label: 'Scrapers', href: '/admin/scrapers', icon: 'bi-cpu', activePage: 'scrapers' },
   { label: 'Health', href: '/admin/scraper-health', icon: 'bi-heart-pulse', activePage: 'scraper-health' },
   { label: 'Exports', href: '/admin/exports', icon: 'bi-download', activePage: 'exports' },
+  { label: 'Audit Log', href: '/admin/audit-log', icon: 'bi-shield-check', activePage: 'audit-log' },
+  { label: 'Trends', href: '/admin/scraper-trends', icon: 'bi-graph-up-arrow', activePage: 'scraper-trends' },
+  { label: 'Retention', href: '/admin/retention', icon: 'bi-clock-history', activePage: 'retention' },
   { label: 'AI Map', href: '/admin/ai-map', icon: 'bi-magic', activePage: 'ai-map' },
 ];
 

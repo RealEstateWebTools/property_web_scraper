@@ -5,6 +5,7 @@
  */
 
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
+import { persistAuditEntry } from './audit-log.js';
 
 export type LogLevel = 'info' | 'warn' | 'error';
 export type LogCategory = 'api_request' | 'extraction' | 'auth' | 'rate_limit' | 'system' | 'quality';
@@ -87,6 +88,11 @@ export function logActivity(input: LogInput): void {
     } else {
       console.log(payload);
     }
+  }
+
+  // Persist to audit log for extraction, quality, and system events
+  if (['extraction', 'quality', 'system'].includes(input.category)) {
+    persistAuditEntry(entry).catch(() => {});
   }
 }
 

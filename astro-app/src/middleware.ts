@@ -2,6 +2,7 @@ import type { MiddlewareHandler } from 'astro';
 import { validateEnv } from '@lib/services/env-validator.js';
 import { corsPreflightResponse, buildCorsHeaders } from '@lib/services/api-response.js';
 import { initAllKV } from '@lib/services/kv-init.js';
+import { maybeTriggerCleanup } from '@lib/services/retention-cleanup.js';
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   validateEnv();
@@ -47,6 +48,11 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data:; font-src 'self' https:; connect-src 'self' https:; frame-ancestors 'none'");
 
   console.log(`[Middleware] ${method} ${url.pathname} → ${response.status}`);
+
+  // Probabilistic retention cleanup on admin/API requests
+  if (url.pathname.startsWith('/admin/') || url.pathname.startsWith('/public_api/')) {
+    maybeTriggerCleanup();
+  }
 
   return response;
 };

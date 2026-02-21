@@ -1,0 +1,236 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { authenticateAdmin } from '@lib/services/admin-auth.js';
+
+const auth = authenticateAdmin(Astro.request);
+if (!auth.authorized) return Astro.redirect('/admin/login');
+---
+<AdminLayout title="Scraper Trends — Admin" activePage="scraper-trends">
+  <h1 class="text-2xl font-bold mb-2">Scraper Quality Trends</h1>
+  <p class="text-sm text-gray-500 mb-6">Per-scraper quality snapshots over time with rolling averages and trend direction.</p>
+
+  <!-- Controls -->
+  <div class="flex items-center gap-3 mb-6">
+    <label class="text-sm text-gray-600">Period:</label>
+    <select id="days-select" class="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <option value="7">7 days</option>
+      <option value="30" selected>30 days</option>
+      <option value="90">90 days</option>
+      <option value="180">180 days</option>
+    </select>
+    <button
+      id="refresh-btn"
+      class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition"
+    >
+      Refresh
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading" class="text-center py-12">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
+    <p class="mt-3 text-sm text-gray-500">Loading trend data...</p>
+  </div>
+
+  <!-- Summary cards -->
+  <div id="summary" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Scrapers Tracked</p>
+      <p class="text-2xl font-bold" id="tracked-count">—</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Improving</p>
+      <p class="text-2xl font-bold text-green-600" id="improving-count">—</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Stable</p>
+      <p class="text-2xl font-bold text-blue-600" id="stable-count">—</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Declining</p>
+      <p class="text-2xl font-bold text-red-600" id="declining-count">—</p>
+    </div>
+  </div>
+
+  <!-- Results table -->
+  <div id="results" class="hidden bg-white rounded-lg shadow">
+    <div class="px-5 py-4 border-b border-gray-200">
+      <h2 class="font-semibold">Scraper Trends</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-200">
+            <th class="py-2 px-5 font-medium">Scraper</th>
+            <th class="py-2 px-5 font-medium">Latest Grade</th>
+            <th class="py-2 px-5 font-medium">Avg Rate</th>
+            <th class="py-2 px-5 font-medium">Avg Weighted</th>
+            <th class="py-2 px-5 font-medium">Trend</th>
+            <th class="py-2 px-5 font-medium">Snapshots</th>
+            <th class="py-2 px-5 font-medium">Grade Distribution</th>
+            <th class="py-2 px-5 font-medium">Last Seen</th>
+          </tr>
+        </thead>
+        <tbody id="results-body">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="empty" class="hidden text-center py-12 text-gray-400">
+    No trend data available yet. Trends are recorded automatically during extractions.
+  </div>
+
+  <!-- Error -->
+  <div id="error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm mt-4">
+  </div>
+
+  <script>
+    const gradeColors: Record<string, string> = {
+      A: 'bg-green-100 text-green-700',
+      B: 'bg-blue-100 text-blue-700',
+      C: 'bg-amber-100 text-amber-700',
+      F: 'bg-red-100 text-red-700',
+    };
+
+    const trendIcons: Record<string, string> = {
+      improving: '<span class="text-green-600 font-medium">&#9650; improving</span>',
+      stable: '<span class="text-blue-600 font-medium">&#9654; stable</span>',
+      declining: '<span class="text-red-600 font-medium">&#9660; declining</span>',
+    };
+
+    function formatTime(ts: number): string {
+      const diff = Date.now() - ts;
+      if (diff < 60_000) return `${Math.floor(diff / 1000)}s ago`;
+      if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+      if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+      return new Date(ts).toLocaleDateString();
+    }
+
+    async function loadTrends() {
+      const loadingEl = document.getElementById('loading')!;
+      const summaryEl = document.getElementById('summary')!;
+      const resultsEl = document.getElementById('results')!;
+      const emptyEl = document.getElementById('empty')!;
+      const errorEl = document.getElementById('error')!;
+      const bodyEl = document.getElementById('results-body')!;
+
+      loadingEl.classList.remove('hidden');
+      summaryEl.classList.add('hidden');
+      resultsEl.classList.add('hidden');
+      emptyEl.classList.add('hidden');
+      errorEl.classList.add('hidden');
+
+      const days = (document.getElementById('days-select') as HTMLSelectElement).value;
+
+      try {
+        const res = await fetch(`/admin/api/scraper-trends?days=${days}`);
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({ error: 'Request failed' }));
+          errorEl.textContent = data.error || `HTTP ${res.status}`;
+          errorEl.classList.remove('hidden');
+          loadingEl.classList.add('hidden');
+          return;
+        }
+
+        const data = await res.json();
+        const trends: any[] = data.trends || [];
+
+        if (trends.length === 0) {
+          loadingEl.classList.add('hidden');
+          emptyEl.classList.remove('hidden');
+          return;
+        }
+
+        // Summary
+        const improving = trends.filter((t: any) => t.trendDirection === 'improving').length;
+        const stable = trends.filter((t: any) => t.trendDirection === 'stable').length;
+        const declining = trends.filter((t: any) => t.trendDirection === 'declining').length;
+
+        document.getElementById('tracked-count')!.textContent = String(trends.length);
+        document.getElementById('improving-count')!.textContent = String(improving);
+        document.getElementById('stable-count')!.textContent = String(stable);
+        document.getElementById('declining-count')!.textContent = String(declining);
+
+        // Table rows
+        bodyEl.innerHTML = '';
+        for (const t of trends) {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-gray-100 hover:bg-gray-50';
+
+          // Scraper name
+          const tdName = document.createElement('td');
+          tdName.className = 'py-2 px-5 font-mono text-sm';
+          tdName.textContent = t.scraperName;
+          tr.appendChild(tdName);
+
+          // Latest grade
+          const tdGrade = document.createElement('td');
+          tdGrade.className = 'py-2 px-5';
+          const colorClass = gradeColors[t.latestGrade] || gradeColors.F;
+          tdGrade.innerHTML = `<span class="inline-block px-2 py-0.5 rounded text-xs font-semibold ${colorClass}">${t.latestGrade}</span>`;
+          tr.appendChild(tdGrade);
+
+          // Avg rate
+          const tdRate = document.createElement('td');
+          tdRate.className = 'py-2 px-5 text-gray-600';
+          tdRate.textContent = `${Math.round(t.averageExtractionRate * 100)}%`;
+          tr.appendChild(tdRate);
+
+          // Avg weighted
+          const tdWeighted = document.createElement('td');
+          tdWeighted.className = 'py-2 px-5 text-gray-600';
+          tdWeighted.textContent = t.averageWeightedRate ? `${Math.round(t.averageWeightedRate * 100)}%` : '—';
+          tr.appendChild(tdWeighted);
+
+          // Trend
+          const tdTrend = document.createElement('td');
+          tdTrend.className = 'py-2 px-5';
+          tdTrend.innerHTML = trendIcons[t.trendDirection] || t.trendDirection;
+          tr.appendChild(tdTrend);
+
+          // Snapshots
+          const tdCount = document.createElement('td');
+          tdCount.className = 'py-2 px-5 text-gray-600';
+          tdCount.textContent = String(t.snapshotCount);
+          tr.appendChild(tdCount);
+
+          // Grade distribution
+          const tdDist = document.createElement('td');
+          tdDist.className = 'py-2 px-5';
+          const dist = t.gradeDistribution || {};
+          const parts: string[] = [];
+          for (const g of ['A', 'B', 'C', 'F']) {
+            if (dist[g]) {
+              const gc = gradeColors[g] || '';
+              parts.push(`<span class="inline-block px-1.5 py-0.5 mr-1 rounded text-xs font-medium ${gc}">${g}:${dist[g]}</span>`);
+            }
+          }
+          tdDist.innerHTML = parts.length > 0 ? parts.join('') : '<span class="text-gray-400 text-xs">—</span>';
+          tr.appendChild(tdDist);
+
+          // Last seen
+          const tdLast = document.createElement('td');
+          tdLast.className = 'py-2 px-5 text-gray-500 whitespace-nowrap';
+          tdLast.textContent = formatTime(t.latestTimestamp);
+          tr.appendChild(tdLast);
+
+          bodyEl.appendChild(tr);
+        }
+
+        loadingEl.classList.add('hidden');
+        summaryEl.classList.remove('hidden');
+        resultsEl.classList.remove('hidden');
+      } catch (err) {
+        errorEl.textContent = 'Network error: ' + (err instanceof Error ? err.message : String(err));
+        errorEl.classList.remove('hidden');
+        loadingEl.classList.add('hidden');
+      }
+    }
+
+    loadTrends();
+    document.getElementById('refresh-btn')?.addEventListener('click', loadTrends);
+    document.getElementById('days-select')?.addEventListener('change', loadTrends);
+  </script>
+</AdminLayout>

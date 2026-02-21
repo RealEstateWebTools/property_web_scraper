@@ -92,7 +92,9 @@ async function firestoreSaveDiagnostics(id: string, diagnostics: ExtractionDiagn
     const db = await getClient();
     const prefix = getCollectionPrefix();
     const col = db.collection(`${prefix}diagnostics`);
-    await col.doc(id).set(JSON.parse(JSON.stringify(diagnostics)));
+    const payload = JSON.parse(JSON.stringify(diagnostics));
+    payload.created_at = Date.now();
+    await col.doc(id).set(payload);
   } catch (err) {
     logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore diagnostics save failed: ' + ((err as Error).message || err) });
   }
