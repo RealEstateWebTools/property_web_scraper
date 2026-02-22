@@ -136,6 +136,22 @@ const HOSTNAME_MAP: Record<string, string> = {
   'buyrentkenya.com': 'ke_buyrentkenya',
   'www.propertypro.ng': 'ng_propertypro',
   'propertypro.ng': 'ng_propertypro',
+  'www.cian.ru': 'ru_cian',
+  'cian.ru': 'ru_cian',
+  'www.magicbricks.com': 'in_magicbricks',
+  'magicbricks.com': 'in_magicbricks',
+  'www.propertyguru.com.my': 'my_propertyguru',
+  'propertyguru.com.my': 'my_propertyguru',
+  'www.squarefoot.com.hk': 'hk_squarefoot',
+  'squarefoot.com.hk': 'hk_squarefoot',
+  'www.oikotie.fi': 'fi_oikotie',
+  'oikotie.fi': 'fi_oikotie',
+  'www.finn.no': 'no_finn',
+  'finn.no': 'no_finn',
+  'www.immoscout24.ch': 'ch_immoscout',
+  'immoscout24.ch': 'ch_immoscout',
+  'www.myhome.ie': 'ie_myhome',
+  'myhome.ie': 'ie_myhome',
 };
 
 const HELP_TEXT = `

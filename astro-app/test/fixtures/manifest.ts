@@ -931,4 +931,52 @@ export const fixtures: FixtureEntry[] = [
     sourceUrl: 'https://www.propertypro.ng/property/sale/12345',
     expected: {},
   },
+  {
+    scraper: 'ru_cian',
+    fixture: null,
+    sourceUrl: 'https://www.cian.ru/sale/flat/12345/',
+    expected: {},
+  },
+  {
+    scraper: 'in_magicbricks',
+    fixture: null,
+    sourceUrl: 'https://www.magicbricks.com/propertyDetails/12345',
+    expected: {},
+  },
+  {
+    scraper: 'my_propertyguru',
+    fixture: null,
+    sourceUrl: 'https://www.propertyguru.com.my/listing/sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'hk_squarefoot',
+    fixture: null,
+    sourceUrl: 'https://www.squarefoot.com.hk/property/sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'fi_oikotie',
+    fixture: null,
+    sourceUrl: 'https://www.oikotie.fi/myytavat-asunnot/12345',
+    expected: {},
+  },
+  {
+    scraper: 'no_finn',
+    fixture: null,
+    sourceUrl: 'https://www.finn.no/realestate/homes/ad.html?finnkode=12345',
+    expected: {},
+  },
+  {
+    scraper: 'ch_immoscout',
+    fixture: null,
+    sourceUrl: 'https://www.immoscout24.ch/en/d/buy/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ie_myhome',
+    fixture: null,
+    sourceUrl: 'https://www.myhome.ie/residential/12345',
+    expected: {},
+  },
 ];
