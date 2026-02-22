@@ -1,0 +1,125 @@
+[{
+  "name": "lt_aruodas",
+  "expectedExtractionRate": 0.60,
+
+  // aruodas.lt — Lithuania's largest real estate portal
+  // Primary data source: JSON-LD or HTML-based extraction
+  // Secondary: CSS selectors for property details, meta tags
+  // URL patterns: /butai/ (apartments), /namai/ (houses)
+  // Sale/rent: /nuoma/ (rent) vs default (sale)
+
+  "defaultValues": {
+    "country":            { "value": "Lithuania" },
+    "currency":           { "value": "EUR" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "lt-LT" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='aruodas'], img[src*='aruodas.lt']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": ".obj-detail-info dt:contains('Kambarių') + dd, [class*='rooms']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": ".obj-detail-info dt:contains('Sanitarinių') + dd, [class*='bathroom']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "year_construction": {
+      "cssLocator": ".obj-detail-info dt:contains('Metai') + dd, .obj-detail-info dt:contains('Statybos') + dd",
+      "modifiers": ["digitsOnly"]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".price, .obj-price", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": ".obj-detail-info dt:contains('Plotas') + dd, [class*='area']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".price, .obj-price",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": ".obj-header-text h1, .obj-location" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1",
+      "regex": "(\\d[\\d-]+)",
+      "regexGroup": 1
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "exclude?",
+      "evaluatorParam": "nuoma"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "nuoma"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "nuoma"
+    }
+  }
+}]

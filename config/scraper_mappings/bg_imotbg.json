@@ -1,0 +1,131 @@
+[{
+  "name": "bg_imotbg",
+  "expectedExtractionRate": 0.55,
+
+  // imot.bg — Bulgaria's long-running real estate portal
+  // Primarily HTML-based extraction (older site, limited structured data)
+  // Secondary: meta og tags for title/description/image
+  // URL patterns: /prodava/ (sale) vs /dava-pod-naem/ (rent)
+
+  "defaultValues": {
+    "country":            { "value": "Bulgaria" },
+    "currency":           { "value": "EUR" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "bg-BG" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='imot.bg'], img[src*='cdn.imot.bg']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "cssLocator": ".info li:contains('Стаи') strong, .adParams div:contains('Стаи') span",
+      "modifiers": ["digitsOnly"],
+      "fallbacks": [
+        { "cssLocator": "[class*='room']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "cssLocator": ".info li:contains('Баня') strong, .adParams div:contains('Баня') span",
+      "modifiers": ["digitsOnly"]
+    },
+    "year_construction": {
+      "cssLocator": ".info li:contains('Година') strong, .adParams div:contains('Строителство') span",
+      "modifiers": ["digitsOnly"]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "cssLocator": "#cena, .price, .advPrice",
+      "modifiers": ["digitsOnly"]
+    },
+    "constructed_area": {
+      "cssLocator": ".info li:contains('Площ') strong, .adParams div:contains('Площ') span",
+      "modifiers": ["digitsOnly"]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "#description_div, .advText" }
+      ]
+    },
+    "price_string": {
+      "cssLocator": "#cena, .price, .advPrice",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "cssLocator": ".location, .adLocation, h2.info",
+      "fallbacks": [
+        { "jsonLdPath": "address.streetAddress" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality",
+      "fallbacks": [
+        { "cssLocator": ".location .city, .adLocation a:first-child" }
+      ]
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion",
+      "fallbacks": [
+        { "cssLocator": ".location .region, .adLocation a:nth-child(2)" }
+      ]
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "cssLocator": ".info li:contains('Вид') strong, .adParams div:contains('Тип') span",
+      "fallbacks": [
+        { "jsonLdPath": "@type" }
+      ]
+    },
+    "reference": {
+      "urlPathPart": "-1",
+      "regex": "(\\d+)",
+      "regexGroup": 1
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "prodava"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "dava-pod-naem"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "dava-pod-naem"
+    }
+  }
+}]

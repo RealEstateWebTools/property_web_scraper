@@ -1027,4 +1027,52 @@ export const fixtures: FixtureEntry[] = [
     sourceUrl: 'https://www.plusvalia.com/propiedades/venta/12345',
     expected: {},
   },
+  {
+    scraper: 'pk_zameen',
+    fixture: null,
+    sourceUrl: 'https://www.zameen.com/Property/lahore-12345.html',
+    expected: {},
+  },
+  {
+    scraper: 'id_rumah123',
+    fixture: null,
+    sourceUrl: 'https://www.rumah123.com/properti/dijual/12345',
+    expected: {},
+  },
+  {
+    scraper: 'vn_batdongsan',
+    fixture: null,
+    sourceUrl: 'https://www.batdongsan.com.vn/ban-can-ho-chung-cu/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ua_lun',
+    fixture: null,
+    sourceUrl: 'https://www.lun.ua/prodazha-kvartir/kyiv/12345',
+    expected: {},
+  },
+  {
+    scraper: 'sa_bayut',
+    fixture: null,
+    sourceUrl: 'https://www.bayut.sa/en/property/details-12345.html',
+    expected: {},
+  },
+  {
+    scraper: 'ma_mubawab',
+    fixture: null,
+    sourceUrl: 'https://www.mubawab.ma/fr/ad/a-vendre/12345',
+    expected: {},
+  },
+  {
+    scraper: 'lt_aruodas',
+    fixture: null,
+    sourceUrl: 'https://www.aruodas.lt/butai/vilniuje/12345/',
+    expected: {},
+  },
+  {
+    scraper: 'bg_imotbg',
+    fixture: null,
+    sourceUrl: 'https://www.imot.bg/pcgi/imot.cgi?act=5&adv=12345',
+    expected: {},
+  },
 ];

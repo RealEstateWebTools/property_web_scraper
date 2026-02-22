@@ -1,0 +1,110 @@
+[{
+  "name": "sa_bayut",
+  "expectedExtractionRate": 0.70,
+
+  // bayut.sa — Saudi Arabia's property portal (Bayut network)
+  // Primary data source: JSON-LD @graph[0] (RealEstateListing -> mainEntity)
+  // Same pattern as ae_bayut — structured data via @graph, aria-label attributes
+  // URL patterns: sale/rent detected via aria-label Purpose field
+
+  "defaultValues": {
+    "country":            { "value": "Saudi Arabia" },
+    "currency":           { "value": "SAR" },
+    "area_unit":          { "value": "sqft" },
+    "locale_code":        { "value": "en-SA" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='images.bayut.sa'], img[src*='images.bayut.com']",
+    "cssAttr": "src"
+  }],
+
+  "features": [{
+    "cssLocator": "span.c0327f5b"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "@graph.0.mainEntity.numberOfBedrooms"
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "@graph.0.mainEntity.numberOfBathroomsTotal"
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "@graph.0.mainEntity.price"
+    },
+    "constructed_area": {
+      "jsonLdPath": "@graph.0.mainEntity.floorSize.value",
+      "stripString": ","
+    },
+    "plot_area": {
+      "cssLocator": "[aria-label='Plot Area']",
+      "splitTextCharacter": " ",
+      "splitTextArrayId": "0",
+      "stripString": ","
+    },
+    "latitude": {
+      "jsonLdPath": "@graph.0.mainEntity.geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "@graph.0.mainEntity.geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "jsonLdPath": "@graph.0.name"
+    },
+    "description": {
+      "jsonLdPath": "@graph.0.mainEntity.description"
+    },
+    "price_string": {
+      "cssLocator": "[aria-label='Price']",
+      "cssCountId": "0"
+    },
+    "reference": {
+      "cssLocator": "[aria-label='Reference']"
+    },
+    "address_string": {
+      "cssLocator": "[aria-label='Property header']"
+    },
+    "city": {
+      "jsonLdPath": "@graph.0.mainEntity.address.addressRegion"
+    },
+    "district": {
+      "jsonLdPath": "@graph.0.mainEntity.address.addressLocality"
+    },
+    "property_type": {
+      "jsonLdPath": "@graph.0.mainEntity.accommodationCategory"
+    },
+    "agent_name": {
+      "jsonLdPath": "@graph.0.mainEntity.seller.name"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "cssLocator": "[aria-label='Purpose']",
+      "evaluator":      "include?",
+      "evaluatorParam": "Sale"
+    },
+    "for_rent": {
+      "cssLocator": "[aria-label='Purpose']",
+      "evaluator":      "include?",
+      "evaluatorParam": "Rent"
+    },
+    "for_rent_long_term": {
+      "cssLocator": "[aria-label='Purpose']",
+      "evaluator":      "include?",
+      "evaluatorParam": "Rent"
+    }
+  }
+}]

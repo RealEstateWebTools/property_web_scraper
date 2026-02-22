@@ -168,6 +168,22 @@ const HOSTNAME_MAP: Record<string, string> = {
   'adondevivir.com': 'pe_adondevivir',
   'www.plusvalia.com': 'ec_plusvalia',
   'plusvalia.com': 'ec_plusvalia',
+  'www.zameen.com': 'pk_zameen',
+  'zameen.com': 'pk_zameen',
+  'www.rumah123.com': 'id_rumah123',
+  'rumah123.com': 'id_rumah123',
+  'www.batdongsan.com.vn': 'vn_batdongsan',
+  'batdongsan.com.vn': 'vn_batdongsan',
+  'www.lun.ua': 'ua_lun',
+  'lun.ua': 'ua_lun',
+  'www.bayut.sa': 'sa_bayut',
+  'bayut.sa': 'sa_bayut',
+  'www.mubawab.ma': 'ma_mubawab',
+  'mubawab.ma': 'ma_mubawab',
+  'www.aruodas.lt': 'lt_aruodas',
+  'aruodas.lt': 'lt_aruodas',
+  'www.imot.bg': 'bg_imotbg',
+  'imot.bg': 'bg_imotbg',
 };
 
 const HELP_TEXT = `

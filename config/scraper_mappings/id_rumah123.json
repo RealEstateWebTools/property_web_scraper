@@ -1,0 +1,124 @@
+[{
+  "name": "id_rumah123",
+  "expectedExtractionRate": 0.65,
+
+  // rumah123.com — Indonesia's leading property portal
+  // Primary data source: JSON-LD (schema.org RealEstateListing)
+  // Secondary: CSS selectors for listing details
+  // URL patterns: /dijual/ (sale) vs /disewa/ (rent)
+
+  "defaultValues": {
+    "country":            { "value": "Indonesia" },
+    "currency":           { "value": "IDR" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "id-ID" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='rumah123'], img[src*='r123cdn']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": ".listing-details [class*='bedroom'], .ui-listing-specification__label:contains('Kamar Tidur') + span", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": ".listing-details [class*='bathroom'], .ui-listing-specification__label:contains('Kamar Mandi') + span", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".listing-price, .ui-listing-price__value", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": ".listing-details [class*='building-size'], .ui-listing-specification__label:contains('Luas Bangunan') + span", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "plot_area": {
+      "cssLocator": ".listing-details [class*='land-size'], .ui-listing-specification__label:contains('Luas Tanah') + span",
+      "modifiers": ["digitsOnly"]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".listing-price, .ui-listing-price__value",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": ".listing-address, .ui-listing-address" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1",
+      "regex": "(\\d+)",
+      "regexGroup": 1
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "dijual"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "disewa"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "disewa"
+    }
+  }
+}]
