@@ -60,7 +60,7 @@ export async function recordHealthSnapshot(
     meetsExpectation: diagnostics.meetsExpectation,
     criticalFieldsMissing: diagnostics.criticalFieldsMissing,
     sourceUrl,
-    confidenceScore: diagnostics.confidenceScore,
+    confidenceScore: diagnostics.confidenceScore ?? 1.0,
   };
 
   // In-memory store
@@ -86,7 +86,7 @@ async function getAllSnapshots(days?: number): Promise<HealthSnapshot[]> {
     const db = await getClient();
     const prefix = getCollectionPrefix();
     const snapshot = await db.collection(`${prefix}scraper_health`).get();
-    snapshots = snapshot.docs.map(doc => doc.data() as HealthSnapshot);
+    snapshots = snapshot.docs.map(doc => doc.data() as unknown as HealthSnapshot);
   } catch {
     snapshots = [...memoryStore];
   }

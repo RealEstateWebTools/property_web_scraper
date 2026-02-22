@@ -79,7 +79,7 @@ async function firestoreGetHaul(id: string): Promise<Haul | undefined> {
   const col = db.collection(`${prefix}hauls`);
   const doc = await col.doc(id).get();
   if (!doc.exists) return undefined;
-  return doc.data() as Haul;
+  return doc.data() as unknown as Haul;
 }
 
 // ─── Public API ─────────────────────────────────────────────────
@@ -191,7 +191,7 @@ export async function getAllHauls(): Promise<Haul[]> {
     const col = db.collection(`${prefix}hauls`);
     const snapshot = await col.get();
     for (const doc of snapshot.docs) {
-      const haul = doc.data() as Haul;
+      const haul = doc.data() as unknown as Haul;
       if (new Date(haul.expiresAt).getTime() < now) continue;
       results.push(haul);
       seenIds.add(doc.id);

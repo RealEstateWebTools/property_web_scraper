@@ -180,7 +180,8 @@ export class Listing extends BaseModel {
    * Returns a JSON-safe hash of public listing attributes.
    * Port of Ruby Listing#as_json.
    */
-  override asJson(): Record<string, unknown> {
+  override asJson(only?: string[]): Record<string, unknown> {
+    if (only) return super.asJson(only);
     return super.asJson([
       'import_url', 'reference', 'price_string', 'price_float',
       'price_cents', 'price_currency',
@@ -236,8 +237,8 @@ export class Listing extends BaseModel {
       'price_float', 'price_cents',
     ]);
 
-    const rec = existing as Record<string, unknown>;
-    const inc = incoming as Record<string, unknown>;
+    const rec = existing as unknown as Record<string, unknown>;
+    const inc = incoming as unknown as Record<string, unknown>;
 
     for (const key of Object.keys(Listing._attributeDefinitions)) {
       if (IMMUTABLE.has(key) || key === 'import_history') continue;
@@ -414,9 +415,10 @@ export class Listing extends BaseModel {
       'price_qualifier', 'floor_plan_urls', 'energy_certificate_grade',
     ];
 
+    const listingRec = listing as unknown as Record<string, unknown>;
     for (const attr of stdAttributes) {
       if (attr in sanitized) {
-        (listing as Record<string, unknown>)[attr] = sanitized[attr];
+        listingRec[attr] = sanitized[attr];
       }
     }
 
@@ -428,7 +430,7 @@ export class Listing extends BaseModel {
 
     for (const attr of numericAttributes) {
       if (attr in sanitized) {
-        (listing as Record<string, unknown>)[attr] = sanitized[attr] || 0;
+        listingRec[attr] = sanitized[attr] || 0;
       }
     }
 

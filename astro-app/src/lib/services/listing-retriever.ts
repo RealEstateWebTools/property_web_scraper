@@ -59,8 +59,12 @@ export async function retrieveListing(
           listing.last_retrieved_at = new Date();
           Listing.updateFromHash(listing, result.properties[0]);
           if (diagnostics && !(listing as any).manual_override) {
-            listing.confidence_score = diagnostics.confidenceScore;
-            listing.visibility = diagnostics.visibility;
+            if (diagnostics.confidenceScore !== undefined) {
+              listing.confidence_score = diagnostics.confidenceScore;
+            }
+            if (diagnostics.visibility !== undefined) {
+              listing.visibility = diagnostics.visibility;
+            }
           }
           if (diagnostics) {
             Listing.applyDiagnostics(listing, diagnostics);
@@ -169,8 +173,12 @@ export async function retrieveListing(
  
         // Sync quality metadata from diagnostics (if not manually overridden)
         if (diagnostics && !(listing as any).manual_override) {
-          listing.confidence_score = diagnostics.confidenceScore;
-          listing.visibility = diagnostics.visibility;
+          if (diagnostics.confidenceScore !== undefined) {
+            listing.confidence_score = diagnostics.confidenceScore;
+          }
+          if (diagnostics.visibility !== undefined) {
+            listing.visibility = diagnostics.visibility;
+          }
         }
 
         // Price normalization using portal's default currency

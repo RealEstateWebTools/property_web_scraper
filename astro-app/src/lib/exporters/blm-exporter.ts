@@ -103,7 +103,7 @@ export class BLMExporter extends BaseExporter {
     reverseMap: Record<string, string>,
   ): Record<string, string | number> {
     const values: Record<string, string | number> = {};
-    const rec = listing as Record<string, unknown>;
+    const rec = listing as unknown as Record<string, unknown>;
 
     // Map standard fields via reverse lookup
     for (const col of BLM_COLUMNS) {

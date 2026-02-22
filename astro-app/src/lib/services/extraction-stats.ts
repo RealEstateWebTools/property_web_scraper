@@ -87,7 +87,7 @@ export async function getRecentExtractions(limit = 100): Promise<ExtractionSumma
     const col = await Listing.collectionRef();
     const snapshot = await col.get();
     for (const doc of snapshot.docs) {
-      const listing = Listing.buildFromSnapshot(doc);
+      const listing = Listing.buildFromSnapshot(doc) as unknown as Listing;
       const summary = listingToSummary(doc.id, listing);
       if (summary) {
         summaries.push(summary);
@@ -128,6 +128,7 @@ export async function getRecentExtractions(limit = 100): Promise<ExtractionSumma
       meetsExpectation: diag.meetsExpectation,
       criticalFieldsMissing: diag.criticalFieldsMissing,
       title: (listing as any).title || '',
+      reference: (listing as any).reference || '',
       priceString: (listing as any).price_string || '',
       visibility: (listing as any).visibility || diag.visibility || 'published',
       confidenceScore: (listing as any).confidence_score ?? diag.confidenceScore ?? 1.0,
@@ -187,7 +188,7 @@ export async function getScraperStats(name: string): Promise<ScraperStats> {
     const col = await Listing.collectionRef();
     const snapshot = await col.where('scraper_name', '==', name).get();
     for (const doc of snapshot.docs) {
-      const listing = Listing.buildFromSnapshot(doc);
+      const listing = Listing.buildFromSnapshot(doc) as unknown as Listing;
       if (!listing.quality_grade) continue;
       const grade = listing.quality_grade as QualityGrade;
       gradeDistribution[grade]++;

@@ -76,7 +76,7 @@ export async function getListing(id: string): Promise<Listing | undefined> {
   }
   // Fall back to Firestore if available
   try {
-    const listing = await Listing.find(id);
+    const listing = await Listing.find(id) as unknown as Listing;
     store.set(id, listing);
     return listing;
   } catch (err) {
@@ -107,7 +107,7 @@ async function firestoreGetDiagnostics(id: string): Promise<ExtractionDiagnostic
     const col = db.collection(`${prefix}diagnostics`);
     const doc = await col.doc(id).get();
     if (!doc.exists) return undefined;
-    return doc.data() as ExtractionDiagnostics;
+    return doc.data() as unknown as ExtractionDiagnostics;
   } catch (err) {
     logActivity({ level: 'error', category: 'system', message: '[ListingStore] Firestore diagnostics read failed for ' + id + ': ' + ((err as Error).message || err) });
     return undefined;
@@ -133,7 +133,7 @@ export async function storeDiagnostics(id: string, diagnostics: ExtractionDiagno
 /** Tier 3: Lossy reconstruction from Firestore listing's embedded diagnostic fields. */
 async function reconstructDiagnosticsFromListing(id: string): Promise<ExtractionDiagnostics | undefined> {
   try {
-    const listing = await Listing.find(id);
+    const listing = await Listing.find(id) as unknown as Listing;
     if (listing.scraper_name) {
       const diag = {
         scraperName: listing.scraper_name,
@@ -189,7 +189,7 @@ export async function getAllListings(): Promise<Array<{ id: string; listing: Lis
     const col = await Listing.collectionRef();
     const snapshot = await col.get();
     for (const doc of snapshot.docs) {
-      const listing = Listing.buildFromSnapshot(doc);
+      const listing = Listing.buildFromSnapshot(doc) as unknown as Listing;
       results.push({ id: doc.id, listing });
       seenIds.add(doc.id);
       // Populate in-memory cache for subsequent getListing() calls
@@ -275,7 +275,7 @@ export async function updateListingVisibility(id: string, visibility: string): P
     throw new Error(`Listing not found: ${id}`);
   }
 
-  listing.visibility = visibility;
+  listing.visibility = visibility as 'published' | 'pending' | 'spam' | 'hidden';
   listing.manual_override = true;
   store.set(id, listing);
 

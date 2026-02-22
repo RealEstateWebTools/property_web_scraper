@@ -1,4 +1,5 @@
-import type { CheerioAPI, Cheerio, AnyNode } from 'cheerio';
+import type { CheerioAPI, Cheerio } from 'cheerio';
+import type { AnyNode } from 'domhandler';
 import type { FieldMapping } from './mapping-loader.js';
 import { getTextFromCss, cleanUpString, getOrParseScriptJson, getByDotPath } from './strategies.js';
 import { normalizeImageUrl } from './image-normalizer.js';

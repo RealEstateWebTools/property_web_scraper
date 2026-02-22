@@ -147,11 +147,11 @@ export async function runExtraction(opts: {
   recordSnapshot({
     url,
     scraper: importHost.scraper_name,
-    price_float: rawProps.price_float,
-    price_string: rawProps.price_string,
-    price_currency: rawProps.price_currency || rawProps.currency,
+    price_float: rawProps.price_float as number | undefined,
+    price_string: rawProps.price_string as string | undefined,
+    price_currency: (rawProps.price_currency || rawProps.currency) as string | undefined,
     quality_grade: result.diagnostics?.qualityGrade,
-    title: rawProps.title,
+    title: rawProps.title as string | undefined,
   }).catch((err) => {
     logActivity({ level: 'error', category: 'system', message: '[ExtractionRunner] Price history recording failed: ' + (err.message || err) });
     recordDeadLetter({ source: 'price_history', operation: `recordSnapshot(${url})`, error: (err as Error).message || String(err), context: { url, scraper: importHost.scraper_name }, attempts: 1 }).catch(() => {});

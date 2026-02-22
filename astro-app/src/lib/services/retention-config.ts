@@ -46,7 +46,7 @@ export async function getRetentionConfig(): Promise<RetentionConfig> {
     const prefix = getCollectionPrefix();
     const doc = await db.collection(`${prefix}retention_config`).doc('current').get();
     if (doc.exists) {
-      cachedConfig = doc.data() as RetentionConfig;
+      cachedConfig = doc.data() as unknown as RetentionConfig;
       return cachedConfig;
     }
   } catch {

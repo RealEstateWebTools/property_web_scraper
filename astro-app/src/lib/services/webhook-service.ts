@@ -71,7 +71,7 @@ async function firestoreListWebhooks(): Promise<WebhookRegistration[]> {
   const prefix = getCollectionPrefix();
   const col = db.collection(`${prefix}webhooks`);
   const snapshot = await col.where('active', '==', true).get();
-  return snapshot.docs.map(doc => doc.data() as WebhookRegistration);
+  return snapshot.docs.map(doc => doc.data() as unknown as WebhookRegistration);
 }
 
 async function firestoreGetWebhook(id: string): Promise<WebhookRegistration | null> {
@@ -79,7 +79,7 @@ async function firestoreGetWebhook(id: string): Promise<WebhookRegistration | nu
   const prefix = getCollectionPrefix();
   const doc = await db.collection(`${prefix}webhooks`).doc(id).get();
   if (!doc.exists) return null;
-  return doc.data() as WebhookRegistration;
+  return doc.data() as unknown as WebhookRegistration;
 }
 
 // ─── HMAC Signing ────────────────────────────────────────────────

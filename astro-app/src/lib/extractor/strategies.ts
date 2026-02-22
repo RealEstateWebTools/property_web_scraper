@@ -1,4 +1,5 @@
 import * as cheerio from 'cheerio';
+import type { AnyNode } from 'domhandler';
 import type { FieldMapping } from './mapping-loader.js';
 import { parseFlightData, searchFlightData } from './flight-data-parser.js';
 import { applyModifiers } from './modifiers.js';
@@ -9,13 +10,13 @@ export interface RetrievalResult {
   strategyDescription: string;
 }
 
-const selectorCache = new WeakMap<cheerio.CheerioAPI, Map<string, cheerio.Cheerio<cheerio.AnyNode>>>();
+const selectorCache = new WeakMap<cheerio.CheerioAPI, Map<string, cheerio.Cheerio<AnyNode>>>();
 const scriptTextCache = new WeakMap<cheerio.CheerioAPI, string>();
 
 function getCachedSelectorElements(
   $: cheerio.CheerioAPI,
   cssLocator: string
-): cheerio.Cheerio<cheerio.AnyNode> {
+): cheerio.Cheerio<AnyNode> {
   let perDocument = selectorCache.get($);
   if (!perDocument) {
     perDocument = new Map();
@@ -45,7 +46,7 @@ function getCombinedScriptText($: cheerio.CheerioAPI): string {
  */
 export function getTextFromCss(
   $: cheerio.CheerioAPI,
-  elements: cheerio.Cheerio<cheerio.AnyNode>,
+  elements: cheerio.Cheerio<AnyNode>,
   mapping: FieldMapping
 ): string {
   let text = elements.text();

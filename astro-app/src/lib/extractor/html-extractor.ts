@@ -27,7 +27,7 @@ export interface FieldTrace {
 
 export interface ContentAnalysis {
   htmlLength: number;
-  hasScriptTags: boolean;
+  hasScriptTags?: boolean;
   jsonLdCount: number;
   scriptJsonVarsFound: string[];
   appearsBlocked: boolean;
@@ -40,22 +40,22 @@ export interface ExtractionDiagnostics {
   totalFields: number;
   populatedFields: number;
   emptyFields: string[];
-  extractableFields: number;
-  populatedExtractableFields: number;
-  extractionRate: number;
-  qualityGrade: QualityGrade;
-  qualityLabel: string;
-  successClassification: 'excellent' | 'good' | 'partial' | 'failed';
+  extractableFields?: number;
+  populatedExtractableFields?: number;
+  extractionRate?: number;
+  qualityGrade?: QualityGrade;
+  qualityLabel?: string;
+  successClassification?: 'excellent' | 'good' | 'partial' | 'failed';
   expectedExtractionRate?: number;
   expectedQualityGrade?: QualityGrade;
-  meetsExpectation: boolean;
+  meetsExpectation?: boolean;
   expectationGap?: number;
   expectationStatus?: 'unknown' | 'above' | 'meets' | 'below' | 'well_below';
   weightedExtractionRate?: number;
   criticalFieldsMissing?: string[];
   contentAnalysis?: ContentAnalysis;
-  confidenceScore: number;
-  visibility: 'published' | 'pending' | 'spam';
+  confidenceScore?: number;
+  visibility?: 'published' | 'pending' | 'spam';
 }
 
 export type ExtractionStatus = 'full' | 'partial' | 'blocked' | 'failed';

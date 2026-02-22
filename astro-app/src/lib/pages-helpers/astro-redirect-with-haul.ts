@@ -5,7 +5,7 @@
  */
 
 import type { ExtractionDiagnostics } from '@lib/extractor/html-extractor.js';
-import type Listing from '@lib/models/listing.js';
+import type { Listing } from '@lib/models/listing.js';
 import { buildHaulScrapeFromListing } from './build-haul-scrape.js';
 import { addScrapeToHaul } from '@lib/services/haul-store.js';
 import { resolveWebHaul, setHaulCookie } from '@lib/services/web-haul-resolver.js';

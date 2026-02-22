@@ -162,7 +162,7 @@ export const GET: APIRoute = async ({ request }) => {
   let listing: Listing;
   try {
     const chain = new WhereChain(Listing as any, { import_url: url! });
-    listing = await chain.firstOrCreate();
+    listing = await chain.firstOrCreate() as unknown as Listing;
   } catch {
     listing = new Listing();
     listing.assignAttributes({ import_url: url! });
@@ -357,7 +357,7 @@ export const POST: APIRoute = async ({ request }) => {
   let listing: Listing;
   try {
     const chain = new WhereChain(Listing as any, { import_url: url });
-    listing = await chain.firstOrCreate();
+    listing = await chain.firstOrCreate() as unknown as Listing;
   } catch {
     listing = new Listing();
     listing.assignAttributes({ import_url: url });

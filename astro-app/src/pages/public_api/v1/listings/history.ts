@@ -51,5 +51,5 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   const history = await getHistory(url, limit);
-  return successResponse(history, request);
+  return successResponse(history as unknown as Record<string, unknown>, request);
 };

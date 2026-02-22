@@ -72,7 +72,7 @@ export async function getExportHistory(
     } else {
       snapshot = await col.get();
     }
-    const entries = snapshot.docs.map(doc => doc.data() as ExportHistoryEntry);
+    const entries = snapshot.docs.map(doc => doc.data() as unknown as ExportHistoryEntry);
     entries.sort((a, b) => b.timestamp - a.timestamp);
     return entries.slice(0, limit);
   } catch {

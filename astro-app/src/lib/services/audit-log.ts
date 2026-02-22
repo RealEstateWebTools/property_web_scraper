@@ -103,7 +103,7 @@ export async function queryAuditLog(query: AuditLogQuery = {}): Promise<AuditLog
     const db = await getClient();
     const prefix = getCollectionPrefix();
     const snapshot = await db.collection(`${prefix}audit_log`).get();
-    entries = snapshot.docs.map(doc => doc.data() as AuditEntry);
+    entries = snapshot.docs.map(doc => doc.data() as unknown as AuditEntry);
   } catch {
     // Firestore unavailable — fall back to in-memory
     entries = [...memoryStore];
@@ -141,7 +141,7 @@ export interface AuditLogStats {
 }
 
 export async function getAuditLogStats(): Promise<AuditLogStats> {
-  const byLevel: Record<LogLevel, number> = { info: 0, warn: 0, error: 0 };
+  const byLevel: Record<LogLevel, number> = { debug: 0, info: 0, warn: 0, error: 0 };
   const byCategory: Record<string, number> = {};
   let oldest: number | null = null;
   let newest: number | null = null;
@@ -151,7 +151,7 @@ export async function getAuditLogStats(): Promise<AuditLogStats> {
     const db = await getClient();
     const prefix = getCollectionPrefix();
     const snapshot = await db.collection(`${prefix}audit_log`).get();
-    entries = snapshot.docs.map(doc => doc.data() as AuditEntry);
+    entries = snapshot.docs.map(doc => doc.data() as unknown as AuditEntry);
   } catch {
     entries = [...memoryStore];
   }

@@ -57,7 +57,7 @@ export class RESOJsonExporter extends BaseExporter {
     const resoMappings = getMappingsForStandard('reso');
     const fields = this.getFieldsToExport();
     const result: Record<string, unknown> = {};
-    const rec = listing as Record<string, unknown>;
+    const rec = listing as unknown as Record<string, unknown>;
 
     for (const field of fields) {
       if (SKIP_FIELDS.has(field)) continue;

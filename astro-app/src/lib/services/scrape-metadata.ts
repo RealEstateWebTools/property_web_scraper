@@ -133,7 +133,7 @@ async function firestoreGetScrape(id: string): Promise<ScrapeRecord | undefined>
   const prefix = getCollectionPrefix();
   const doc = await db.collection(`${prefix}scrape_records`).doc(id).get();
   if (!doc.exists) return undefined;
-  return doc.data() as ScrapeRecord;
+  return doc.data() as unknown as ScrapeRecord;
 }
 
 async function firestoreGetPortalProfile(portalSlug: string): Promise<PortalProfileCurrent | undefined> {
@@ -141,7 +141,7 @@ async function firestoreGetPortalProfile(portalSlug: string): Promise<PortalProf
   const prefix = getCollectionPrefix();
   const doc = await db.collection(`${prefix}portal_profiles`).doc(portalSlug).get();
   if (!doc.exists) return undefined;
-  return doc.data() as PortalProfileCurrent;
+  return doc.data() as unknown as PortalProfileCurrent;
 }
 
 async function firestoreSavePortalProfile(profile: PortalProfileCurrent): Promise<void> {
@@ -163,7 +163,7 @@ async function firestoreGetPortalHistory(portalSlug: string, limit: number): Pro
   const snapshot = await db.collection(`${prefix}portal_profile_history`)
     .where('portal_slug', '==', portalSlug)
     .get();
-  const entries = snapshot.docs.map(doc => doc.data() as PortalProfileHistoryEntry);
+  const entries = snapshot.docs.map(doc => doc.data() as unknown as PortalProfileHistoryEntry);
   entries.sort((a, b) => b.archived_at.localeCompare(a.archived_at));
   return entries.slice(0, limit);
 }
@@ -272,7 +272,7 @@ export async function getLatestScrapeForListing(listingId: string): Promise<Scra
       .where('listing_id', '==', listingId)
       .get();
     if (snapshot.docs.length === 0) return undefined;
-    const records = snapshot.docs.map(doc => doc.data() as ScrapeRecord);
+    const records = snapshot.docs.map(doc => doc.data() as unknown as ScrapeRecord);
     records.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
     return records[0];
   } catch {
@@ -305,7 +305,7 @@ export async function getScrapeHistoryForListing(listingId: string, limit = 10):
     const snapshot = await db.collection(`${prefix}scrape_records`)
       .where('listing_id', '==', listingId)
       .get();
-    const records = snapshot.docs.map(doc => doc.data() as ScrapeRecord);
+    const records = snapshot.docs.map(doc => doc.data() as unknown as ScrapeRecord);
     records.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
     return records.slice(0, limit);
   } catch {

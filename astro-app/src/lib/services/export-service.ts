@@ -115,7 +115,7 @@ export class ExportService {
 
     // Stream export
     if ('exportStream' in exporter) {
-      yield* (exporter.exportStream(listings) as AsyncGenerator<string>);
+      yield* ((exporter as unknown as { exportStream(l: typeof listings): AsyncGenerator<string> }).exportStream(listings));
     } else {
       // Fallback to non-streaming
       yield await exporter.export(listings);
