@@ -1,9 +1,15 @@
-# property-context — Developer Guide
+# property_data_enhancer — Developer Guide
 
-A property enrichment service built with Astro.js and Firebase/Firestore. It
-accepts a property listing URL or haul URL from the `property_web_scraper`
-project, fetches the scraped data, enriches each property with location and
-market intelligence from external APIs, and stores everything in Firestore.
+A standalone property enrichment service built with Astro.js and
+Firebase/Firestore. Give it the URL of a haul JSON endpoint from
+`property_web_scraper` and it fetches the scraped data, enriches each property
+with location and market intelligence from external APIs, and stores everything
+in Firestore.
+
+Each deployment is configured for a **single country** via the `COUNTRY_CODE`
+environment variable. Country-specific enrichers live in their own folder under
+`src/lib/countries/<code>/`, making it easy to add support for new markets
+without touching existing code.
 
 ---
 
@@ -16,41 +22,47 @@ market intelligence from external APIs, and stores everything in Firestore.
 5. [Environment Variables](#5-environment-variables)
 6. [Database Setup](#6-database-setup)
 7. [Project Structure](#7-project-structure)
-8. [Implementation — Database Client](#8-implementation--database-client)
-9. [Implementation — Fetchers](#9-implementation--fetchers)
-10. [Implementation — Enrichers](#10-implementation--enrichers)
+8. [Implementation — Firestore Client](#8-implementation--firestore-client)
+9. [Implementation — Haul Fetcher](#9-implementation--haul-fetcher)
+10. [Implementation — Country Modules & Enrichers](#10-implementation--country-modules--enrichers)
 11. [Implementation — Routes](#11-implementation--routes)
 12. [Implementation — Frontend Pages](#12-implementation--frontend-pages)
 13. [Implementation — Astro Config](#13-implementation--astro-config)
 14. [Running Locally](#14-running-locally)
 15. [Deployment](#15-deployment)
 16. [Enricher API Reference](#16-enricher-api-reference)
-17. [Adding a New Enricher](#17-adding-a-new-enricher)
+17. [Adding a New Country](#17-adding-a-new-country)
+18. [Adding a New Enricher](#18-adding-a-new-enricher)
 
 ---
 
 ## 1. Overview
 
-`property-context` augments raw property listing data with information that no
-portal publishes — walkability, nearby amenities, flood risk, energy certificates,
-historical sold prices, and more.
-
-The only coupling to `property_web_scraper` is a single HTTP fetch at import time:
+`property_data_enhancer` is a **standalone** service. Its only external dependency is
+a URL that returns haul JSON from `property_web_scraper`. It has no API keys for
+the scraper, no shared database, and no code imports from the parent project.
 
 ```
-You → POST /api/imports { source_url }
-   → property-context fetches from scraper API
-   → stores property snapshot in Firestore
-   → runs enrichment inline (awaits all enrichers)
-   → returns with { import_id, property_ids, status }
+You → POST /api/imports { haul_url }
+   → fetches JSON from the haul URL
+   → stores property snapshots in Firestore
+   → runs country-specific enrichers inline
+   → returns { import_id, property_ids, status }
 ```
 
-Everything else — database, enrichers, API, frontend — is fully independent.
+**Key design decisions:**
 
-**Key difference from a queue-based design:** enrichment runs inline during the
-import request using `Promise.allSettled()`. There is no separate worker process
-or job queue. The import endpoint waits for all enrichers to complete before
-responding.
+- **One country per deployment.** Set `COUNTRY_CODE=GB` (or `US`, `ES`, etc.)
+  as an environment variable. The app loads only the enrichers for that country
+  plus the global enrichers. Deploy the same codebase to multiple Cloudflare
+  URLs with different `COUNTRY_CODE` values to support multiple countries.
+
+- **Inline enrichment.** No job queue or worker process. Enrichers run inside
+  the import request via `Promise.allSettled()`.
+
+- **Modular country folders.** Each country is a self-contained folder under
+  `src/lib/countries/`. Adding a new country means adding a new folder — no
+  changes to existing code.
 
 ---
 
@@ -58,54 +70,64 @@ responding.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        property-context                         │
-│                        (Astro.js SSR)                           │
+│                        property_data_enhancer                         │
+│              Astro.js SSR on Cloudflare Pages                   │
+│              COUNTRY_CODE=GB (per deployment)                   │
 │                                                                 │
-│  POST /api/imports                                              │
+│  POST /api/imports { haul_url }                                 │
 │       │                                                         │
 │       ▼                                                         │
 │  ┌──────────┐    HTTP GET    ┌─────────────────────────────┐   │
-│  │ Fetcher  │ ─────────────► │  property_web_scraper API   │   │
-│  │          │ ◄───────────── │  /ext/v1/hauls/:id          │   │
-│  └──────────┘   JSON         │  /public_api/v1/listings/:id│   │
-│       │                      └─────────────────────────────┘   │
+│  │ Fetcher  │ ─────────────► │  Haul JSON endpoint         │   │
+│  │          │ ◄───────────── │  (any property_web_scraper) │   │
+│  └──────────┘   JSON         └─────────────────────────────┘   │
+│       │                                                         │
 │       ▼                                                         │
 │  ┌──────────────────────┐                                       │
-│  │  Firestore           │                                       │
+│  │  Firestore (REST)    │                                       │
 │  │  ├── imports          │                                       │
-│  │  ├── properties       │                                       │
-│  │  │   └── enrichments  │  (subcollection)                     │
-│  │  └──                  │                                       │
+│  │  └── properties       │                                       │
+│  │      └── enrichments  │  (subcollection)                     │
 │  └──────────────────────┘                                       │
 │       │                                                         │
 │       ▼                                                         │
 │  ┌──────────────────────────────────────┐                       │
-│  │  Inline enrichment (Promise.allSettled)                      │
-│  │  ├── overpass.ts      (global)       │                       │
-│  │  ├── walkscore.ts     (global)       │                       │
-│  │  ├── epc-uk.ts        (UK only)      │                       │
-│  │  ├── flood-uk.ts      (UK only)      │                       │
-│  │  └── land-registry-uk.ts (UK only)   │                       │
+│  │  Enrichment runner                   │                       │
+│  │  Promise.allSettled([                │                       │
+│  │    ...globalEnrichers,   ◄── always  │                       │
+│  │    ...countryEnrichers,  ◄── GB only │                       │
+│  │  ])                                  │                       │
 │  └──────────────────────────────────────┘                       │
 │       │                                                         │
-│       ▼                                                         │
-│  ┌──────────────────────┐                                       │
-│  │  Firestore           │                                       │
-│  │  enrichments written  │                                       │
-│  └──────────────────────┘                                       │
+│  ┌──────────────────────────────────────┐                       │
+│  │  src/lib/countries/                  │                       │
+│  │  ├── global/          (all deploys)  │                       │
+│  │  │   ├── overpass.ts                 │                       │
+│  │  │   └── walkscore.ts               │                       │
+│  │  ├── gb/              (GB deploys)   │                       │
+│  │  │   ├── epc.ts                     │                       │
+│  │  │   ├── flood.ts                   │                       │
+│  │  │   └── land-registry.ts           │                       │
+│  │  └── us/              (US deploys)   │                       │
+│  │      └── ...                         │                       │
+│  └──────────────────────────────────────┘                       │
 │                                                                 │
 │  ┌──────────────────────────────────────┐                       │
 │  │  Astro Pages (frontend)              │                       │
-│  │  ├── /dashboard      (recent imports)│                       │
-│  │  ├── /properties/:id (detail view)   │                       │
-│  │  └── /imports/new    (import form)   │                       │
+│  │  ├── /dashboard                      │                       │
+│  │  ├── /properties/:id                 │                       │
+│  │  └── /imports/new                    │                       │
 │  └──────────────────────────────────────┘                       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Processing model:** both fetch and enrichment happen synchronously within the
-`POST /api/imports` handler. The caller receives the full result when enrichment
-completes. Use `GET /api/properties/:id` to retrieve enriched data later.
+**Multi-country deployment example:**
+
+| Cloudflare URL | `COUNTRY_CODE` | Active enrichers |
+|---|---|---|
+| `property-data-enhancer-gb.pages.dev` | `GB` | overpass, walkscore, epc, flood, land-registry |
+| `property-data-enhancer-us.pages.dev` | `US` | overpass, walkscore _(+ future US enrichers)_ |
+| `property-data-enhancer-es.pages.dev` | `ES` | overpass, walkscore _(+ future ES enrichers)_ |
 
 ---
 
@@ -114,10 +136,10 @@ completes. Use `GET /api/properties/:id` to retrieve enriched data later.
 - Node.js ≥ 20
 - npm ≥ 10
 - A [Firebase](https://firebase.google.com) project with Firestore enabled (free Spark plan is sufficient)
-- A Firebase service account JSON key (for server-side Admin SDK access)
+- A Firebase service account JSON key
 - A [Walk Score API key](https://www.walkscore.com/professional/api.php) (free, 5 000 calls/day)
-- For UK enrichers: an [EPC Register API key](https://epc.opendatacommunities.org/) (free)
-- A running instance of `property_web_scraper` (the source project) with its base URL
+- Country-specific API keys (e.g. for GB: an [EPC Register API key](https://epc.opendatacommunities.org/))
+- A haul JSON URL from a running `property_web_scraper` instance
 
 ---
 
@@ -126,8 +148,8 @@ completes. Use `GET /api/properties/:id` to retrieve enriched data later.
 ### 4.1 Initialise the repository
 
 ```bash
-npm create astro@latest property-context -- --template minimal
-cd property-context
+npm create astro@latest property_data_enhancer -- --template minimal
+cd property_data_enhancer
 git init
 ```
 
@@ -135,36 +157,35 @@ git init
 
 ```bash
 # Runtime
-npm install firebase-admin geofire-common
+npm install astro @astrojs/cloudflare geofire-common
 
 # Dev
-npm install -D vitest @types/node
+npm install -D vitest @types/node wrangler
 ```
 
 ### 4.3 `package.json`
 
-Update the generated `package.json`:
-
 ```json
 {
-  "name": "property-context",
+  "name": "property_data_enhancer",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
-    "start": "node dist/server/entry.mjs",
+    "preview": "wrangler pages dev dist",
+    "deploy": "astro build && wrangler pages deploy dist",
     "test": "vitest run"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.0.0",
     "astro": "^5.17.0",
-    "firebase-admin": "^13.0.0",
     "geofire-common": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "vitest": "^2.1.0"
+    "vitest": "^2.1.0",
+    "wrangler": "^4.0.0"
   }
 }
 ```
@@ -188,24 +209,32 @@ Update the generated `package.json`:
 
 ## 5. Environment Variables
 
-Create `.env` (and `.env.example` for the repo):
+For local development, create `.dev.vars` (Cloudflare convention, equivalent to
+`.env`). For production, set these in the Cloudflare Pages dashboard under
+**Settings → Environment variables**.
 
 ```bash
-# ── Firebase ─────────────────────────────────────────────────────
+# ── Country ──────────────────────────────────────────────────────
+COUNTRY_CODE=GB                          # which country module to load
+
+# ── Firestore ────────────────────────────────────────────────────
 FIRESTORE_PROJECT_ID=your-firebase-project-id
-GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account","project_id":"...","private_key":"...","client_email":"..."}'
+GOOGLE_SERVICE_ACCOUNT_JSON={"type":"service_account","project_id":"...","private_key":"...","client_email":"..."}
+FIRESTORE_COLLECTION_PREFIX=             # optional: prefix for collection names (e.g. "dev_")
 
-# ── Source project (property_web_scraper) ─────────────────────────
-SCRAPER_BASE_URL=https://your-scraper-deployment.com
-SCRAPER_API_KEY=pws_live_...            # optional; required only for /public_api routes
-
-# ── Enricher API keys ─────────────────────────────────────────────
+# ── Enricher API keys (global) ───────────────────────────────────
 WALKSCORE_API_KEY=your_walkscore_key
-EPC_API_EMAIL=you@example.com           # UK EPC Register credentials
-EPC_API_KEY=your_epc_api_key            # UK EPC Register API key
+
+# ── Enricher API keys (GB-specific) ─────────────────────────────
+EPC_API_EMAIL=you@example.com
+EPC_API_KEY=your_epc_api_key
 ```
 
-> **Security:** Never commit `.env`. Add it to `.gitignore`.
+Each country module declares which environment variables it requires (see
+[section 10](#10-implementation--country-modules--enrichers)). Only set the
+variables for the country you are deploying.
+
+> **Security:** Never commit `.dev.vars`. Add it to `.gitignore`.
 
 ---
 
@@ -216,40 +245,34 @@ EPC_API_KEY=your_epc_api_key            # UK EPC Register API key
 1. Go to [console.firebase.google.com](https://console.firebase.google.com) → **Add project**
 2. Enable **Cloud Firestore** (start in test mode or configure rules below)
 3. Go to **Project Settings → Service accounts → Generate new private key**
-4. Paste the JSON into `GOOGLE_SERVICE_ACCOUNT_JSON` in your `.env`
+4. Paste the JSON into `GOOGLE_SERVICE_ACCOUNT_JSON`
 
 ### 6.2 Firestore collection structure
 
-Firestore is schema-less, but the application expects these collections:
-
 ```
-imports/
+{prefix}imports/
   {import_id}/
-    source_url:       string
-    source_type:      "haul" | "listing"
-    source_id:        string
+    haul_url:         string
     status:           "pending" | "processing" | "complete" | "failed"
+    country_code:     string         # the COUNTRY_CODE active at import time
     listing_count:    number
     error:            string | null
-    created_at:       timestamp
-    completed_at:     timestamp | null
+    created_at:       number         # Date.now() timestamp
+    completed_at:     number | null
 
-properties/
+{prefix}properties/
   {property_id}/
     import_id:             string
     source_listing_id:     string
     source_url:            string
-    portal:                string | null
     country:               string | null
-
-    # Scraped snapshot
     title:                 string | null
     price_float:           number | null
     price_currency:        string | null
     price_string:          string | null
     latitude:              number | null
     longitude:             number | null
-    geohash:               string | null    # for proximity queries
+    geohash:               string | null
     address_string:        string | null
     city:                  string | null
     region:                string | null
@@ -258,16 +281,7 @@ properties/
     count_bathrooms:       number | null
     constructed_area:      number | null
     plot_area:             number | null
-    area_unit:             string | null
-    year_construction:     number | null
     property_type:         string | null
-    property_subtype:      string | null
-    tenure:                string | null
-    for_sale:              boolean | null
-    for_rent:              boolean | null
-    for_rent_long_term:    boolean | null
-    for_rent_short_term:   boolean | null
-    sold:                  boolean | null
     features:              string[]
     main_image_url:        string | null
     description:           string | null
@@ -277,41 +291,36 @@ properties/
     walkability_score:     number | null
     transit_score:         number | null
     bike_score:            number | null
-    flood_risk:            string | null    # "low" | "medium" | "high"
-    epc_grade:             string | null    # "A".."G"
+    flood_risk:            string | null
+    epc_grade:             string | null
     nearby_schools:        number | null
     nearby_transit_stops:  number | null
     nearby_supermarkets:   number | null
 
-    # Timestamps
-    scraped_at:            timestamp | null
-    imported_at:           timestamp
-    enriched_at:           timestamp | null
+    imported_at:           number
+    enriched_at:           number | null
     enrichment_status:     "pending" | "partial" | "complete" | "failed"
 
     # Subcollection
     enrichments/
       {enricher_name}/
         enricher:      string
-        status:        "pending" | "running" | "complete" | "failed" | "skipped"
-        data:          map          # raw enricher output
+        status:        "running" | "complete" | "failed"
+        data:          map
         error:         string | null
-        created_at:    timestamp
-        completed_at:  timestamp | null
-        expires_at:    timestamp | null
+        completed_at:  number | null
+        expires_at:    number | null
 ```
 
-### 6.3 Firestore security rules
+The optional `FIRESTORE_COLLECTION_PREFIX` prepends a string to collection names
+(e.g. `dev_imports`, `dev_properties`), useful for isolating dev/staging data.
 
-For development, use permissive rules. For production, restrict to the
-service account only (Admin SDK bypasses rules, but this protects against
-accidental client access):
+### 6.3 Firestore security rules
 
 ```
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Deny all client access — only Admin SDK (server) writes
     match /{document=**} {
       allow read, write: if false;
     }
@@ -319,122 +328,195 @@ service cloud.firestore {
 }
 ```
 
+All access is via the service account (REST API with JWT auth), which bypasses
+security rules. These rules deny accidental client-side access.
+
 ### 6.4 Firestore indexes
 
-Create a composite index for nearby queries (geohash-based):
+Create a composite index for geohash-based nearby queries:
 
 ```
-Collection: properties
+Collection: {prefix}properties
 Fields:     geohash (ascending), imported_at (descending)
 ```
-
-Create this in the Firebase console under **Firestore → Indexes → Composite**.
 
 ---
 
 ## 7. Project Structure
 
 ```
-property-context/
+property_data_enhancer/
 ├── src/
 │   ├── lib/
-│   │   ├── db/
-│   │   │   └── client.ts            # Firebase Admin SDK singleton
-│   │   ├── fetchers/
-│   │   │   ├── index.ts             # dispatch: detect haul vs listing URL
-│   │   │   ├── types.ts             # ScrapedProperty interface
-│   │   │   ├── haul.ts              # fetch + normalise haul response
-│   │   │   └── listing.ts           # fetch + normalise single listing
-│   │   ├── enrichers/
-│   │   │   ├── registry.ts          # maps country → applicable enrichers
-│   │   │   ├── types.ts             # shared Enricher interface
-│   │   │   ├── runner.ts            # inline enrichment runner
-│   │   │   ├── overpass.ts          # OpenStreetMap nearby POIs (global, free)
-│   │   │   ├── walkscore.ts         # walk/transit/bike scores
-│   │   │   ├── epc-uk.ts            # UK energy performance certificates
-│   │   │   ├── flood-uk.ts          # UK Environment Agency flood risk
-│   │   │   └── land-registry-uk.ts  # UK HM Land Registry sold prices
+│   │   ├── firestore/
+│   │   │   ├── client.ts            # Singleton (REST-based, CF Workers compatible)
+│   │   │   ├── rest-client.ts       # Firestore REST API client
+│   │   │   └── types.ts             # FirestoreClient interface
+│   │   ├── fetcher/
+│   │   │   ├── haul.ts              # fetch haul JSON → ScrapedProperty[]
+│   │   │   └── types.ts             # ScrapedProperty interface
+│   │   ├── countries/
+│   │   │   ├── types.ts             # CountryModule interface
+│   │   │   ├── loader.ts            # loads module for COUNTRY_CODE
+│   │   │   ├── global/              # enrichers that run for ALL countries
+│   │   │   │   ├── overpass.ts
+│   │   │   │   └── walkscore.ts
+│   │   │   ├── gb/                  # Great Britain
+│   │   │   │   ├── index.ts         # exports CountryModule
+│   │   │   │   ├── epc.ts
+│   │   │   │   ├── flood.ts
+│   │   │   │   └── land-registry.ts
+│   │   │   └── us/                  # United States (placeholder)
+│   │   │       └── index.ts
+│   │   ├── enricher/
+│   │   │   ├── types.ts             # Enricher interface
+│   │   │   └── runner.ts            # inline enrichment runner
 │   │   └── services/
 │   │       └── api-response.ts      # JSON response helpers
 │   ├── pages/
 │   │   ├── api/
 │   │   │   ├── imports/
 │   │   │   │   ├── index.ts         # POST /api/imports
-│   │   │   │   └── [id].ts          # GET /api/imports/:id
+│   │   │   │   └── [id].ts          # GET  /api/imports/:id
 │   │   │   └── properties/
-│   │   │       ├── index.ts         # GET /api/properties
-│   │   │       ├── nearby.ts        # GET /api/properties/nearby
-│   │   │       ├── [id].ts          # GET /api/properties/:id
+│   │   │       ├── index.ts         # GET  /api/properties
+│   │   │       ├── nearby.ts        # GET  /api/properties/nearby
+│   │   │       ├── [id].ts          # GET  /api/properties/:id
 │   │   │       └── [id]/
 │   │   │           └── re-enrich.ts # POST /api/properties/:id/re-enrich
-│   │   ├── dashboard.astro          # Recent imports and properties
+│   │   ├── dashboard.astro
 │   │   ├── imports/
-│   │   │   └── new.astro            # Import form
+│   │   │   └── new.astro
 │   │   └── properties/
-│   │       └── [id].astro           # Property detail page
+│   │       └── [id].astro
 │   └── layouts/
-│       └── Base.astro               # Shared page layout
-├── .env
-├── .env.example
+│       └── Base.astro
+├── .dev.vars                        # local env vars (not committed)
 ├── .gitignore
 ├── astro.config.mjs
 ├── package.json
-└── tsconfig.json
+├── tsconfig.json
+└── wrangler.jsonc
 ```
 
 ---
 
-## 8. Implementation — Database Client
+## 8. Implementation — Firestore Client
 
-**`src/lib/db/client.ts`**
+The Firestore client uses the REST API directly with JWT auth, making it
+compatible with Cloudflare Workers (no Node.js native modules required). This
+follows the same pattern as the existing `astro-app` project.
 
-Singleton pattern matching the existing astro-app conventions.
+### 8.1 Types
+
+**`src/lib/firestore/types.ts`**
 
 ```typescript
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+export type DocData = Record<string, unknown>;
 
-let _db: Firestore | null = null;
+export interface FirestoreDocumentSnapshot {
+  readonly id: string;
+  readonly exists: boolean;
+  data(): DocData | undefined;
+  readonly ref: FirestoreDocumentReference;
+}
 
-export function getDb(): Firestore {
-  if (_db) return _db;
+export interface FirestoreDocumentReference {
+  readonly id: string;
+  get(): Promise<FirestoreDocumentSnapshot>;
+  set(data: DocData): Promise<void>;
+  update(data: DocData): Promise<void>;
+  delete(): Promise<void>;
+}
+
+export interface FirestoreQuerySnapshot {
+  readonly docs: FirestoreDocumentSnapshot[];
+  readonly empty: boolean;
+}
+
+export interface FirestoreQuery {
+  where(field: string, op: string, value: unknown): FirestoreQuery;
+  get(): Promise<FirestoreQuerySnapshot>;
+}
+
+export interface FirestoreCollectionReference extends FirestoreQuery {
+  doc(id?: string): FirestoreDocumentReference;
+  listDocuments(): Promise<FirestoreDocumentReference[]>;
+}
+
+export interface FirestoreClient {
+  collection(name: string): FirestoreCollectionReference;
+}
+```
+
+### 8.2 REST client
+
+**`src/lib/firestore/rest-client.ts`**
+
+A fetch()-based Firestore client that authenticates via a self-signed JWT.
+Copy this from the existing `astro-app/src/lib/firestore/rest-client.ts` —
+it handles JWT generation, document CRUD, and structured queries using
+only Web APIs (no Node.js dependencies).
+
+### 8.3 Singleton
+
+**`src/lib/firestore/client.ts`**
+
+```typescript
+import { RestFirestoreClient, parseServiceAccountJson } from './rest-client.js';
+import type { FirestoreClient } from './types.js';
+
+let client: FirestoreClient | null = null;
+
+export async function getClient(): Promise<FirestoreClient> {
+  if (client) return client;
 
   const projectId = import.meta.env.FIRESTORE_PROJECT_ID;
   const credsJson = import.meta.env.GOOGLE_SERVICE_ACCOUNT_JSON;
 
   if (!projectId || !credsJson) {
-    throw new Error('FIRESTORE_PROJECT_ID and GOOGLE_SERVICE_ACCOUNT_JSON are required');
+    throw new Error(
+      '[Firestore] Missing env vars: FIRESTORE_PROJECT_ID and/or GOOGLE_SERVICE_ACCOUNT_JSON. ' +
+      'Add them to .dev.vars (local) or Cloudflare Pages environment variables (production).'
+    );
   }
 
-  if (getApps().length === 0) {
-    const creds = JSON.parse(credsJson);
-    initializeApp({ credential: cert(creds), projectId });
+  const creds = parseServiceAccountJson(credsJson);
+  const restClient = new RestFirestoreClient(creds);
+  const health = await restClient.healthCheck();
+
+  if (!health.ok) {
+    throw new Error(`[Firestore] Health check failed: ${health.error}`);
   }
 
-  _db = getFirestore();
-  return _db;
+  client = restClient;
+  return client;
 }
 
-export function resetDb(): void {
-  _db = null;
+export function resetClient(): void {
+  client = null;
+}
+
+export function getCollectionPrefix(): string {
+  return import.meta.env.FIRESTORE_COLLECTION_PREFIX || '';
 }
 ```
 
 ---
 
-## 9. Implementation — Fetchers
+## 9. Implementation — Haul Fetcher
+
+The only external data source. Given a haul URL, it fetches the JSON and
+normalises each scrape into a `ScrapedProperty`.
 
 ### 9.1 Types
 
-**`src/lib/fetchers/types.ts`**
+**`src/lib/fetcher/types.ts`**
 
 ```typescript
-// Normalised property shape that both haul and listing fetchers produce.
-// Fields mirror the scraper project's Listing model.
 export interface ScrapedProperty {
   source_listing_id: string;
   source_url:        string;
-  portal:            string | null;
   country:           string | null;
   title:             string | null;
   price_float:       number | null;
@@ -450,16 +532,7 @@ export interface ScrapedProperty {
   count_bathrooms:   number | null;
   constructed_area:  number | null;
   plot_area:         number | null;
-  area_unit:         string | null;
-  year_construction: number | null;
   property_type:     string | null;
-  property_subtype:  string | null;
-  tenure:            string | null;
-  for_sale:          boolean | null;
-  for_rent:          boolean | null;
-  for_rent_long_term:  boolean | null;
-  for_rent_short_term: boolean | null;
-  sold:              boolean | null;
   features:          string[];
   main_image_url:    string | null;
   description:       string | null;
@@ -470,18 +543,43 @@ export interface ScrapedProperty {
 
 ### 9.2 Haul fetcher
 
-**`src/lib/fetchers/haul.ts`**
+**`src/lib/fetcher/haul.ts`**
 
-Calls `GET /ext/v1/hauls/:id` on the scraper project. No authentication required.
+Fetches haul JSON from the given URL. No API key needed — haul endpoints are
+public. This is the **only** coupling to `property_web_scraper`: the shape of
+the JSON response.
 
 ```typescript
 import type { ScrapedProperty } from './types.js';
 
-const BASE_URL = import.meta.env.SCRAPER_BASE_URL;
+interface HaulScrape {
+  resultId:          string;
+  url:               string;
+  title?:            string;
+  price_float?:      number;
+  currency?:         string;
+  price?:            string;
+  latitude?:         number;
+  longitude?:        number;
+  city?:             string;
+  country?:          string;
+  region?:           string;
+  postal_code?:      string;
+  count_bedrooms?:   number;
+  count_bathrooms?:  number;
+  constructed_area?: number;
+  plot_area?:        number;
+  property_type?:    string;
+  main_image_url?:   string;
+  features?:         string[];
+  description?:      string;
+  agent_name?:       string;
+  createdAt?:        string;
+  [key: string]:     unknown;
+}
 
-export async function fetchHaul(haulId: string): Promise<ScrapedProperty[]> {
-  const url = `${BASE_URL}/ext/v1/hauls/${haulId}`;
-  const res = await fetch(url);
+export async function fetchHaul(haulUrl: string): Promise<ScrapedProperty[]> {
+  const res = await fetch(haulUrl);
 
   if (!res.ok) {
     throw new Error(`Haul fetch failed: ${res.status} ${await res.text()}`);
@@ -493,38 +591,16 @@ export async function fetchHaul(haulId: string): Promise<ScrapedProperty[]> {
   };
 
   if (!body.success || !Array.isArray(body.scrapes)) {
-    throw new Error('Unexpected haul response shape');
+    throw new Error('Unexpected haul response shape — expected { success: true, scrapes: [...] }');
   }
 
-  return body.scrapes.map(normaliseHaulScrape);
+  return body.scrapes.map(normalise);
 }
 
-interface HaulScrape {
-  resultId:        string;
-  url:             string;
-  title?:          string;
-  price_float?:    number;
-  currency?:       string;
-  price?:          string;
-  latitude?:       number;
-  longitude?:      number;
-  city?:           string;
-  country?:        string;
-  count_bedrooms?: number;
-  count_bathrooms?: number;
-  constructed_area?: number;
-  plot_area?:      number;
-  main_image_url?: string;
-  features?:       string[];
-  createdAt?:      string;
-  [key: string]:   unknown;
-}
-
-function normaliseHaulScrape(s: HaulScrape): ScrapedProperty {
+function normalise(s: HaulScrape): ScrapedProperty {
   return {
     source_listing_id: s.resultId,
     source_url:        s.url,
-    portal:            null,
     country:           s.country ?? null,
     title:             s.title ?? null,
     price_float:       s.price_float ?? null,
@@ -534,169 +610,41 @@ function normaliseHaulScrape(s: HaulScrape): ScrapedProperty {
     longitude:         s.longitude ?? null,
     address_string:    null,
     city:              s.city ?? null,
-    region:            null,
-    postal_code:       null,
+    region:            s.region ?? null,
+    postal_code:       s.postal_code ?? null,
     count_bedrooms:    s.count_bedrooms ?? null,
     count_bathrooms:   s.count_bathrooms ?? null,
     constructed_area:  s.constructed_area ?? null,
     plot_area:         s.plot_area ?? null,
-    area_unit:         null,
-    year_construction: null,
-    property_type:     null,
-    property_subtype:  null,
-    tenure:            null,
-    for_sale:          null,
-    for_rent:          null,
-    for_rent_long_term:  null,
-    for_rent_short_term: null,
-    sold:              null,
+    property_type:     s.property_type ?? null,
     features:          s.features ?? [],
     main_image_url:    s.main_image_url ?? null,
-    description:       null,
-    agent_name:        null,
+    description:       s.description ?? null,
+    agent_name:        s.agent_name ?? null,
     scraped_at:        s.createdAt ?? null,
   };
 }
 ```
 
-### 9.3 Listing fetcher
-
-**`src/lib/fetchers/listing.ts`**
-
-Calls `GET /public_api/v1/listings/:id`. Requires an API key.
-
-```typescript
-import type { ScrapedProperty } from './types.js';
-
-const BASE_URL  = import.meta.env.SCRAPER_BASE_URL;
-const API_KEY   = import.meta.env.SCRAPER_API_KEY ?? '';
-
-export async function fetchListing(listingId: string): Promise<ScrapedProperty> {
-  const url = `${BASE_URL}/public_api/v1/listings/${listingId}`;
-  const res = await fetch(url, {
-    headers: { 'X-Api-Key': API_KEY },
-  });
-
-  if (!res.ok) {
-    throw new Error(`Listing fetch failed: ${res.status} ${await res.text()}`);
-  }
-
-  const body = await res.json() as { success: boolean; listing?: Record<string, unknown> };
-  if (!body.success || !body.listing) {
-    throw new Error('Unexpected listing response shape');
-  }
-
-  return normaliseListing(body.listing);
-}
-
-function normaliseListing(l: Record<string, unknown>): ScrapedProperty {
-  const str  = (k: string) => (typeof l[k] === 'string'  ? l[k] as string  : null);
-  const num  = (k: string) => (typeof l[k] === 'number'  ? l[k] as number  : null);
-  const bool = (k: string) => (typeof l[k] === 'boolean' ? l[k] as boolean : null);
-
-  return {
-    source_listing_id: str('id') ?? String(l['id']),
-    source_url:        str('import_url') ?? '',
-    portal:            str('import_host_slug'),
-    country:           str('country'),
-    title:             str('title'),
-    price_float:       num('price_float'),
-    price_currency:    str('price_currency'),
-    price_string:      str('price_string'),
-    latitude:          num('latitude'),
-    longitude:         num('longitude'),
-    address_string:    str('address_string'),
-    city:              str('city'),
-    region:            str('region'),
-    postal_code:       str('postal_code'),
-    count_bedrooms:    num('count_bedrooms'),
-    count_bathrooms:   num('count_bathrooms'),
-    constructed_area:  num('constructed_area'),
-    plot_area:         num('plot_area'),
-    area_unit:         str('area_unit'),
-    year_construction: num('year_construction'),
-    property_type:     str('property_type'),
-    property_subtype:  str('property_subtype'),
-    tenure:            str('tenure'),
-    for_sale:          bool('for_sale'),
-    for_rent:          bool('for_rent'),
-    for_rent_long_term:  bool('for_rent_long_term'),
-    for_rent_short_term: bool('for_rent_short_term'),
-    sold:              bool('sold'),
-    features:          Array.isArray(l['features']) ? l['features'] as string[] : [],
-    main_image_url:    str('main_image_url'),
-    description:       str('description'),
-    agent_name:        str('agent_name'),
-    scraped_at:        str('last_retrieved_at'),
-  };
-}
-```
-
-### 9.4 Dispatcher
-
-**`src/lib/fetchers/index.ts`**
-
-Detects whether the submitted URL points to a haul or a single listing.
-
-```typescript
-import { fetchHaul }    from './haul.js';
-import { fetchListing } from './listing.js';
-import type { ScrapedProperty } from './types.js';
-
-export type SourceType = 'haul' | 'listing';
-
-export interface FetchResult {
-  sourceType: SourceType;
-  sourceId:   string;
-  properties: ScrapedProperty[];
-}
-
-export async function fetchFromScraper(sourceUrl: string): Promise<FetchResult> {
-  const url = new URL(sourceUrl);
-  const path = url.pathname;
-
-  // /ext/v1/hauls/:id
-  const haulMatch = path.match(/\/ext\/v1\/hauls\/([^/]+)/);
-  if (haulMatch) {
-    const haulId = haulMatch[1];
-    const properties = await fetchHaul(haulId);
-    return { sourceType: 'haul', sourceId: haulId, properties };
-  }
-
-  // /public_api/v1/listings/:id
-  const listingMatch = path.match(/\/public_api\/v1\/listings\/([^/]+)/);
-  if (listingMatch) {
-    const listingId = listingMatch[1];
-    const property = await fetchListing(listingId);
-    return { sourceType: 'listing', sourceId: listingId, properties: [property] };
-  }
-
-  throw new Error(`Unrecognised scraper URL pattern: ${path}`);
-}
-```
-
 ---
 
-## 10. Implementation — Enrichers
+## 10. Implementation — Country Modules & Enrichers
 
-### 10.1 Shared interface
+### 10.1 Enricher interface
 
-**`src/lib/enrichers/types.ts`**
+**`src/lib/enricher/types.ts`**
 
 ```typescript
 export interface EnricherInput {
-  property_id:  string;
-  latitude:     number;
-  longitude:    number;
-  country:      string | null;
-  postal_code:  string | null;
-  city:         string | null;
+  property_id:    string;
+  latitude:       number;
+  longitude:      number;
+  country:        string | null;
+  postal_code:    string | null;
+  city:           string | null;
   address_string: string | null;
 }
 
-// What an enricher writes to the enrichments subcollection.
-// The `data` field is free-form; `summary` fields are
-// written back to the property document.
 export interface EnricherResult {
   data:    Record<string, unknown>;
   summary: Partial<{
@@ -709,160 +657,120 @@ export interface EnricherResult {
     nearby_transit_stops: number;
     nearby_supermarkets:  number;
   }>;
-  // ISO 8601 — when this enrichment becomes stale and should be re-run
-  expiresAt: string;
+  expiresAt: string;   // ISO 8601
 }
 
 export interface Enricher {
-  name:   string;
-  run:    (input: EnricherInput) => Promise<EnricherResult>;
+  name: string;
+  run:  (input: EnricherInput) => Promise<EnricherResult>;
 }
 ```
 
-### 10.2 Enricher registry
+### 10.2 Country module interface
 
-**`src/lib/enrichers/registry.ts`**
+**`src/lib/countries/types.ts`**
 
-Maps countries to which enrichers should run. Add entries here as you add enrichers.
+Each country folder exports a `CountryModule` — a self-describing bundle of
+enrichers, required env vars, and metadata.
 
 ```typescript
-import { overpassEnricher }       from './overpass.js';
-import { walkscoreEnricher }      from './walkscore.js';
-import { epcUkEnricher }          from './epc-uk.js';
-import { floodUkEnricher }        from './flood-uk.js';
-import { landRegistryUkEnricher } from './land-registry-uk.js';
-import type { Enricher } from './types.js';
+import type { Enricher } from '@lib/enricher/types.js';
 
-// Enrichers that apply regardless of country
+export interface CountryModule {
+  /** ISO 3166-1 alpha-2 code (e.g. 'GB', 'US') */
+  code:     string;
+  /** Human-readable label (e.g. 'United Kingdom') */
+  label:    string;
+  /** Enrichers specific to this country */
+  enrichers: Enricher[];
+  /** Env vars this module requires (validated at startup) */
+  requiredEnvVars: string[];
+}
+```
+
+### 10.3 Country loader
+
+**`src/lib/countries/loader.ts`**
+
+Reads `COUNTRY_CODE` from the environment and dynamically imports the matching
+country module. Also loads the global enrichers that run for every country.
+
+```typescript
+import type { CountryModule } from './types.js';
+import type { Enricher } from '@lib/enricher/types.js';
+import { overpassEnricher } from './global/overpass.js';
+import { walkscoreEnricher } from './global/walkscore.js';
+
+// Register country modules here.
+// Each entry is a lazy import so only the active country is loaded.
+const COUNTRY_MODULES: Record<string, () => Promise<CountryModule>> = {
+  GB: () => import('./gb/index.js').then((m) => m.default),
+  US: () => import('./us/index.js').then((m) => m.default),
+  // Add new countries here:
+  // ES: () => import('./es/index.js').then((m) => m.default),
+};
+
 const GLOBAL_ENRICHERS: Enricher[] = [
   overpassEnricher,
   walkscoreEnricher,
 ];
 
-// Enrichers keyed by ISO 3166-1 alpha-2 country code or common name
-const COUNTRY_ENRICHERS: Record<string, Enricher[]> = {
-  'GB':             [epcUkEnricher, floodUkEnricher, landRegistryUkEnricher],
-  'UK':             [epcUkEnricher, floodUkEnricher, landRegistryUkEnricher],
-  'United Kingdom': [epcUkEnricher, floodUkEnricher, landRegistryUkEnricher],
-  'England':        [epcUkEnricher, floodUkEnricher, landRegistryUkEnricher],
-  // Add: 'US', 'ES', 'DE', etc.
-};
+let _cached: { country: CountryModule; all: Enricher[] } | null = null;
 
-export function getEnrichersForCountry(country: string | null): Enricher[] {
-  const countryEnrichers = country ? (COUNTRY_ENRICHERS[country] ?? []) : [];
-  return [...GLOBAL_ENRICHERS, ...countryEnrichers];
+export async function loadEnrichers(): Promise<{ country: CountryModule; all: Enricher[] }> {
+  if (_cached) return _cached;
+
+  const code = (import.meta.env.COUNTRY_CODE || '').toUpperCase();
+
+  if (!code) {
+    throw new Error(
+      '[Country] COUNTRY_CODE env var is required. ' +
+      `Available: ${Object.keys(COUNTRY_MODULES).join(', ')}`
+    );
+  }
+
+  const loader = COUNTRY_MODULES[code];
+  if (!loader) {
+    throw new Error(
+      `[Country] Unsupported COUNTRY_CODE "${code}". ` +
+      `Available: ${Object.keys(COUNTRY_MODULES).join(', ')}`
+    );
+  }
+
+  const country = await loader();
+
+  // Validate required env vars
+  const missing = country.requiredEnvVars.filter(
+    (v) => !import.meta.env[v]
+  );
+  if (missing.length > 0) {
+    throw new Error(
+      `[Country:${code}] Missing required env vars: ${missing.join(', ')}`
+    );
+  }
+
+  const all = [...GLOBAL_ENRICHERS, ...country.enrichers];
+  _cached = { country, all };
+  return _cached;
+}
+
+export function getAvailableCountries(): string[] {
+  return Object.keys(COUNTRY_MODULES);
 }
 ```
 
-### 10.3 Enrichment runner
+### 10.4 Global enrichers
 
-**`src/lib/enrichers/runner.ts`**
+These enrichers run for **every** country deployment.
 
-Runs all applicable enrichers inline using `Promise.allSettled()`. Called
-directly from the import route — no queue or worker needed.
+**`src/lib/countries/global/overpass.ts`**
 
-```typescript
-import { getDb } from '@lib/db/client.js';
-import { getEnrichersForCountry } from './registry.js';
-import { FieldValue } from 'firebase-admin/firestore';
-import type { EnricherInput } from './types.js';
-
-export async function runEnrichment(input: EnricherInput): Promise<void> {
-  const db = getDb();
-  const enrichers = getEnrichersForCountry(input.country);
-
-  if (enrichers.length === 0) return;
-
-  const propertyRef = db.collection('properties').doc(input.property_id);
-
-  const results = await Promise.allSettled(
-    enrichers.map(async (enricher) => {
-      // Mark as running
-      await propertyRef.collection('enrichments').doc(enricher.name).set({
-        enricher: enricher.name,
-        status:   'running',
-        created_at: FieldValue.serverTimestamp(),
-      });
-
-      try {
-        const result = await enricher.run(input);
-
-        // Write enrichment result
-        await propertyRef.collection('enrichments').doc(enricher.name).set({
-          enricher:     enricher.name,
-          status:       'complete',
-          data:         result.data,
-          completed_at: FieldValue.serverTimestamp(),
-          expires_at:   new Date(result.expiresAt),
-        });
-
-        // Merge summary fields back into property document
-        if (Object.keys(result.summary).length > 0) {
-          await propertyRef.update({
-            ...result.summary,
-            enriched_at: FieldValue.serverTimestamp(),
-          });
-        }
-
-        return { enricher: enricher.name, status: 'complete' as const };
-      } catch (err) {
-        const error = err instanceof Error ? err.message : String(err);
-        console.error(`[enricher] ${enricher.name} failed for ${input.property_id}:`, error);
-
-        await propertyRef.collection('enrichments').doc(enricher.name).set({
-          enricher:     enricher.name,
-          status:       'failed',
-          error,
-          completed_at: FieldValue.serverTimestamp(),
-        });
-
-        return { enricher: enricher.name, status: 'failed' as const };
-      }
-    }),
-  );
-
-  // Determine overall enrichment status
-  const statuses = results.map((r) =>
-    r.status === 'fulfilled' ? r.value.status : 'failed',
-  );
-  const allComplete = statuses.every((s) => s === 'complete');
-  const allFailed   = statuses.every((s) => s === 'failed');
-
-  await propertyRef.update({
-    enrichment_status: allComplete ? 'complete' : allFailed ? 'failed' : 'partial',
-  });
-}
-```
-
-### 10.4 Overpass enricher (OpenStreetMap nearby POIs)
-
-**`src/lib/enrichers/overpass.ts`**
-
-Queries OpenStreetMap for nearby points of interest using the Overpass API.
-Free, no API key, global coverage. Rate limit: avoid more than 1 req/s.
+Queries OpenStreetMap for nearby POIs. Free, no API key, global coverage.
 
 ```typescript
-import type { Enricher, EnricherInput, EnricherResult } from './types.js';
+import type { Enricher, EnricherInput, EnricherResult } from '@lib/enricher/types.js';
 
 const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
-
-interface OsmElement {
-  type: string;
-  id:   number;
-  lat?: number;
-  lon?: number;
-  tags: Record<string, string>;
-}
-
-interface OverpassResponse {
-  elements: OsmElement[];
-}
-
-interface PoiGroup {
-  count:    number;
-  nearest?: { name: string; distance_m: number };
-  items:    Array<{ name: string; lat: number; lon: number }>;
-}
 
 function haversineMetres(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6_371_000;
@@ -875,112 +783,58 @@ function haversineMetres(lat1: number, lon1: number, lat2: number, lon2: number)
   return R * 2 * Math.asin(Math.sqrt(a));
 }
 
-async function queryOverpass(lat: number, lon: number, radiusM: number): Promise<OverpassResponse> {
-  const query = `
-    [out:json][timeout:25];
-    (
-      node["amenity"="school"](around:${radiusM},${lat},${lon});
-      node["amenity"="college"](around:${radiusM},${lat},${lon});
-      node["amenity"="university"](around:${radiusM},${lat},${lon});
-      node["public_transport"="stop_position"](around:500,${lat},${lon});
-      node["highway"="bus_stop"](around:500,${lat},${lon});
-      node["railway"="station"](around:1000,${lat},${lon});
-      node["railway"="subway_entrance"](around:1000,${lat},${lon});
-      node["shop"="supermarket"](around:${radiusM},${lat},${lon});
-      node["shop"="convenience"](around:500,${lat},${lon});
-      node["leisure"="park"](around:${radiusM},${lat},${lon});
-      node["amenity"="hospital"](around:${radiusM},${lat},${lon});
-      node["amenity"="pharmacy"](around:${radiusM},${lat},${lon});
-    );
-    out body;
-  `;
-
-  const res = await fetch(OVERPASS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `data=${encodeURIComponent(query)}`,
-  });
-
-  if (!res.ok) throw new Error(`Overpass error ${res.status}`);
-  return res.json() as Promise<OverpassResponse>;
-}
-
-function groupElements(
-  elements: OsmElement[],
-  lat: number,
-  lon: number,
-): Record<string, PoiGroup> {
-  const groups: Record<string, PoiGroup> = {
-    schools:      { count: 0, items: [] },
-    transit:      { count: 0, items: [] },
-    supermarkets: { count: 0, items: [] },
-    parks:        { count: 0, items: [] },
-    hospitals:    { count: 0, items: [] },
-    pharmacies:   { count: 0, items: [] },
-  };
-
-  for (const el of elements) {
-    if (!el.lat || !el.lon) continue;
-    const name = el.tags.name ?? el.tags.operator ?? 'Unknown';
-    const dist = Math.round(haversineMetres(lat, lon, el.lat, el.lon));
-    const item = { name, lat: el.lat, lon: el.lon };
-
-    let key: keyof typeof groups | null = null;
-
-    if (['school', 'college', 'university'].includes(el.tags.amenity)) {
-      key = 'schools';
-    } else if (
-      el.tags.public_transport === 'stop_position' ||
-      el.tags.highway === 'bus_stop' ||
-      el.tags.railway === 'station' ||
-      el.tags.railway === 'subway_entrance'
-    ) {
-      key = 'transit';
-    } else if (['supermarket', 'convenience'].includes(el.tags.shop)) {
-      key = 'supermarkets';
-    } else if (el.tags.leisure === 'park') {
-      key = 'parks';
-    } else if (el.tags.amenity === 'hospital') {
-      key = 'hospitals';
-    } else if (el.tags.amenity === 'pharmacy') {
-      key = 'pharmacies';
-    }
-
-    if (!key) continue;
-
-    groups[key].count++;
-    groups[key].items.push(item);
-    if (!groups[key].nearest || dist < (groups[key].nearest?.distance_m ?? Infinity)) {
-      groups[key].nearest = { name, distance_m: dist };
-    }
-  }
-
-  return groups;
-}
-
 export const overpassEnricher: Enricher = {
   name: 'overpass',
 
   async run(input: EnricherInput): Promise<EnricherResult> {
     const { latitude: lat, longitude: lon } = input;
+    const radius = 1000;
 
-    const radius = 1000; // metres
-    const response = await queryOverpass(lat, lon, radius);
-    const groups   = groupElements(response.elements, lat, lon);
+    const query = `
+      [out:json][timeout:25];
+      (
+        node["amenity"="school"](around:${radius},${lat},${lon});
+        node["amenity"="college"](around:${radius},${lat},${lon});
+        node["amenity"="university"](around:${radius},${lat},${lon});
+        node["public_transport"="stop_position"](around:500,${lat},${lon});
+        node["highway"="bus_stop"](around:500,${lat},${lon});
+        node["railway"="station"](around:1000,${lat},${lon});
+        node["railway"="subway_entrance"](around:1000,${lat},${lon});
+        node["shop"="supermarket"](around:${radius},${lat},${lon});
+        node["shop"="convenience"](around:500,${lat},${lon});
+        node["leisure"="park"](around:${radius},${lat},${lon});
+        node["amenity"="hospital"](around:${radius},${lat},${lon});
+        node["amenity"="pharmacy"](around:${radius},${lat},${lon});
+      );
+      out body;
+    `;
 
-    // 90-day TTL — OSM data changes slowly
+    const res = await fetch(OVERPASS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `data=${encodeURIComponent(query)}`,
+    });
+
+    if (!res.ok) throw new Error(`Overpass error ${res.status}`);
+    const body = await res.json() as { elements: Array<{ lat?: number; lon?: number; tags: Record<string, string> }> };
+
+    // Group elements by category
+    const counts = { schools: 0, transit: 0, supermarkets: 0 };
+    for (const el of body.elements) {
+      if (!el.lat || !el.lon) continue;
+      if (['school', 'college', 'university'].includes(el.tags.amenity)) counts.schools++;
+      else if (el.tags.public_transport || el.tags.highway === 'bus_stop' || el.tags.railway) counts.transit++;
+      else if (['supermarket', 'convenience'].includes(el.tags.shop)) counts.supermarkets++;
+    }
+
     const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
 
     return {
-      data: {
-        query_radius_m: radius,
-        element_count:  response.elements.length,
-        ...groups,
-      },
+      data: { query_radius_m: radius, element_count: body.elements.length, ...counts },
       summary: {
-        nearby_schools:       groups.schools.count,
-        nearby_transit_stops: groups.transit.count,
-        nearby_supermarkets:  groups.supermarkets.count,
+        nearby_schools:       counts.schools,
+        nearby_transit_stops: counts.transit,
+        nearby_supermarkets:  counts.supermarkets,
       },
       expiresAt,
     };
@@ -988,73 +842,37 @@ export const overpassEnricher: Enricher = {
 };
 ```
 
-### 10.5 Walk Score enricher
-
-**`src/lib/enrichers/walkscore.ts`**
-
-Returns walkability, transit, and bike scores (0–100) for a location.
-Requires a free API key from [walkscore.com/professional/api.php](https://www.walkscore.com/professional/api.php).
+**`src/lib/countries/global/walkscore.ts`**
 
 ```typescript
-import type { Enricher, EnricherInput, EnricherResult } from './types.js';
-
-const API_KEY = import.meta.env.WALKSCORE_API_KEY ?? '';
-
-interface WalkScoreResponse {
-  status:            number;  // 1 = success
-  walkscore:         number;
-  description:       string;
-  updated:           string;
-  transit?: {
-    score:       number;
-    description: string;
-    summary:     string;
-  };
-  bike?: {
-    score:       number;
-    description: string;
-  };
-}
+import type { Enricher, EnricherInput, EnricherResult } from '@lib/enricher/types.js';
 
 export const walkscoreEnricher: Enricher = {
   name: 'walkscore',
 
   async run(input: EnricherInput): Promise<EnricherResult> {
-    if (!API_KEY) throw new Error('WALKSCORE_API_KEY not set');
+    const apiKey = import.meta.env.WALKSCORE_API_KEY ?? '';
+    if (!apiKey) throw new Error('WALKSCORE_API_KEY not set');
 
     const { latitude: lat, longitude: lon, address_string } = input;
     const address = encodeURIComponent(address_string ?? `${lat},${lon}`);
 
-    const url = [
-      `https://api.walkscore.com/score`,
-      `?format=json`,
-      `&address=${address}`,
-      `&lat=${lat}`,
-      `&lon=${lon}`,
-      `&transit=1`,
-      `&bike=1`,
-      `&wsapikey=${API_KEY}`,
-    ].join('');
-
+    const url = `https://api.walkscore.com/score?format=json&address=${address}&lat=${lat}&lon=${lon}&transit=1&bike=1&wsapikey=${apiKey}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Walk Score error ${res.status}`);
 
-    const body = await res.json() as WalkScoreResponse;
+    const body = await res.json() as {
+      status: number;
+      walkscore: number;
+      transit?: { score: number };
+      bike?: { score: number };
+    };
     if (body.status !== 1) throw new Error(`Walk Score status ${body.status}`);
 
-    // 30-day TTL
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     return {
-      data: {
-        walkscore:            body.walkscore,
-        walk_description:     body.description,
-        transit_score:        body.transit?.score ?? null,
-        transit_description:  body.transit?.description ?? null,
-        transit_summary:      body.transit?.summary ?? null,
-        bike_score:           body.bike?.score ?? null,
-        bike_description:     body.bike?.description ?? null,
-      },
+      data: { walkscore: body.walkscore, transit_score: body.transit?.score ?? null, bike_score: body.bike?.score ?? null },
       summary: {
         walkability_score: body.walkscore,
         transit_score:     body.transit?.score,
@@ -1066,104 +884,83 @@ export const walkscoreEnricher: Enricher = {
 };
 ```
 
-### 10.6 UK EPC enricher
+### 10.5 GB country module
 
-**`src/lib/enrichers/epc-uk.ts`**
-
-Looks up the Energy Performance Certificate for a UK property by postcode.
-Register for a free API key at [epc.opendatacommunities.org](https://epc.opendatacommunities.org/).
+**`src/lib/countries/gb/index.ts`**
 
 ```typescript
-import type { Enricher, EnricherInput, EnricherResult } from './types.js';
+import type { CountryModule } from '../types.js';
+import { epcEnricher } from './epc.js';
+import { floodEnricher } from './flood.js';
+import { landRegistryEnricher } from './land-registry.js';
 
-const EPC_EMAIL = import.meta.env.EPC_API_EMAIL ?? '';
-const EPC_KEY   = import.meta.env.EPC_API_KEY   ?? '';
+const gb: CountryModule = {
+  code:  'GB',
+  label: 'United Kingdom',
+  enrichers: [
+    epcEnricher,
+    floodEnricher,
+    landRegistryEnricher,
+  ],
+  requiredEnvVars: [
+    'EPC_API_EMAIL',
+    'EPC_API_KEY',
+  ],
+};
 
-interface EpcRow {
-  'current-energy-rating':         string;
-  'potential-energy-rating':        string;
-  'current-energy-efficiency':      string;
-  'potential-energy-efficiency':    string;
-  'environment-impact-current':     string;
-  'environment-impact-potential':   string;
-  'co2-emissions-current':          string;
-  'property-type':                  string;
-  'built-form':                     string;
-  'inspection-date':                string;
-  'lodgement-date':                 string;
-  address1?:                        string;
-  address2?:                        string;
-  posttown?:                        string;
-}
+export default gb;
+```
 
-interface EpcResponse {
-  rows: EpcRow[];
-}
+**`src/lib/countries/gb/epc.ts`**
 
-export const epcUkEnricher: Enricher = {
+```typescript
+import type { Enricher, EnricherInput, EnricherResult } from '@lib/enricher/types.js';
+
+export const epcEnricher: Enricher = {
   name: 'epc_uk',
 
   async run(input: EnricherInput): Promise<EnricherResult> {
-    if (!EPC_EMAIL || !EPC_KEY) throw new Error('EPC_API_EMAIL / EPC_API_KEY not set');
+    const email = import.meta.env.EPC_API_EMAIL ?? '';
+    const key   = import.meta.env.EPC_API_KEY   ?? '';
+    if (!email || !key) throw new Error('EPC_API_EMAIL / EPC_API_KEY not set');
     if (!input.postal_code) throw new Error('No postal_code — skipping EPC lookup');
 
     const postcode = input.postal_code.replace(/\s+/g, '+');
     const url = `https://epc.opendatacommunities.org/api/v1/domestic/search?postcode=${postcode}&size=1`;
-    const auth = Buffer.from(`${EPC_EMAIL}:${EPC_KEY}`).toString('base64');
+    const auth = btoa(`${email}:${key}`);
 
     const res = await fetch(url, {
-      headers: {
-        Authorization: `Basic ${auth}`,
-        Accept: 'application/json',
-      },
+      headers: { Authorization: `Basic ${auth}`, Accept: 'application/json' },
     });
-
     if (!res.ok) throw new Error(`EPC API error ${res.status}`);
 
-    const body = await res.json() as EpcResponse;
-    const row  = body.rows[0];
+    const body = await res.json() as { rows: Array<Record<string, string>> };
+    const row = body.rows[0];
     if (!row) throw new Error('No EPC certificate found for postcode');
 
-    // 1-year TTL — EPC data is stable
     const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
 
     return {
       data: {
-        current_energy_rating:       row['current-energy-rating'],
-        potential_energy_rating:     row['potential-energy-rating'],
-        current_energy_efficiency:   Number(row['current-energy-efficiency']),
-        potential_energy_efficiency: Number(row['potential-energy-efficiency']),
-        co2_emissions_current:       Number(row['co2-emissions-current']),
-        property_type:               row['property-type'],
-        built_form:                  row['built-form'],
-        inspection_date:             row['inspection-date'],
-        lodgement_date:              row['lodgement-date'],
+        current_energy_rating:     row['current-energy-rating'],
+        potential_energy_rating:   row['potential-energy-rating'],
+        current_energy_efficiency: Number(row['current-energy-efficiency']),
+        property_type:             row['property-type'],
+        inspection_date:           row['inspection-date'],
       },
-      summary: {
-        epc_grade: row['current-energy-rating'] ?? undefined,
-      },
+      summary: { epc_grade: row['current-energy-rating'] ?? undefined },
       expiresAt,
     };
   },
 };
 ```
 
-### 10.7 UK flood risk enricher
-
-**`src/lib/enrichers/flood-uk.ts`**
-
-Queries the Environment Agency's ArcGIS services to determine which flood zone
-a property falls in (Zone 1 = low risk, Zone 2 = medium, Zone 3 = high).
+**`src/lib/countries/gb/flood.ts`**
 
 ```typescript
-import type { Enricher, EnricherInput, EnricherResult } from './types.js';
+import type { Enricher, EnricherInput, EnricherResult } from '@lib/enricher/types.js';
 
-// Environment Agency Flood Map for Planning — flood zones 2 and 3
 const EA_BASE = 'https://environment.data.gov.uk/arcgis/rest/services/EA';
-
-interface EaQueryResponse {
-  features: Array<{ attributes: Record<string, unknown> }>;
-}
 
 async function queryFloodZone(lat: number, lon: number, zone: 2 | 3): Promise<boolean> {
   const service = zone === 3
@@ -1171,52 +968,31 @@ async function queryFloodZone(lat: number, lon: number, zone: 2 | 3): Promise<bo
     : 'FloodMapForPlanningRiversAndSeaFloodZone2/MapServer/0';
 
   const params = new URLSearchParams({
-    geometry:           `${lon},${lat}`,
-    geometryType:       'esriGeometryPoint',
-    inSR:               '4326',
-    spatialRel:         'esriSpatialRelIntersects',
-    outFields:          '*',
-    returnGeometry:     'false',
-    f:                  'json',
+    geometry: `${lon},${lat}`, geometryType: 'esriGeometryPoint',
+    inSR: '4326', spatialRel: 'esriSpatialRelIntersects',
+    outFields: '*', returnGeometry: 'false', f: 'json',
   });
 
   const res = await fetch(`${EA_BASE}/${service}/query?${params}`);
   if (!res.ok) throw new Error(`EA flood API error ${res.status}`);
-
-  const body = await res.json() as EaQueryResponse;
+  const body = await res.json() as { features: unknown[] };
   return body.features.length > 0;
 }
 
-function resolveRisk(inZone3: boolean, inZone2: boolean): string {
-  if (inZone3) return 'high';       // Zone 3a/3b — significant flood probability
-  if (inZone2) return 'medium';     // Zone 2 — between 0.1% and 1% annual probability
-  return 'low';                     // Zone 1 — less than 0.1% annual probability
-}
-
-export const floodUkEnricher: Enricher = {
+export const floodEnricher: Enricher = {
   name: 'flood_uk',
 
   async run(input: EnricherInput): Promise<EnricherResult> {
-    const { latitude: lat, longitude: lon } = input;
-
-    // Query both zones in parallel
     const [inZone3, inZone2] = await Promise.all([
-      queryFloodZone(lat, lon, 3),
-      queryFloodZone(lat, lon, 2),
+      queryFloodZone(input.latitude, input.longitude, 3),
+      queryFloodZone(input.latitude, input.longitude, 2),
     ]);
 
-    const risk = resolveRisk(inZone3, inZone2);
-
-    // 1-year TTL — flood zone designations change rarely
+    const risk = inZone3 ? 'high' : inZone2 ? 'medium' : 'low';
     const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
 
     return {
-      data: {
-        in_flood_zone_3: inZone3,
-        in_flood_zone_2: inZone2,
-        flood_risk:      risk,
-        source:          'Environment Agency Flood Map for Planning',
-      },
+      data: { in_flood_zone_3: inZone3, in_flood_zone_2: inZone2, flood_risk: risk },
       summary: { flood_risk: risk },
       expiresAt,
     };
@@ -1224,98 +1000,144 @@ export const floodUkEnricher: Enricher = {
 };
 ```
 
-### 10.8 UK Land Registry enricher
-
-**`src/lib/enrichers/land-registry-uk.ts`**
-
-Fetches recent sold prices in the same postcode from HM Land Registry open data.
-No API key required. Returns price trend data and comparable transactions.
+**`src/lib/countries/gb/land-registry.ts`**
 
 ```typescript
-import type { Enricher, EnricherInput, EnricherResult } from './types.js';
+import type { Enricher, EnricherInput, EnricherResult } from '@lib/enricher/types.js';
 
-// HM Land Registry Price Paid Linked Data API
 const LR_BASE = 'https://landregistry.data.gov.uk/data/ppi';
 
-interface LrTransaction {
-  '@id':                   string;
-  transactionDate:         string;
-  pricePaid:               number;
-  propertyAddress: {
-    postcode:    string;
-    town?:       string;
-    street?:     string;
-  };
-  estateType:              { prefLabel: string };
-  newBuild:                boolean;
-  propertyType:            { prefLabel: string };
-}
-
-interface LrResponse {
-  result: {
-    items: LrTransaction[];
-  };
-}
-
-export const landRegistryUkEnricher: Enricher = {
+export const landRegistryEnricher: Enricher = {
   name: 'land_registry_uk',
 
   async run(input: EnricherInput): Promise<EnricherResult> {
     if (!input.postal_code) throw new Error('No postal_code for Land Registry lookup');
 
     const postcode = input.postal_code.replace(/\s+/g, '');
-    const url = [
-      `${LR_BASE}/transaction-record.json`,
-      `?propertyAddress.postcode=${postcode}`,
-      `&_pageSize=20`,
-      `&_sort=-transactionDate`,
-    ].join('');
+    const url = `${LR_BASE}/transaction-record.json?propertyAddress.postcode=${postcode}&_pageSize=20&_sort=-transactionDate`;
 
     const res = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`Land Registry error ${res.status}`);
 
-    const body = await res.json() as LrResponse;
+    const body = await res.json() as { result: { items: Array<{ pricePaid: number; transactionDate: string; propertyType?: { prefLabel: string }; newBuild: boolean }> } };
     const items = body.result?.items ?? [];
 
-    if (items.length === 0) {
-      return {
-        data:      { postcode, transaction_count: 0, transactions: [] },
-        summary:   {},
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      };
-    }
+    const prices = items.map((t) => t.pricePaid).filter(Boolean);
+    const avg = prices.length ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : null;
 
-    const prices = items.map(t => t.pricePaid).filter(Boolean);
-    const avg    = prices.reduce((a, b) => a + b, 0) / prices.length;
-    const min    = Math.min(...prices);
-    const max    = Math.max(...prices);
-
-    const transactions = items.slice(0, 10).map(t => ({
-      date:          t.transactionDate,
-      price:         t.pricePaid,
+    const transactions = items.slice(0, 10).map((t) => ({
+      date: t.transactionDate,
+      price: t.pricePaid,
       property_type: t.propertyType?.prefLabel ?? null,
-      new_build:     t.newBuild,
-      estate_type:   t.estateType?.prefLabel ?? null,
+      new_build: t.newBuild,
     }));
 
-    // 30-day TTL — new sales registered monthly
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     return {
-      data: {
-        postcode,
-        transaction_count:  items.length,
-        avg_sold_price:     Math.round(avg),
-        min_sold_price:     min,
-        max_sold_price:     max,
-        most_recent_sale:   transactions[0],
-        transactions,
-      },
+      data: { postcode, transaction_count: items.length, avg_sold_price: avg, transactions },
       summary: {},
       expiresAt,
     };
   },
 };
+```
+
+### 10.6 US country module (placeholder)
+
+**`src/lib/countries/us/index.ts`**
+
+```typescript
+import type { CountryModule } from '../types.js';
+
+const us: CountryModule = {
+  code:  'US',
+  label: 'United States',
+  enrichers: [
+    // Add US-specific enrichers here as they are built:
+    // zillowEnricher,
+    // femaFloodEnricher,
+  ],
+  requiredEnvVars: [],
+};
+
+export default us;
+```
+
+### 10.7 Enrichment runner
+
+**`src/lib/enricher/runner.ts`**
+
+Runs all enrichers (global + country) for a single property.
+
+```typescript
+import { getClient, getCollectionPrefix } from '@lib/firestore/client.js';
+import { loadEnrichers } from '@lib/countries/loader.js';
+import type { EnricherInput } from './types.js';
+
+export async function runEnrichment(input: EnricherInput): Promise<void> {
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const { all: enrichers } = await loadEnrichers();
+
+  if (enrichers.length === 0) return;
+
+  const propertyRef = db.collection(`${prefix}properties`).doc(input.property_id);
+
+  const results = await Promise.allSettled(
+    enrichers.map(async (enricher) => {
+      // Mark as running
+      await propertyRef.collection('enrichments').doc(enricher.name).set({
+        enricher: enricher.name,
+        status:   'running',
+        created_at: Date.now(),
+      });
+
+      try {
+        const result = await enricher.run(input);
+
+        await propertyRef.collection('enrichments').doc(enricher.name).set({
+          enricher:     enricher.name,
+          status:       'complete',
+          data:         result.data,
+          completed_at: Date.now(),
+          expires_at:   new Date(result.expiresAt).getTime(),
+        });
+
+        if (Object.keys(result.summary).length > 0) {
+          await propertyRef.update({
+            ...result.summary,
+            enriched_at: Date.now(),
+          });
+        }
+
+        return { enricher: enricher.name, status: 'complete' as const };
+      } catch (err) {
+        const error = err instanceof Error ? err.message : String(err);
+        console.error(`[enricher] ${enricher.name} failed for ${input.property_id}:`, error);
+
+        await propertyRef.collection('enrichments').doc(enricher.name).set({
+          enricher:     enricher.name,
+          status:       'failed',
+          error,
+          completed_at: Date.now(),
+        });
+
+        return { enricher: enricher.name, status: 'failed' as const };
+      }
+    }),
+  );
+
+  const statuses = results.map((r) =>
+    r.status === 'fulfilled' ? r.value.status : 'failed',
+  );
+  const allComplete = statuses.every((s) => s === 'complete');
+  const allFailed   = statuses.every((s) => s === 'failed');
+
+  await propertyRef.update({
+    enrichment_status: allComplete ? 'complete' : allFailed ? 'failed' : 'partial',
+  });
+}
 ```
 
 ---
@@ -1327,10 +1149,7 @@ export const landRegistryUkEnricher: Enricher = {
 **`src/lib/services/api-response.ts`**
 
 ```typescript
-export function successResponse(
-  data: Record<string, unknown>,
-  statusCode = 200,
-): Response {
+export function successResponse(data: Record<string, unknown>, statusCode = 200): Response {
   return new Response(JSON.stringify({ success: true, ...data }), {
     status: statusCode,
     headers: { 'Content-Type': 'application/json' },
@@ -1351,56 +1170,54 @@ export function errorResponse(message: string, statusCode = 400): Response {
 
 ```typescript
 import type { APIRoute } from 'astro';
-import { getDb } from '@lib/db/client.js';
-import { fetchFromScraper } from '@lib/fetchers/index.js';
-import { runEnrichment } from '@lib/enrichers/runner.js';
+import { getClient, getCollectionPrefix } from '@lib/firestore/client.js';
+import { fetchHaul } from '@lib/fetcher/haul.js';
+import { runEnrichment } from '@lib/enricher/runner.js';
+import { loadEnrichers } from '@lib/countries/loader.js';
 import { successResponse, errorResponse } from '@lib/services/api-response.js';
-import { FieldValue } from 'firebase-admin/firestore';
 import { geohashForLocation } from 'geofire-common';
 
 export const POST: APIRoute = async ({ request }) => {
-  const body = await request.json() as { source_url?: string };
-  const sourceUrl = body.source_url?.trim();
+  const body = await request.json() as { haul_url?: string };
+  const haulUrl = body.haul_url?.trim();
 
-  if (!sourceUrl) {
-    return errorResponse('source_url is required', 400);
+  if (!haulUrl) {
+    return errorResponse('haul_url is required', 400);
   }
 
-  const db = getDb();
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
+  const { country } = await loadEnrichers();
 
-  // Fetch from scraper project
-  let fetchResult;
+  // Fetch haul JSON
+  let properties;
   try {
-    fetchResult = await fetchFromScraper(sourceUrl);
+    properties = await fetchHaul(haulUrl);
   } catch (err) {
     return errorResponse(String(err), 422);
   }
 
-  const { sourceType, sourceId, properties } = fetchResult;
-
   // Create import record
-  const importRef = db.collection('imports').doc();
+  const importRef = db.collection(`${prefix}imports`).doc();
   const importId = importRef.id;
 
   await importRef.set({
-    source_url:    sourceUrl,
-    source_type:   sourceType,
-    source_id:     sourceId,
+    haul_url:      haulUrl,
     status:        'processing',
+    country_code:  country.code,
     listing_count: properties.length,
     error:         null,
-    created_at:    FieldValue.serverTimestamp(),
+    created_at:    Date.now(),
     completed_at:  null,
   });
 
-  // Insert properties and run enrichment inline
+  // Insert properties and run enrichment
   const propertyIds: string[] = [];
 
   for (const prop of properties) {
-    const propertyRef = db.collection('properties').doc();
+    const propertyRef = db.collection(`${prefix}properties`).doc();
     const propertyId = propertyRef.id;
 
-    // Compute geohash for proximity queries
     const geohash = (prop.latitude && prop.longitude)
       ? geohashForLocation([prop.latitude, prop.longitude])
       : null;
@@ -1409,7 +1226,6 @@ export const POST: APIRoute = async ({ request }) => {
       import_id:          importId,
       source_listing_id:  prop.source_listing_id,
       source_url:         prop.source_url,
-      portal:             prop.portal,
       country:            prop.country,
       title:              prop.title,
       price_float:        prop.price_float,
@@ -1426,29 +1242,19 @@ export const POST: APIRoute = async ({ request }) => {
       count_bathrooms:    prop.count_bathrooms,
       constructed_area:   prop.constructed_area,
       plot_area:          prop.plot_area,
-      area_unit:          prop.area_unit,
-      year_construction:  prop.year_construction,
       property_type:      prop.property_type,
-      property_subtype:   prop.property_subtype,
-      tenure:             prop.tenure,
-      for_sale:           prop.for_sale,
-      for_rent:           prop.for_rent,
-      for_rent_long_term:  prop.for_rent_long_term,
-      for_rent_short_term: prop.for_rent_short_term,
-      sold:               prop.sold,
       features:           prop.features,
       main_image_url:     prop.main_image_url,
       description:        prop.description,
       agent_name:         prop.agent_name,
       scraped_at:         prop.scraped_at,
-      imported_at:        FieldValue.serverTimestamp(),
+      imported_at:        Date.now(),
       enriched_at:        null,
       enrichment_status:  (prop.latitude && prop.longitude) ? 'pending' : 'failed',
     });
 
     propertyIds.push(propertyId);
 
-    // Run enrichment inline if coordinates are available
     if (prop.latitude && prop.longitude) {
       await runEnrichment({
         property_id:    propertyId,
@@ -1462,19 +1268,14 @@ export const POST: APIRoute = async ({ request }) => {
     }
   }
 
-  // Mark import complete
-  await importRef.update({
-    status:       'complete',
-    completed_at: FieldValue.serverTimestamp(),
-  });
+  await importRef.update({ status: 'complete', completed_at: Date.now() });
 
   return successResponse({
-    import_id:    importId,
-    source_type:  sourceType,
-    source_id:    sourceId,
+    import_id:     importId,
+    country_code:  country.code,
     listing_count: properties.length,
-    property_ids: propertyIds,
-    status:       'complete',
+    property_ids:  propertyIds,
+    status:        'complete',
   }, 201);
 };
 ```
@@ -1483,29 +1284,22 @@ export const POST: APIRoute = async ({ request }) => {
 
 ```typescript
 import type { APIRoute } from 'astro';
-import { getDb } from '@lib/db/client.js';
+import { getClient, getCollectionPrefix } from '@lib/firestore/client.js';
 import { successResponse, errorResponse } from '@lib/services/api-response.js';
 
 export const GET: APIRoute = async ({ params }) => {
-  const db = getDb();
-  const { id } = params;
+  const db = await getClient();
+  const prefix = getCollectionPrefix();
 
-  const importDoc = await db.collection('imports').doc(id!).get();
-  if (!importDoc.exists) {
-    return errorResponse('Import not found', 404);
-  }
+  const doc = await db.collection(`${prefix}imports`).doc(params.id!).get();
+  if (!doc.exists) return errorResponse('Import not found', 404);
 
-  const importData = { id: importDoc.id, ...importDoc.data() };
-
-  // Include property enrichment summary
-  const propsSnap = await db.collection('properties')
-    .where('import_id', '==', id)
-    .select('enrichment_status', 'source_url')
+  const propsSnap = await db.collection(`${prefix}properties`)
+    .where('import_id', '==', doc.id)
     .get();
-
   const properties = propsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-  return successResponse({ ...importData, properties });
+  return successResponse({ id: doc.id, ...doc.data(), properties });
 };
 ```
 
@@ -1515,28 +1309,20 @@ export const GET: APIRoute = async ({ params }) => {
 
 ```typescript
 import type { APIRoute } from 'astro';
-import { getDb } from '@lib/db/client.js';
-import { successResponse, errorResponse } from '@lib/services/api-response.js';
+import { getClient, getCollectionPrefix } from '@lib/firestore/client.js';
+import { successResponse } from '@lib/services/api-response.js';
 
 export const GET: APIRoute = async ({ url }) => {
-  const db      = getDb();
-  const country = url.searchParams.get('country');
-  const limit   = Math.min(Number(url.searchParams.get('limit') ?? 50), 200);
-  const offset  = Number(url.searchParams.get('offset') ?? 0);
+  const db     = await getClient();
+  const prefix = getCollectionPrefix();
+  const limit  = Math.min(Number(url.searchParams.get('limit') ?? 50), 200);
 
-  let query: FirebaseFirestore.Query = db.collection('properties')
-    .orderBy('imported_at', 'desc')
-    .limit(limit)
-    .offset(offset);
+  const snap = await db.collection(`${prefix}properties`).get();
+  const properties = snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }))
+    .slice(0, limit);
 
-  if (country) {
-    query = query.where('country', '==', country);
-  }
-
-  const snap = await query.get();
-  const properties = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
-  return successResponse({ properties, limit, offset });
+  return successResponse({ properties, limit });
 };
 ```
 
@@ -1544,25 +1330,20 @@ export const GET: APIRoute = async ({ url }) => {
 
 ```typescript
 import type { APIRoute } from 'astro';
-import { getDb } from '@lib/db/client.js';
+import { getClient, getCollectionPrefix } from '@lib/firestore/client.js';
 import { successResponse, errorResponse } from '@lib/services/api-response.js';
 
 export const GET: APIRoute = async ({ params }) => {
-  const db = getDb();
-  const { id } = params;
+  const db     = await getClient();
+  const prefix = getCollectionPrefix();
 
-  const propDoc = await db.collection('properties').doc(id!).get();
-  if (!propDoc.exists) {
-    return errorResponse('Property not found', 404);
-  }
+  const doc = await db.collection(`${prefix}properties`).doc(params.id!).get();
+  if (!doc.exists) return errorResponse('Property not found', 404);
 
-  const prop = { id: propDoc.id, ...propDoc.data() };
-
-  // Fetch enrichment subcollection
-  const enrichSnap = await propDoc.ref.collection('enrichments').get();
+  const enrichSnap = await doc.ref.collection('enrichments').get();
   const enrichments = enrichSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-  return successResponse({ ...prop, enrichments });
+  return successResponse({ id: doc.id, ...doc.data(), enrichments });
 };
 ```
 
@@ -1570,55 +1351,47 @@ export const GET: APIRoute = async ({ params }) => {
 
 ```typescript
 import type { APIRoute } from 'astro';
-import { getDb } from '@lib/db/client.js';
-import { runEnrichment } from '@lib/enrichers/runner.js';
+import { getClient, getCollectionPrefix } from '@lib/firestore/client.js';
+import { runEnrichment } from '@lib/enricher/runner.js';
 import { successResponse, errorResponse } from '@lib/services/api-response.js';
 
 export const POST: APIRoute = async ({ params }) => {
-  const db = getDb();
-  const { id } = params;
+  const db     = await getClient();
+  const prefix = getCollectionPrefix();
 
-  const propDoc = await db.collection('properties').doc(id!).get();
-  if (!propDoc.exists) {
-    return errorResponse('Property not found', 404);
-  }
+  const doc = await db.collection(`${prefix}properties`).doc(params.id!).get();
+  if (!doc.exists) return errorResponse('Property not found', 404);
 
-  const prop = propDoc.data()!;
+  const prop = doc.data()!;
   if (!prop.latitude || !prop.longitude) {
     return errorResponse('Property has no coordinates — cannot enrich', 422);
   }
 
   // Delete existing enrichments
-  const enrichSnap = await propDoc.ref.collection('enrichments').get();
-  const batch = db.batch();
-  enrichSnap.docs.forEach((d) => batch.delete(d.ref));
-  await batch.commit();
+  const enrichSnap = await doc.ref.collection('enrichments').get();
+  for (const d of enrichSnap.docs) await d.ref.delete();
 
-  // Reset enrichment state
-  await propDoc.ref.update({ enrichment_status: 'pending', enriched_at: null });
+  await doc.ref.update({ enrichment_status: 'pending', enriched_at: null });
 
-  // Run enrichment inline
   await runEnrichment({
-    property_id:    propDoc.id,
-    latitude:       prop.latitude,
-    longitude:      prop.longitude,
-    country:        prop.country,
-    postal_code:    prop.postal_code,
-    city:           prop.city,
-    address_string: prop.address_string,
+    property_id:    doc.id,
+    latitude:       prop.latitude as number,
+    longitude:      prop.longitude as number,
+    country:        (prop.country as string) ?? null,
+    postal_code:    (prop.postal_code as string) ?? null,
+    city:           (prop.city as string) ?? null,
+    address_string: (prop.address_string as string) ?? null,
   });
 
-  return successResponse({ message: 'Re-enrichment complete', property_id: propDoc.id });
+  return successResponse({ message: 'Re-enrichment complete', property_id: doc.id });
 };
 ```
 
 **`src/pages/api/properties/nearby.ts`** — `GET /api/properties/nearby`
 
-Uses geohash-based proximity queries via `geofire-common`.
-
 ```typescript
 import type { APIRoute } from 'astro';
-import { getDb } from '@lib/db/client.js';
+import { getClient, getCollectionPrefix } from '@lib/firestore/client.js';
 import { geohashQueryBounds, distanceBetween } from 'geofire-common';
 import { successResponse, errorResponse } from '@lib/services/api-response.js';
 
@@ -1628,55 +1401,38 @@ export const GET: APIRoute = async ({ url }) => {
   const radiusKm = Number(url.searchParams.get('radius_km') ?? 1);
   const limit    = Math.min(Number(url.searchParams.get('limit') ?? 20), 100);
 
-  if (!lat || !lng) {
-    return errorResponse('lat and lng are required', 400);
-  }
+  if (!lat || !lng) return errorResponse('lat and lng are required', 400);
 
-  const db = getDb();
+  const db     = await getClient();
+  const prefix = getCollectionPrefix();
   const center: [number, number] = [lat, lng];
   const radiusM = radiusKm * 1000;
-
-  // Get geohash range bounds for the query radius
   const bounds = geohashQueryBounds(center, radiusM);
 
-  // Run all geohash range queries in parallel
   const snapshots = await Promise.all(
     bounds.map(([start, end]) =>
-      db.collection('properties')
-        .orderBy('geohash')
-        .startAt(start)
-        .endAt(end)
+      db.collection(`${prefix}properties`)
+        .where('geohash', '>=', start)
+        .where('geohash', '<=', end)
         .get(),
     ),
   );
 
-  // Merge, filter by actual distance, sort, and limit
   const properties: Array<Record<string, unknown>> = [];
-
   for (const snap of snapshots) {
     for (const doc of snap.docs) {
       const data = doc.data();
       if (!data.latitude || !data.longitude) continue;
-
-      const distKm = distanceBetween(
-        [data.latitude, data.longitude],
-        center,
-      );
-
+      const distKm = distanceBetween([data.latitude as number, data.longitude as number], center);
       if (distKm <= radiusKm) {
-        properties.push({
-          id: doc.id,
-          ...data,
-          distance_m: Math.round(distKm * 1000),
-        });
+        properties.push({ id: doc.id, ...data, distance_m: Math.round(distKm * 1000) });
       }
     }
   }
 
   properties.sort((a, b) => (a.distance_m as number) - (b.distance_m as number));
-  const limited = properties.slice(0, limit);
 
-  return successResponse({ properties: limited, radius_km: radiusKm });
+  return successResponse({ properties: properties.slice(0, limit), radius_km: radiusKm });
 };
 ```
 
@@ -1684,17 +1440,13 @@ export const GET: APIRoute = async ({ url }) => {
 
 ## 12. Implementation — Frontend Pages
 
-Astro pages provide a simple dashboard for viewing imports and properties.
-
 ### 12.1 Base layout
 
 **`src/layouts/Base.astro`**
 
 ```astro
 ---
-interface Props {
-  title: string;
-}
+interface Props { title: string }
 const { title } = Astro.props;
 ---
 <!doctype html>
@@ -1702,16 +1454,14 @@ const { title } = Astro.props;
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{title} — property-context</title>
+  <title>{title} — property_data_enhancer</title>
 </head>
 <body>
   <nav>
     <a href="/dashboard">Dashboard</a>
     <a href="/imports/new">New Import</a>
   </nav>
-  <main>
-    <slot />
-  </main>
+  <main><slot /></main>
 </body>
 </html>
 ```
@@ -1723,34 +1473,30 @@ const { title } = Astro.props;
 ```astro
 ---
 import Base from '../layouts/Base.astro';
-import { getDb } from '@lib/db/client.js';
+import { getClient, getCollectionPrefix } from '@lib/firestore/client.js';
+import { loadEnrichers } from '@lib/countries/loader.js';
 
-const db = getDb();
+const db = await getClient();
+const prefix = getCollectionPrefix();
+const { country } = await loadEnrichers();
 
-const importsSnap = await db.collection('imports')
-  .orderBy('created_at', 'desc')
-  .limit(10)
-  .get();
+const importsSnap = await db.collection(`${prefix}imports`).get();
 const imports = importsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-const propsSnap = await db.collection('properties')
-  .orderBy('imported_at', 'desc')
-  .limit(20)
-  .get();
+const propsSnap = await db.collection(`${prefix}properties`).get();
 const properties = propsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 ---
 <Base title="Dashboard">
-  <h1>Recent Imports</h1>
+  <h1>property_data_enhancer — {country.label} ({country.code})</h1>
+
+  <h2>Recent Imports ({imports.length})</h2>
   <ul>
     {imports.map(imp => (
-      <li>
-        <strong>{imp.source_type}</strong> — {imp.source_id}
-        ({imp.status}) — {imp.listing_count} listings
-      </li>
+      <li>{imp.haul_url} — {imp.status} — {imp.listing_count} listings</li>
     ))}
   </ul>
 
-  <h1>Recent Properties</h1>
+  <h2>Properties ({properties.length})</h2>
   <ul>
     {properties.map(prop => (
       <li>
@@ -1769,36 +1515,29 @@ const properties = propsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 ```astro
 ---
 import Base from '../../layouts/Base.astro';
-import { getDb } from '@lib/db/client.js';
+import { getClient, getCollectionPrefix } from '@lib/firestore/client.js';
 
 const { id } = Astro.params;
-const db = getDb();
+const db = await getClient();
+const prefix = getCollectionPrefix();
 
-const propDoc = await db.collection('properties').doc(id!).get();
-if (!propDoc.exists) return Astro.redirect('/dashboard');
+const doc = await db.collection(`${prefix}properties`).doc(id!).get();
+if (!doc.exists) return Astro.redirect('/dashboard');
 
-const prop = { id: propDoc.id, ...propDoc.data() } as Record<string, any>;
-
-const enrichSnap = await propDoc.ref.collection('enrichments').get();
+const prop = { id: doc.id, ...doc.data() } as Record<string, any>;
+const enrichSnap = await doc.ref.collection('enrichments').get();
 const enrichments = enrichSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 ---
 <Base title={prop.title ?? 'Property'}>
   <h1>{prop.title ?? 'Untitled Property'}</h1>
-  <p>{prop.address_string} — {prop.city}, {prop.country}</p>
-  <p>Price: {prop.price_string ?? 'N/A'}</p>
-  <p>Bedrooms: {prop.count_bedrooms ?? 'N/A'}</p>
-  <p>Enrichment status: {prop.enrichment_status}</p>
+  <p>{prop.city}, {prop.country} — {prop.price_string ?? 'N/A'}</p>
+  <p>Enrichment: {prop.enrichment_status}</p>
 
-  <h2>Enrichment Summary</h2>
+  <h2>Scores</h2>
   <ul>
-    <li>Walk Score: {prop.walkability_score ?? '—'}</li>
-    <li>Transit Score: {prop.transit_score ?? '—'}</li>
-    <li>Bike Score: {prop.bike_score ?? '—'}</li>
-    <li>Flood Risk: {prop.flood_risk ?? '—'}</li>
-    <li>EPC Grade: {prop.epc_grade ?? '—'}</li>
-    <li>Nearby Schools: {prop.nearby_schools ?? '—'}</li>
-    <li>Nearby Transit: {prop.nearby_transit_stops ?? '—'}</li>
-    <li>Nearby Supermarkets: {prop.nearby_supermarkets ?? '—'}</li>
+    <li>Walk: {prop.walkability_score ?? '—'} | Transit: {prop.transit_score ?? '—'} | Bike: {prop.bike_score ?? '—'}</li>
+    <li>Flood: {prop.flood_risk ?? '—'} | EPC: {prop.epc_grade ?? '—'}</li>
+    <li>Schools: {prop.nearby_schools ?? '—'} | Transit stops: {prop.nearby_transit_stops ?? '—'}</li>
   </ul>
 
   <h2>Enrichment Details</h2>
@@ -1824,14 +1563,14 @@ const enrichments = enrichSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 import Base from '../../layouts/Base.astro';
 ---
 <Base title="New Import">
-  <h1>Import Properties</h1>
+  <h1>Import from Haul</h1>
   <form id="import-form">
-    <label for="source_url">Scraper URL (haul or listing):</label>
-    <input type="url" id="source_url" name="source_url" required
-      placeholder="https://your-scraper.com/ext/v1/hauls/haul_abc123" />
-    <button type="submit">Import</button>
+    <label for="haul_url">Haul JSON URL:</label>
+    <input type="url" id="haul_url" name="haul_url" required
+      placeholder="https://scraper.example.com/ext/v1/hauls/haul_abc123" />
+    <button type="submit">Import & Enrich</button>
   </form>
-  <div id="result"></div>
+  <pre id="result"></pre>
 
   <script>
     const form = document.getElementById('import-form') as HTMLFormElement;
@@ -1839,13 +1578,13 @@ import Base from '../../layouts/Base.astro';
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      result.textContent = 'Importing...';
+      result.textContent = 'Importing & enriching...';
 
-      const sourceUrl = new FormData(form).get('source_url') as string;
+      const haulUrl = new FormData(form).get('haul_url') as string;
       const res = await fetch('/api/imports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source_url: sourceUrl }),
+        body: JSON.stringify({ haul_url: haulUrl }),
       });
 
       const data = await res.json();
@@ -1863,39 +1602,43 @@ import Base from '../../layouts/Base.astro';
 
 ```javascript
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
+import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
   output: 'server',
-  adapter: node({ mode: 'standalone' }),
+  adapter: cloudflare(),
 });
 ```
 
-> **Note:** If deploying to Cloudflare (matching the existing astro-app), swap
-> `@astrojs/node` for `@astrojs/cloudflare`. The Firebase Admin SDK requires a
-> Node.js runtime, so Cloud Run or a standalone Node adapter is recommended.
+**`wrangler.jsonc`**
+
+```jsonc
+{
+  "name": "property_data_enhancer",
+  "compatibility_date": "2026-02-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "dist"
+}
+```
 
 ---
 
 ## 14. Running Locally
 
-Only one process is needed — the Astro dev server handles both API routes and
-frontend pages:
-
 ```bash
 npm run dev
 ```
 
-**Test the import flow:**
+Test the import flow:
 
 ```bash
-# Submit a haul URL from the scraper project
+# Import a haul
 curl -X POST http://localhost:4321/api/imports \
   -H 'Content-Type: application/json' \
-  -d '{"source_url":"https://your-scraper.com/ext/v1/hauls/haul_abc123"}'
+  -d '{"haul_url":"https://your-scraper.com/ext/v1/hauls/haul_abc123"}'
 
-# Response (enrichment runs inline, so status is 'complete'):
-# { "success": true, "import_id": "...", "property_ids": ["..."], "status": "complete" }
+# Response:
+# { "success": true, "import_id": "...", "country_code": "GB", "property_ids": [...], "status": "complete" }
 
 # Get import details
 curl http://localhost:4321/api/imports/<import_id>
@@ -1906,197 +1649,182 @@ curl http://localhost:4321/api/properties/<property_id>
 # List all properties
 curl http://localhost:4321/api/properties
 
-# Nearby properties (1km radius around London Bridge)
+# Nearby properties
 curl "http://localhost:4321/api/properties/nearby?lat=51.5079&lng=-0.0877&radius_km=1"
 
-# Re-enrich a property
+# Re-enrich
 curl -X POST http://localhost:4321/api/properties/<property_id>/re-enrich
 ```
 
-Or visit `http://localhost:4321/dashboard` for the web UI.
+Or visit `http://localhost:4321/dashboard`.
 
 ---
 
 ## 15. Deployment
 
-### 15.1 Firebase Hosting + Cloud Run (recommended)
+### 15.1 Cloudflare Pages (recommended)
 
-Firebase Admin SDK requires a Node.js runtime. Deploy the Astro SSR app to
-Cloud Run and optionally front it with Firebase Hosting.
-
-```bash
-# Install Firebase CLI
-npm install -g firebase-tools
-firebase login
-
-# Initialize (select Hosting + set up Cloud Run)
-firebase init hosting
-
-# Build the Astro app
-npm run build
-
-# Deploy to Cloud Run
-gcloud run deploy property-context \
-  --source . \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --set-env-vars "FIRESTORE_PROJECT_ID=your-project-id"
-
-# Or use firebase.json to proxy Hosting → Cloud Run
-```
-
-### 15.2 Standalone Node.js (Railway, Fly.io, etc.)
-
-Since the app uses the Node.js adapter, it can run anywhere Node.js is available.
+Each country gets its own Cloudflare Pages project, all deployed from the same
+repository. The only difference is the environment variables.
 
 ```bash
-# Build
-npm run build
-
-# Start
-node dist/server/entry.mjs
+# Build and deploy
+npm run deploy
 ```
 
-Set all environment variables in your hosting platform's dashboard.
+Or connect the GitHub repository to Cloudflare Pages:
 
-**Railway:**
-1. Push code to GitHub
-2. Go to [railway.app](https://railway.app) → **New project → Deploy from GitHub**
-3. Set environment variables
-4. Railway auto-detects Node.js and runs `npm start`
+1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages → Create**
+2. Connect your GitHub repo
+3. Build command: `npm run build`
+4. Output directory: `dist`
+5. Set environment variables:
 
-**Fly.io:**
-```bash
-fly launch
-fly secrets set \
-  FIRESTORE_PROJECT_ID=your-project-id \
-  GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account",...}' \
-  SCRAPER_BASE_URL=https://... \
-  WALKSCORE_API_KEY=... \
-  EPC_API_EMAIL=... \
-  EPC_API_KEY=...
-fly deploy
-```
+| Variable | GB deployment | US deployment |
+|---|---|---|
+| `COUNTRY_CODE` | `GB` | `US` |
+| `FIRESTORE_PROJECT_ID` | `my-project` | `my-project` |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | `{...}` | `{...}` |
+| `WALKSCORE_API_KEY` | `abc123` | `abc123` |
+| `EPC_API_EMAIL` | `me@example.com` | _(not needed)_ |
+| `EPC_API_KEY` | `xyz789` | _(not needed)_ |
+| `FIRESTORE_COLLECTION_PREFIX` | `gb_` | `us_` |
+
+Using `FIRESTORE_COLLECTION_PREFIX` keeps each country's data in separate
+Firestore collections (`gb_properties`, `us_properties`, etc.) within the same
+Firebase project.
+
+### 15.2 Multiple deployments from one repo
+
+With Cloudflare Pages, you can create multiple projects pointing at the same
+repo. Each project has its own URL and environment variables:
+
+| Project name | URL | `COUNTRY_CODE` |
+|---|---|---|
+| `property-data-enhancer-gb` | `property-data-enhancer-gb.pages.dev` | `GB` |
+| `property-data-enhancer-us` | `property-data-enhancer-us.pages.dev` | `US` |
+| `property-data-enhancer-es` | `property-data-enhancer-es.pages.dev` | `ES` |
 
 ---
 
 ## 16. Enricher API Reference
 
-### Overpass (OpenStreetMap)
+### Overpass (OpenStreetMap) — global
 
 | Detail | Value |
 |--------|-------|
 | API | `https://overpass-api.de/api/interpreter` |
 | Auth | None |
-| Method | `POST` with OverpassQL in body |
-| Rate limit | ~1 req/s recommended, do not hammer |
-| Docs | [wiki.openstreetmap.org/wiki/Overpass_API](https://wiki.openstreetmap.org/wiki/Overpass_API) |
+| Rate limit | ~1 req/s recommended |
 | TTL | 90 days |
 
-Output fields: `schools`, `transit`, `supermarkets`, `parks`, `hospitals`, `pharmacies`
-(each with `count`, `nearest.name`, `nearest.distance_m`, `items[]`)
-
-### Walk Score
+### Walk Score — global
 
 | Detail | Value |
 |--------|-------|
 | API | `https://api.walkscore.com/score` |
-| Auth | API key in query string (`wsapikey=`) |
-| Rate limit | 5 000 calls/day on free tier |
-| Register | [walkscore.com/professional/api.php](https://www.walkscore.com/professional/api.php) |
+| Auth | API key in query string |
+| Rate limit | 5 000 calls/day (free) |
 | TTL | 30 days |
 
-Output fields: `walkscore` (0–100), `transit_score` (0–100), `bike_score` (0–100),
-plus description strings for each.
-
-### UK EPC Register
+### UK EPC Register — `countries/gb/`
 
 | Detail | Value |
 |--------|-------|
 | API | `https://epc.opendatacommunities.org/api/v1/domestic/search` |
-| Auth | Basic auth — email + API key |
-| Rate limit | Not published; be reasonable |
-| Register | [epc.opendatacommunities.org](https://epc.opendatacommunities.org/) |
+| Auth | Basic auth (email + key) |
 | TTL | 1 year |
 
-Output fields: `current_energy_rating` (A–G), `potential_energy_rating`,
-`current_energy_efficiency` (0–100), `potential_energy_efficiency`,
-`co2_emissions_current`, `property_type`, `built_form`.
-
-### UK Flood Risk (Environment Agency)
+### UK Flood Risk — `countries/gb/`
 
 | Detail | Value |
 |--------|-------|
 | API | Environment Agency ArcGIS REST services |
 | Auth | None |
-| Rate limit | Not published |
-| Docs | [environment.data.gov.uk](https://environment.data.gov.uk) |
 | TTL | 1 year |
 
-Output fields: `in_flood_zone_3` (boolean), `in_flood_zone_2` (boolean),
-`flood_risk` (`low` / `medium` / `high`).
-
-Risk mapping: Zone 3 = high (>1% annual probability), Zone 2 = medium (0.1–1%),
-Zone 1 (neither) = low (<0.1%).
-
-### UK Land Registry Price Paid
+### UK Land Registry — `countries/gb/`
 
 | Detail | Value |
 |--------|-------|
 | API | `https://landregistry.data.gov.uk/data/ppi/transaction-record.json` |
 | Auth | None |
-| Rate limit | Not published |
-| Docs | [landregistry.data.gov.uk](https://landregistry.data.gov.uk) |
 | TTL | 30 days |
-
-Output fields: `transaction_count`, `avg_sold_price`, `min_sold_price`,
-`max_sold_price`, `most_recent_sale`, `transactions[]` (up to 10 recent).
 
 ---
 
-## 17. Adding a New Enricher
+## 17. Adding a New Country
 
-1. **Create the file** `src/lib/enrichers/<name>.ts`
-2. **Implement** the `Enricher` interface from `src/lib/enrichers/types.ts`
-3. **Register it** in `src/lib/enrichers/registry.ts` (global or country-specific)
+1. Create a folder: `src/lib/countries/<code>/`
 
-That's it. The inline runner picks it up automatically — no queue, worker, or
-route changes needed.
-
-Minimal enricher template:
+2. Create `index.ts` exporting a `CountryModule`:
 
 ```typescript
-import type { Enricher, EnricherInput, EnricherResult } from './types.js';
+import type { CountryModule } from '../types.js';
+
+const xx: CountryModule = {
+  code:  'XX',
+  label: 'Country Name',
+  enrichers: [],
+  requiredEnvVars: [],
+};
+
+export default xx;
+```
+
+3. Register it in `src/lib/countries/loader.ts`:
+
+```typescript
+const COUNTRY_MODULES: Record<string, () => Promise<CountryModule>> = {
+  GB: () => import('./gb/index.js').then((m) => m.default),
+  US: () => import('./us/index.js').then((m) => m.default),
+  XX: () => import('./xx/index.js').then((m) => m.default),  // ← add
+};
+```
+
+4. Deploy with `COUNTRY_CODE=XX`.
+
+No other files need to change. The loader, runner, routes, and frontend all
+work automatically with the new country.
+
+---
+
+## 18. Adding a New Enricher
+
+1. Create the enricher file in the appropriate country folder (or `global/`
+   for all countries):
+
+```typescript
+// src/lib/countries/gb/my-enricher.ts
+import type { Enricher, EnricherInput, EnricherResult } from '@lib/enricher/types.js';
 
 export const myEnricher: Enricher = {
-  name: 'my_enricher',  // must be unique; used as the enrichment doc ID
+  name: 'my_enricher',
 
   async run(input: EnricherInput): Promise<EnricherResult> {
-    const { latitude, longitude, country, postal_code } = input;
-
     // ... call external API ...
-    const apiData = {};
-
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-
-    return {
-      data:    apiData,          // stored as-is in enrichments subcollection
-      summary: {},               // merged into property document summary fields
-      expiresAt,
-    };
+    return { data: {}, summary: {}, expiresAt };
   },
 };
 ```
 
-Then in `registry.ts`:
+2. Add it to the country's `index.ts`:
 
 ```typescript
 import { myEnricher } from './my-enricher.js';
 
-// Add to GLOBAL_ENRICHERS or a specific country entry
-const GLOBAL_ENRICHERS: Enricher[] = [
-  overpassEnricher,
-  walkscoreEnricher,
-  myEnricher,   // ← add here
-];
+const gb: CountryModule = {
+  // ...
+  enrichers: [epcEnricher, floodEnricher, landRegistryEnricher, myEnricher],
+  // ...
+};
 ```
+
+3. If the enricher needs an API key, add it to `requiredEnvVars`:
+
+```typescript
+requiredEnvVars: ['EPC_API_EMAIL', 'EPC_API_KEY', 'MY_API_KEY'],
+```
+
+The runner picks it up automatically. No route or config changes needed.
