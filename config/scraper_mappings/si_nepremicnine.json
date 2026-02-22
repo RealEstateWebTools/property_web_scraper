@@ -1,0 +1,116 @@
+[{
+  "name": "si_nepremicnine",
+  "expectedExtractionRate": 0.55,
+
+  // nepremicnine.net — Slovenia's leading property portal
+  // HTML-based extraction
+
+  "defaultValues": {
+    "country":            { "value": "Slovenia" },
+    "currency":           { "value": "EUR" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "sl-SI" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='nepremicnine'], meta[property='og:image']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": ".lastnosti .sobe, .podatki-sobe", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": ".lastnosti .kopalnice, .podatki-kopalnice", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".cena, .cena-vrednost", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": ".lastnosti .povrsina, .podatki-povrsina", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".cena, .cena-vrednost",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": ".lokacija, .naslov-lokacija" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "prodaja"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "najem"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "najem"
+    }
+  }
+}]

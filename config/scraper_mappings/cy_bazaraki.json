@@ -1,0 +1,116 @@
+[{
+  "name": "cy_bazaraki",
+  "expectedExtractionRate": 0.55,
+
+  // bazaraki.com — Cyprus's leading classifieds and property portal
+  // JSON-LD with CSS fallbacks
+
+  "defaultValues": {
+    "country":            { "value": "Cyprus" },
+    "currency":           { "value": "EUR" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "en-CY" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='bazaraki'], meta[property='og:image']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": ".announcement-characteristics .bedrooms, .char-bedrooms", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": ".announcement-characteristics .bathrooms, .char-bathrooms", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".announcement-price, .announcement-price__cost", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": ".announcement-characteristics .area, .char-area", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".announcement-price, .announcement-price__cost",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": ".announcement-location, .announcement-loc" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "for-sale"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "for-rent"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "for-rent"
+    }
+  }
+}]

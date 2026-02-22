@@ -1,0 +1,116 @@
+[{
+  "name": "ee_city24",
+  "expectedExtractionRate": 0.55,
+
+  // city24.ee — Estonia's City24 property portal (same platform as city24.lv)
+  // JSON-LD with CSS fallbacks
+
+  "defaultValues": {
+    "country":            { "value": "Estonia" },
+    "currency":           { "value": "EUR" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "et-EE" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='city24'], meta[property='og:image']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": ".object-params .rooms, .detail-rooms", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": ".object-params .bathrooms, .detail-bathrooms", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".price, .price-main", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": ".object-params .area, .detail-area", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".price, .price-main",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": ".object-location, .detail-address" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "sell"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    }
+  }
+}]

@@ -1075,4 +1075,52 @@ export const fixtures: FixtureEntry[] = [
     sourceUrl: 'https://www.imot.bg/pcgi/imot.cgi?act=5&adv=12345',
     expected: {},
   },
+  {
+    scraper: 'sk_nehnutelnosti',
+    fixture: null,
+    sourceUrl: 'https://www.nehnutelnosti.sk/detail/predaj/12345/',
+    expected: {},
+  },
+  {
+    scraper: 'rs_nekretnine',
+    fixture: null,
+    sourceUrl: 'https://www.nekretnine.rs/stambeni-objekti/prodaja/12345',
+    expected: {},
+  },
+  {
+    scraper: 'si_nepremicnine',
+    fixture: null,
+    sourceUrl: 'https://www.nepremicnine.net/oglasi-prodaja/12345/',
+    expected: {},
+  },
+  {
+    scraper: 'lv_city24',
+    fixture: null,
+    sourceUrl: 'https://www.city24.lv/real-estate/sell/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ee_city24',
+    fixture: null,
+    sourceUrl: 'https://www.city24.ee/real-estate/sell/12345',
+    expected: {},
+  },
+  {
+    scraper: 'cy_bazaraki',
+    fixture: null,
+    sourceUrl: 'https://www.bazaraki.com/real-estate/for-sale/12345/',
+    expected: {},
+  },
+  {
+    scraper: 'lu_athome',
+    fixture: null,
+    sourceUrl: 'https://www.athome.lu/vente/appartement/12345',
+    expected: {},
+  },
+  {
+    scraper: 'jp_suumo',
+    fixture: null,
+    sourceUrl: 'https://www.suumo.jp/chintai/jnc_12345/',
+    expected: {},
+  },
 ];

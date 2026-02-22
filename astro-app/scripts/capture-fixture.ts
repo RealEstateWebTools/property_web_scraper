@@ -184,6 +184,22 @@ const HOSTNAME_MAP: Record<string, string> = {
   'aruodas.lt': 'lt_aruodas',
   'www.imot.bg': 'bg_imotbg',
   'imot.bg': 'bg_imotbg',
+  'www.nehnutelnosti.sk': 'sk_nehnutelnosti',
+  'nehnutelnosti.sk': 'sk_nehnutelnosti',
+  'www.nekretnine.rs': 'rs_nekretnine',
+  'nekretnine.rs': 'rs_nekretnine',
+  'www.nepremicnine.net': 'si_nepremicnine',
+  'nepremicnine.net': 'si_nepremicnine',
+  'www.city24.lv': 'lv_city24',
+  'city24.lv': 'lv_city24',
+  'www.city24.ee': 'ee_city24',
+  'city24.ee': 'ee_city24',
+  'www.bazaraki.com': 'cy_bazaraki',
+  'bazaraki.com': 'cy_bazaraki',
+  'www.athome.lu': 'lu_athome',
+  'athome.lu': 'lu_athome',
+  'www.suumo.jp': 'jp_suumo',
+  'suumo.jp': 'jp_suumo',
 };
 
 const HELP_TEXT = `
