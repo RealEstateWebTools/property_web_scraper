@@ -1171,4 +1171,52 @@ export const fixtures: FixtureEntry[] = [
     sourceUrl: 'https://www.supercasas.com/venta/apartamentos/12345',
     expected: {},
   },
+  {
+    scraper: 'pa_encuentra24',
+    fixture: null,
+    sourceUrl: 'https://www.encuentra24.com/panama/bienes-raices-venta/12345',
+    expected: {},
+  },
+  {
+    scraper: 'mt_remax',
+    fixture: null,
+    sourceUrl: 'https://www.remax-malta.com/for-sale/apartment/12345',
+    expected: {},
+  },
+  {
+    scraper: 'is_mbl',
+    fixture: null,
+    sourceUrl: 'https://www.mbl.is/fasteignir/sala/12345/',
+    expected: {},
+  },
+  {
+    scraper: 'ng_privateproperty',
+    fixture: null,
+    sourceUrl: 'https://www.privateproperty.com.ng/for-sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'za_privateproperty',
+    fixture: null,
+    sourceUrl: 'https://www.privateproperty.co.za/for-sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'in_99acres',
+    fixture: null,
+    sourceUrl: 'https://www.99acres.com/property-for-sale-12345',
+    expected: {},
+  },
+  {
+    scraper: 'de_immowelt',
+    fixture: null,
+    sourceUrl: 'https://www.immowelt.de/expose/kaufen/12345',
+    expected: {},
+  },
+  {
+    scraper: 'fr_leboncoin',
+    fixture: null,
+    sourceUrl: 'https://www.leboncoin.fr/ventes_immobilieres/12345.htm',
+    expected: {},
+  },
 ];

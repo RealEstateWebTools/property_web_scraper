@@ -320,10 +320,10 @@ describe('url-screener', () => {
     });
   });
 
-  describe('unknown_real_estate — known RE sites without scrapers', () => {
-    it('identifies immowelt.de', () => {
+  describe('known RE sites now with scrapers', () => {
+    it('identifies immowelt.de as allowed', () => {
       const r = screenUrl('https://www.immowelt.de/expose/12345');
-      expect(r.verdict).toBe('unknown_real_estate');
+      expect(r.verdict).toBe('allowed');
     });
   });
 
