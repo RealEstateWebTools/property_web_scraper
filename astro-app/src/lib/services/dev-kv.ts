@@ -73,6 +73,32 @@ export class DevKV {
     try { unlinkSync(filePath); } catch { /* file may not exist */ }
   }
 
+  async list(options?: { prefix?: string; limit?: number; cursor?: string }): Promise<{
+    keys: Array<{ name: string; expiration?: number; metadata?: unknown }>;
+    list_complete: boolean;
+    cursor?: string;
+  }> {
+    const prefix = options?.prefix ?? '';
+    const limit = options?.limit ?? 1000;
+    const now = Date.now();
+    const keys: Array<{ name: string; expiration?: number }> = [];
+    try {
+      for (const file of readdirSync(this.dir)) {
+        if (!file.endsWith('.json')) continue;
+        const key = decodeURIComponent(file.slice(0, -5));
+        if (prefix && !key.startsWith(prefix)) continue;
+        const filePath = join(this.dir, file);
+        try {
+          const entry: StoredEntry = JSON.parse(readFileSync(filePath, 'utf-8'));
+          if (entry.expiresAt && entry.expiresAt < now) continue;
+          keys.push({ name: key, expiration: entry.expiresAt ? Math.floor(entry.expiresAt / 1000) : undefined });
+        } catch { /* skip corrupt files */ }
+        if (keys.length >= limit) break;
+      }
+    } catch { /* dir may not exist */ }
+    return { keys, list_complete: keys.length < limit };
+  }
+
   /** Remove all expired entries from disk. Call on startup to prevent stale data buildup. */
   cleanup(): number {
     let removed = 0;

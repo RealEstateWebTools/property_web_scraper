@@ -15,6 +15,7 @@ export const ApiErrorCode = {
   FETCH_BLOCKED: 'FETCH_BLOCKED',
   HAUL_LIMIT_REACHED: 'HAUL_LIMIT_REACHED',
   EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;
 
 export type ApiErrorCodeValue = (typeof ApiErrorCode)[keyof typeof ApiErrorCode];
@@ -34,6 +35,7 @@ const HTTP_STATUS: Record<ApiErrorCodeValue, number> = {
   [ApiErrorCode.FETCH_BLOCKED]: 422,
   [ApiErrorCode.HAUL_LIMIT_REACHED]: 402,
   [ApiErrorCode.EMAIL_NOT_VERIFIED]: 403,
+  [ApiErrorCode.INTERNAL_ERROR]: 500,
 };
 
 const VALIDATOR_CODE_MAP: Record<string, ApiErrorCodeValue> = {

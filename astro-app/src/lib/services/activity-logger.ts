@@ -7,8 +7,8 @@
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { persistAuditEntry } from './audit-log.js';
 
-export type LogLevel = 'info' | 'warn' | 'error';
-export type LogCategory = 'api_request' | 'extraction' | 'auth' | 'rate_limit' | 'system' | 'quality';
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogCategory = 'api_request' | 'extraction' | 'auth' | 'rate_limit' | 'system' | 'quality' | 'api_key' | 'stripe' | 'webhook';
 
 export interface LogEntry {
   id: string;
@@ -78,8 +78,8 @@ export function logActivity(input: LogInput): void {
 
   if (shouldEmitConsoleLogs()) {
     const payload = JSON.stringify({
-      timestamp: new Date(entry.timestamp).toISOString(),
       ...entry,
+      timestamp: new Date(entry.timestamp).toISOString(),
     });
     if (entry.level === 'error') {
       console.error(payload);
@@ -128,9 +128,10 @@ export function queryLogs(query: LogQuery = {}): LogQueryResult {
 }
 
 export function getLogStats(): LogStats {
-  const byLevel: Record<LogLevel, number> = { info: 0, warn: 0, error: 0 };
+  const byLevel: Record<LogLevel, number> = { debug: 0, info: 0, warn: 0, error: 0 };
   const byCategory: Record<LogCategory, number> = {
     api_request: 0, extraction: 0, auth: 0, rate_limit: 0, system: 0, quality: 0,
+    api_key: 0, stripe: 0, webhook: 0,
   };
   let oldest: number | null = null;
   let newest: number | null = null;

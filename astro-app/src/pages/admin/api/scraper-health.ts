@@ -117,7 +117,7 @@ export const GET: APIRoute = async ({ request }) => {
         grade: diag?.qualityGrade,
         label: diag?.qualityLabel,
         extractionRate: diag?.extractionRate,
-        weightedRate: diag?.weightedRate,
+        weightedRate: diag?.weightedExtractionRate,
         populatedFields: diag?.populatedFields,
         totalFields: diag?.totalFields,
         criticalFieldsMissing: diag?.criticalFieldsMissing,
