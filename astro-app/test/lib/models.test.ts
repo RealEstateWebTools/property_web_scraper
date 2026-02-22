@@ -21,7 +21,7 @@ describe('Models', () => {
       expect(listing.id).toBeTruthy();
       expect(listing.persisted).toBe(true);
 
-      const found = await Listing.find.call(Listing, listing.id);
+      const found = await Listing.find.call(Listing, listing.id) as unknown as Listing;
       expect(found.title).toBe('Test Property');
       expect(found.price_float).toBe(500000);
       expect(found.count_bedrooms).toBe(3);
@@ -142,7 +142,7 @@ describe('Models', () => {
   describe('WhereChain', () => {
     it('finds or creates a listing', async () => {
       const chain = new WhereChain(Listing as any, { import_url: 'https://example.com/unique-test' });
-      const created = await chain.firstOrCreate();
+      const created = await chain.firstOrCreate() as unknown as Listing;
       expect(created.import_url).toBe('https://example.com/unique-test');
 
       // Second call should return the same document

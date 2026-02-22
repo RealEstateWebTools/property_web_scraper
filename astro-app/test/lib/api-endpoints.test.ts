@@ -996,7 +996,7 @@ describe('OPTIONS preflight (CORS)', () => {
   it('usage OPTIONS returns 204 with CORS headers', async () => {
     const { OPTIONS } = await import('../../src/pages/public_api/v1/usage.js');
     const request = mockRequest('/public_api/v1/usage', { method: 'OPTIONS' });
-    const response = OPTIONS({ request } as any);
+    const response = await OPTIONS({ request } as any);
 
     expect(response.status).toBe(204);
     expect(response.headers.get('Access-Control-Allow-Methods')).toContain('GET');
@@ -1006,7 +1006,7 @@ describe('OPTIONS preflight (CORS)', () => {
   it('webhooks OPTIONS returns 204 with CORS headers', async () => {
     const { OPTIONS } = await import('../../src/pages/public_api/v1/webhooks.js');
     const request = mockRequest('/public_api/v1/webhooks', { method: 'OPTIONS' });
-    const response = OPTIONS({ request } as any);
+    const response = await OPTIONS({ request } as any);
 
     expect(response.status).toBe(204);
     expect(response.headers.get('Access-Control-Allow-Methods')).toContain('POST');
@@ -1015,7 +1015,7 @@ describe('OPTIONS preflight (CORS)', () => {
   it('export OPTIONS returns 204 with CORS headers', async () => {
     const { OPTIONS } = await import('../../src/pages/public_api/v1/export.js');
     const request = mockRequest('/public_api/v1/export', { method: 'OPTIONS' });
-    const response = OPTIONS({ request } as any);
+    const response = await OPTIONS({ request } as any);
 
     expect(response.status).toBe(204);
   });
@@ -1023,7 +1023,7 @@ describe('OPTIONS preflight (CORS)', () => {
   it('supported_sites OPTIONS returns 204 with CORS headers', async () => {
     const { OPTIONS } = await import('../../src/pages/public_api/v1/supported_sites.js');
     const request = mockRequest('/public_api/v1/supported_sites', { method: 'OPTIONS' });
-    const response = OPTIONS({ request } as any);
+    const response = await OPTIONS({ request } as any);
 
     expect(response.status).toBe(204);
   });

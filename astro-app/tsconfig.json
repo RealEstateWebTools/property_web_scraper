@@ -5,6 +5,7 @@
     "paths": {
       "@lib/*": ["src/lib/*"],
       "@components/*": ["src/components/*"]
-    }
+    },
+    "types": ["vitest/globals"]
   }
 }

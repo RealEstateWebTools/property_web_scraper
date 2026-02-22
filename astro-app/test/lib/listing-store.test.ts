@@ -333,6 +333,12 @@ describe('listing-store', () => {
         totalFields: 0,
         populatedFields: 0,
         emptyFields: [],
+        extractableFields: 0,
+        populatedExtractableFields: 0,
+        extractionRate: 0,
+        qualityGrade: 'F',
+        qualityLabel: 'Failed',
+        meetsExpectation: false,
       });
 
       expect(getStoreStats().count).toBe(1);
@@ -512,6 +518,12 @@ describe('listing-store', () => {
         totalFields: 0,
         populatedFields: 0,
         emptyFields: [],
+        extractableFields: 0,
+        populatedExtractableFields: 0,
+        extractionRate: 0,
+        qualityGrade: 'F',
+        qualityLabel: 'Failed',
+        meetsExpectation: false,
       });
 
       expect(await getDiagnostics(id)).toBeDefined();
