@@ -1123,4 +1123,52 @@ export const fixtures: FixtureEntry[] = [
     sourceUrl: 'https://www.suumo.jp/chintai/jnc_12345/',
     expected: {},
   },
+  {
+    scraper: 'kr_zigbang',
+    fixture: null,
+    sourceUrl: 'https://www.zigbang.com/home/apt/12345',
+    expected: {},
+  },
+  {
+    scraper: 'tw_591',
+    fixture: null,
+    sourceUrl: 'https://www.591.com.tw/home/sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'bd_bproperty',
+    fixture: null,
+    sourceUrl: 'https://www.bproperty.com/buy/12345.html',
+    expected: {},
+  },
+  {
+    scraper: 'lk_ikman',
+    fixture: null,
+    sourceUrl: 'https://www.ikman.lk/en/ad/house-for-sale-12345',
+    expected: {},
+  },
+  {
+    scraper: 'gh_meqasa',
+    fixture: null,
+    sourceUrl: 'https://www.meqasa.com/property/for-sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'uy_infocasas',
+    fixture: null,
+    sourceUrl: 'https://www.infocasas.com.uy/venta/12345',
+    expected: {},
+  },
+  {
+    scraper: 'cr_encuentra24',
+    fixture: null,
+    sourceUrl: 'https://www.encuentra24.com/costa-rica/bienes-raices-venta/12345',
+    expected: {},
+  },
+  {
+    scraper: 'do_supercasas',
+    fixture: null,
+    sourceUrl: 'https://www.supercasas.com/venta/apartamentos/12345',
+    expected: {},
+  },
 ];
