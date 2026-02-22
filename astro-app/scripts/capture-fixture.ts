@@ -120,6 +120,22 @@ const HOSTNAME_MAP: Record<string, string> = {
   'propertyguru.com.sg': 'sg_propertyguru',
   'www.fincaraiz.com.co': 'co_fincaraiz',
   'fincaraiz.com.co': 'co_fincaraiz',
+  'www.sahibinden.com': 'tr_sahibinden',
+  'sahibinden.com': 'tr_sahibinden',
+  'www.spitogatos.gr': 'gr_spitogatos',
+  'spitogatos.gr': 'gr_spitogatos',
+  'www.zonaprop.com.ar': 'ar_zonaprop',
+  'zonaprop.com.ar': 'ar_zonaprop',
+  'www.portalinmobiliario.com': 'cl_portalinmobiliario',
+  'portalinmobiliario.com': 'cl_portalinmobiliario',
+  'www.ddproperty.com': 'th_ddproperty',
+  'ddproperty.com': 'th_ddproperty',
+  'www.lamudi.com.ph': 'ph_lamudi',
+  'lamudi.com.ph': 'ph_lamudi',
+  'www.buyrentkenya.com': 'ke_buyrentkenya',
+  'buyrentkenya.com': 'ke_buyrentkenya',
+  'www.propertypro.ng': 'ng_propertypro',
+  'propertypro.ng': 'ng_propertypro',
 };
 
 const HELP_TEXT = `

@@ -1,0 +1,123 @@
+[{
+  "name": "tr_sahibinden",
+  "expectedExtractionRate": 0.65,
+
+  // sahibinden.com — Turkey's largest classifieds portal (property section)
+  // Uses JSON-LD Product and meta tags; property details in classified-info tables
+
+  "defaultValues": {
+    "country":            { "value": "Turkey" },
+    "currency":           { "value": "TRY" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "tr-TR" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='shbdn'], img[src*='sahibinden']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "cssLocator": ".classifiedInfo li:has(strong:contains('Oda')) span",
+      "modifiers": ["digitsOnly"],
+      "fallbacks": [
+        { "cssLocator": "[class*='room']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "cssLocator": ".classifiedInfo li:has(strong:contains('Banyo')) span",
+      "modifiers": ["digitsOnly"]
+    },
+    "year_construction": {
+      "cssLocator": ".classifiedInfo li:has(strong:contains('Bina Yaşı')) span",
+      "modifiers": ["digitsOnly"]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".classifiedDetailPrice h3, [class*='price']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "cssLocator": ".classifiedInfo li:has(strong:contains('Brüt')) span, .classifiedInfo li:has(strong:contains('Net')) span",
+      "modifiers": ["digitsOnly"]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "#classifiedDescription" }
+      ]
+    },
+    "price_string": {
+      "cssLocator": ".classifiedDetailPrice h3, [class*='price']",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": ".classifiedInfo .address, .classifiedDetailTitle h2" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality",
+      "fallbacks": [
+        { "cssLocator": ".classifiedInfo li:has(strong:contains('İl')) span" }
+      ]
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion",
+      "fallbacks": [
+        { "cssLocator": ".classifiedInfo li:has(strong:contains('İlçe')) span" }
+      ]
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "reference": {
+      "urlPathPart": "-1"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "satilik"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "kiralik"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "kiralik"
+    }
+  }
+}]

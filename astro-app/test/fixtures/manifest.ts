@@ -883,4 +883,52 @@ export const fixtures: FixtureEntry[] = [
     sourceUrl: 'https://www.fincaraiz.com.co/inmueble/venta/apartamento/bogota/12345',
     expected: {},
   },
+  {
+    scraper: 'tr_sahibinden',
+    fixture: null,
+    sourceUrl: 'https://www.sahibinden.com/ilan/emlak-konut-satilik-12345',
+    expected: {},
+  },
+  {
+    scraper: 'gr_spitogatos',
+    fixture: null,
+    sourceUrl: 'https://www.spitogatos.gr/en/sale/residential/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ar_zonaprop',
+    fixture: null,
+    sourceUrl: 'https://www.zonaprop.com.ar/propiedades/departamento-en-venta-12345.html',
+    expected: {},
+  },
+  {
+    scraper: 'cl_portalinmobiliario',
+    fixture: null,
+    sourceUrl: 'https://www.portalinmobiliario.com/venta/departamento/santiago/12345',
+    expected: {},
+  },
+  {
+    scraper: 'th_ddproperty',
+    fixture: null,
+    sourceUrl: 'https://www.ddproperty.com/property/sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ph_lamudi',
+    fixture: null,
+    sourceUrl: 'https://www.lamudi.com.ph/buy/12345.html',
+    expected: {},
+  },
+  {
+    scraper: 'ke_buyrentkenya',
+    fixture: null,
+    sourceUrl: 'https://www.buyrentkenya.com/sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ng_propertypro',
+    fixture: null,
+    sourceUrl: 'https://www.propertypro.ng/property/sale/12345',
+    expected: {},
+  },
 ];
