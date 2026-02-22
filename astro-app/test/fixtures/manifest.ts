@@ -1267,4 +1267,52 @@ export const fixtures: FixtureEntry[] = [
     sourceUrl: 'https://www.segundamano.mx/inmuebles/venta/12345',
     expected: {},
   },
+  {
+    scraper: 'au_allhomes',
+    fixture: null,
+    sourceUrl: 'https://www.allhomes.com.au/sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'nz_realestate',
+    fixture: null,
+    sourceUrl: 'https://www.realestate.co.nz/residential/sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'es_habitaclia',
+    fixture: null,
+    sourceUrl: 'https://www.habitaclia.com/comprar/vivienda/12345',
+    expected: {},
+  },
+  {
+    scraper: 'fr_bienici',
+    fixture: null,
+    sourceUrl: 'https://www.bienici.com/achat/appartement/12345',
+    expected: {},
+  },
+  {
+    scraper: 'de_kleinanzeigen',
+    fixture: null,
+    sourceUrl: 'https://www.kleinanzeigen.de/s-immobilien/12345',
+    expected: {},
+  },
+  {
+    scraper: 'pk_olx',
+    fixture: null,
+    sourceUrl: 'https://www.olx.com.pk/item/house-for-sale-12345.html',
+    expected: {},
+  },
+  {
+    scraper: 'tz_propertybw',
+    fixture: null,
+    sourceUrl: 'https://www.property.co.tz/for-sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ug_lamudi',
+    fixture: null,
+    sourceUrl: 'https://www.lamudi.co.ug/for-sale/12345.html',
+    expected: {},
+  },
 ];
