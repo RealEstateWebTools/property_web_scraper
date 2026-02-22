@@ -832,4 +832,55 @@ export const fixtures: FixtureEntry[] = [
       title: "Apartamento com 2 quartos e com piscina, 47 m² na Zona Leste em Vila Ema, São Paulo - ZAP Imóveis",
     },
   },
+
+  // === New portals (fixture capture pending) ===
+
+  {
+    scraper: 'se_hemnet',
+    fixture: null,
+    sourceUrl: 'https://www.hemnet.se/bostad/villa-6rum-kurverod-uddevalla-kommun-middagsvagen-11-21671440',
+    expected: {},
+  },
+  {
+    scraper: 'pl_otodom',
+    fixture: null,
+    sourceUrl: 'https://www.otodom.pl/pl/oferta/komfort-styl-metro-cisza-i-zielen-klimatyzacja-do-negocjacji-ID4A06q',
+    expected: {},
+  },
+  {
+    scraper: 'at_willhaben',
+    fixture: null,
+    sourceUrl: 'https://www.willhaben.at/iad/immobilien/d/eigentumswohnung/wien/12345',
+    expected: {},
+  },
+  {
+    scraper: 'dk_boligsiden',
+    fixture: null,
+    sourceUrl: 'https://www.boligsiden.dk/adresse/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ca_realtor',
+    fixture: null,
+    sourceUrl: 'https://www.realtor.ca/real-estate/12345/123-main-st-toronto-on',
+    expected: {},
+  },
+  {
+    scraper: 'nz_trademe',
+    fixture: null,
+    sourceUrl: 'https://www.trademe.co.nz/a/property/residential/sale/listing/12345',
+    expected: {},
+  },
+  {
+    scraper: 'sg_propertyguru',
+    fixture: null,
+    sourceUrl: 'https://www.propertyguru.com.sg/listing/for-sale-12345',
+    expected: {},
+  },
+  {
+    scraper: 'co_fincaraiz',
+    fixture: null,
+    sourceUrl: 'https://www.fincaraiz.com.co/inmueble/venta/apartamento/bogota/12345',
+    expected: {},
+  },
 ];

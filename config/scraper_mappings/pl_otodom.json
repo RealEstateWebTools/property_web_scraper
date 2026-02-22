@@ -1,0 +1,111 @@
+[{
+  "name": "pl_otodom",
+  "expectedExtractionRate": 0.85,
+
+  // Primary: JSON-LD @graph[1] (Product/Apartment type)
+  // Rich structured data: address, geo, price, rooms, additionalProperty array
+
+  "defaultValues": {
+    "country":            { "value": "Poland" },
+    "currency":           { "value": "PLN" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "pl-PL" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='otodomcontent']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "@graph.1.numberOfRooms"
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "@graph.1.offers.price"
+    },
+    "constructed_area": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content",
+      "regex": "(\\d+)\\s*m²",
+      "regexGroup": 1
+    },
+    "latitude": {
+      "jsonLdPath": "@graph.1.geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "@graph.1.geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "jsonLdPath": "@graph.1.name",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" }
+      ]
+    },
+    "description": {
+      "jsonLdPath": "@graph.1.description",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" }
+      ]
+    },
+    "price_string": {
+      "jsonLdPath": "@graph.1.offers.price",
+      "fallbacks": [
+        { "cssLocator": "[data-cy='adPageHeaderPrice']" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "@graph.1.address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": "[data-cy='adPageHeaderLocation']" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "@graph.1.address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "@graph.1.address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@graph.1.@type",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" }
+      ]
+    },
+    "reference": {
+      "cssLocator": "meta[property='og:url']",
+      "cssAttr": "content",
+      "regex": "(\\d+)",
+      "regexGroup": 1
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "sprzedaz"
+    },
+    "for_rent": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "wynajem"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "wynajem"
+    }
+  }
+}]

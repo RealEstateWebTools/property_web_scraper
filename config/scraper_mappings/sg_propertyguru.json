@@ -1,0 +1,125 @@
+[{
+  "name": "sg_propertyguru",
+  "expectedExtractionRate": 0.70,
+
+  // propertyguru.com.sg — Singapore's leading property portal
+  // Uses JSON-LD RealEstateListing and structured HTML data attributes
+
+  "defaultValues": {
+    "country":            { "value": "Singapore" },
+    "currency":           { "value": "SGD" },
+    "area_unit":          { "value": "sqft" },
+    "locale_code":        { "value": "en-SG" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='pgimages'], img[src*='propertyguru']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": "[data-automation-id='overview-bedrooms'], .listing-rooms-bedrooms", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": "[data-automation-id='overview-bathrooms'], .listing-rooms-bathrooms", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": "[data-automation-id='overview-price'], .element-price", "stripString": "$,S", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": "[data-automation-id='overview-floor-area']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": ".listing-description" }
+      ]
+    },
+    "price_string": {
+      "cssLocator": "[data-automation-id='overview-price'], .element-price",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": "[data-automation-id='overview-address']" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "postal_code": {
+      "jsonLdPath": "address.postalCode"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type",
+      "fallbacks": [
+        { "cssLocator": "[data-automation-id='overview-property-type']" }
+      ]
+    },
+    "reference": {
+      "urlPathPart": "-1"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "sale"
+    },
+    "for_rent": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    }
+  }
+}]

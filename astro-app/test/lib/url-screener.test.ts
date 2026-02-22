@@ -301,10 +301,10 @@ describe('url-screener', () => {
       expect(r.portalTier).toBe('core');
     });
 
-    it('allows hemnet.se with experimental tier', () => {
+    it('allows hemnet.se with core tier', () => {
       const r = screenUrl('https://www.hemnet.se/bostad/lagenhet-2rum-stockholm-12345');
       expect(r.verdict).toBe('allowed');
-      expect(r.portalTier).toBe('experimental');
+      expect(r.portalTier).toBe('core');
     });
 
     it('allows seloger.com with core tier', () => {

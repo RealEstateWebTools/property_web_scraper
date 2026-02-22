@@ -1,0 +1,110 @@
+[{
+  "name": "se_hemnet",
+  "expectedExtractionRate": 0.75,
+
+  // Primary: JSON-LD (Product for name/desc/price, Place for address, Event for price/showing)
+  // Secondary: CSS selectors for attributes (NestList components)
+  // Note: Hemnet uses Next.js with 3 JSON-LD blocks: Event, Product, Place
+
+  "defaultValues": {
+    "country":            { "value": "Sweden" },
+    "currency":           { "value": "SEK" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "sv-SE" },
+    "for_sale":           { "value": "true" },
+    "for_rent":           { "value": "false" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='bilder.hemnet.se']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "year_construction": {
+      "cssLocator": "title",
+      "regex": "Byggår.{0,30}?(\\d{4})",
+      "regexGroup": 1,
+      "fallbacks": [
+        { "cssLocator": "body", "regex": "Byggår[^\\d]{0,20}(\\d{4})", "regexGroup": 1 }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "jsonLdType": "Event"
+    },
+    "constructed_area": {
+      "jsonLdPath": "offers.eligibleQuantity.value",
+      "jsonLdType": "Product",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content", "regex": "(\\d+)\\s*m", "regexGroup": 1 }
+      ]
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "jsonLdPath": "name",
+      "jsonLdType": "Product",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" }
+      ]
+    },
+    "description": {
+      "jsonLdPath": "description",
+      "jsonLdType": "Product",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" }
+      ]
+    },
+    "price_string": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price", "jsonLdType": "Event" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "jsonLdType": "Place",
+      "fallbacks": [
+        { "jsonLdPath": "name", "jsonLdType": "Place" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality",
+      "jsonLdType": "Place"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion",
+      "jsonLdType": "Place"
+    },
+    "postal_code": {
+      "jsonLdPath": "address.postalCode",
+      "jsonLdType": "Place"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "agent_company": {
+      "jsonLdPath": "organizer.name",
+      "jsonLdType": "Event",
+      "fallbacks": [
+        { "jsonLdPath": "brand.name", "jsonLdType": "Product" }
+      ]
+    },
+    "reference": {
+      "urlPathPart": "-1",
+      "fallbacks": [
+        { "jsonLdPath": "mpn", "jsonLdType": "Product" }
+      ]
+    }
+  },
+
+  "booleanFields": {}
+}]

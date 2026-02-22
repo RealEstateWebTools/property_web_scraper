@@ -1,0 +1,114 @@
+[{
+  "name": "at_willhaben",
+  "expectedExtractionRate": 0.65,
+
+  // willhaben.at — Austria's largest classifieds/property portal
+  // Uses JSON-LD Product type and meta tags
+  // Property details in structured data-testid attributes
+
+  "defaultValues": {
+    "country":            { "value": "Austria" },
+    "currency":           { "value": "EUR" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "de-AT" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='willhaben']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "cssLocator": "[data-testid='attribute-Zimmer'] span, [data-testid='ad-detail-teaser-attribute-Zimmer']",
+      "modifiers": ["digitsOnly"]
+    },
+    "count_bathrooms": {
+      "cssLocator": "[data-testid='attribute-Badezimmer'] span",
+      "modifiers": ["digitsOnly"]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='contact-box-price-box-price-value'], [data-testid='price-value']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "cssLocator": "[data-testid='attribute-Wohnfläche'] span, [data-testid='ad-detail-teaser-attribute-Wohnfläche']",
+      "modifiers": ["digitsOnly"]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='ad-detail-description']" }
+      ]
+    },
+    "price_string": {
+      "cssLocator": "[data-testid='contact-box-price-box-price-value'], [data-testid='price-value']",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='object-location-address']" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "postal_code": {
+      "jsonLdPath": "address.postalCode"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "reference": {
+      "urlPathPart": "-1"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "eigentum"
+    },
+    "for_rent": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "miet"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "miet"
+    }
+  }
+}]

@@ -1,0 +1,122 @@
+[{
+  "name": "nz_trademe",
+  "expectedExtractionRate": 0.65,
+
+  // trademe.co.nz — New Zealand's leading property portal
+  // Uses JSON-LD and meta tags; detail pages at /a/property/residential/sale/listing/
+
+  "defaultValues": {
+    "country":            { "value": "New Zealand" },
+    "currency":           { "value": "NZD" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "en-NZ" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='trademe'], img[src*='tmsimg']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='bedrooms'], .tm-property-listing-attribute-bedrooms__value", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='bathrooms'], .tm-property-listing-attribute-bathrooms__value", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".tm-property-listing-body__price, [data-testid='price']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='floor-area']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "plot_area": {
+      "jsonLdPath": "lotSize.value",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='land-area']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".tm-property-listing-body__price, [data-testid='price']",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "5",
+      "evaluator":      "include?",
+      "evaluatorParam": "sale"
+    },
+    "for_rent": {
+      "urlPathPart": "5",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "5",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    }
+  }
+}]

@@ -1,0 +1,111 @@
+[{
+  "name": "dk_boligsiden",
+  "expectedExtractionRate": 0.65,
+
+  // boligsiden.dk — Denmark's property portal (aggregator of Danish listings)
+  // Uses JSON-LD SingleFamilyResidence / Apartment and meta tags
+
+  "defaultValues": {
+    "country":            { "value": "Denmark" },
+    "currency":           { "value": "DKK" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "da-DK" },
+    "for_sale":           { "value": "true" },
+    "for_rent":           { "value": "false" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='boligsiden']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='rooms'], .property-rooms", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "year_construction": {
+      "jsonLdPath": "yearBuilt",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='year-built']", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".property-price, [data-testid='price']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='living-area']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "plot_area": {
+      "jsonLdPath": "lotSize.value",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='lot-size']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".property-price, [data-testid='price']",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "postal_code": {
+      "jsonLdPath": "address.postalCode"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1"
+    }
+  },
+
+  "booleanFields": {}
+}]

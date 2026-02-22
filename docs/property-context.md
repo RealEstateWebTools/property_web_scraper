@@ -1,9 +1,9 @@
 # property-context — Developer Guide
 
-A standalone enrichment service that accepts a property listing URL or haul URL
-from the `property_web_scraper` project, fetches the scraped data, enriches each
-property with location and market intelligence from external APIs, and stores
-everything in its own independent database.
+A property enrichment service built with Astro.js and Firebase/Firestore. It
+accepts a property listing URL or haul URL from the `property_web_scraper`
+project, fetches the scraped data, enriches each property with location and
+market intelligence from external APIs, and stores everything in Firestore.
 
 ---
 
@@ -19,9 +19,9 @@ everything in its own independent database.
 8. [Implementation — Database Client](#8-implementation--database-client)
 9. [Implementation — Fetchers](#9-implementation--fetchers)
 10. [Implementation — Enrichers](#10-implementation--enrichers)
-11. [Implementation — Queue & Worker](#11-implementation--queue--worker)
-12. [Implementation — Routes](#12-implementation--routes)
-13. [Implementation — App Entry Point](#13-implementation--app-entry-point)
+11. [Implementation — Routes](#11-implementation--routes)
+12. [Implementation — Frontend Pages](#12-implementation--frontend-pages)
+13. [Implementation — Astro Config](#13-implementation--astro-config)
 14. [Running Locally](#14-running-locally)
 15. [Deployment](#15-deployment)
 16. [Enricher API Reference](#16-enricher-api-reference)
@@ -38,14 +38,19 @@ historical sold prices, and more.
 The only coupling to `property_web_scraper` is a single HTTP fetch at import time:
 
 ```
-You → POST /imports { source_url }
+You → POST /api/imports { source_url }
    → property-context fetches from scraper API
-   → stores property snapshot
-   → enqueues enrichment jobs (background)
-   → returns immediately with { import_id, property_ids }
+   → stores property snapshot in Firestore
+   → runs enrichment inline (awaits all enrichers)
+   → returns with { import_id, property_ids, status }
 ```
 
-Everything else — database, enrichers, API — is fully independent.
+Everything else — database, enrichers, API, frontend — is fully independent.
+
+**Key difference from a queue-based design:** enrichment runs inline during the
+import request using `Promise.allSettled()`. There is no separate worker process
+or job queue. The import endpoint waits for all enrichers to complete before
+responding.
 
 ---
 
@@ -54,8 +59,9 @@ Everything else — database, enrichers, API — is fully independent.
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        property-context                         │
+│                        (Astro.js SSR)                           │
 │                                                                 │
-│  POST /imports                                                  │
+│  POST /api/imports                                              │
 │       │                                                         │
 │       ▼                                                         │
 │  ┌──────────┐    HTTP GET    ┌─────────────────────────────┐   │
@@ -65,33 +71,41 @@ Everything else — database, enrichers, API — is fully independent.
 │       │                      └─────────────────────────────┘   │
 │       ▼                                                         │
 │  ┌──────────────────────┐                                       │
-│  │  Supabase (Postgres) │                                       │
-│  │  ├── imports         │                                       │
-│  │  ├── properties      │                                       │
-│  │  └── enrichments     │                                       │
+│  │  Firestore           │                                       │
+│  │  ├── imports          │                                       │
+│  │  ├── properties       │                                       │
+│  │  │   └── enrichments  │  (subcollection)                     │
+│  │  └──                  │                                       │
 │  └──────────────────────┘                                       │
 │       │                                                         │
 │       ▼                                                         │
-│  ┌──────────┐  pgboss jobs   ┌────────────────────────────┐    │
-│  │  Queue   │ ─────────────► │  Worker process            │    │
-│  │ (pgboss) │                │  ├── overpass.ts           │    │
-│  └──────────┘                │  ├── walkscore.ts          │    │
-│                              │  ├── epc-uk.ts             │    │
-│                              │  ├── flood-uk.ts           │    │
-│                              │  └── land-registry-uk.ts   │    │
-│                              └────────────────────────────┘    │
-│                                        │                        │
-│                                        ▼                        │
-│                              ┌──────────────────────┐          │
-│                              │  Supabase (Postgres) │          │
-│                              │  enrichments table   │          │
-│                              └──────────────────────┘          │
+│  ┌──────────────────────────────────────┐                       │
+│  │  Inline enrichment (Promise.allSettled)                      │
+│  │  ├── overpass.ts      (global)       │                       │
+│  │  ├── walkscore.ts     (global)       │                       │
+│  │  ├── epc-uk.ts        (UK only)      │                       │
+│  │  ├── flood-uk.ts      (UK only)      │                       │
+│  │  └── land-registry-uk.ts (UK only)   │                       │
+│  └──────────────────────────────────────┘                       │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌──────────────────────┐                                       │
+│  │  Firestore           │                                       │
+│  │  enrichments written  │                                       │
+│  └──────────────────────┘                                       │
+│                                                                 │
+│  ┌──────────────────────────────────────┐                       │
+│  │  Astro Pages (frontend)              │                       │
+│  │  ├── /dashboard      (recent imports)│                       │
+│  │  ├── /properties/:id (detail view)   │                       │
+│  │  └── /imports/new    (import form)   │                       │
+│  └──────────────────────────────────────┘                       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Processing model:** import is synchronous (fetch + insert properties immediately),
-enrichment is asynchronous (pgboss jobs run in the background). Callers poll
-`GET /imports/:id` for status or `GET /properties/:id` for results.
+**Processing model:** both fetch and enrichment happen synchronously within the
+`POST /api/imports` handler. The caller receives the full result when enrichment
+completes. Use `GET /api/properties/:id` to retrieve enriched data later.
 
 ---
 
@@ -99,7 +113,8 @@ enrichment is asynchronous (pgboss jobs run in the background). Callers poll
 
 - Node.js ≥ 20
 - npm ≥ 10
-- A [Supabase](https://supabase.com) account (free tier is sufficient)
+- A [Firebase](https://firebase.google.com) project with Firestore enabled (free Spark plan is sufficient)
+- A Firebase service account JSON key (for server-side Admin SDK access)
 - A [Walk Score API key](https://www.walkscore.com/professional/api.php) (free, 5 000 calls/day)
 - For UK enrichers: an [EPC Register API key](https://epc.opendatacommunities.org/) (free)
 - A running instance of `property_web_scraper` (the source project) with its base URL
@@ -111,27 +126,24 @@ enrichment is asynchronous (pgboss jobs run in the background). Callers poll
 ### 4.1 Initialise the repository
 
 ```bash
-mkdir property-context && cd property-context
+npm create astro@latest property-context -- --template minimal
+cd property-context
 git init
-npm init -y
 ```
 
 ### 4.2 Install dependencies
 
 ```bash
 # Runtime
-npm install hono @hono/node-server
-npm install @supabase/supabase-js
-npm install pg-boss
-npm install dotenv
+npm install firebase-admin geofire-common
 
 # Dev
-npm install -D typescript tsx @types/node vitest
+npm install -D vitest @types/node
 ```
 
 ### 4.3 `package.json`
 
-Replace the generated `package.json` with:
+Update the generated `package.json`:
 
 ```json
 {
@@ -139,23 +151,19 @@ Replace the generated `package.json` with:
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "worker": "tsx watch src/queue/worker.ts",
-    "start": "node dist/index.js",
-    "build": "tsc",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "start": "node dist/server/entry.mjs",
     "test": "vitest run"
   },
   "dependencies": {
-    "@hono/node-server": "^1.12.0",
-    "@supabase/supabase-js": "^2.45.0",
-    "dotenv": "^16.4.0",
-    "hono": "^4.5.0",
-    "pg-boss": "^10.1.0"
+    "astro": "^5.17.0",
+    "firebase-admin": "^13.0.0",
+    "geofire-common": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "tsx": "^4.19.0",
-    "typescript": "^5.5.0",
     "vitest": "^2.1.0"
   }
 }
@@ -165,21 +173,14 @@ Replace the generated `package.json` with:
 
 ```json
 {
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
+    "baseUrl": ".",
     "paths": {
-      "@lib/*": ["src/lib/*"]
+      "@lib/*": ["src/lib/*"],
+      "@components/*": ["src/components/*"]
     }
-  },
-  "include": ["src"]
+  }
 }
 ```
 
@@ -190,9 +191,9 @@ Replace the generated `package.json` with:
 Create `.env` (and `.env.example` for the repo):
 
 ```bash
-# ── Supabase ──────────────────────────────────────────────────────
-SUPABASE_URL=https://your-project-ref.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...   # service role key (not anon key)
+# ── Firebase ─────────────────────────────────────────────────────
+FIRESTORE_PROJECT_ID=your-firebase-project-id
+GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account","project_id":"...","private_key":"...","client_email":"..."}'
 
 # ── Source project (property_web_scraper) ─────────────────────────
 SCRAPER_BASE_URL=https://your-scraper-deployment.com
@@ -202,9 +203,6 @@ SCRAPER_API_KEY=pws_live_...            # optional; required only for /public_ap
 WALKSCORE_API_KEY=your_walkscore_key
 EPC_API_EMAIL=you@example.com           # UK EPC Register credentials
 EPC_API_KEY=your_epc_api_key            # UK EPC Register API key
-
-# ── Server ────────────────────────────────────────────────────────
-PORT=3000
 ```
 
 > **Security:** Never commit `.env`. Add it to `.gitignore`.
@@ -213,129 +211,124 @@ PORT=3000
 
 ## 6. Database Setup
 
-### 6.1 Create a Supabase project
+### 6.1 Create a Firebase project
 
-1. Go to [app.supabase.com](https://app.supabase.com) → **New project**
-2. Choose a region close to your users
-3. Note your **Project URL** and **service role key** (Settings → API)
+1. Go to [console.firebase.google.com](https://console.firebase.google.com) → **Add project**
+2. Enable **Cloud Firestore** (start in test mode or configure rules below)
+3. Go to **Project Settings → Service accounts → Generate new private key**
+4. Paste the JSON into `GOOGLE_SERVICE_ACCOUNT_JSON` in your `.env`
 
-### 6.2 Enable the PostGIS extension
+### 6.2 Firestore collection structure
 
-In the Supabase dashboard → **SQL Editor**, run:
+Firestore is schema-less, but the application expects these collections:
 
-```sql
-CREATE EXTENSION IF NOT EXISTS postgis;
+```
+imports/
+  {import_id}/
+    source_url:       string
+    source_type:      "haul" | "listing"
+    source_id:        string
+    status:           "pending" | "processing" | "complete" | "failed"
+    listing_count:    number
+    error:            string | null
+    created_at:       timestamp
+    completed_at:     timestamp | null
+
+properties/
+  {property_id}/
+    import_id:             string
+    source_listing_id:     string
+    source_url:            string
+    portal:                string | null
+    country:               string | null
+
+    # Scraped snapshot
+    title:                 string | null
+    price_float:           number | null
+    price_currency:        string | null
+    price_string:          string | null
+    latitude:              number | null
+    longitude:             number | null
+    geohash:               string | null    # for proximity queries
+    address_string:        string | null
+    city:                  string | null
+    region:                string | null
+    postal_code:           string | null
+    count_bedrooms:        number | null
+    count_bathrooms:       number | null
+    constructed_area:      number | null
+    plot_area:             number | null
+    area_unit:             string | null
+    year_construction:     number | null
+    property_type:         string | null
+    property_subtype:      string | null
+    tenure:                string | null
+    for_sale:              boolean | null
+    for_rent:              boolean | null
+    for_rent_long_term:    boolean | null
+    for_rent_short_term:   boolean | null
+    sold:                  boolean | null
+    features:              string[]
+    main_image_url:        string | null
+    description:           string | null
+    agent_name:            string | null
+
+    # Enrichment summary (denormalized for fast queries)
+    walkability_score:     number | null
+    transit_score:         number | null
+    bike_score:            number | null
+    flood_risk:            string | null    # "low" | "medium" | "high"
+    epc_grade:             string | null    # "A".."G"
+    nearby_schools:        number | null
+    nearby_transit_stops:  number | null
+    nearby_supermarkets:   number | null
+
+    # Timestamps
+    scraped_at:            timestamp | null
+    imported_at:           timestamp
+    enriched_at:           timestamp | null
+    enrichment_status:     "pending" | "partial" | "complete" | "failed"
+
+    # Subcollection
+    enrichments/
+      {enricher_name}/
+        enricher:      string
+        status:        "pending" | "running" | "complete" | "failed" | "skipped"
+        data:          map          # raw enricher output
+        error:         string | null
+        created_at:    timestamp
+        completed_at:  timestamp | null
+        expires_at:    timestamp | null
 ```
 
-### 6.3 Run the schema
+### 6.3 Firestore security rules
 
-Paste and run the following in the SQL editor:
+For development, use permissive rules. For production, restrict to the
+service account only (Admin SDK bypasses rules, but this protects against
+accidental client access):
 
-```sql
--- ─── Imports ──────────────────────────────────────────────────────
--- Tracks each submitted scraper URL (haul or single listing)
-
-CREATE TABLE imports (
-  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  source_url    TEXT        NOT NULL,
-  source_type   TEXT        NOT NULL CHECK (source_type IN ('haul', 'listing')),
-  source_id     TEXT        NOT NULL,     -- haul_id or listing_id from scraper
-  status        TEXT        NOT NULL DEFAULT 'pending'
-                            CHECK (status IN ('pending','processing','complete','failed')),
-  listing_count INT,
-  error         TEXT,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  completed_at  TIMESTAMPTZ
-);
-
--- ─── Properties ───────────────────────────────────────────────────
--- One row per property. Stores a snapshot of the scraped fields plus
--- denormalized enrichment summary columns for efficient filtering.
-
-CREATE TABLE properties (
-  id                    UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  import_id             UUID        REFERENCES imports(id) ON DELETE CASCADE,
-  source_listing_id     TEXT        NOT NULL,   -- listing id in scraper project
-  source_url            TEXT        NOT NULL,   -- original listing URL
-  portal                TEXT,                   -- e.g. 'uk_rightmove'
-  country               TEXT,
-
-  -- Scraped snapshot
-  title                 TEXT,
-  price_float           FLOAT,
-  price_currency        TEXT,
-  price_string          TEXT,
-  latitude              FLOAT,
-  longitude             FLOAT,
-  location              GEOGRAPHY(POINT, 4326),
-  address_string        TEXT,
-  city                  TEXT,
-  region                TEXT,
-  postal_code           TEXT,
-  count_bedrooms        INT,
-  count_bathrooms       FLOAT,
-  constructed_area      FLOAT,
-  plot_area             FLOAT,
-  area_unit             TEXT,
-  year_construction     INT,
-  property_type         TEXT,
-  property_subtype      TEXT,
-  tenure                TEXT,
-  for_sale              BOOLEAN,
-  for_rent              BOOLEAN,
-  for_rent_long_term    BOOLEAN,
-  for_rent_short_term   BOOLEAN,
-  sold                  BOOLEAN,
-  features              TEXT[],
-  main_image_url        TEXT,
-  description           TEXT,
-  agent_name            TEXT,
-
-  -- Enrichment summary (denormalized for fast queries)
-  walkability_score     INT,
-  transit_score         INT,
-  bike_score            INT,
-  flood_risk            TEXT,         -- 'low' | 'medium' | 'high' | 'very_high'
-  epc_grade             TEXT,         -- 'A'..'G'
-  nearby_schools        INT,
-  nearby_transit_stops  INT,
-  nearby_supermarkets   INT,
-
-  -- Timestamps
-  scraped_at            TIMESTAMPTZ,  -- last_retrieved_at from scraper
-  imported_at           TIMESTAMPTZ  NOT NULL DEFAULT now(),
-  enriched_at           TIMESTAMPTZ,
-  enrichment_status     TEXT         NOT NULL DEFAULT 'pending'
-                                     CHECK (enrichment_status IN
-                                       ('pending','partial','complete','failed'))
-);
-
--- Spatial index for nearby queries
-CREATE INDEX properties_location_idx  ON properties USING GIST(location);
-CREATE INDEX properties_country_idx   ON properties(country);
-CREATE INDEX properties_import_id_idx ON properties(import_id);
-
--- ─── Enrichments ──────────────────────────────────────────────────
--- One row per enricher per property.
-
-CREATE TABLE enrichments (
-  id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  property_id  UUID        NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
-  enricher     TEXT        NOT NULL,  -- 'overpass' | 'walkscore' | 'epc_uk' | ...
-  status       TEXT        NOT NULL DEFAULT 'pending'
-                           CHECK (status IN
-                             ('pending','running','complete','failed','skipped')),
-  data         JSONB,                 -- raw enricher output
-  error        TEXT,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-  completed_at TIMESTAMPTZ,
-  expires_at   TIMESTAMPTZ,          -- when to re-enrich
-  UNIQUE (property_id, enricher)
-);
-
-CREATE INDEX enrichments_property_id_idx ON enrichments(property_id);
-CREATE INDEX enrichments_status_idx      ON enrichments(status);
 ```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Deny all client access — only Admin SDK (server) writes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+```
+
+### 6.4 Firestore indexes
+
+Create a composite index for nearby queries (geohash-based):
+
+```
+Collection: properties
+Fields:     geohash (ascending), imported_at (descending)
+```
+
+Create this in the Firebase console under **Firestore → Indexes → Composite**.
 
 ---
 
@@ -344,32 +337,47 @@ CREATE INDEX enrichments_status_idx      ON enrichments(status);
 ```
 property-context/
 ├── src/
-│   ├── index.ts                 # Hono app + server bootstrap
-│   ├── db/
-│   │   └── client.ts            # Supabase client singleton
-│   ├── fetchers/
-│   │   ├── index.ts             # dispatch: detect haul vs listing URL
-│   │   ├── haul.ts              # fetch + normalise haul response
-│   │   └── listing.ts          # fetch + normalise single listing
-│   ├── enrichers/
-│   │   ├── registry.ts          # maps country → applicable enrichers + TTLs
-│   │   ├── types.ts             # shared Enricher interface
-│   │   ├── overpass.ts          # OpenStreetMap nearby POIs (global, free)
-│   │   ├── nominatim.ts         # reverse geocoding (global, free)
-│   │   ├── walkscore.ts         # walk/transit/bike scores
-│   │   ├── epc-uk.ts            # UK energy performance certificates
-│   │   ├── flood-uk.ts          # UK Environment Agency flood risk
-│   │   └── land-registry-uk.ts  # UK HM Land Registry sold prices
-│   ├── queue/
-│   │   ├── boss.ts              # pgboss singleton
-│   │   ├── scheduler.ts         # enqueue jobs after import
-│   │   └── worker.ts            # worker process entry point
-│   └── routes/
-│       ├── imports.ts
-│       └── properties.ts
+│   ├── lib/
+│   │   ├── db/
+│   │   │   └── client.ts            # Firebase Admin SDK singleton
+│   │   ├── fetchers/
+│   │   │   ├── index.ts             # dispatch: detect haul vs listing URL
+│   │   │   ├── types.ts             # ScrapedProperty interface
+│   │   │   ├── haul.ts              # fetch + normalise haul response
+│   │   │   └── listing.ts           # fetch + normalise single listing
+│   │   ├── enrichers/
+│   │   │   ├── registry.ts          # maps country → applicable enrichers
+│   │   │   ├── types.ts             # shared Enricher interface
+│   │   │   ├── runner.ts            # inline enrichment runner
+│   │   │   ├── overpass.ts          # OpenStreetMap nearby POIs (global, free)
+│   │   │   ├── walkscore.ts         # walk/transit/bike scores
+│   │   │   ├── epc-uk.ts            # UK energy performance certificates
+│   │   │   ├── flood-uk.ts          # UK Environment Agency flood risk
+│   │   │   └── land-registry-uk.ts  # UK HM Land Registry sold prices
+│   │   └── services/
+│   │       └── api-response.ts      # JSON response helpers
+│   ├── pages/
+│   │   ├── api/
+│   │   │   ├── imports/
+│   │   │   │   ├── index.ts         # POST /api/imports
+│   │   │   │   └── [id].ts          # GET /api/imports/:id
+│   │   │   └── properties/
+│   │   │       ├── index.ts         # GET /api/properties
+│   │   │       ├── nearby.ts        # GET /api/properties/nearby
+│   │   │       ├── [id].ts          # GET /api/properties/:id
+│   │   │       └── [id]/
+│   │   │           └── re-enrich.ts # POST /api/properties/:id/re-enrich
+│   │   ├── dashboard.astro          # Recent imports and properties
+│   │   ├── imports/
+│   │   │   └── new.astro            # Import form
+│   │   └── properties/
+│   │       └── [id].astro           # Property detail page
+│   └── layouts/
+│       └── Base.astro               # Shared page layout
 ├── .env
 ├── .env.example
 ├── .gitignore
+├── astro.config.mjs
 ├── package.json
 └── tsconfig.json
 ```
@@ -378,20 +386,37 @@ property-context/
 
 ## 8. Implementation — Database Client
 
-**`src/db/client.ts`**
+**`src/lib/db/client.ts`**
+
+Singleton pattern matching the existing astro-app conventions.
 
 ```typescript
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
-let _client: SupabaseClient | null = null;
+let _db: Firestore | null = null;
 
-export function getDb(): SupabaseClient {
-  if (_client) return _client;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required');
-  _client = createClient(url, key, { auth: { persistSession: false } });
-  return _client;
+export function getDb(): Firestore {
+  if (_db) return _db;
+
+  const projectId = import.meta.env.FIRESTORE_PROJECT_ID;
+  const credsJson = import.meta.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+
+  if (!projectId || !credsJson) {
+    throw new Error('FIRESTORE_PROJECT_ID and GOOGLE_SERVICE_ACCOUNT_JSON are required');
+  }
+
+  if (getApps().length === 0) {
+    const creds = JSON.parse(credsJson);
+    initializeApp({ credential: cert(creds), projectId });
+  }
+
+  _db = getFirestore();
+  return _db;
+}
+
+export function resetDb(): void {
+  _db = null;
 }
 ```
 
@@ -401,7 +426,7 @@ export function getDb(): SupabaseClient {
 
 ### 9.1 Types
 
-**`src/fetchers/types.ts`**
+**`src/lib/fetchers/types.ts`**
 
 ```typescript
 // Normalised property shape that both haul and listing fetchers produce.
@@ -445,14 +470,14 @@ export interface ScrapedProperty {
 
 ### 9.2 Haul fetcher
 
-**`src/fetchers/haul.ts`**
+**`src/lib/fetchers/haul.ts`**
 
 Calls `GET /ext/v1/hauls/:id` on the scraper project. No authentication required.
 
 ```typescript
 import type { ScrapedProperty } from './types.js';
 
-const BASE_URL = process.env.SCRAPER_BASE_URL!;
+const BASE_URL = import.meta.env.SCRAPER_BASE_URL;
 
 export async function fetchHaul(haulId: string): Promise<ScrapedProperty[]> {
   const url = `${BASE_URL}/ext/v1/hauls/${haulId}`;
@@ -499,7 +524,7 @@ function normaliseHaulScrape(s: HaulScrape): ScrapedProperty {
   return {
     source_listing_id: s.resultId,
     source_url:        s.url,
-    portal:            null,               // not exposed in haul summary
+    portal:            null,
     country:           s.country ?? null,
     title:             s.title ?? null,
     price_float:       s.price_float ?? null,
@@ -536,15 +561,15 @@ function normaliseHaulScrape(s: HaulScrape): ScrapedProperty {
 
 ### 9.3 Listing fetcher
 
-**`src/fetchers/listing.ts`**
+**`src/lib/fetchers/listing.ts`**
 
 Calls `GET /public_api/v1/listings/:id`. Requires an API key.
 
 ```typescript
 import type { ScrapedProperty } from './types.js';
 
-const BASE_URL  = process.env.SCRAPER_BASE_URL!;
-const API_KEY   = process.env.SCRAPER_API_KEY ?? '';
+const BASE_URL  = import.meta.env.SCRAPER_BASE_URL;
+const API_KEY   = import.meta.env.SCRAPER_API_KEY ?? '';
 
 export async function fetchListing(listingId: string): Promise<ScrapedProperty> {
   const url = `${BASE_URL}/public_api/v1/listings/${listingId}`;
@@ -609,7 +634,7 @@ function normaliseListing(l: Record<string, unknown>): ScrapedProperty {
 
 ### 9.4 Dispatcher
 
-**`src/fetchers/index.ts`**
+**`src/lib/fetchers/index.ts`**
 
 Detects whether the submitted URL points to a haul or a single listing.
 
@@ -656,7 +681,7 @@ export async function fetchFromScraper(sourceUrl: string): Promise<FetchResult> 
 
 ### 10.1 Shared interface
 
-**`src/enrichers/types.ts`**
+**`src/lib/enrichers/types.ts`**
 
 ```typescript
 export interface EnricherInput {
@@ -669,9 +694,9 @@ export interface EnricherInput {
   address_string: string | null;
 }
 
-// What an enricher writes to the `enrichments` table.
-// The `data` field is free-form JSONB; `summary` fields are
-// written back to the `properties` table.
+// What an enricher writes to the enrichments subcollection.
+// The `data` field is free-form; `summary` fields are
+// written back to the property document.
 export interface EnricherResult {
   data:    Record<string, unknown>;
   summary: Partial<{
@@ -696,7 +721,7 @@ export interface Enricher {
 
 ### 10.2 Enricher registry
 
-**`src/enrichers/registry.ts`**
+**`src/lib/enrichers/registry.ts`**
 
 Maps countries to which enrichers should run. Add entries here as you add enrichers.
 
@@ -729,9 +754,89 @@ export function getEnrichersForCountry(country: string | null): Enricher[] {
 }
 ```
 
-### 10.3 Overpass enricher (OpenStreetMap nearby POIs)
+### 10.3 Enrichment runner
 
-**`src/enrichers/overpass.ts`**
+**`src/lib/enrichers/runner.ts`**
+
+Runs all applicable enrichers inline using `Promise.allSettled()`. Called
+directly from the import route — no queue or worker needed.
+
+```typescript
+import { getDb } from '@lib/db/client.js';
+import { getEnrichersForCountry } from './registry.js';
+import { FieldValue } from 'firebase-admin/firestore';
+import type { EnricherInput } from './types.js';
+
+export async function runEnrichment(input: EnricherInput): Promise<void> {
+  const db = getDb();
+  const enrichers = getEnrichersForCountry(input.country);
+
+  if (enrichers.length === 0) return;
+
+  const propertyRef = db.collection('properties').doc(input.property_id);
+
+  const results = await Promise.allSettled(
+    enrichers.map(async (enricher) => {
+      // Mark as running
+      await propertyRef.collection('enrichments').doc(enricher.name).set({
+        enricher: enricher.name,
+        status:   'running',
+        created_at: FieldValue.serverTimestamp(),
+      });
+
+      try {
+        const result = await enricher.run(input);
+
+        // Write enrichment result
+        await propertyRef.collection('enrichments').doc(enricher.name).set({
+          enricher:     enricher.name,
+          status:       'complete',
+          data:         result.data,
+          completed_at: FieldValue.serverTimestamp(),
+          expires_at:   new Date(result.expiresAt),
+        });
+
+        // Merge summary fields back into property document
+        if (Object.keys(result.summary).length > 0) {
+          await propertyRef.update({
+            ...result.summary,
+            enriched_at: FieldValue.serverTimestamp(),
+          });
+        }
+
+        return { enricher: enricher.name, status: 'complete' as const };
+      } catch (err) {
+        const error = err instanceof Error ? err.message : String(err);
+        console.error(`[enricher] ${enricher.name} failed for ${input.property_id}:`, error);
+
+        await propertyRef.collection('enrichments').doc(enricher.name).set({
+          enricher:     enricher.name,
+          status:       'failed',
+          error,
+          completed_at: FieldValue.serverTimestamp(),
+        });
+
+        return { enricher: enricher.name, status: 'failed' as const };
+      }
+    }),
+  );
+
+  // Determine overall enrichment status
+  const statuses = results.map((r) =>
+    r.status === 'fulfilled' ? r.value.status : 'failed',
+  );
+  const allComplete = statuses.every((s) => s === 'complete');
+  const allFailed   = statuses.every((s) => s === 'failed');
+
+  await propertyRef.update({
+    enrichment_status: allComplete ? 'complete' : allFailed ? 'failed' : 'partial',
+  });
+}
+```
+
+### 10.4 Overpass enricher (OpenStreetMap nearby POIs)
+
+**`src/lib/enrichers/overpass.ts`**
 
 Queries OpenStreetMap for nearby points of interest using the Overpass API.
 Free, no API key, global coverage. Rate limit: avoid more than 1 req/s.
@@ -771,7 +876,6 @@ function haversineMetres(lat1: number, lon1: number, lat2: number, lon2: number)
 }
 
 async function queryOverpass(lat: number, lon: number, radiusM: number): Promise<OverpassResponse> {
-  // Single consolidated query — one request for all POI types
   const query = `
     [out:json][timeout:25];
     (
@@ -884,9 +988,9 @@ export const overpassEnricher: Enricher = {
 };
 ```
 
-### 10.4 Walk Score enricher
+### 10.5 Walk Score enricher
 
-**`src/enrichers/walkscore.ts`**
+**`src/lib/enrichers/walkscore.ts`**
 
 Returns walkability, transit, and bike scores (0–100) for a location.
 Requires a free API key from [walkscore.com/professional/api.php](https://www.walkscore.com/professional/api.php).
@@ -894,7 +998,7 @@ Requires a free API key from [walkscore.com/professional/api.php](https://www.wa
 ```typescript
 import type { Enricher, EnricherInput, EnricherResult } from './types.js';
 
-const API_KEY = process.env.WALKSCORE_API_KEY ?? '';
+const API_KEY = import.meta.env.WALKSCORE_API_KEY ?? '';
 
 interface WalkScoreResponse {
   status:            number;  // 1 = success
@@ -962,9 +1066,9 @@ export const walkscoreEnricher: Enricher = {
 };
 ```
 
-### 10.5 UK EPC enricher
+### 10.6 UK EPC enricher
 
-**`src/enrichers/epc-uk.ts`**
+**`src/lib/enrichers/epc-uk.ts`**
 
 Looks up the Energy Performance Certificate for a UK property by postcode.
 Register for a free API key at [epc.opendatacommunities.org](https://epc.opendatacommunities.org/).
@@ -972,8 +1076,8 @@ Register for a free API key at [epc.opendatacommunities.org](https://epc.opendat
 ```typescript
 import type { Enricher, EnricherInput, EnricherResult } from './types.js';
 
-const EPC_EMAIL = process.env.EPC_API_EMAIL ?? '';
-const EPC_KEY   = process.env.EPC_API_KEY   ?? '';
+const EPC_EMAIL = import.meta.env.EPC_API_EMAIL ?? '';
+const EPC_KEY   = import.meta.env.EPC_API_KEY   ?? '';
 
 interface EpcRow {
   'current-energy-rating':         string;
@@ -1044,9 +1148,9 @@ export const epcUkEnricher: Enricher = {
 };
 ```
 
-### 10.6 UK flood risk enricher
+### 10.7 UK flood risk enricher
 
-**`src/enrichers/flood-uk.ts`**
+**`src/lib/enrichers/flood-uk.ts`**
 
 Queries the Environment Agency's ArcGIS services to determine which flood zone
 a property falls in (Zone 1 = low risk, Zone 2 = medium, Zone 3 = high).
@@ -1120,9 +1224,9 @@ export const floodUkEnricher: Enricher = {
 };
 ```
 
-### 10.7 UK Land Registry enricher
+### 10.8 UK Land Registry enricher
 
-**`src/enrichers/land-registry-uk.ts`**
+**`src/lib/enrichers/land-registry-uk.ts`**
 
 Fetches recent sold prices in the same postcode from HM Land Registry open data.
 No API key required. Returns price trend data and comparable transactions.
@@ -1216,237 +1320,50 @@ export const landRegistryUkEnricher: Enricher = {
 
 ---
 
-## 11. Implementation — Queue & Worker
+## 11. Implementation — Routes
 
-### 11.1 pgboss singleton
+### 11.1 Response helpers
 
-**`src/queue/boss.ts`**
-
-```typescript
-import PgBoss from 'pg-boss';
-
-let _boss: PgBoss | null = null;
-
-export async function getBoss(): Promise<PgBoss> {
-  if (_boss) return _boss;
-
-  // pgboss connects directly to PostgreSQL using the Supabase connection string.
-  // Find this under: Supabase dashboard → Settings → Database → Connection string (URI)
-  const connectionString = process.env.SUPABASE_DB_URL;
-  if (!connectionString) throw new Error('SUPABASE_DB_URL is required for pgboss');
-
-  _boss = new PgBoss({ connectionString, schema: 'pgboss' });
-  _boss.on('error', err => console.error('[pgboss]', err));
-  await _boss.start();
-  return _boss;
-}
-
-export const ENRICH_QUEUE = 'enrich-property';
-```
-
-Add `SUPABASE_DB_URL` to your `.env` — find it in:
-Supabase dashboard → **Settings → Database → Connection string (URI)**.
-
-### 11.2 Scheduler
-
-**`src/queue/scheduler.ts`**
-
-Called after a successful import to enqueue one enrichment job per property.
+**`src/lib/services/api-response.ts`**
 
 ```typescript
-import { getBoss, ENRICH_QUEUE } from './boss.js';
-import { getEnrichersForCountry } from '../enrichers/registry.js';
-
-export interface EnrichJobData {
-  property_id:    string;
-  enricher_name:  string;
-  latitude:       number;
-  longitude:      number;
-  country:        string | null;
-  postal_code:    string | null;
-  city:           string | null;
-  address_string: string | null;
+export function successResponse(
+  data: Record<string, unknown>,
+  statusCode = 200,
+): Response {
+  return new Response(JSON.stringify({ success: true, ...data }), {
+    status: statusCode,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 
-export async function scheduleEnrichment(
-  propertyId:    string,
-  latitude:      number,
-  longitude:     number,
-  country:       string | null,
-  postalCode:    string | null,
-  city:          string | null,
-  addressString: string | null,
-): Promise<void> {
-  const boss     = await getBoss();
-  const enrichers = getEnrichersForCountry(country);
-
-  const jobs = enrichers.map(enricher => ({
-    name: ENRICH_QUEUE,
-    data: {
-      property_id:    propertyId,
-      enricher_name:  enricher.name,
-      latitude,
-      longitude,
-      country,
-      postal_code:    postalCode,
-      city,
-      address_string: addressString,
-    } satisfies EnrichJobData,
-    options: {
-      retryLimit:  3,
-      retryDelay:  60,    // seconds between retries
-      expireInHours: 24,
-    },
-  }));
-
-  await boss.insert(jobs);
+export function errorResponse(message: string, statusCode = 400): Response {
+  return new Response(JSON.stringify({ success: false, error: message }), {
+    status: statusCode,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 ```
 
-### 11.3 Worker
+### 11.2 Imports routes
 
-**`src/queue/worker.ts`**
-
-Run this as a separate process alongside the API server.
+**`src/pages/api/imports/index.ts`** — `POST /api/imports`
 
 ```typescript
-import 'dotenv/config';
-import { getBoss, ENRICH_QUEUE }  from './boss.js';
-import { getEnrichersForCountry } from '../enrichers/registry.js';
-import { getDb }                  from '../db/client.js';
-import type { EnrichJobData }     from './scheduler.js';
+import type { APIRoute } from 'astro';
+import { getDb } from '@lib/db/client.js';
+import { fetchFromScraper } from '@lib/fetchers/index.js';
+import { runEnrichment } from '@lib/enrichers/runner.js';
+import { successResponse, errorResponse } from '@lib/services/api-response.js';
+import { FieldValue } from 'firebase-admin/firestore';
+import { geohashForLocation } from 'geofire-common';
 
-async function runWorker(): Promise<void> {
-  const boss = await getBoss();
-  const db   = getDb();
-
-  console.log('[worker] started, listening for enrichment jobs');
-
-  await boss.work<EnrichJobData>(
-    ENRICH_QUEUE,
-    { teamSize: 5, teamConcurrency: 5 },
-    async (job) => {
-      const {
-        property_id,
-        enricher_name,
-        latitude,
-        longitude,
-        country,
-        postal_code,
-        city,
-        address_string,
-      } = job.data;
-
-      console.log(`[worker] enriching ${property_id} with ${enricher_name}`);
-
-      // Mark as running
-      await db.from('enrichments').upsert({
-        property_id,
-        enricher: enricher_name,
-        status:   'running',
-      }, { onConflict: 'property_id,enricher' });
-
-      // Find the enricher
-      const allEnrichers  = getEnrichersForCountry(country);
-      const enricher      = allEnrichers.find(e => e.name === enricher_name);
-
-      if (!enricher) {
-        await db.from('enrichments').upsert({
-          property_id,
-          enricher:    enricher_name,
-          status:      'skipped',
-          error:       'enricher not found in registry',
-          completed_at: new Date().toISOString(),
-        }, { onConflict: 'property_id,enricher' });
-        return;
-      }
-
-      try {
-        const result = await enricher.run({
-          property_id,
-          latitude,
-          longitude,
-          country,
-          postal_code,
-          city,
-          address_string,
-        });
-
-        // Write full enrichment result
-        await db.from('enrichments').upsert({
-          property_id,
-          enricher:    enricher_name,
-          status:      'complete',
-          data:        result.data,
-          completed_at: new Date().toISOString(),
-          expires_at:  result.expiresAt,
-        }, { onConflict: 'property_id,enricher' });
-
-        // Merge summary fields back into properties
-        if (Object.keys(result.summary).length > 0) {
-          await db.from('properties')
-            .update({ ...result.summary, enriched_at: new Date().toISOString() })
-            .eq('id', property_id);
-        }
-
-        // Check if all enrichments are done; update enrichment_status
-        const { data: pending } = await db
-          .from('enrichments')
-          .select('status')
-          .eq('property_id', property_id)
-          .in('status', ['pending', 'running']);
-
-        if (!pending?.length) {
-          await db.from('properties')
-            .update({ enrichment_status: 'complete' })
-            .eq('id', property_id);
-        }
-
-      } catch (err) {
-        const error = err instanceof Error ? err.message : String(err);
-        console.error(`[worker] ${enricher_name} failed for ${property_id}:`, error);
-
-        await db.from('enrichments').upsert({
-          property_id,
-          enricher:    enricher_name,
-          status:      'failed',
-          error,
-          completed_at: new Date().toISOString(),
-        }, { onConflict: 'property_id,enricher' });
-      }
-    },
-  );
-}
-
-runWorker().catch(err => {
-  console.error('[worker] fatal:', err);
-  process.exit(1);
-});
-```
-
----
-
-## 12. Implementation — Routes
-
-### 12.1 Imports route
-
-**`src/routes/imports.ts`**
-
-```typescript
-import { Hono }             from 'hono';
-import { getDb }            from '../db/client.js';
-import { fetchFromScraper } from '../fetchers/index.js';
-import { scheduleEnrichment } from '../queue/scheduler.js';
-
-export const importsRouter = new Hono();
-
-// POST /imports — submit a scraper URL
-importsRouter.post('/', async (c) => {
-  const body = await c.req.json<{ source_url?: string }>();
+export const POST: APIRoute = async ({ request }) => {
+  const body = await request.json() as { source_url?: string };
   const sourceUrl = body.source_url?.trim();
 
   if (!sourceUrl) {
-    return c.json({ error: 'source_url is required' }, 400);
+    return errorResponse('source_url is required', 400);
   }
 
   const db = getDb();
@@ -1456,424 +1373,609 @@ importsRouter.post('/', async (c) => {
   try {
     fetchResult = await fetchFromScraper(sourceUrl);
   } catch (err) {
-    return c.json({ error: String(err) }, 422);
+    return errorResponse(String(err), 422);
   }
 
   const { sourceType, sourceId, properties } = fetchResult;
 
   // Create import record
-  const { data: importRow, error: importErr } = await db
-    .from('imports')
-    .insert({
-      source_url:    sourceUrl,
-      source_type:   sourceType,
-      source_id:     sourceId,
-      status:        'processing',
-      listing_count: properties.length,
-    })
-    .select('id')
-    .single();
+  const importRef = db.collection('imports').doc();
+  const importId = importRef.id;
 
-  if (importErr || !importRow) {
-    return c.json({ error: 'Failed to create import record' }, 500);
-  }
+  await importRef.set({
+    source_url:    sourceUrl,
+    source_type:   sourceType,
+    source_id:     sourceId,
+    status:        'processing',
+    listing_count: properties.length,
+    error:         null,
+    created_at:    FieldValue.serverTimestamp(),
+    completed_at:  null,
+  });
 
-  const importId = importRow.id as string;
-
-  // Insert properties and enqueue enrichment jobs
+  // Insert properties and run enrichment inline
   const propertyIds: string[] = [];
 
   for (const prop of properties) {
-    // Build PostGIS point string if coordinates available
-    const location = (prop.latitude && prop.longitude)
-      ? `POINT(${prop.longitude} ${prop.latitude})`
+    const propertyRef = db.collection('properties').doc();
+    const propertyId = propertyRef.id;
+
+    // Compute geohash for proximity queries
+    const geohash = (prop.latitude && prop.longitude)
+      ? geohashForLocation([prop.latitude, prop.longitude])
       : null;
 
-    const { data: propRow, error: propErr } = await db
-      .from('properties')
-      .insert({
-        import_id:          importId,
-        source_listing_id:  prop.source_listing_id,
-        source_url:         prop.source_url,
-        portal:             prop.portal,
-        country:            prop.country,
-        title:              prop.title,
-        price_float:        prop.price_float,
-        price_currency:     prop.price_currency,
-        price_string:       prop.price_string,
-        latitude:           prop.latitude,
-        longitude:          prop.longitude,
-        location:           location ? `SRID=4326;${location}` : null,
-        address_string:     prop.address_string,
-        city:               prop.city,
-        region:             prop.region,
-        postal_code:        prop.postal_code,
-        count_bedrooms:     prop.count_bedrooms,
-        count_bathrooms:    prop.count_bathrooms,
-        constructed_area:   prop.constructed_area,
-        plot_area:          prop.plot_area,
-        area_unit:          prop.area_unit,
-        year_construction:  prop.year_construction,
-        property_type:      prop.property_type,
-        property_subtype:   prop.property_subtype,
-        tenure:             prop.tenure,
-        for_sale:           prop.for_sale,
-        for_rent:           prop.for_rent,
-        for_rent_long_term:  prop.for_rent_long_term,
-        for_rent_short_term: prop.for_rent_short_term,
-        sold:               prop.sold,
-        features:           prop.features,
-        main_image_url:     prop.main_image_url,
-        description:        prop.description,
-        agent_name:         prop.agent_name,
-        scraped_at:         prop.scraped_at,
-        enrichment_status:  (prop.latitude && prop.longitude) ? 'pending' : 'failed',
-      })
-      .select('id')
-      .single();
+    await propertyRef.set({
+      import_id:          importId,
+      source_listing_id:  prop.source_listing_id,
+      source_url:         prop.source_url,
+      portal:             prop.portal,
+      country:            prop.country,
+      title:              prop.title,
+      price_float:        prop.price_float,
+      price_currency:     prop.price_currency,
+      price_string:       prop.price_string,
+      latitude:           prop.latitude,
+      longitude:          prop.longitude,
+      geohash,
+      address_string:     prop.address_string,
+      city:               prop.city,
+      region:             prop.region,
+      postal_code:        prop.postal_code,
+      count_bedrooms:     prop.count_bedrooms,
+      count_bathrooms:    prop.count_bathrooms,
+      constructed_area:   prop.constructed_area,
+      plot_area:          prop.plot_area,
+      area_unit:          prop.area_unit,
+      year_construction:  prop.year_construction,
+      property_type:      prop.property_type,
+      property_subtype:   prop.property_subtype,
+      tenure:             prop.tenure,
+      for_sale:           prop.for_sale,
+      for_rent:           prop.for_rent,
+      for_rent_long_term:  prop.for_rent_long_term,
+      for_rent_short_term: prop.for_rent_short_term,
+      sold:               prop.sold,
+      features:           prop.features,
+      main_image_url:     prop.main_image_url,
+      description:        prop.description,
+      agent_name:         prop.agent_name,
+      scraped_at:         prop.scraped_at,
+      imported_at:        FieldValue.serverTimestamp(),
+      enriched_at:        null,
+      enrichment_status:  (prop.latitude && prop.longitude) ? 'pending' : 'failed',
+    });
 
-    if (propErr || !propRow) continue;
-
-    const propertyId = propRow.id as string;
     propertyIds.push(propertyId);
 
-    // Only enqueue enrichment if coordinates are available
+    // Run enrichment inline if coordinates are available
     if (prop.latitude && prop.longitude) {
-      await scheduleEnrichment(
-        propertyId,
-        prop.latitude,
-        prop.longitude,
-        prop.country,
-        prop.postal_code,
-        prop.city,
-        prop.address_string,
-      );
+      await runEnrichment({
+        property_id:    propertyId,
+        latitude:       prop.latitude,
+        longitude:      prop.longitude,
+        country:        prop.country,
+        postal_code:    prop.postal_code,
+        city:           prop.city,
+        address_string: prop.address_string,
+      });
     }
   }
 
   // Mark import complete
-  await db.from('imports').update({ status: 'complete', completed_at: new Date().toISOString() })
-    .eq('id', importId);
+  await importRef.update({
+    status:       'complete',
+    completed_at: FieldValue.serverTimestamp(),
+  });
 
-  return c.json({
+  return successResponse({
     import_id:    importId,
     source_type:  sourceType,
     source_id:    sourceId,
     listing_count: properties.length,
     property_ids: propertyIds,
-    status:       'processing',   // enrichment still running in background
+    status:       'complete',
   }, 201);
-});
-
-// GET /imports/:id — poll import status
-importsRouter.get('/:id', async (c) => {
-  const db = getDb();
-  const { data, error } = await db
-    .from('imports')
-    .select('*')
-    .eq('id', c.req.param('id'))
-    .single();
-
-  if (error || !data) return c.json({ error: 'Import not found' }, 404);
-
-  // Include property enrichment summary
-  const { data: props } = await db
-    .from('properties')
-    .select('id, enrichment_status, source_url')
-    .eq('import_id', data.id);
-
-  return c.json({ ...data, properties: props ?? [] });
-});
+};
 ```
 
-### 12.2 Properties route
-
-**`src/routes/properties.ts`**
+**`src/pages/api/imports/[id].ts`** — `GET /api/imports/:id`
 
 ```typescript
-import { Hono } from 'hono';
-import { getDb } from '../db/client.js';
+import type { APIRoute } from 'astro';
+import { getDb } from '@lib/db/client.js';
+import { successResponse, errorResponse } from '@lib/services/api-response.js';
 
-export const propertiesRouter = new Hono();
-
-// GET /properties — list with optional filters
-propertiesRouter.get('/', async (c) => {
-  const db      = getDb();
-  const country = c.req.query('country');
-  const city    = c.req.query('city');
-  const minBeds = c.req.query('min_beds');
-  const maxPrice = c.req.query('max_price');
-  const limit   = Math.min(Number(c.req.query('limit') ?? 50), 200);
-  const offset  = Number(c.req.query('offset') ?? 0);
-
-  let query = db
-    .from('properties')
-    .select('id, source_url, title, price_float, price_currency, city, country, count_bedrooms, property_type, walkability_score, flood_risk, epc_grade, enrichment_status, imported_at')
-    .order('imported_at', { ascending: false })
-    .range(offset, offset + limit - 1);
-
-  if (country)  query = query.eq('country', country);
-  if (city)     query = query.ilike('city', `%${city}%`);
-  if (minBeds)  query = query.gte('count_bedrooms', Number(minBeds));
-  if (maxPrice) query = query.lte('price_float', Number(maxPrice));
-
-  const { data, error } = await query;
-  if (error) return c.json({ error: error.message }, 500);
-
-  return c.json({ properties: data ?? [], limit, offset });
-});
-
-// GET /properties/:id — full enriched property
-propertiesRouter.get('/:id', async (c) => {
+export const GET: APIRoute = async ({ params }) => {
   const db = getDb();
-  const { data: prop, error } = await db
-    .from('properties')
-    .select('*')
-    .eq('id', c.req.param('id'))
-    .single();
+  const { id } = params;
 
-  if (error || !prop) return c.json({ error: 'Property not found' }, 404);
-
-  const { data: enrichments } = await db
-    .from('enrichments')
-    .select('enricher, status, data, completed_at, expires_at')
-    .eq('property_id', prop.id);
-
-  return c.json({ ...prop, enrichments: enrichments ?? [] });
-});
-
-// GET /properties/:id/enrichments — enrichment details only
-propertiesRouter.get('/:id/enrichments', async (c) => {
-  const db = getDb();
-  const { data, error } = await db
-    .from('enrichments')
-    .select('*')
-    .eq('property_id', c.req.param('id'))
-    .order('enricher');
-
-  if (error) return c.json({ error: error.message }, 500);
-  return c.json({ enrichments: data ?? [] });
-});
-
-// POST /properties/:id/re-enrich — trigger fresh enrichment
-propertiesRouter.post('/:id/re-enrich', async (c) => {
-  const db = getDb();
-  const { data: prop, error } = await db
-    .from('properties')
-    .select('id, latitude, longitude, country, postal_code, city, address_string')
-    .eq('id', c.req.param('id'))
-    .single();
-
-  if (error || !prop) return c.json({ error: 'Property not found' }, 404);
-  if (!prop.latitude || !prop.longitude) {
-    return c.json({ error: 'Property has no coordinates — cannot enrich' }, 422);
+  const importDoc = await db.collection('imports').doc(id!).get();
+  if (!importDoc.exists) {
+    return errorResponse('Import not found', 404);
   }
 
-  // Reset enrichment state
-  await db.from('enrichments').delete().eq('property_id', prop.id);
-  await db.from('properties').update({ enrichment_status: 'pending', enriched_at: null })
-    .eq('id', prop.id);
+  const importData = { id: importDoc.id, ...importDoc.data() };
 
-  const { scheduleEnrichment } = await import('../queue/scheduler.js');
-  await scheduleEnrichment(
-    prop.id,
-    prop.latitude,
-    prop.longitude,
-    prop.country,
-    prop.postal_code,
-    prop.city,
-    prop.address_string,
-  );
+  // Include property enrichment summary
+  const propsSnap = await db.collection('properties')
+    .where('import_id', '==', id)
+    .select('enrichment_status', 'source_url')
+    .get();
 
-  return c.json({ message: 'Re-enrichment queued', property_id: prop.id });
-});
+  const properties = propsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-// GET /properties/nearby — spatial query
-propertiesRouter.get('/nearby', async (c) => {
-  const lat    = Number(c.req.query('lat'));
-  const lng    = Number(c.req.query('lng'));
-  const radius = Number(c.req.query('radius_km') ?? 1);
-  const limit  = Math.min(Number(c.req.query('limit') ?? 20), 100);
-
-  if (!lat || !lng) return c.json({ error: 'lat and lng are required' }, 400);
-
-  const db = getDb();
-
-  // PostGIS ST_DWithin — distance in metres (geography type)
-  const { data, error } = await db.rpc('properties_within_radius', {
-    ref_lat:    lat,
-    ref_lng:    lng,
-    radius_m:   radius * 1000,
-    row_limit:  limit,
-  });
-
-  if (error) return c.json({ error: error.message }, 500);
-  return c.json({ properties: data ?? [], radius_km: radius });
-});
+  return successResponse({ ...importData, properties });
+};
 ```
 
-Add the PostGIS RPC function to Supabase (SQL editor):
+### 11.3 Properties routes
 
-```sql
-CREATE OR REPLACE FUNCTION properties_within_radius(
-  ref_lat   FLOAT,
-  ref_lng   FLOAT,
-  radius_m  FLOAT,
-  row_limit INT DEFAULT 20
-)
-RETURNS TABLE (
-  id              UUID,
-  source_url      TEXT,
-  title           TEXT,
-  price_float     FLOAT,
-  price_currency  TEXT,
-  latitude        FLOAT,
-  longitude       FLOAT,
-  city            TEXT,
-  country         TEXT,
-  count_bedrooms  INT,
-  property_type   TEXT,
-  distance_m      FLOAT
-)
-LANGUAGE sql STABLE AS $$
-  SELECT
-    p.id, p.source_url, p.title, p.price_float, p.price_currency,
-    p.latitude, p.longitude, p.city, p.country, p.count_bedrooms,
-    p.property_type,
-    ST_Distance(p.location, ST_MakePoint(ref_lng, ref_lat)::GEOGRAPHY) AS distance_m
-  FROM properties p
-  WHERE p.location IS NOT NULL
-    AND ST_DWithin(p.location, ST_MakePoint(ref_lng, ref_lat)::GEOGRAPHY, radius_m)
-  ORDER BY distance_m
-  LIMIT row_limit;
-$$;
+**`src/pages/api/properties/index.ts`** — `GET /api/properties`
+
+```typescript
+import type { APIRoute } from 'astro';
+import { getDb } from '@lib/db/client.js';
+import { successResponse, errorResponse } from '@lib/services/api-response.js';
+
+export const GET: APIRoute = async ({ url }) => {
+  const db      = getDb();
+  const country = url.searchParams.get('country');
+  const limit   = Math.min(Number(url.searchParams.get('limit') ?? 50), 200);
+  const offset  = Number(url.searchParams.get('offset') ?? 0);
+
+  let query: FirebaseFirestore.Query = db.collection('properties')
+    .orderBy('imported_at', 'desc')
+    .limit(limit)
+    .offset(offset);
+
+  if (country) {
+    query = query.where('country', '==', country);
+  }
+
+  const snap = await query.get();
+  const properties = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  return successResponse({ properties, limit, offset });
+};
+```
+
+**`src/pages/api/properties/[id].ts`** — `GET /api/properties/:id`
+
+```typescript
+import type { APIRoute } from 'astro';
+import { getDb } from '@lib/db/client.js';
+import { successResponse, errorResponse } from '@lib/services/api-response.js';
+
+export const GET: APIRoute = async ({ params }) => {
+  const db = getDb();
+  const { id } = params;
+
+  const propDoc = await db.collection('properties').doc(id!).get();
+  if (!propDoc.exists) {
+    return errorResponse('Property not found', 404);
+  }
+
+  const prop = { id: propDoc.id, ...propDoc.data() };
+
+  // Fetch enrichment subcollection
+  const enrichSnap = await propDoc.ref.collection('enrichments').get();
+  const enrichments = enrichSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  return successResponse({ ...prop, enrichments });
+};
+```
+
+**`src/pages/api/properties/[id]/re-enrich.ts`** — `POST /api/properties/:id/re-enrich`
+
+```typescript
+import type { APIRoute } from 'astro';
+import { getDb } from '@lib/db/client.js';
+import { runEnrichment } from '@lib/enrichers/runner.js';
+import { successResponse, errorResponse } from '@lib/services/api-response.js';
+
+export const POST: APIRoute = async ({ params }) => {
+  const db = getDb();
+  const { id } = params;
+
+  const propDoc = await db.collection('properties').doc(id!).get();
+  if (!propDoc.exists) {
+    return errorResponse('Property not found', 404);
+  }
+
+  const prop = propDoc.data()!;
+  if (!prop.latitude || !prop.longitude) {
+    return errorResponse('Property has no coordinates — cannot enrich', 422);
+  }
+
+  // Delete existing enrichments
+  const enrichSnap = await propDoc.ref.collection('enrichments').get();
+  const batch = db.batch();
+  enrichSnap.docs.forEach((d) => batch.delete(d.ref));
+  await batch.commit();
+
+  // Reset enrichment state
+  await propDoc.ref.update({ enrichment_status: 'pending', enriched_at: null });
+
+  // Run enrichment inline
+  await runEnrichment({
+    property_id:    propDoc.id,
+    latitude:       prop.latitude,
+    longitude:      prop.longitude,
+    country:        prop.country,
+    postal_code:    prop.postal_code,
+    city:           prop.city,
+    address_string: prop.address_string,
+  });
+
+  return successResponse({ message: 'Re-enrichment complete', property_id: propDoc.id });
+};
+```
+
+**`src/pages/api/properties/nearby.ts`** — `GET /api/properties/nearby`
+
+Uses geohash-based proximity queries via `geofire-common`.
+
+```typescript
+import type { APIRoute } from 'astro';
+import { getDb } from '@lib/db/client.js';
+import { geohashQueryBounds, distanceBetween } from 'geofire-common';
+import { successResponse, errorResponse } from '@lib/services/api-response.js';
+
+export const GET: APIRoute = async ({ url }) => {
+  const lat      = Number(url.searchParams.get('lat'));
+  const lng      = Number(url.searchParams.get('lng'));
+  const radiusKm = Number(url.searchParams.get('radius_km') ?? 1);
+  const limit    = Math.min(Number(url.searchParams.get('limit') ?? 20), 100);
+
+  if (!lat || !lng) {
+    return errorResponse('lat and lng are required', 400);
+  }
+
+  const db = getDb();
+  const center: [number, number] = [lat, lng];
+  const radiusM = radiusKm * 1000;
+
+  // Get geohash range bounds for the query radius
+  const bounds = geohashQueryBounds(center, radiusM);
+
+  // Run all geohash range queries in parallel
+  const snapshots = await Promise.all(
+    bounds.map(([start, end]) =>
+      db.collection('properties')
+        .orderBy('geohash')
+        .startAt(start)
+        .endAt(end)
+        .get(),
+    ),
+  );
+
+  // Merge, filter by actual distance, sort, and limit
+  const properties: Array<Record<string, unknown>> = [];
+
+  for (const snap of snapshots) {
+    for (const doc of snap.docs) {
+      const data = doc.data();
+      if (!data.latitude || !data.longitude) continue;
+
+      const distKm = distanceBetween(
+        [data.latitude, data.longitude],
+        center,
+      );
+
+      if (distKm <= radiusKm) {
+        properties.push({
+          id: doc.id,
+          ...data,
+          distance_m: Math.round(distKm * 1000),
+        });
+      }
+    }
+  }
+
+  properties.sort((a, b) => (a.distance_m as number) - (b.distance_m as number));
+  const limited = properties.slice(0, limit);
+
+  return successResponse({ properties: limited, radius_km: radiusKm });
+};
 ```
 
 ---
 
-## 13. Implementation — App Entry Point
+## 12. Implementation — Frontend Pages
 
-**`src/index.ts`**
+Astro pages provide a simple dashboard for viewing imports and properties.
 
-```typescript
-import 'dotenv/config';
-import { serve }   from '@hono/node-server';
-import { Hono }    from 'hono';
-import { logger }  from 'hono/logger';
-import { cors }    from 'hono/cors';
+### 12.1 Base layout
 
-import { importsRouter }    from './routes/imports.js';
-import { propertiesRouter } from './routes/properties.js';
+**`src/layouts/Base.astro`**
 
-const app = new Hono();
-
-app.use('*', logger());
-app.use('*', cors());
-
-app.get('/health', (c) => c.json({ status: 'ok', ts: new Date().toISOString() }));
-
-app.route('/imports',    importsRouter);
-app.route('/properties', propertiesRouter);
-
-app.onError((err, c) => {
-  console.error(err);
-  return c.json({ error: err.message }, 500);
-});
-
-const port = Number(process.env.PORT ?? 3000);
-console.log(`property-context listening on :${port}`);
-
-serve({ fetch: app.fetch, port });
+```astro
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title} — property-context</title>
+</head>
+<body>
+  <nav>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/imports/new">New Import</a>
+  </nav>
+  <main>
+    <slot />
+  </main>
+</body>
+</html>
 ```
+
+### 12.2 Dashboard
+
+**`src/pages/dashboard.astro`**
+
+```astro
+---
+import Base from '../layouts/Base.astro';
+import { getDb } from '@lib/db/client.js';
+
+const db = getDb();
+
+const importsSnap = await db.collection('imports')
+  .orderBy('created_at', 'desc')
+  .limit(10)
+  .get();
+const imports = importsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+const propsSnap = await db.collection('properties')
+  .orderBy('imported_at', 'desc')
+  .limit(20)
+  .get();
+const properties = propsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+---
+<Base title="Dashboard">
+  <h1>Recent Imports</h1>
+  <ul>
+    {imports.map(imp => (
+      <li>
+        <strong>{imp.source_type}</strong> — {imp.source_id}
+        ({imp.status}) — {imp.listing_count} listings
+      </li>
+    ))}
+  </ul>
+
+  <h1>Recent Properties</h1>
+  <ul>
+    {properties.map(prop => (
+      <li>
+        <a href={`/properties/${prop.id}`}>{prop.title ?? 'Untitled'}</a>
+        — {prop.city} — {prop.enrichment_status}
+      </li>
+    ))}
+  </ul>
+</Base>
+```
+
+### 12.3 Property detail
+
+**`src/pages/properties/[id].astro`**
+
+```astro
+---
+import Base from '../../layouts/Base.astro';
+import { getDb } from '@lib/db/client.js';
+
+const { id } = Astro.params;
+const db = getDb();
+
+const propDoc = await db.collection('properties').doc(id!).get();
+if (!propDoc.exists) return Astro.redirect('/dashboard');
+
+const prop = { id: propDoc.id, ...propDoc.data() } as Record<string, any>;
+
+const enrichSnap = await propDoc.ref.collection('enrichments').get();
+const enrichments = enrichSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+---
+<Base title={prop.title ?? 'Property'}>
+  <h1>{prop.title ?? 'Untitled Property'}</h1>
+  <p>{prop.address_string} — {prop.city}, {prop.country}</p>
+  <p>Price: {prop.price_string ?? 'N/A'}</p>
+  <p>Bedrooms: {prop.count_bedrooms ?? 'N/A'}</p>
+  <p>Enrichment status: {prop.enrichment_status}</p>
+
+  <h2>Enrichment Summary</h2>
+  <ul>
+    <li>Walk Score: {prop.walkability_score ?? '—'}</li>
+    <li>Transit Score: {prop.transit_score ?? '—'}</li>
+    <li>Bike Score: {prop.bike_score ?? '—'}</li>
+    <li>Flood Risk: {prop.flood_risk ?? '—'}</li>
+    <li>EPC Grade: {prop.epc_grade ?? '—'}</li>
+    <li>Nearby Schools: {prop.nearby_schools ?? '—'}</li>
+    <li>Nearby Transit: {prop.nearby_transit_stops ?? '—'}</li>
+    <li>Nearby Supermarkets: {prop.nearby_supermarkets ?? '—'}</li>
+  </ul>
+
+  <h2>Enrichment Details</h2>
+  {enrichments.map(e => (
+    <details>
+      <summary>{e.enricher} — {e.status}</summary>
+      <pre>{JSON.stringify(e.data, null, 2)}</pre>
+    </details>
+  ))}
+
+  <form method="post" action={`/api/properties/${id}/re-enrich`}>
+    <button type="submit">Re-enrich</button>
+  </form>
+</Base>
+```
+
+### 12.4 Import form
+
+**`src/pages/imports/new.astro`**
+
+```astro
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base title="New Import">
+  <h1>Import Properties</h1>
+  <form id="import-form">
+    <label for="source_url">Scraper URL (haul or listing):</label>
+    <input type="url" id="source_url" name="source_url" required
+      placeholder="https://your-scraper.com/ext/v1/hauls/haul_abc123" />
+    <button type="submit">Import</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    const form = document.getElementById('import-form') as HTMLFormElement;
+    const result = document.getElementById('result')!;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      result.textContent = 'Importing...';
+
+      const sourceUrl = new FormData(form).get('source_url') as string;
+      const res = await fetch('/api/imports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source_url: sourceUrl }),
+      });
+
+      const data = await res.json();
+      result.textContent = JSON.stringify(data, null, 2);
+    });
+  </script>
+</Base>
+```
+
+---
+
+## 13. Implementation — Astro Config
+
+**`astro.config.mjs`**
+
+```javascript
+import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
+
+export default defineConfig({
+  output: 'server',
+  adapter: node({ mode: 'standalone' }),
+});
+```
+
+> **Note:** If deploying to Cloudflare (matching the existing astro-app), swap
+> `@astrojs/node` for `@astrojs/cloudflare`. The Firebase Admin SDK requires a
+> Node.js runtime, so Cloud Run or a standalone Node adapter is recommended.
 
 ---
 
 ## 14. Running Locally
 
-You need two terminal processes: the API server and the worker.
+Only one process is needed — the Astro dev server handles both API routes and
+frontend pages:
 
 ```bash
-# Terminal 1 — API server
 npm run dev
-
-# Terminal 2 — enrichment worker
-npm run worker
 ```
 
 **Test the import flow:**
 
 ```bash
 # Submit a haul URL from the scraper project
-curl -X POST http://localhost:3000/imports \
+curl -X POST http://localhost:4321/api/imports \
   -H 'Content-Type: application/json' \
   -d '{"source_url":"https://your-scraper.com/ext/v1/hauls/haul_abc123"}'
 
-# Response:
-# { "import_id": "...", "property_ids": ["..."], "status": "processing" }
+# Response (enrichment runs inline, so status is 'complete'):
+# { "success": true, "import_id": "...", "property_ids": ["..."], "status": "complete" }
 
-# Poll import status
-curl http://localhost:3000/imports/<import_id>
+# Get import details
+curl http://localhost:4321/api/imports/<import_id>
 
-# Get enriched property (enrichment may still be running)
-curl http://localhost:3000/properties/<property_id>
+# Get enriched property
+curl http://localhost:4321/api/properties/<property_id>
 
 # List all properties
-curl http://localhost:3000/properties
+curl http://localhost:4321/api/properties
 
 # Nearby properties (1km radius around London Bridge)
-curl "http://localhost:3000/properties/nearby?lat=51.5079&lng=-0.0877&radius_km=1"
+curl "http://localhost:4321/api/properties/nearby?lat=51.5079&lng=-0.0877&radius_km=1"
+
+# Re-enrich a property
+curl -X POST http://localhost:4321/api/properties/<property_id>/re-enrich
 ```
+
+Or visit `http://localhost:4321/dashboard` for the web UI.
 
 ---
 
 ## 15. Deployment
 
-### 15.1 Railway (recommended)
+### 15.1 Firebase Hosting + Cloud Run (recommended)
 
-Railway handles both the API server and worker as separate services sharing
-environment variables.
-
-1. Push your code to GitHub
-2. Go to [railway.app](https://railway.app) → **New project → Deploy from GitHub**
-3. Set all environment variables in Railway's **Variables** tab
-4. Railway auto-detects Node.js and runs `npm start`
-5. For the worker: **New service → same repo**, override start command to `npm run worker`
-
-**`railway.json`** (optional, for explicit config):
-```json
-{
-  "$schema": "https://railway.app/railway.schema.json",
-  "build": { "builder": "NIXPACKS" },
-  "deploy": { "startCommand": "node dist/index.js", "restartPolicyType": "ON_FAILURE" }
-}
-```
-
-### 15.2 Fly.io (alternative)
+Firebase Admin SDK requires a Node.js runtime. Deploy the Astro SSR app to
+Cloud Run and optionally front it with Firebase Hosting.
 
 ```bash
-# Install flyctl and log in
-curl -L https://fly.io/install.sh | sh
-fly auth login
+# Install Firebase CLI
+npm install -g firebase-tools
+firebase login
 
-# Launch (creates fly.toml)
+# Initialize (select Hosting + set up Cloud Run)
+firebase init hosting
+
+# Build the Astro app
+npm run build
+
+# Deploy to Cloud Run
+gcloud run deploy property-context \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars "FIRESTORE_PROJECT_ID=your-project-id"
+
+# Or use firebase.json to proxy Hosting → Cloud Run
+```
+
+### 15.2 Standalone Node.js (Railway, Fly.io, etc.)
+
+Since the app uses the Node.js adapter, it can run anywhere Node.js is available.
+
+```bash
+# Build
+npm run build
+
+# Start
+node dist/server/entry.mjs
+```
+
+Set all environment variables in your hosting platform's dashboard.
+
+**Railway:**
+1. Push code to GitHub
+2. Go to [railway.app](https://railway.app) → **New project → Deploy from GitHub**
+3. Set environment variables
+4. Railway auto-detects Node.js and runs `npm start`
+
+**Fly.io:**
+```bash
 fly launch
-
-# Set secrets
 fly secrets set \
-  SUPABASE_URL=https://xxx.supabase.co \
-  SUPABASE_SERVICE_ROLE_KEY=eyJ... \
-  SUPABASE_DB_URL=postgresql://... \
+  FIRESTORE_PROJECT_ID=your-project-id \
+  GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account",...}' \
   SCRAPER_BASE_URL=https://... \
-  SCRAPER_API_KEY=pws_live_... \
   WALKSCORE_API_KEY=... \
   EPC_API_EMAIL=... \
   EPC_API_KEY=...
-
-# Deploy
 fly deploy
-
-# Deploy worker as a separate machine
-fly machine run . --env NODE_ENV=production --command "node dist/queue/worker.js"
 ```
 
 ---
@@ -1954,10 +2056,12 @@ Output fields: `transaction_count`, `avg_sold_price`, `min_sold_price`,
 
 ## 17. Adding a New Enricher
 
-1. **Create the file** `src/enrichers/<name>.ts`
-2. **Implement** the `Enricher` interface from `src/enrichers/types.ts`
-3. **Register it** in `src/enrichers/registry.ts` (global or country-specific)
-4. The worker picks it up automatically — no other changes needed
+1. **Create the file** `src/lib/enrichers/<name>.ts`
+2. **Implement** the `Enricher` interface from `src/lib/enrichers/types.ts`
+3. **Register it** in `src/lib/enrichers/registry.ts` (global or country-specific)
+
+That's it. The inline runner picks it up automatically — no queue, worker, or
+route changes needed.
 
 Minimal enricher template:
 
@@ -1965,7 +2069,7 @@ Minimal enricher template:
 import type { Enricher, EnricherInput, EnricherResult } from './types.js';
 
 export const myEnricher: Enricher = {
-  name: 'my_enricher',  // must be unique; stored in enrichments.enricher column
+  name: 'my_enricher',  // must be unique; used as the enrichment doc ID
 
   async run(input: EnricherInput): Promise<EnricherResult> {
     const { latitude, longitude, country, postal_code } = input;
@@ -1976,8 +2080,8 @@ export const myEnricher: Enricher = {
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     return {
-      data:    apiData,          // stored as-is in enrichments.data (JSONB)
-      summary: {},               // merged into properties table summary columns
+      data:    apiData,          // stored as-is in enrichments subcollection
+      summary: {},               // merged into property document summary fields
       expiresAt,
     };
   },
@@ -1996,5 +2100,3 @@ const GLOBAL_ENRICHERS: Enricher[] = [
   myEnricher,   // ← add here
 ];
 ```
-
-That's all that's needed. The queue, worker, and API routes require no changes.

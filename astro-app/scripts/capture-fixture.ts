@@ -104,6 +104,22 @@ const HOSTNAME_MAP: Record<string, string> = {
   'propertyfinder.ae': 'ae_propertyfinder',
   'www.zapimoveis.com.br': 'br_zapimoveis',
   'zapimoveis.com.br': 'br_zapimoveis',
+  'www.hemnet.se': 'se_hemnet',
+  'hemnet.se': 'se_hemnet',
+  'www.otodom.pl': 'pl_otodom',
+  'otodom.pl': 'pl_otodom',
+  'www.willhaben.at': 'at_willhaben',
+  'willhaben.at': 'at_willhaben',
+  'www.boligsiden.dk': 'dk_boligsiden',
+  'boligsiden.dk': 'dk_boligsiden',
+  'www.realtor.ca': 'ca_realtor',
+  'realtor.ca': 'ca_realtor',
+  'www.trademe.co.nz': 'nz_trademe',
+  'trademe.co.nz': 'nz_trademe',
+  'www.propertyguru.com.sg': 'sg_propertyguru',
+  'propertyguru.com.sg': 'sg_propertyguru',
+  'www.fincaraiz.com.co': 'co_fincaraiz',
+  'fincaraiz.com.co': 'co_fincaraiz',
 };
 
 const HELP_TEXT = `
