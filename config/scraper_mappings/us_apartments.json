@@ -1,0 +1,104 @@
+[{
+  "name": "us_apartments",
+  "expectedExtractionRate": 0.60,
+
+  // apartments.com — US rental property portal
+  // Uses JSON-LD and CSS fallbacks
+  // Defaults to for_rent since this is a rental-only portal
+
+  "defaultValues": {
+    "country":            { "value": "USA" },
+    "currency":           { "value": "USD" },
+    "area_unit":          { "value": "sqft" },
+    "locale_code":        { "value": "en-US" },
+    "for_rent_short_term":{ "value": "false" },
+    "for_rent":           { "value": "true" },
+    "for_sale":           { "value": "false" },
+    "for_rent_long_term": { "value": "true" }
+  },
+
+  "images": [{
+    "cssLocator": "meta[property='og:image']",
+    "cssAttr": "content"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": ".priceBedRangeInfo .bed-range, .bedRange", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": ".priceBedRangeInfo .bath-range, .bathRange", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".priceBedRangeInfo .rentRollup, .rentRange", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": ".priceBedRangeInfo .sqft-range, .sqftRange", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".priceBedRangeInfo .rentRollup, .rentRange",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": ".propertyAddressContainer .propertyAddress, .propertyAddress" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1"
+    }
+  },
+
+  "booleanFields": {}
+}]

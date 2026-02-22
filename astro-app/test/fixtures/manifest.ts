@@ -1219,4 +1219,52 @@ export const fixtures: FixtureEntry[] = [
     sourceUrl: 'https://www.leboncoin.fr/ventes_immobilieres/12345.htm',
     expected: {},
   },
+  {
+    scraper: 'pt_imovirtual',
+    fixture: null,
+    sourceUrl: 'https://www.imovirtual.com/comprar/apartamento/12345',
+    expected: {},
+  },
+  {
+    scraper: 'it_casa',
+    fixture: null,
+    sourceUrl: 'https://www.casa.it/vendita/appartamento/12345',
+    expected: {},
+  },
+  {
+    scraper: 'nl_pararius',
+    fixture: null,
+    sourceUrl: 'https://www.pararius.com/apartment-for-rent/amsterdam/12345',
+    expected: {},
+  },
+  {
+    scraper: 'us_apartments',
+    fixture: null,
+    sourceUrl: 'https://www.apartments.com/12345/',
+    expected: {},
+  },
+  {
+    scraper: 'uk_purplebricks',
+    fixture: null,
+    sourceUrl: 'https://www.purplebricks.co.uk/property/for-sale/12345',
+    expected: {},
+  },
+  {
+    scraper: 'in_housing',
+    fixture: null,
+    sourceUrl: 'https://www.housing.com/buy/12345',
+    expected: {},
+  },
+  {
+    scraper: 'br_vivareal',
+    fixture: null,
+    sourceUrl: 'https://www.vivareal.com.br/imovel/venda-12345/',
+    expected: {},
+  },
+  {
+    scraper: 'mx_segundamano',
+    fixture: null,
+    sourceUrl: 'https://www.segundamano.mx/inmuebles/venta/12345',
+    expected: {},
+  },
 ];
