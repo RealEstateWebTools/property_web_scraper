@@ -979,4 +979,52 @@ export const fixtures: FixtureEntry[] = [
     sourceUrl: 'https://www.myhome.ie/residential/12345',
     expected: {},
   },
+  {
+    scraper: 'eg_propertyfinder',
+    fixture: null,
+    sourceUrl: 'https://www.propertyfinder.eg/en/buy/apartment-for-sale-cairo-12345',
+    expected: {},
+  },
+  {
+    scraper: 'il_yad2',
+    fixture: null,
+    sourceUrl: 'https://www.yad2.co.il/realestate/item/12345',
+    expected: {},
+  },
+  {
+    scraper: 'hr_njuskalo',
+    fixture: null,
+    sourceUrl: 'https://www.njuskalo.hr/nekretnine/prodaja/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ro_imobiliare',
+    fixture: null,
+    sourceUrl: 'https://www.imobiliare.ro/vanzare-apartamente/12345',
+    expected: {},
+  },
+  {
+    scraper: 'hu_ingatlan',
+    fixture: null,
+    sourceUrl: 'https://www.ingatlan.com/elado+lakas/12345',
+    expected: {},
+  },
+  {
+    scraper: 'cz_sreality',
+    fixture: null,
+    sourceUrl: 'https://www.sreality.cz/detail/prodej/byt/12345',
+    expected: {},
+  },
+  {
+    scraper: 'pe_adondevivir',
+    fixture: null,
+    sourceUrl: 'https://www.adondevivir.com/propiedades/venta/12345',
+    expected: {},
+  },
+  {
+    scraper: 'ec_plusvalia',
+    fixture: null,
+    sourceUrl: 'https://www.plusvalia.com/propiedades/venta/12345',
+    expected: {},
+  },
 ];

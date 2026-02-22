@@ -1,0 +1,119 @@
+[{
+  "name": "cz_sreality",
+  "expectedExtractionRate": 0.60,
+
+  // sreality.cz — Czech Republic's leading real estate portal
+  // Uses JSON-LD and meta tags
+  // URL patterns: /prodej/ (for sale) or /pronajem/ (for rent)
+
+  "defaultValues": {
+    "country":            { "value": "Czech Republic" },
+    "currency":           { "value": "CZK" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "cs-CZ" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='sreality'], img[src*='szn']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='bedrooms'], .rooms-value", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='bathrooms'], .bathrooms-value", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".price, .price-value", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": ".area-value, [data-testid='area']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".price, .price-value",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": ".location-info, .address-value" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1",
+      "regex": "(\\d+)",
+      "regexGroup": 1
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "prodej"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "pronajem"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "pronajem"
+    }
+  }
+}]

@@ -1,0 +1,119 @@
+[{
+  "name": "il_yad2",
+  "expectedExtractionRate": 0.60,
+
+  // yad2.co.il — Israel's leading classifieds portal
+  // Uses JSON-LD and meta tags
+  // URL patterns: /realestate/forsale/ or /realestate/rent/
+
+  "defaultValues": {
+    "country":            { "value": "Israel" },
+    "currency":           { "value": "ILS" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "he-IL" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='yad2'], img[src*='y2cdn']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='bedrooms'], .rooms-value", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='bathrooms'], .bathrooms-value", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='price'], .price", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='area'], .area-value", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": "[data-testid='price'], .price",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='address'], .address-value" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1",
+      "regex": "(\\d+)",
+      "regexGroup": 1
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "forsale"
+    },
+    "for_rent": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "2",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    }
+  }
+}]

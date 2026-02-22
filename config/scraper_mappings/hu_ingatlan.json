@@ -1,0 +1,119 @@
+[{
+  "name": "hu_ingatlan",
+  "expectedExtractionRate": 0.60,
+
+  // ingatlan.com — Hungary's leading real estate portal
+  // Uses JSON-LD and meta tags
+  // URL patterns: /elado/ (for sale) or /kiado/ (for rent)
+
+  "defaultValues": {
+    "country":            { "value": "Hungary" },
+    "currency":           { "value": "HUF" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "hu-HU" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='ingatlan'], img[src*='ingcdn']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='bedrooms'], .rooms-value", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='bathrooms'], .bathrooms-value", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "offers.price",
+      "fallbacks": [
+        { "cssLocator": ".price, .listing-price", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "floorSize.value",
+      "fallbacks": [
+        { "cssLocator": ".area-value, [data-testid='area']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": ".price, .listing-price",
+      "fallbacks": [
+        { "jsonLdPath": "offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": ".location-info, .address-value" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@type"
+    },
+    "reference": {
+      "urlPathPart": "-1",
+      "regex": "(\\d+)",
+      "regexGroup": 1
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "elado"
+    },
+    "for_rent": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "kiado"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "1",
+      "evaluator":      "include?",
+      "evaluatorParam": "kiado"
+    }
+  }
+}]

@@ -1,0 +1,119 @@
+[{
+  "name": "eg_propertyfinder",
+  "expectedExtractionRate": 0.60,
+
+  // propertyfinder.eg — Egypt property portal (PropertyFinder group, same as ae_propertyfinder)
+  // Uses JSON-LD @graph and aria-label selectors
+  // for_sale/for_rent determined by URL path: "buy" or "rent"
+
+  "defaultValues": {
+    "country":            { "value": "Egypt" },
+    "currency":           { "value": "EGP" },
+    "area_unit":          { "value": "sqmt" },
+    "locale_code":        { "value": "en-EG" },
+    "for_rent_short_term":{ "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "img[src*='propertyfinder'], img[aria-label*='property']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "jsonLdPath": "@graph.0.numberOfBedrooms",
+      "fallbacks": [
+        { "cssLocator": "[aria-label*='Bedroom'], [aria-label*='bedroom']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "jsonLdPath": "@graph.0.numberOfBathroomsTotal",
+      "fallbacks": [
+        { "cssLocator": "[aria-label*='Bathroom'], [aria-label*='bathroom']", "modifiers": ["digitsOnly"] }
+      ]
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "jsonLdPath": "@graph.0.offers.price",
+      "fallbacks": [
+        { "cssLocator": "[aria-label*='Price'], [class*='price']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "constructed_area": {
+      "jsonLdPath": "@graph.0.floorSize.value",
+      "fallbacks": [
+        { "cssLocator": "[aria-label*='Area'], [aria-label*='area']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "latitude": {
+      "jsonLdPath": "@graph.0.geo.latitude"
+    },
+    "longitude": {
+      "jsonLdPath": "@graph.0.geo.longitude"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "fallbacks": [
+        { "cssLocator": "head > title" }
+      ]
+    },
+    "description": {
+      "cssLocator": "meta[property='og:description']",
+      "cssAttr": "content"
+    },
+    "price_string": {
+      "cssLocator": "[class*='price'], [aria-label*='Price']",
+      "fallbacks": [
+        { "jsonLdPath": "@graph.0.offers.price" }
+      ]
+    },
+    "address_string": {
+      "jsonLdPath": "@graph.0.address.streetAddress",
+      "fallbacks": [
+        { "cssLocator": "[aria-label*='Location'], [class*='location']" }
+      ]
+    },
+    "city": {
+      "jsonLdPath": "@graph.0.address.addressLocality"
+    },
+    "region": {
+      "jsonLdPath": "@graph.0.address.addressRegion"
+    },
+    "main_image_url": {
+      "cssLocator": "meta[property='og:image']",
+      "cssAttr": "content"
+    },
+    "property_type": {
+      "jsonLdPath": "@graph.0.@type"
+    },
+    "reference": {
+      "urlPathPart": "-1",
+      "regex": "(\\d+)",
+      "regexGroup": 1
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "urlPathPart": "3",
+      "evaluator":      "include?",
+      "evaluatorParam": "buy"
+    },
+    "for_rent": {
+      "urlPathPart": "3",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    },
+    "for_rent_long_term": {
+      "urlPathPart": "3",
+      "evaluator":      "include?",
+      "evaluatorParam": "rent"
+    }
+  }
+}]

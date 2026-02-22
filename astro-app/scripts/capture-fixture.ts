@@ -152,6 +152,22 @@ const HOSTNAME_MAP: Record<string, string> = {
   'immoscout24.ch': 'ch_immoscout',
   'www.myhome.ie': 'ie_myhome',
   'myhome.ie': 'ie_myhome',
+  'www.propertyfinder.eg': 'eg_propertyfinder',
+  'propertyfinder.eg': 'eg_propertyfinder',
+  'www.yad2.co.il': 'il_yad2',
+  'yad2.co.il': 'il_yad2',
+  'www.njuskalo.hr': 'hr_njuskalo',
+  'njuskalo.hr': 'hr_njuskalo',
+  'www.imobiliare.ro': 'ro_imobiliare',
+  'imobiliare.ro': 'ro_imobiliare',
+  'www.ingatlan.com': 'hu_ingatlan',
+  'ingatlan.com': 'hu_ingatlan',
+  'www.sreality.cz': 'cz_sreality',
+  'sreality.cz': 'cz_sreality',
+  'www.adondevivir.com': 'pe_adondevivir',
+  'adondevivir.com': 'pe_adondevivir',
+  'www.plusvalia.com': 'ec_plusvalia',
+  'plusvalia.com': 'ec_plusvalia',
 };
 
 const HELP_TEXT = `
