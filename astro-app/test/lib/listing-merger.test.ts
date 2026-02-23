@@ -8,7 +8,6 @@ function makeResult(
   return {
     success: true,
     status: 'full',
-    properties: overrides.properties,
     warnings: [],
     fingerprint: overrides.fingerprint || 'abc123',
     ...overrides,

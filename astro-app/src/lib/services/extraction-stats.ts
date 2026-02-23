@@ -119,13 +119,13 @@ export async function getRecentExtractions(limit = 100): Promise<ExtractionSumma
       timestamp: (listing as any).last_retrieved_at?.getTime?.() || parseInt(id.split('-')[0], 36),
       scraperName: diag.scraperName,
       sourceUrl: (listing as any).import_url || '',
-      qualityGrade: diag.qualityGrade,
-      qualityLabel: diag.qualityLabel,
-      extractionRate: diag.extractionRate,
+      qualityGrade: diag.qualityGrade ?? 'F',
+      qualityLabel: diag.qualityLabel ?? '',
+      extractionRate: diag.extractionRate ?? 0,
       weightedExtractionRate: diag.weightedExtractionRate,
-      populatedExtractableFields: diag.populatedExtractableFields,
-      extractableFields: diag.extractableFields,
-      meetsExpectation: diag.meetsExpectation,
+      populatedExtractableFields: diag.populatedExtractableFields ?? 0,
+      extractableFields: diag.extractableFields ?? 0,
+      meetsExpectation: diag.meetsExpectation ?? false,
       criticalFieldsMissing: diag.criticalFieldsMissing,
       title: (listing as any).title || '',
       reference: (listing as any).reference || '',
@@ -216,14 +216,15 @@ export async function getScraperStats(name: string): Promise<ScraperStats> {
 
   for (const { id, diagnostics } of scraperDiags) {
     if (!seenIds.has(id)) {
-      gradeDistribution[diagnostics.qualityGrade]++;
-      rateSum += diagnostics.extractionRate;
+      const grade = diagnostics.qualityGrade ?? 'F';
+      gradeDistribution[grade]++;
+      rateSum += diagnostics.extractionRate ?? 0;
       extractionCount++;
 
       const ts = parseInt(id.split('-')[0], 36);
       if (lastTime === null || ts > lastTime) {
         lastTime = ts;
-        lastGrade = diagnostics.qualityGrade;
+        lastGrade = grade;
       }
     }
 

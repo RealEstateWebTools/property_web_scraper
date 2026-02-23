@@ -81,6 +81,15 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
   </div>
 
   <script>
+    function escapeHtml(str: unknown): string {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     interface HaulItem {
       id: string;
       name: string | null;
@@ -147,10 +156,10 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
         const tdActions = document.createElement('td');
         tdActions.className = 'py-2 px-5';
         tdActions.innerHTML = `
-          <a href="/haul/${h.id}" class="text-blue-600 hover:underline no-underline text-xs mr-3">
+          <a href="/haul/${encodeURIComponent(h.id)}" class="text-blue-600 hover:underline no-underline text-xs mr-3">
             <i class="bi bi-eye"></i> View
           </a>
-          <button class="text-red-600 hover:text-red-800 text-xs cursor-pointer border-0 bg-transparent delete-haul-btn" data-id="${h.id}">
+          <button class="text-red-600 hover:text-red-800 text-xs cursor-pointer border-0 bg-transparent delete-haul-btn" data-id="${escapeHtml(h.id)}">
             <i class="bi bi-trash"></i> Delete
           </button>
         `;

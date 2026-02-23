@@ -97,6 +97,15 @@ document.addEventListener('DOMContentLoaded', function() {
   var serverHaulId = activeHaulId;
   var hasServerHaul = !!serverHaulId;
 
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   // Create Haul button
   var createBtn = document.getElementById('create-haul-btn');
   if (createBtn) {
@@ -181,16 +190,16 @@ document.addEventListener('DOMContentLoaded', function() {
   myHauls.forEach(function(h) {
     var daysLeft = Math.max(0, Math.ceil((new Date(h.expiresAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     var visited = new Date(h.lastVisited).toLocaleDateString();
-    html += '<a href="/haul/' + h.id + '" class="block bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow no-underline">';
+    html += '<a href="/haul/' + encodeURIComponent(h.id) + '" class="block bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow no-underline">';
     html += '<div class="flex items-center justify-between mb-2">';
-    html += '<h3 class="font-semibold text-gray-900 text-sm truncate">' + (h.name || '📦 ' + h.id) + '</h3>';
-    html += '<span class="text-xs text-gray-400 whitespace-nowrap ml-2">' + daysLeft + 'd left</span>';
+    html += '<h3 class="font-semibold text-gray-900 text-sm truncate">' + (h.name ? escapeHtml(h.name) : '📦 ' + escapeHtml(h.id)) + '</h3>';
+    html += '<span class="text-xs text-gray-400 whitespace-nowrap ml-2">' + escapeHtml(daysLeft) + 'd left</span>';
     html += '</div>';
     html += '<p class="text-xs text-gray-500">';
-    html += h.scrapeCount + ' scrape' + (h.scrapeCount !== 1 ? 's' : '') + ' · Last visited ' + visited;
+    html += escapeHtml(h.scrapeCount) + ' scrape' + (h.scrapeCount !== 1 ? 's' : '') + ' · Last visited ' + escapeHtml(visited);
     html += '</p>';
     if (!h.name) {
-      html += '<p class="text-xs text-gray-400 font-mono mt-1 truncate">' + h.id + '</p>';
+      html += '<p class="text-xs text-gray-400 font-mono mt-1 truncate">' + escapeHtml(h.id) + '</p>';
     }
     html += '</a>';
   });

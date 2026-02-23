@@ -83,6 +83,15 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
   </div>
 
   <script>
+    function escapeHtml(str: unknown): string {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function formatTime(ts: number): string {
       return new Date(ts).toLocaleString();
     }
@@ -109,11 +118,11 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
         for (const d of result.details) {
           const highlight = d.expiredDocs > 0 ? 'bg-amber-50' : '';
           html += `<tr class="border-b border-gray-100 ${highlight}">
-            <td class="py-1 px-2 font-mono">${d.collection}</td>
-            <td class="py-1 px-2">${d.ttlDays}d</td>
-            <td class="py-1 px-2">${d.totalDocs}</td>
-            <td class="py-1 px-2">${d.expiredDocs}</td>
-            <td class="py-1 px-2 font-medium">${d.deletedDocs}</td>
+            <td class="py-1 px-2 font-mono">${escapeHtml(d.collection)}</td>
+            <td class="py-1 px-2">${escapeHtml(d.ttlDays)}d</td>
+            <td class="py-1 px-2">${escapeHtml(d.totalDocs)}</td>
+            <td class="py-1 px-2">${escapeHtml(d.expiredDocs)}</td>
+            <td class="py-1 px-2 font-medium">${escapeHtml(d.deletedDocs)}</td>
           </tr>`;
         }
         html += `</tbody></table>`;
@@ -156,9 +165,9 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
           const tr = document.createElement('tr');
           tr.className = 'border-b border-gray-100 hover:bg-gray-50';
           tr.innerHTML = `
-            <td class="py-2 px-5 font-mono text-sm">${p.collectionName}</td>
-            <td class="py-2 px-5">${p.ttlDays}</td>
-            <td class="py-2 px-5 text-gray-500">${p.description}</td>
+            <td class="py-2 px-5 font-mono text-sm">${escapeHtml(p.collectionName)}</td>
+            <td class="py-2 px-5">${escapeHtml(p.ttlDays)}</td>
+            <td class="py-2 px-5 text-gray-500">${escapeHtml(p.description)}</td>
           `;
           tbody.appendChild(tr);
         }

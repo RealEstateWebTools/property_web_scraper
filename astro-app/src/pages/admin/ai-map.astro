@@ -121,6 +121,15 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 </AdminLayout>
 
 <script>
+  function escapeHtml(str: unknown): string {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   const htmlInput = document.getElementById('htmlInput') as HTMLTextAreaElement;
   const sourceUrl = document.getElementById('sourceUrl') as HTMLInputElement;
   const scraperName = document.getElementById('scraperName') as HTMLInputElement;
@@ -216,9 +225,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
     analysisPanel.classList.remove('hidden');
     const cards = [
       { label: 'Size', value: `${(analysis.htmlLength / 1024).toFixed(0)} KB`, color: 'blue' },
-      { label: 'Source', value: analysis.detectedSource, color: 'purple' },
-      { label: 'JSON-LD', value: analysis.hasJsonLd ? `✅ ${analysis.jsonLdTypes.join(', ')}` : '❌ None', color: analysis.hasJsonLd ? 'green' : 'gray' },
-      { label: 'Script Vars', value: analysis.scriptVars.length > 0 ? `✅ ${analysis.scriptVars.join(', ')}` : '❌ None', color: analysis.scriptVars.length > 0 ? 'green' : 'gray' },
+      { label: 'Source', value: escapeHtml(analysis.detectedSource), color: 'purple' },
+      { label: 'JSON-LD', value: analysis.hasJsonLd ? `✅ ${escapeHtml(analysis.jsonLdTypes.join(', '))}` : '❌ None', color: analysis.hasJsonLd ? 'green' : 'gray' },
+      { label: 'Script Vars', value: analysis.scriptVars.length > 0 ? `✅ ${escapeHtml(analysis.scriptVars.join(', '))}` : '❌ None', color: analysis.scriptVars.length > 0 ? 'green' : 'gray' },
     ];
     analysisContent.innerHTML = cards.map(c => `
       <div class="bg-${c.color}-50 border border-${c.color}-200 rounded-lg p-3">
@@ -271,7 +280,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
     // Notes
     mappingNotes.innerHTML = suggestion.notes.map((n: string) =>
-      `<p class="text-xs text-gray-600">${n}</p>`
+      `<p class="text-xs text-gray-600">${escapeHtml(n)}</p>`
     ).join('');
   }
 
@@ -309,7 +318,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       const data = await resp.json();
       renderTestResults(data);
     } catch (err) {
-      testResults.innerHTML = `<p class="text-red-600 font-medium">${(err as Error).message}</p>`;
+      testResults.innerHTML = `<p class="text-red-600 font-medium">${escapeHtml((err as Error).message)}</p>`;
     } finally {
       hideLoading();
     }
@@ -317,7 +326,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
   function renderTestResults(data: any) {
     if (data.error) {
-      testResults.innerHTML = `<p class="text-red-600">${data.error}</p>`;
+      testResults.innerHTML = `<p class="text-red-600">${escapeHtml(data.error)}</p>`;
       return;
     }
 
@@ -352,7 +361,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         const isEmpty = value === null || value === undefined || value === '' || value === 0;
         const cls = isEmpty ? 'text-gray-300' : 'text-gray-900';
         const display = Array.isArray(value) ? `[${value.length} items]` : String(value).slice(0, 80);
-        html += `<tr class="border-t border-gray-100"><td class="py-1 px-2 font-mono ${cls}">${key}</td><td class="py-1 px-2 ${cls}">${display}</td></tr>`;
+        html += `<tr class="border-t border-gray-100"><td class="py-1 px-2 font-mono ${cls}">${escapeHtml(key)}</td><td class="py-1 px-2 ${cls}">${escapeHtml(display)}</td></tr>`;
       }
       html += '</tbody></table>';
     } else {

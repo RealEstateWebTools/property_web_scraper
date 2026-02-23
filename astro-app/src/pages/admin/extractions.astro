@@ -242,6 +242,14 @@ function truncate(str: string, len: number): string {
 
   <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     // ── Bulk export ──────────────────────────────────────────────────────────
     const toggle = document.querySelector('[data-bulk-export-toggle]');
@@ -290,7 +298,7 @@ function truncate(str: string, len: number): string {
           const fmt = b.getAttribute('data-bulk-format');
           const icons = { json: 'bi-braces text-blue-600', csv: 'bi-file-earmark-spreadsheet text-green-600', geojson: 'bi-geo-alt text-orange-600' };
           const labels = { json: 'JSON', csv: 'CSV', geojson: 'GeoJSON' };
-          b.innerHTML = '<i class="bi ' + (icons[fmt] || '') + '"></i> ' + (labels[fmt] || fmt);
+          b.innerHTML = '<i class="bi ' + escapeHtml(icons[fmt] || '') + '"></i> ' + escapeHtml(labels[fmt] || fmt);
         });
       });
     });

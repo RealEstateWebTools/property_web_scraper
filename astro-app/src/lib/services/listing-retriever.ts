@@ -3,7 +3,6 @@ import { extractFromHtml } from '../extractor/html-extractor.js';
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { findByName } from '../extractor/mapping-loader.js';
 import { Listing } from '../models/listing.js';
-import { WhereChain } from '../firestore/base-model.js';
 import { logActivity } from './activity-logger.js';
 import { findPortalByHost } from './portal-registry.js';
 import { normalizePrice } from '../extractor/price-normalizer.js';
@@ -116,7 +115,7 @@ export async function retrieveListing(
     }
 
     // Find or create listing (Firestore or in-memory fallback)
-    let listing: Listing;
+    let listing: Listing | null = null;
     if (existingListing) {
       listing = existingListing;
       logActivity({
@@ -127,8 +126,8 @@ export async function retrieveListing(
       });
     } else {
       try {
-        const chain = new WhereChain(Listing as any, { import_url: importUrl });
-        listing = await chain.first() ?? null as any;
+        const chain = await Listing.where({ import_url: importUrl });
+        listing = (await chain.first()) as Listing | null;
       } catch (e: any) {
         logActivity({
           level: 'warn',
@@ -136,7 +135,7 @@ export async function retrieveListing(
           message: `Firestore query failed (${e.message}), using in-memory listing`,
           sourceUrl: importUrl,
         });
-        listing = null as any;
+        listing = null;
       }
       if (!listing) {
         listing = new Listing();

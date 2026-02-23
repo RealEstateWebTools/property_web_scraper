@@ -4,7 +4,6 @@ import { apiGuard } from '@lib/services/api-guard.js';
 import { validateUrl } from '@lib/services/url-validator.js';
 import { findByName } from '@lib/extractor/mapping-loader.js';
 import { Listing } from '@lib/models/listing.js';
-import { WhereChain } from '@lib/firestore/base-model.js';
 import { checkRateLimit } from '@lib/services/rate-limiter.js';
 import {
   errorResponse, successResponse, corsPreflightResponse,
@@ -161,8 +160,8 @@ export const GET: APIRoute = async ({ request }) => {
 
   let listing: Listing;
   try {
-    const chain = new WhereChain(Listing as any, { import_url: url! });
-    listing = await chain.firstOrCreate() as unknown as Listing;
+    const chain = await Listing.where({ import_url: url! });
+    listing = await chain.firstOrCreate() as Listing;
   } catch {
     listing = new Listing();
     listing.assignAttributes({ import_url: url! });
@@ -356,8 +355,8 @@ export const POST: APIRoute = async ({ request }) => {
 
   let listing: Listing;
   try {
-    const chain = new WhereChain(Listing as any, { import_url: url });
-    listing = await chain.firstOrCreate() as unknown as Listing;
+    const chain = await Listing.where({ import_url: url });
+    listing = await chain.firstOrCreate() as Listing;
   } catch {
     listing = new Listing();
     listing.assignAttributes({ import_url: url });

@@ -12,6 +12,7 @@
  *   npx tsx scripts/capture-browser-fixtures.ts --server-only # Only server-fetched
  */
 
+// @ts-expect-error puppeteer is an optional dev dependency for this script only
 import puppeteer from 'puppeteer';
 import { writeFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';

@@ -92,6 +92,15 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
   </div>
 
   <script>
+    function escapeHtml(str: unknown): string {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     interface DLEntry {
       id: string;
       timestamp: string;
@@ -134,7 +143,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
         const tdSource = document.createElement('td');
         tdSource.className = 'py-2 px-5';
         const colorClass = sourceColors[e.source] || 'bg-gray-100 text-gray-600';
-        tdSource.innerHTML = `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium ${colorClass}">${e.source}</span>`;
+        tdSource.innerHTML = `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium ${colorClass}">${escapeHtml(e.source)}</span>`;
         tr.appendChild(tdSource);
 
         // Operation
@@ -165,7 +174,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
           <button class="text-gray-500 hover:text-gray-700 text-xs mr-2 cursor-pointer border-0 bg-transparent context-btn" data-ctx="${encodeURIComponent(ctxStr)}" title="View context">
             <i class="bi bi-info-circle"></i>
           </button>
-          <button class="text-red-500 hover:text-red-700 text-xs cursor-pointer border-0 bg-transparent dismiss-btn" data-id="${e.id}">
+          <button class="text-red-500 hover:text-red-700 text-xs cursor-pointer border-0 bg-transparent dismiss-btn" data-id="${escapeHtml(e.id)}">
             <i class="bi bi-x-lg"></i> Dismiss
           </button>
         `;
@@ -255,7 +264,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
           .sort((a, b) => b[1] - a[1])
           .map(([s, c]) => {
             const color = sourceColors[s] || 'bg-gray-100 text-gray-600';
-            return `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium ${color} mr-1 mb-1">${s}: ${c}</span>`;
+            return `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium ${color} mr-1 mb-1">${escapeHtml(s)}: ${escapeHtml(c)}</span>`;
           })
           .join('');
         sourceBreakdown.innerHTML = sourceHtml || '<span class="text-gray-400">none</span>';

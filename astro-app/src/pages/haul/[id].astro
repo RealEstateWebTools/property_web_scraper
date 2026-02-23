@@ -481,6 +481,15 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
 </section>
 
 <script is:inline define:vars={{ h2cUrl, id, haul: haul ? { id: haul.id, name: haul.name, scrapes: haul.scrapes.map((s: any) => ({ resultId: s.resultId, title: s.title, grade: s.grade, price: s.price, extractionRate: s.extractionRate, latitude: s.latitude, longitude: s.longitude, city: s.city })), expiresAt: haul.expiresAt } : null }}>
+function escapeHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   // --- Copy URL ---
   var copyBtn = document.getElementById('copy-haul-url');
@@ -759,7 +768,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cached.scrapes && cached.scrapes.length > 0) {
           html += '<ul class="list-disc pl-4 space-y-1">';
           cached.scrapes.forEach(function(s) {
-            html += '<li>' + (s.title || 'Untitled') + (s.price ? ' — ' + s.price : '') + (s.grade ? ' (Grade ' + s.grade + ')' : '') + '</li>';
+            html += '<li>' + escapeHtml(s.title || 'Untitled') + (s.price ? ' — ' + escapeHtml(s.price) : '') + (s.grade ? ' (Grade ' + escapeHtml(s.grade) + ')' : '') + '</li>';
           });
           html += '</ul>';
         }

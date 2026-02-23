@@ -219,6 +219,15 @@ const scrapersForTest = mappingNames.map((name) => {
   </div>
 
   <script>
+    function escapeHtml(str: unknown): string {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     // Field importance map (mirrors quality-scorer.ts)
     const FIELD_IMPORTANCE: Record<string, string> = {
       title: 'critical', price_string: 'critical', price_float: 'critical',
@@ -379,12 +388,12 @@ const scrapersForTest = mappingNames.map((name) => {
           };
           const colorClass = gradeColors[diag.qualityGrade] || gradeColors.F;
           let diagHtml = `<div class="${colorClass} border rounded px-4 py-3 text-sm">`;
-          diagHtml += `<strong>Grade ${diag.qualityGrade}</strong>: `;
-          diagHtml += `<strong>${diag.populatedFields}/${diag.totalFields}</strong> fields populated`;
+          diagHtml += `<strong>Grade ${escapeHtml(diag.qualityGrade)}</strong>: `;
+          diagHtml += `<strong>${escapeHtml(diag.populatedFields)}/${escapeHtml(diag.totalFields)}</strong> fields populated`;
           diagHtml += ` (${Math.round((diag.extractionRate || 0) * 100)}%)`;
-          diagHtml += ` using <span class="font-mono">${diag.scraperName}</span>`;
+          diagHtml += ` using <span class="font-mono">${escapeHtml(diag.scraperName)}</span>`;
           if (diag.emptyFields && diag.emptyFields.length > 0) {
-            diagHtml += `<div class="mt-1 text-xs">Empty: ${diag.emptyFields.join(', ')}</div>`;
+            diagHtml += `<div class="mt-1 text-xs">Empty: ${diag.emptyFields.map(escapeHtml).join(', ')}</div>`;
           }
           diagHtml += '</div>';
           diagEl.innerHTML = diagHtml;

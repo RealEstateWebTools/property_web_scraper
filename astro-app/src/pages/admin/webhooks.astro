@@ -99,6 +99,15 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
   </div>
 
   <script>
+    function escapeHtml(str: unknown): string {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     interface WebhookItem {
       id: string;
       url: string;
@@ -133,7 +142,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
         const tdEvents = document.createElement('td');
         tdEvents.className = 'py-2 px-5';
         tdEvents.innerHTML = w.events
-          .map((e) => `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 mr-1">${e}</span>`)
+          .map((e) => `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 mr-1">${escapeHtml(e)}</span>`)
           .join('');
         tr.appendChild(tdEvents);
 
@@ -155,7 +164,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
         const tdActions = document.createElement('td');
         tdActions.className = 'py-2 px-5';
         tdActions.innerHTML = `
-          <button class="text-red-600 hover:text-red-800 text-xs cursor-pointer border-0 bg-transparent delete-btn" data-id="${w.id}">
+          <button class="text-red-600 hover:text-red-800 text-xs cursor-pointer border-0 bg-transparent delete-btn" data-id="${escapeHtml(w.id)}">
             <i class="bi bi-trash"></i> Delete
           </button>
         `;

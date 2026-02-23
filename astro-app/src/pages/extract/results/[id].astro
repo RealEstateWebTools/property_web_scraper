@@ -482,6 +482,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script is:inline define:vars={{ id, listing: listing ? { title: listing.title, price_string: listing.price_string, import_url: (listing as any).import_url } : null, grade, ratePercent }}>
 document.addEventListener('DOMContentLoaded', () => {
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   if (typeof window.PwsStorage === 'undefined') return;
   var resultId = id;
   if (!resultId) return;
@@ -540,10 +549,10 @@ document.addEventListener('DOMContentLoaded', () => {
       var content = document.getElementById('cached-result-content');
       if (fallback && content) {
         var parts = [];
-        if (cached.title) parts.push('<strong>' + cached.title + '</strong>');
-        if (cached.price) parts.push('Price: ' + cached.price);
-        if (cached.grade) parts.push('Grade: ' + cached.grade);
-        if (cached.rate != null) parts.push('Rate: ' + cached.rate + '%');
+        if (cached.title) parts.push('<strong>' + escapeHtml(cached.title) + '</strong>');
+        if (cached.price) parts.push('Price: ' + escapeHtml(cached.price));
+        if (cached.grade) parts.push('Grade: ' + escapeHtml(cached.grade));
+        if (cached.rate != null) parts.push('Rate: ' + escapeHtml(cached.rate) + '%');
         parts.push('<span class="text-xs text-gray-400">Cached ' + new Date(cached.timestamp).toLocaleString() + '</span>');
         content.innerHTML = parts.join('<br>');
         fallback.classList.remove('hidden');
@@ -555,6 +564,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script is:inline define:vars={{ id }}>
 document.addEventListener('DOMContentLoaded', function() {
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   var btn = document.getElementById('add-to-haul-btn');
   var picker = document.getElementById('haul-picker');
   var listEl = document.getElementById('haul-picker-list');
@@ -589,9 +607,9 @@ document.addEventListener('DOMContentLoaded', function() {
     myHauls.sort(function(a, b) { return new Date(b.lastVisited).getTime() - new Date(a.lastVisited).getTime(); });
     var html = '';
     myHauls.forEach(function(h) {
-      html += '<button type="button" class="haul-pick-item w-full text-left text-sm px-2 py-1.5 rounded hover:bg-gray-100 cursor-pointer border-0 bg-transparent flex justify-between items-center" data-haul-id="' + h.id + '">';
-      html += '<span class="truncate">' + (h.name || h.id) + '</span>';
-      html += '<span class="text-xs text-gray-400 ml-2 whitespace-nowrap">' + (h.scrapeCount || 0) + '/20</span>';
+      html += '<button type="button" class="haul-pick-item w-full text-left text-sm px-2 py-1.5 rounded hover:bg-gray-100 cursor-pointer border-0 bg-transparent flex justify-between items-center" data-haul-id="' + escapeHtml(h.id) + '">';
+      html += '<span class="truncate">' + escapeHtml(h.name || h.id) + '</span>';
+      html += '<span class="text-xs text-gray-400 ml-2 whitespace-nowrap">' + escapeHtml(h.scrapeCount || 0) + '/20</span>';
       html += '</button>';
     });
     listEl.innerHTML = html;

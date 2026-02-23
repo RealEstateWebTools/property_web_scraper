@@ -136,6 +136,15 @@ const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
     document.getElementById(id).classList.remove('hidden');
   }
 
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function populateDashboard(user) {
     // User name
     var nameEl = document.getElementById('user-name');
@@ -159,22 +168,22 @@ const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
       var shown = recentExtractions.slice(0, 8);
       for (var i = 0; i < shown.length; i++) {
         var e = shown[i];
-        var title = e.title || e.url || 'Untitled';
-        var grade = e.grade || '?';
-        var gradeColor = grade === 'A' ? 'bg-green-100 text-green-700'
-          : grade === 'B' ? 'bg-blue-100 text-blue-700'
-          : grade === 'C' ? 'bg-amber-100 text-amber-700'
+        var title = escapeHtml(e.title || e.url || 'Untitled');
+        var grade = escapeHtml(e.grade || '?');
+        var gradeColor = e.grade === 'A' ? 'bg-green-100 text-green-700'
+          : e.grade === 'B' ? 'bg-blue-100 text-blue-700'
+          : e.grade === 'C' ? 'bg-amber-100 text-amber-700'
           : 'bg-red-100 text-red-700';
         var resultId = e.resultId || e.id || '';
-        var href = resultId ? '/extract/results/' + resultId : '#';
+        var href = '/extract/results/' + encodeURIComponent(resultId);
 
-        html += '<a href="' + href + '" class="block px-5 py-3 hover:bg-gray-50 transition no-underline">';
+        html += '<a href="' + (resultId ? href : '#') + '" class="block px-5 py-3 hover:bg-gray-50 transition no-underline">';
         html += '<div class="flex items-center justify-between">';
         html += '<p class="text-sm text-gray-800 truncate flex-1 mr-3">' + title + '</p>';
         html += '<span class="inline-block px-2 py-0.5 rounded text-xs font-semibold ' + gradeColor + '">' + grade + '</span>';
         html += '</div>';
         if (e.price) {
-          html += '<p class="text-xs text-gray-400 mt-0.5">' + e.price + '</p>';
+          html += '<p class="text-xs text-gray-400 mt-0.5">' + escapeHtml(e.price) + '</p>';
         }
         html += '</a>';
       }
@@ -216,14 +225,15 @@ const fbAuthDomain = import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? '';
       for (var k = 0; k < haulShown.length; k++) {
         var h = haulShown[k];
         var daysLeft = Math.max(0, Math.ceil((new Date(h.expiresAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-        var name = h.name || h.id;
+        var name = escapeHtml(h.name || h.id);
+        var haulId = encodeURIComponent(h.id || '');
 
-        haulHtml += '<a href="/haul/' + h.id + '" class="block px-5 py-3 hover:bg-gray-50 transition no-underline">';
+        haulHtml += '<a href="/haul/' + haulId + '" class="block px-5 py-3 hover:bg-gray-50 transition no-underline">';
         haulHtml += '<div class="flex items-center justify-between">';
         haulHtml += '<p class="text-sm text-gray-800 truncate flex-1 mr-3">' + name + '</p>';
-        haulHtml += '<span class="text-xs text-gray-400 whitespace-nowrap">' + (h.scrapeCount || 0) + ' scrapes</span>';
+        haulHtml += '<span class="text-xs text-gray-400 whitespace-nowrap">' + escapeHtml(String(h.scrapeCount || 0)) + ' scrapes</span>';
         haulHtml += '</div>';
-        haulHtml += '<p class="text-xs text-gray-400 mt-0.5">' + daysLeft + ' days left</p>';
+        haulHtml += '<p class="text-xs text-gray-400 mt-0.5">' + escapeHtml(String(daysLeft)) + ' days left</p>';
         haulHtml += '</a>';
       }
       haulsList.innerHTML = haulHtml + (haulsEmpty.outerHTML);

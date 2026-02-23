@@ -27,8 +27,8 @@ describe('resolveKV', () => {
     process.env.DEV_KV_PERSIST = 'true';
     const result = resolveKV({});
     expect(result).not.toBeNull();
-    expect(typeof result.put).toBe('function');
-    expect(typeof result.get).toBe('function');
+    expect(typeof result!.put).toBe('function');
+    expect(typeof result!.get).toBe('function');
   });
 
   it('prefers runtime binding over DevKV', () => {

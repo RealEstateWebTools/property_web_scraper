@@ -82,6 +82,15 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
   </div>
 
   <script>
+    function escapeHtml(str: unknown): string {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     const gradeColors: Record<string, string> = {
       A: 'bg-green-100 text-green-700',
       B: 'bg-blue-100 text-blue-700',
@@ -174,7 +183,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
           tdTier.className = 'py-2 px-5';
           if (r.supportTier) {
             const tierColor = tierColors[r.supportTier] || 'bg-gray-100 text-gray-500';
-            tdTier.innerHTML = `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium ${tierColor}">${r.supportTier}</span>`;
+            tdTier.innerHTML = `<span class="inline-block px-2 py-0.5 rounded text-xs font-medium ${tierColor}">${escapeHtml(r.supportTier)}</span>`;
           } else {
             tdTier.innerHTML = '<span class="text-gray-400 text-xs">—</span>';
           }
@@ -196,7 +205,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
             const tdErr = document.createElement('td');
             tdErr.className = 'py-2 px-5';
             tdErr.colSpan = 7;
-            tdErr.innerHTML = `<span class="text-red-600 text-xs">${r.error}</span>`;
+            tdErr.innerHTML = `<span class="text-red-600 text-xs">${escapeHtml(r.error)}</span>`;
             tr.appendChild(tdErr);
 
             const tdStatus = document.createElement('td');
@@ -208,7 +217,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
             const tdGrade = document.createElement('td');
             tdGrade.className = 'py-2 px-5';
             const colorClass = gradeColors[r.grade] || gradeColors.F;
-            tdGrade.innerHTML = `<span class="inline-block px-2 py-0.5 rounded text-xs font-semibold ${colorClass}">${r.grade} — ${r.label}</span>`;
+            tdGrade.innerHTML = `<span class="inline-block px-2 py-0.5 rounded text-xs font-semibold ${colorClass}">${escapeHtml(r.grade)} — ${escapeHtml(r.label)}</span>`;
             tr.appendChild(tdGrade);
 
             // Rate
@@ -252,7 +261,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
             tdCritical.className = 'py-2 px-5';
             if (r.criticalFieldsMissing && r.criticalFieldsMissing.length > 0) {
               tdCritical.innerHTML = r.criticalFieldsMissing
-                .map((f: string) => `<span class="inline-block px-1.5 py-0.5 mr-1 mb-0.5 rounded text-xs bg-red-50 text-red-600 font-mono">${f}</span>`)
+                .map((f: string) => `<span class="inline-block px-1.5 py-0.5 mr-1 mb-0.5 rounded text-xs bg-red-50 text-red-600 font-mono">${escapeHtml(f)}</span>`)
                 .join('');
             } else {
               tdCritical.innerHTML = '<span class="text-green-600 text-xs">✓ none</span>';

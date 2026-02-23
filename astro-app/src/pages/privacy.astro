@@ -63,6 +63,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <script is:inline>
 document.addEventListener('DOMContentLoaded', function() {
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   if (typeof window.PwsStorage === 'undefined' || typeof window.PwsConsent === 'undefined') return;
 
   var functionalStatus = document.getElementById('functional-status');
@@ -102,8 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
     keys.forEach(function(k) {
       var catClass = k.category === 'necessary' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
       html += '<tr class="border-b border-gray-100">';
-      html += '<td class="py-2 px-3 font-mono text-xs break-all">' + k.key + '</td>';
-      html += '<td class="py-2 px-3"><span class="text-xs font-medium px-1.5 py-0.5 rounded ' + catClass + '">' + k.category + '</span></td>';
+      html += '<td class="py-2 px-3 font-mono text-xs break-all">' + escapeHtml(k.key) + '</td>';
+      html += '<td class="py-2 px-3"><span class="text-xs font-medium px-1.5 py-0.5 rounded ' + catClass + '">' + escapeHtml(k.category) + '</span></td>';
       html += '<td class="py-2 px-3 text-xs text-gray-500">' + (k.sizeBytes / 1024).toFixed(1) + ' KB</td>';
       html += '<td class="py-2 px-3 text-xs text-gray-500">' + new Date(k.expiresAt).toLocaleDateString() + '</td>';
       html += '</tr>';

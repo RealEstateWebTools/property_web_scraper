@@ -12,22 +12,31 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const FIXTURES_DIR = resolve(__dirname, '..', '..', '..', '..', 'test', 'fixtures');
 
-/** Map from scraper name → fixture filename (without .html) */
-const FIXTURE_MAP: Record<string, string> = {
-  us_realtor: 'realtor',
-  uk_rightmove: 'rightmove_v2',
-  uk_zoopla: 'zoopla_v2',
-  es_idealista: 'idealista_v2',
-  es_fotocasa: 'fotocasa',
+/**
+ * Legacy fixture name overrides for scrapers where the fixture file name
+ * differs from the scraper name. New scrapers use <scraper_name>.html directly.
+ */
+const LEGACY_FIXTURE_MAP: Record<string, string> = {
   es_pisos: 'pisos_dot_com',
   in_realestateindia: 'realestateindia',
   us_mlslistings: 'mlslistings',
   us_wyomingmls: 'wyomingmls',
   us_forsalebyowner: 'forsalebyowner',
-  uk_jitty: 'uk_jitty',
-  uk_onthemarket: 'onthemarket',
-  ie_daft: 'daft',
 };
+
+/** Resolve the fixture filename for a scraper, returning null if none exists. */
+function resolveFixtureName(scraperName: string): string | null {
+  // Try standard <scraper_name>.html first
+  if (existsSync(resolve(FIXTURES_DIR, `${scraperName}.html`))) {
+    return scraperName;
+  }
+  // Fall back to legacy overrides
+  const legacy = LEGACY_FIXTURE_MAP[scraperName];
+  if (legacy && existsSync(resolve(FIXTURES_DIR, `${legacy}.html`))) {
+    return legacy;
+  }
+  return null;
+}
 
 interface ScraperHealthResult {
   name: string;
@@ -63,7 +72,7 @@ export const GET: APIRoute = async ({ request }) => {
   for (const name of scraperNames) {
     const portal = findPortalByName(name);
     const portalProfile = await getPortalProfile(name);
-    const fixtureName = FIXTURE_MAP[name];
+    const fixtureName = resolveFixtureName(name);
     const country = portal?.country || '??';
     const consecutiveBelow = portalProfile?.consecutive_below_threshold;
 
@@ -80,17 +89,6 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     const fixturePath = resolve(FIXTURES_DIR, `${fixtureName}.html`);
-    if (!existsSync(fixturePath)) {
-      results.push({
-        name,
-        country,
-        hasFixture: false,
-        supportTier: portal?.supportTier,
-        expectedExtractionRate: portal?.expectedExtractionRate,
-        consecutiveBelowThreshold: consecutiveBelow,
-      });
-      continue;
-    }
 
     try {
       const html = readFileSync(fixturePath, 'utf-8');

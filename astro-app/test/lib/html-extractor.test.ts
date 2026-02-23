@@ -113,7 +113,7 @@ describe('HtmlExtractor', () => {
       const diag = result.diagnostics!;
       expect(diag.extractableFields).toBeGreaterThan(0);
       expect(diag.populatedExtractableFields).toBeGreaterThan(0);
-      expect(diag.populatedExtractableFields).toBeLessThanOrEqual(diag.extractableFields);
+      expect(diag.populatedExtractableFields).toBeLessThanOrEqual(diag.extractableFields!);
       expect(diag.extractionRate).toBeGreaterThan(0);
       expect(diag.extractionRate).toBeLessThanOrEqual(1);
       expect(['A', 'B', 'C', 'F']).toContain(diag.qualityGrade);

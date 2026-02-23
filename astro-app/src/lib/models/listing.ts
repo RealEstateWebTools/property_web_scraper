@@ -450,13 +450,13 @@ export class Listing extends BaseModel {
    */
   static applyDiagnostics(listing: Listing, diag: ExtractionDiagnostics): void {
     listing.scraper_name = diag.scraperName;
-    listing.quality_grade = diag.qualityGrade;
-    listing.quality_label = diag.qualityLabel;
-    listing.extraction_rate = diag.extractionRate;
+    listing.quality_grade = diag.qualityGrade ?? '';
+    listing.quality_label = diag.qualityLabel ?? '';
+    listing.extraction_rate = diag.extractionRate ?? 0;
     listing.weighted_extraction_rate = diag.weightedExtractionRate ?? 0;
-    listing.extractable_fields = diag.extractableFields;
-    listing.populated_extractable_fields = diag.populatedExtractableFields;
-    listing.meets_expectation = diag.meetsExpectation;
+    listing.extractable_fields = diag.extractableFields ?? 0;
+    listing.populated_extractable_fields = diag.populatedExtractableFields ?? 0;
+    listing.meets_expectation = diag.meetsExpectation ?? false;
     listing.critical_fields_missing = diag.criticalFieldsMissing ?? [];
   }
 }

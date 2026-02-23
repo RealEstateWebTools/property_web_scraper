@@ -553,7 +553,7 @@ describe('listing-store', () => {
       const listing = await Listing.create({
         title: 'Firestore Delete Test',
         price_float: 100000,
-      });
+      }) as Listing;
       const firestoreId = listing.id;
 
       // Also store in memory
@@ -623,7 +623,7 @@ describe('listing-store', () => {
       const listing = await Listing.create({
         title: 'Firestore Vis Test',
         visibility: 'published',
-      });
+      }) as Listing;
       const firestoreId = listing.id;
       await storeListing(firestoreId, listing);
 
