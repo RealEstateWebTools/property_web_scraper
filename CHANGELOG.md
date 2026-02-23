@@ -7,6 +7,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- Unit test suite for critical services: `html-analysis.ts` (48 tests), `api-guard.ts` (7 tests), `resilient-fetch.ts` (13 tests), `scraper-health-trends.ts` (16 tests), `retention-cleanup.ts` (11 tests), `scrape-handler.ts` (13 tests) — total suite now 2254 tests across 79 files
+- `DevKV.list()` — implements KV key listing with prefix, limit, and cursor support, mirroring the Cloudflare Workers KV API
+- `ApiErrorCode.INTERNAL_ERROR` — adds a 500 error code for unhandled server errors
+- `'debug'` log level in `LogLevel` union alongside info/warn/error
+- `'api_key'`, `'stripe'`, `'webhook'` categories added to `LogCategory` for billing and auth events
+
+### Changed
+- `docs/property-context.md` renamed and restructured as `docs/property_data_enhancer.md`; clarifies the enrichment service is standalone (no shared code or database), takes a haul URL as input, and supports per-country modules via `COUNTRY_CODE` env var
+
+### Fixed
+- TypeScript type-safety across 21 files: `ExtractionDiagnostics` fields made optional (`extractableFields`, `extractionRate`, `qualityGrade`, `confidenceScore`, `visibility`); all Firestore `doc.data()` casts updated to `as unknown as T`; `AnyNode` imported from `domhandler` instead of `cheerio` to match cheerio v1 re-exports; `weightedRate` renamed to `weightedExtractionRate` in scraper-health admin API
+- Test suite sync after type changes: awaited `OPTIONS()` responses in api-endpoints tests, added missing diagnostic fields to `storeDiagnostics` fixtures, added `"vitest/globals"` to `tsconfig.json` types
+
+### Security
+- XSS fixes: `escapeHtml()` applied to all dynamic `innerHTML` assignments across 14 Astro pages and admin pages (`dashboard.astro`, `hauls.astro`, `privacy.astro`, `haul/[id].astro`, `extract/results/[id].astro`, and all admin pages)
+
+### Changed
+- Admin scraper-health page replaces hardcoded 13-entry `FIXTURE_MAP` with auto-discovery via `resolveFixtureName()` — checks `<scraper_name>.html` first, falling back to a minimal legacy map for 5 non-standard names
+- `WhereChain` antipattern removed from `listing-retriever.ts` and `public_api/v1/listings.ts`; replaced with proper `Listing.where()` API
+
+### Added
 - Webhook delivery retry with exponential backoff (500ms, 1s) — retries on network errors, 429, and 5xx; max 2 retries (3 total attempts)
 - KV-backed dead-letter queue (`dead-letter.ts`) — captures fire-and-forget failures from webhooks, Firestore writes, price history, scrape metadata, and usage recording; 30-day TTL, FIFO eviction at 500 entries
 - Dead-letter count exposed in health endpoint (`/public_api/v1/health` → `checks.dead_letters.count`)
