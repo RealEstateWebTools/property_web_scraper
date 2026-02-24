@@ -51,6 +51,22 @@ export interface SystemOverview {
   scraperUsage: Record<string, number>;
 }
 
+/**
+ * Extract millisecond timestamp from auto-generated ID.
+ * IDs are formatted as `auto_${Date.now()}_${counter}` where Date.now()
+ * returns milliseconds. Falls back to current time if extraction fails.
+ */
+function extractIdTimestamp(id: string): number {
+  // Match pattern: auto_<timestamp>_<counter>
+  const match = id.match(/^auto_(\d+)_/);
+  if (match && match[1]) {
+    const ts = parseInt(match[1], 10);
+    // Sanity check: timestamp should be reasonable (within 10 years of epoch)
+    if (ts > 0 && ts < Date.now() + 315_360_000_000) return ts;
+  }
+  return Date.now();
+}
+
 function emptyGradeDistribution(): Record<QualityGrade, number> {
   return { A: 0, B: 0, C: 0, F: 0 };
 }
@@ -58,7 +74,7 @@ function emptyGradeDistribution(): Record<QualityGrade, number> {
 function listingToSummary(id: string, listing: Listing): ExtractionSummary | null {
   return {
     id,
-    timestamp: listing.last_retrieved_at?.getTime?.() || parseInt(id.split('-')[0], 36),
+    timestamp: listing.last_retrieved_at?.getTime?.() || extractIdTimestamp(id),
     scraperName: listing.scraper_name || '',
     sourceUrl: listing.import_url || '',
     qualityGrade: (listing.quality_grade || 'F') as QualityGrade,
@@ -116,7 +132,7 @@ export async function getRecentExtractions(limit = 100): Promise<ExtractionSumma
     if (!diag) continue;
     summaries.push({
       id,
-      timestamp: (listing as any).last_retrieved_at?.getTime?.() || parseInt(id.split('-')[0], 36),
+      timestamp: (listing as any).last_retrieved_at?.getTime?.() || extractIdTimestamp(id),
       scraperName: diag.scraperName,
       sourceUrl: (listing as any).import_url || '',
       qualityGrade: diag.qualityGrade ?? 'F',

@@ -12,7 +12,12 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nFix CVE-2026-0933: upgrade wrangler to patch command injection vulnerability\n\nOverride transitive wrangler dependency from @astrojs/cloudflare to ensure\nall copies resolve to >= 4.59.1 \\(currently 4.65.0\\).\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(npm outdated:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm view:*)",
+      "Bash(head:*)",
+      "Bash(echo Port 4321 not in use:*)",
+      "Bash(npx tsc:*)",
+      "Bash(tail:*)"
     ]
   }
 }
