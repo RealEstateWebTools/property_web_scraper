@@ -61,10 +61,37 @@ export interface Haul {
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 const MAX_SCRAPES = 20;
+const STALE_IN_MEMORY_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
 
 const store = new Map<string, Haul>();
 
 // ─── Firestore helpers ──────────────────────────────────────────
+
+/**
+ * Clean up in-memory entries that are stale (not persisted to Firestore for too long).
+ * Prevents memory leaks from hauls created but never successfully persisted.
+ * Called with the set of IDs that exist in Firestore.
+ */
+function cleanupStaleInMemoryHauls(firestoreIds: Set<string>): void {
+  const now = Date.now();
+  const idsToDelete: string[] = [];
+
+  for (const [id, haul] of store.entries()) {
+    // Skip if it exists in Firestore (properly persisted)
+    if (firestoreIds.has(id)) continue;
+
+    // If not in Firestore and older than threshold, mark for deletion
+    const createdTime = new Date(haul.createdAt).getTime();
+    if (now - createdTime > STALE_IN_MEMORY_THRESHOLD_MS) {
+      idsToDelete.push(id);
+    }
+  }
+
+  // Clean up stale entries
+  for (const id of idsToDelete) {
+    store.delete(id);
+  }
+}
 
 async function firestoreSaveHaul(haul: Haul): Promise<void> {
   const db = await getClient();
@@ -200,6 +227,9 @@ export async function getAllHauls(): Promise<Haul[]> {
   } catch {
     // Firestore unavailable — fall through to in-memory
   }
+
+  // Clean up stale in-memory entries that failed to persist to Firestore
+  cleanupStaleInMemoryHauls(seenIds);
 
   // Merge in-memory entries not yet in Firestore
   for (const [id, haul] of store.entries()) {
