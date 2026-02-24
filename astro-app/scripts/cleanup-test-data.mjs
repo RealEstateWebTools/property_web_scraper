@@ -75,7 +75,13 @@ const testPatterns = {
 
 async function isTestListing(doc) {
   const data = doc.data();
+  const docId = doc.id;
   if (!data) return false;
+
+  // Check for auto-generated IDs (these are created during tests)
+  if (docId.startsWith('auto_')) {
+    return true;
+  }
 
   const url = (data.import_url || '').toLowerCase();
 
@@ -86,14 +92,45 @@ async function isTestListing(doc) {
     }
   }
 
-  // Check for very recent empty listings (likely test data)
+  // Check for very recent listings (likely test data)
   const created = data.created_at ? new Date(data.created_at).getTime() : 0;
   const now = Date.now();
   const oneHourAgo = now - 60 * 60 * 1000;
+  const oneDayAgo = now - 24 * 60 * 60 * 1000;
 
   // Very recent (< 1 hour) and missing key fields = likely test data
   if (created > oneHourAgo && !data.title) {
     return true;
+  }
+
+  // Recent listings (< 24 hours) with test-like characteristics
+  if (created > oneDayAgo) {
+    // Check for suspicious patterns in recent listings
+    const title = (data.title || '').toLowerCase();
+    const description = (data.description || '').toLowerCase();
+    const combined = title + ' ' + description;
+
+    const suspiciousPatterns = [
+      'test',
+      'demo',
+      'sample',
+      'temporary',
+      'temp ',
+      'xxx',
+      'zzz',
+      'placeholder',
+    ];
+
+    for (const pattern of suspiciousPatterns) {
+      if (combined.includes(pattern)) {
+        return true;
+      }
+    }
+
+    // Recent listings with very low extraction rates might be tests
+    if (data.extraction_rate !== undefined && data.extraction_rate < 0.1) {
+      return true;
+    }
   }
 
   return false;
