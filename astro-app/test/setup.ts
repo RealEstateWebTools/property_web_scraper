@@ -1,6 +1,7 @@
 import { InMemoryFirestoreClient, resetStore, clearCollections } from '../src/lib/firestore/in-memory-backend.js';
 import { setClient } from '../src/lib/firestore/client.js';
 import { clearCache } from '../src/lib/extractor/mapping-loader.js';
+import { __clearStore as clearHaulStore } from '../src/lib/services/haul-store.js';
 import { ImportHost } from '../src/lib/models/import-host.js';
 
 // Inject in-memory Firestore for all tests
@@ -36,7 +37,7 @@ beforeAll(async () => {
 });
 
 afterEach(() => {
-  // Clear collections between tests while preserving import_hosts
+  // Clear Firestore collections between tests while preserving import_hosts
   clearCollections(
     'listings',
     'diagnostics',
@@ -50,6 +51,9 @@ afterEach(() => {
     'hauls',
     'rate_limit_daily',
   );
+
+  // Clear module-level in-memory stores
+  clearHaulStore();
 });
 
 afterAll(() => {

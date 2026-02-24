@@ -241,3 +241,11 @@ export async function updateHaulMeta(
   await persistHaul(haul);
   return haul;
 }
+
+/**
+ * Test-only export: clear module-level in-memory store.
+ * Used in test setup to ensure tests don't accumulate hauls across runs.
+ */
+export function __clearStore(): void {
+  store.clear();
+}
