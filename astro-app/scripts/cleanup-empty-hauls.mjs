@@ -85,6 +85,9 @@ async function cleanup() {
 
   const haulsToDelete = [];
   const haulsToKeep = [];
+  let expiredCount = 0;
+
+  const now = Date.now();
 
   for (const doc of haulsSnapshot.docs) {
     const haul = doc.data();
@@ -93,8 +96,13 @@ async function cleanup() {
     // Count scrapes/listings in the haul
     const scraperCount = (haul.scrapes || []).length;
     const expiresAt = haul.expiresAt ? new Date(haul.expiresAt).getTime() : 0;
-    const now = Date.now();
     const isExpired = expiresAt > 0 && expiresAt < now;
+
+    // Skip expired hauls (matching admin interface behavior)
+    if (isExpired) {
+      expiredCount++;
+      continue;
+    }
 
     const haulInfo = {
       id: doc.id,
@@ -113,7 +121,9 @@ async function cleanup() {
 
   // Summary
   console.log(`\n📊 Haul Analysis:`);
-  console.log(`   Total hauls: ${haulsSnapshot.size}`);
+  console.log(`   Total in collection: ${haulsSnapshot.size}`);
+  console.log(`   Expired hauls (skipped): ${expiredCount}`);
+  console.log(`   Active hauls: ${haulsToDelete.length + haulsToKeep.length}`);
   console.log(`   Hauls to delete: ${haulsToDelete.length}`);
   console.log(`   Hauls to keep: ${haulsToKeep.length}`);
 
