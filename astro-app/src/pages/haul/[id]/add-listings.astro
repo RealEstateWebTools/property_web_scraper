@@ -111,7 +111,7 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
 
 </section>
 
-<script define:vars={{ haulId: id, gradeColors }}>
+<script define:vars={{ haulId: id, gradeColors, haulData: haul ? { scrapes: haul.scrapes.map(s => ({ url: s.url, title: s.title })) } : null }}>
 let currentPage = 0;
 const pageSize = 10;
 let allListings = [];
@@ -132,6 +132,14 @@ async function loadListings() {
     const response = await fetch('/ext/v1/listings?limit=100&sortBy=completeness');
     const data = await response.json();
     allListings = data.items || [];
+
+    // Mark listings that are already in the haul
+    const existingUrls = haulData?.scrapes?.map(s => s.url).filter(Boolean) || [];
+    allListings = allListings.map(item => ({
+      ...item,
+      isInHaul: existingUrls.includes(item.url)
+    }));
+
     filteredListings = [...allListings];
     currentPage = 0;
     renderListings();
@@ -186,27 +194,33 @@ function renderListings() {
 
   listingsContainer.innerHTML = pageListings.map(item => {
     const colors = gradeColors[item.grade] || gradeColors.F;
-    const createdDate = new Date(item.created_at).toLocaleDateString();
+    const createdDate = item.created_at && !isNaN(new Date(item.created_at).getTime())
+      ? new Date(item.created_at).toLocaleDateString()
+      : '(date unknown)';
 
     return `
-      <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition">
+      <div class="bg-white rounded-lg border ${item.isInHaul ? 'border-gray-300 bg-gray-50' : 'border-gray-200'} p-4 hover:shadow-md transition opacity-${item.isInHaul ? '60' : '100'}">
         <div class="flex items-start gap-4">
           <input
             type="checkbox"
             data-listing-id="${item.id}"
             class="listing-checkbox mt-1"
+            ${item.isInHaul ? 'disabled' : ''}
           />
           <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between gap-2 mb-2">
               <div class="flex-1">
-                <h3 class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-1">
+                <h3 class="font-semibold ${item.isInHaul ? 'text-gray-600' : 'text-gray-900'} text-sm leading-tight line-clamp-2 mb-1">
                   ${item.title}
                 </h3>
                 <p class="text-blue-600 font-semibold text-sm mb-2">${item.price}</p>
               </div>
-              <span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shrink-0 ${colors.bg} ${colors.text}">
-                ${item.grade}
-              </span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                ${item.isInHaul ? '<span class="inline-flex items-center gap-0.5 bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium"><i class="bi bi-check-circle"></i> Added</span>' : ''}
+                <span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${colors.bg} ${colors.text}">
+                  ${item.grade}
+                </span>
+              </div>
             </div>
 
             <p class="text-gray-600 text-xs mb-2 line-clamp-2">${item.description}</p>
@@ -225,8 +239,8 @@ function renderListings() {
     `;
   }).join('');
 
-  // Attach checkbox listeners
-  document.querySelectorAll('.listing-checkbox').forEach(cb => {
+  // Attach checkbox listeners (skip disabled ones)
+  document.querySelectorAll('.listing-checkbox:not(:disabled)').forEach(cb => {
     cb.addEventListener('change', updateAddButton);
   });
 
@@ -292,7 +306,7 @@ async function addSelectedListings() {
 searchInput?.addEventListener('input', filterAndSort);
 sortSelect?.addEventListener('change', filterAndSort);
 selectAllCheckbox?.addEventListener('change', (e) => {
-  document.querySelectorAll('.listing-checkbox').forEach(cb => {
+  document.querySelectorAll('.listing-checkbox:not(:disabled)').forEach(cb => {
     cb.checked = e.target.checked;
   });
   updateAddButton();
