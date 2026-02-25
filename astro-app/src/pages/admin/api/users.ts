@@ -3,73 +3,17 @@ import { authenticateAdmin } from '@lib/services/admin-auth.js';
 import { resolveKV } from '@lib/services/kv-resolver.js';
 import {
   initUsersKV,
-  listUsers as listKVUsers,
   listUserKeys,
   updateUserTier,
   revokeApiKey,
   deleteUser,
-  type SubscriptionTier,
 } from '@lib/services/api-key-service.js';
 
-export const GET: APIRoute = async ({ request, locals }) => {
-  const auth = authenticateAdmin(request);
-  if (!auth.authorized) {
-    return new Response(JSON.stringify({ error: auth.errorMessage }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  try {
-    const kv = resolveKV(locals);
-    initUsersKV(kv);
-
-    // Get users from KV (primary source for subscription/API key management)
-    const kvUsers = await listKVUsers();
-
-    // Count by tier and build user data
-    const byTier: Record<SubscriptionTier, number> = {
-      free: 0,
-      starter: 0,
-      pro: 0,
-      enterprise: 0,
-    };
-
-    const usersData = await Promise.all(
-      kvUsers.map(async (u) => {
-        byTier[u.tier]++;
-        const keys = await listUserKeys(u.userId);
-        const activeKeyCount = keys.filter((k) => k.active).length;
-        return {
-          userId: u.userId,
-          email: u.email,
-          name: u.name || null,
-          tier: u.tier,
-          keyCount: u.keyHashes.length,
-          activeKeyCount,
-          createdAt: u.createdAt,
-          stripeCustomerId: u.stripeCustomerId || null,
-        };
-      }),
-    );
-
-    return new Response(
-      JSON.stringify({
-        total: kvUsers.length,
-        byTier,
-        users: usersData,
-      }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-      },
-    );
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+export const GET: APIRoute = async () => {
+  return new Response(JSON.stringify({ error: 'Not found' }), {
+    status: 404,
+    headers: { 'Content-Type': 'application/json' },
+  });
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {

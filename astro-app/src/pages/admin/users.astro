@@ -1,9 +1,86 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
+import { resolveKV } from '@lib/services/kv-resolver.js';
+import {
+  initUsersKV,
+  listUsers as listKVUsers,
+  listUserKeys,
+  type SubscriptionTier,
+} from '@lib/services/api-key-service.js';
+import { listFirebaseUsers } from '@lib/services/firebase-admin-service.js';
+
+interface UserItem {
+  userId: string;
+  email: string;
+  name: string | null;
+  tier: SubscriptionTier;
+  keyCount: number;
+  activeKeyCount: number;
+  createdAt: string;
+  stripeCustomerId: string | null;
+}
 
 const auth = authenticateAdmin(Astro.request);
 if (!auth.authorized) return Astro.redirect('/admin/login');
+
+const byTier = {
+  free: 0,
+  starter: 0,
+  pro: 0,
+  enterprise: 0,
+} satisfies Record<SubscriptionTier, number>;
+
+let initialUsers: UserItem[] = [];
+let initialLoadError: string | null = null;
+
+try {
+  const kv = resolveKV(Astro.locals);
+  initUsersKV(kv);
+
+  const kvUsers = await listKVUsers();
+  const kvUsersById = new Map(kvUsers.map((u) => [u.userId, u]));
+  const firebaseUsers = await listFirebaseUsers();
+  const mergedUsers = [...kvUsers];
+
+  for (const fbUser of firebaseUsers) {
+    if (kvUsersById.has(fbUser.uid)) continue;
+    mergedUsers.push({
+      userId: fbUser.uid,
+      email: fbUser.email || '',
+      name: fbUser.displayName,
+      tier: 'free',
+      keyHashes: [],
+      createdAt: fbUser.createdAt || new Date().toISOString(),
+    });
+  }
+
+  initialUsers = await Promise.all(
+    mergedUsers.map(async (u) => {
+      byTier[u.tier]++;
+      const keys = kvUsersById.has(u.userId) ? await listUserKeys(u.userId) : [];
+      const activeKeyCount = keys.filter((k) => k.active).length;
+      return {
+        userId: u.userId,
+        email: u.email,
+        name: u.name || null,
+        tier: u.tier,
+        keyCount: u.keyHashes.length,
+        activeKeyCount,
+        createdAt: u.createdAt,
+        stripeCustomerId: u.stripeCustomerId || null,
+      };
+    }),
+  );
+} catch (err: unknown) {
+  initialLoadError = err instanceof Error ? err.message : String(err);
+}
+
+const initialPayload = {
+  total: initialUsers.length,
+  byTier,
+  users: initialUsers,
+};
 ---
 <AdminLayout title="Users — Admin" activePage="users">
   <h1 class="text-2xl font-bold mb-2">User Management</h1>
@@ -92,6 +169,9 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
     </div>
   </div>
 
+  <script id="initial-users-data" type="application/json" is:inline>{JSON.stringify(initialPayload)}</script>
+  <script id="initial-users-error" type="application/json" is:inline>{JSON.stringify(initialLoadError)}</script>
+
   <script>
     function escapeHtml(str: unknown): string {
       return String(str == null ? '' : str)
@@ -112,6 +192,34 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
       createdAt: string;
       stripeCustomerId: string | null;
     }
+
+    interface UsersPayload {
+      total: number;
+      byTier: {
+        free: number;
+        starter: number;
+        pro: number;
+        enterprise: number;
+      };
+      users: UserItem[];
+    }
+
+    function parseJsonScript<T>(id: string, fallback: T): T {
+      const el = document.getElementById(id) as HTMLScriptElement | null;
+      if (!el || !el.textContent) return fallback;
+      try {
+        return JSON.parse(el.textContent) as T;
+      } catch {
+        return fallback;
+      }
+    }
+
+    const initialUsersPayload = parseJsonScript<UsersPayload>('initial-users-data', {
+      total: 0,
+      byTier: { free: 0, starter: 0, pro: 0, enterprise: 0 },
+      users: [],
+    });
+    const initialUsersError = parseJsonScript<string | null>('initial-users-error', null);
 
     let allUsers: UserItem[] = [];
     let currentKeysUserId: string | null = null;
@@ -212,7 +320,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
         });
         const data = await res.json();
         if (data.success) {
-          await loadUsers();
+          window.location.reload();
         } else {
           alert(data.error || 'Tier change failed');
         }
@@ -231,7 +339,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
         });
         const data = await res.json();
         if (data.success) {
-          await loadUsers();
+          window.location.reload();
         } else {
           alert(data.error || 'Delete failed');
         }
@@ -333,7 +441,7 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
       renderTable(filtered);
     }
 
-    async function loadUsers() {
+    function loadUsersFromPage() {
       const loadingEl = document.getElementById('loading')!;
       const summaryEl = document.getElementById('summary')!;
       const searchBar = document.getElementById('search-bar')!;
@@ -341,45 +449,32 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
       const emptyEl = document.getElementById('empty-state')!;
       const errorEl = document.getElementById('error')!;
 
-      loadingEl.classList.remove('hidden');
+      loadingEl.classList.add('hidden');
       summaryEl.classList.add('hidden');
       searchBar.classList.add('hidden');
       resultsEl.classList.add('hidden');
       emptyEl.classList.add('hidden');
       errorEl.classList.add('hidden');
 
-      try {
-        const res = await fetch('/admin/api/users');
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({ error: 'Request failed' }));
-          errorEl.textContent = data.error || `HTTP ${res.status}`;
-          errorEl.classList.remove('hidden');
-          loadingEl.classList.add('hidden');
-          return;
-        }
-
-        const data = await res.json();
-        allUsers = data.users || [];
-
-        // Summary
-        document.getElementById('total-users')!.textContent = String(data.total);
-        const byTierText = `Free: ${data.byTier.free} | Starter: ${data.byTier.starter} | Pro: ${data.byTier.pro} | Enterprise: ${data.byTier.enterprise}`;
-        document.getElementById('by-tier')!.textContent = byTierText;
-
-        loadingEl.classList.add('hidden');
-        summaryEl.classList.remove('hidden');
-
-        if (allUsers.length === 0) {
-          emptyEl.classList.remove('hidden');
-        } else {
-          searchBar.classList.remove('hidden');
-          resultsEl.classList.remove('hidden');
-          filterAndRender();
-        }
-      } catch (err) {
-        errorEl.textContent = 'Network error: ' + (err instanceof Error ? err.message : String(err));
+      if (initialUsersError) {
+        errorEl.textContent = initialUsersError;
         errorEl.classList.remove('hidden');
-        loadingEl.classList.add('hidden');
+        return;
+      }
+
+      allUsers = initialUsersPayload.users || [];
+      document.getElementById('total-users')!.textContent = String(initialUsersPayload.total || 0);
+      const byTier = initialUsersPayload.byTier || { free: 0, starter: 0, pro: 0, enterprise: 0 };
+      const byTierText = `Free: ${byTier.free} | Starter: ${byTier.starter} | Pro: ${byTier.pro} | Enterprise: ${byTier.enterprise}`;
+      document.getElementById('by-tier')!.textContent = byTierText;
+      summaryEl.classList.remove('hidden');
+
+      if (allUsers.length === 0) {
+        emptyEl.classList.remove('hidden');
+      } else {
+        searchBar.classList.remove('hidden');
+        resultsEl.classList.remove('hidden');
+        filterAndRender();
       }
     }
 
@@ -393,9 +488,9 @@ if (!auth.authorized) return Astro.redirect('/admin/login');
     });
 
     // Load on page ready
-    loadUsers();
+    loadUsersFromPage();
 
     // Refresh button
-    document.getElementById('refresh-btn')?.addEventListener('click', loadUsers);
+    document.getElementById('refresh-btn')?.addEventListener('click', () => window.location.reload());
   </script>
 </AdminLayout>
