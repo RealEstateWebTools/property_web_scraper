@@ -12,31 +12,31 @@ When a user clicks "Compare on HomesToCompare", they are sent to one of these UR
 
 ### Case 1 — Haul with exactly 2 properties
 ```
-https://homestocompare.com/compare/{haulId}
+https://homestocompare.com/compare-from-pws/{haulId}
 ```
 
 Example:
 ```
-https://homestocompare.com/compare/sleek-robin-37
+https://homestocompare.com/compare-from-pws/sleek-robin-37
 ```
 
 Go straight to the comparison view with the two properties side by side.
 
 ### Case 2 — User selected 2 properties from a larger haul
 ```
-https://homestocompare.com/compare/{haulId}?left={resultId}&right={resultId}
+https://homestocompare.com/compare-from-pws/{haulId}?left={resultId}&right={resultId}
 ```
 
 Example:
 ```
-https://homestocompare.com/compare/sleek-robin-37?left=abc123&right=def456
+https://homestocompare.com/compare-from-pws/sleek-robin-37?left=abc123&right=def456
 ```
 
 The `left` and `right` parameters are `resultId` values identifying which two properties to compare.
 
 ### Case 3 — Haul with 3+ properties, no pre-selection
 ```
-https://homestocompare.com/compare/{haulId}
+https://homestocompare.com/compare-from-pws/{haulId}
 ```
 
 Same URL as Case 1 but with more than 2 properties in the API response. Show a picker so the user can select two to compare.
@@ -162,6 +162,8 @@ All fields except those marked **required** are optional. Check for presence bef
 ---
 
 ## Implementation Logic
+
+Implement a route at `/compare-from-pws/[haulId]` (or equivalent for your framework).
 
 ```typescript
 // Pseudocode — adapt to your framework

@@ -292,7 +292,7 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
             </div>
             {haul.scrapes.length === 2 ? (
               <a
-                href={`${h2cUrl}/new?left_url=${encodeURIComponent(haul.scrapes[0].url)}&right_url=${encodeURIComponent(haul.scrapes[1].url)}&source=scraper`}
+                href={`${h2cUrl}/compare-from-pws/${haul.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-1.5 bg-indigo-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 no-underline transition"
@@ -309,7 +309,7 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
               <div class="flex flex-wrap gap-2 mb-3" id="h2c-checkboxes">
                 {haul.scrapes.map((scrape, idx) => (
                   <label class="inline-flex items-center gap-1.5 text-xs bg-gray-50 rounded-lg px-3 py-1.5 cursor-pointer border border-gray-200 hover:border-blue-300 transition">
-                    <input type="checkbox" class="h2c-scrape-checkbox" data-url={scrape.url} data-index={idx} />
+                    <input type="checkbox" class="h2c-scrape-checkbox" data-url={scrape.url} data-result-id={scrape.resultId} data-index={idx} />
                     <span class="truncate max-w-[150px]">{scrape.title || `Scrape ${idx + 1}`}</span>
                   </label>
                 ))}
@@ -743,8 +743,8 @@ document.addEventListener('DOMContentLoaded', function() {
     compareBtn.addEventListener('click', function() {
       var checked = document.querySelectorAll('.h2c-scrape-checkbox:checked');
       if (checked.length !== 2) return;
-      var urls = Array.from(checked).map(function(cb) { return cb.dataset.url; });
-      var compareUrl = h2cUrl + '/new?left_url=' + encodeURIComponent(urls[0]) + '&right_url=' + encodeURIComponent(urls[1]) + '&source=scraper';
+      var resultIds = Array.from(checked).map(function(cb) { return cb.dataset.resultId; });
+      var compareUrl = h2cUrl + '/compare-from-pws/' + id + '?left=' + resultIds[0] + '&right=' + resultIds[1];
       window.open(compareUrl, '_blank');
     });
   }
