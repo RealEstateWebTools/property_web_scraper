@@ -1,15 +1,21 @@
 /**
  * API Key Management Service
  *
- * Manages per-user API keys stored in KV as SHA-256 hashes.
- * Key format: `pws_live_{32 hex chars}` (44 chars total)
+ * Manages per-user API keys and user records with Firestore persistence.
+ * KV is used as a read-through cache only.
  *
- * KV schema:
+ * Firestore schema:
+ *   users/{userId} → UserRecord
+ *   api_keys/{keyHash} → ApiKeyRecord
+ *
+ * KV schema (cache only):
  *   "apikey:{sha256hash}" → ApiKeyRecord
  *   "user:{userId}"       → UserRecord
  */
 
 import type { KVNamespace } from './kv-types.js';
+import { getClient, getCollectionPrefix } from '../firestore/client.js';
+import type { FirestoreClient } from '../firestore/types.js';
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -70,6 +76,70 @@ async function kvDelete(key: string): Promise<void> {
 }
 
 /**
+ * Persist user record to Firestore.
+ * Falls back gracefully if Firestore is unavailable.
+ */
+async function persistUserToFirestore(user: UserRecord): Promise<void> {
+  try {
+    const client = await getClient();
+    const prefix = getCollectionPrefix();
+    await client.setDocument(`${prefix}users/${user.userId}`, user);
+  } catch (err) {
+    // Firestore not available - continue with KV only (degraded mode)
+    console.warn('[ApiKeyService] Firestore persist failed, using KV only:', err instanceof Error ? err.message : String(err));
+  }
+}
+
+/**
+ * Fetch user record from Firestore.
+ * Falls back to KV if Firestore is unavailable.
+ */
+async function fetchUserFromFirestore(userId: string): Promise<UserRecord | null> {
+  try {
+    const client = await getClient();
+    const prefix = getCollectionPrefix();
+    const doc = await client.getDocument(`${prefix}users/${userId}`);
+    if (doc) {
+      return doc as UserRecord;
+    }
+  } catch (err) {
+    // Firestore not available - continue with KV only
+    console.warn('[ApiKeyService] Firestore fetch failed, falling back to KV');
+  }
+  return null;
+}
+
+/**
+ * List all users from Firestore.
+ * Falls back to KV if Firestore is unavailable.
+ */
+async function listUsersFromFirestore(): Promise<UserRecord[]> {
+  try {
+    const client = await getClient();
+    const prefix = getCollectionPrefix();
+    const docs = await client.listDocuments(`${prefix}users`);
+    return docs.map((doc) => doc as UserRecord);
+  } catch (err) {
+    // Firestore not available - fall back to KV
+    console.warn('[ApiKeyService] Firestore list failed, falling back to KV');
+  }
+  return [];
+}
+
+/**
+ * Persist API key record to Firestore.
+ */
+async function persistKeyToFirestore(keyHash: string, record: ApiKeyRecord): Promise<void> {
+  try {
+    const client = await getClient();
+    const prefix = getCollectionPrefix();
+    await client.setDocument(`${prefix}api_keys/${keyHash}`, record);
+  } catch (err) {
+    console.warn('[ApiKeyService] Firestore key persist failed, using KV only');
+  }
+}
+
+/**
  * In-memory cache for validated API keys.
  * Avoids KV read on every authenticated request.
  * TTL: 5 minutes — key revocations take up to 5 min to propagate.
@@ -105,7 +175,7 @@ function generateRandomHex(bytes: number): string {
  * Generate a new API key for a user.
  *
  * Returns the raw key — this is the ONLY time it's available.
- * After this, only the SHA-256 hash is stored.
+ * After this, only the SHA-256 hash is stored in Firestore + KV.
  */
 export async function generateApiKey(
   userId: string,
@@ -124,12 +194,16 @@ export async function generateApiKey(
     createdAt: new Date().toISOString(),
     prefix,
   };
+
+  // Persist to both Firestore and KV
+  await persistKeyToFirestore(hash, record);
   await kvPut(`apikey:${hash}`, JSON.stringify(record));
 
   // Update user record
   const user = await getUser(userId);
   if (user) {
     user.keyHashes.push(hash);
+    await persistUserToFirestore(user);
     await kvPut(`user:${userId}`, JSON.stringify(user));
   }
 
@@ -184,6 +258,7 @@ export async function validateApiKey(rawKey: string): Promise<ValidatedKey | nul
 /**
  * Revoke an API key by its hash.
  * Soft-delete: marks inactive so it can't be used but history is preserved.
+ * Persists to Firestore.
  */
 export async function revokeApiKey(keyHash: string): Promise<boolean> {
   const json = await kvGet(`apikey:${keyHash}`);
@@ -191,6 +266,11 @@ export async function revokeApiKey(keyHash: string): Promise<boolean> {
 
   const record: ApiKeyRecord = JSON.parse(json);
   record.active = false;
+
+  // Persist to Firestore
+  await persistKeyToFirestore(keyHash, record);
+
+  // Update KV
   await kvPut(`apikey:${keyHash}`, JSON.stringify(record));
 
   // Invalidate validation cache for this key
@@ -254,6 +334,7 @@ export async function listUserKeys(userId: string): Promise<Array<{
 
 /**
  * Create a user record.
+ * Persists to Firestore with KV cache fallback.
  */
 export async function createUser(
   userId: string,
@@ -269,14 +350,30 @@ export async function createUser(
     keyHashes: [],
     createdAt: new Date().toISOString(),
   };
+
+  // Persist to Firestore (primary)
+  await persistUserToFirestore(user);
+
+  // Also cache in KV
   await kvPut(`user:${userId}`, JSON.stringify(user));
+
   return user;
 }
 
 /**
  * Get a user by ID.
+ * Read path: Firestore → KV cache
  */
 export async function getUser(userId: string): Promise<UserRecord | null> {
+  // Try Firestore first
+  const firestoreUser = await fetchUserFromFirestore(userId);
+  if (firestoreUser) {
+    // Cache in KV for next time
+    await kvPut(`user:${userId}`, JSON.stringify(firestoreUser));
+    return firestoreUser;
+  }
+
+  // Fall back to KV
   const json = await kvGet(`user:${userId}`);
   if (!json) return null;
   return JSON.parse(json);
@@ -284,30 +381,54 @@ export async function getUser(userId: string): Promise<UserRecord | null> {
 
 /**
  * Update a user's tier (e.g., after Stripe subscription change).
+ * Persists to Firestore with KV cache.
  */
 export async function updateUserTier(userId: string, tier: SubscriptionTier): Promise<boolean> {
   const user = await getUser(userId);
   if (!user) return false;
   user.tier = tier;
+
+  // Persist to Firestore
+  await persistUserToFirestore(user);
+
+  // Update KV cache
   await kvPut(`user:${userId}`, JSON.stringify(user));
   return true;
 }
 
 /**
  * Set a user's Stripe customer ID.
+ * Persists to Firestore with KV cache.
  */
 export async function setStripeCustomerId(userId: string, stripeCustomerId: string): Promise<boolean> {
   const user = await getUser(userId);
   if (!user) return false;
   user.stripeCustomerId = stripeCustomerId;
+
+  // Persist to Firestore
+  await persistUserToFirestore(user);
+
+  // Update KV cache
   await kvPut(`user:${userId}`, JSON.stringify(user));
   return true;
 }
 
 /**
  * List all users.
+ * Reads from Firestore first, falls back to KV.
  */
 export async function listUsers(): Promise<UserRecord[]> {
+  // Try Firestore first
+  const firestoreUsers = await listUsersFromFirestore();
+  if (firestoreUsers.length > 0) {
+    // Cache in KV
+    for (const user of firestoreUsers) {
+      await kvPut(`user:${user.userId}`, JSON.stringify(user));
+    }
+    return firestoreUsers;
+  }
+
+  // Fall back to KV
   const users: UserRecord[] = [];
   if (kv) {
     const list = await kv.list({ prefix: 'user:' });
