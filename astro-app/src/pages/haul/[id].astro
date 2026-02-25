@@ -123,11 +123,17 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
           </div>
         </div>
 
-        {/* Notes */}
-        <div class="mt-3">
+        {/* Notes and Add Listings */}
+        <div class="mt-3 flex items-center gap-3">
           <button id="toggle-notes-btn" type="button" class="text-xs text-gray-400 hover:text-blue-600 cursor-pointer border-0 bg-transparent">
             <i class="bi bi-sticky mr-1"></i> {haul.notes ? 'Edit notes' : 'Add notes'}
           </button>
+          {haul.scrapes.length < 20 && (
+            <a href={`/haul/${id}/add-listings`} class="text-xs text-gray-400 hover:text-blue-600 cursor-pointer no-underline">
+              <i class="bi bi-plus-circle mr-1"></i> Browse & Add Listings
+            </a>
+          )}
+        </div>
           <div id="notes-section" class={haul.notes ? '' : 'hidden'}>
             <textarea
               id="notes-textarea"

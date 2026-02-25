@@ -1,0 +1,321 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getHaul } from '@lib/services/haul-store.js';
+import { isValidHaulId } from '@lib/services/haul-id.js';
+
+const { id } = Astro.params;
+const validId = id && isValidHaulId(id);
+const haul = validId ? await getHaul(id) : undefined;
+
+const gradeColors: Record<string, { bg: string; text: string }> = {
+  A: { bg: 'bg-green-100', text: 'text-green-800' },
+  B: { bg: 'bg-blue-100', text: 'text-blue-800' },
+  C: { bg: 'bg-amber-100', text: 'text-amber-800' },
+  F: { bg: 'bg-red-100', text: 'text-red-800' },
+};
+---
+
+<BaseLayout title={haul ? `Add Listings to ${haul.name || id}` : 'Haul Not Found'}>
+
+<section class="max-w-5xl mx-auto px-4 py-8">
+
+  {!haul ? (
+    <div class="bg-amber-50 rounded-2xl p-8 text-center">
+      <div class="text-4xl mb-3">📦</div>
+      <h2 class="font-semibold text-amber-900 text-lg mb-2">Haul not found</h2>
+      <p class="text-amber-800 text-sm">This haul may have expired or the ID is invalid.</p>
+      <a href="/hauls" class="inline-block mt-4 text-blue-600 hover:underline text-sm">← Back to My Hauls</a>
+    </div>
+  ) : (
+    <>
+      {/* Header */}
+      <div class="mb-6">
+        <a href={`/haul/${id}`} class="text-sm text-blue-600 hover:underline inline-flex items-center gap-1 mb-4">
+          <i class="bi bi-chevron-left"></i> Back to {haul.name || `Haul ${id}`}
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Browse & Add Listings</h1>
+        <p class="text-gray-600">Select listings with complete data to add to your haul</p>
+      </div>
+
+      {/* Status */}
+      <div class="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-200">
+        <p class="text-sm text-blue-900">
+          <strong>Your haul:</strong> {haul.scrapes.length}/20 listings
+          {haul.scrapes.length >= 20 && (
+            <span class="text-red-600 font-semibold ml-2">⚠️ Haul is full</span>
+          )}
+        </p>
+      </div>
+
+      {/* Controls */}
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div class="flex items-center gap-2">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Search listings..."
+              class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+            />
+            <select id="sort-select" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="completeness">Most Complete</option>
+              <option value="newest">Newest First</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+              <input type="checkbox" id="select-all-checkbox" class="rounded" />
+              Select All
+            </label>
+            <button
+              id="add-selected-btn"
+              type="button"
+              disabled
+              class="bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-green-700 cursor-pointer border-0 disabled:opacity-40 disabled:cursor-not-allowed transition"
+            >
+              <i class="bi bi-plus-lg mr-1"></i> Add Selected (0)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Listings */}
+      <div id="listings-container" class="space-y-3">
+        <div class="text-center py-8 text-gray-500">
+          <p class="mb-2">Loading listings...</p>
+          <div class="inline-block h-8 w-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        </div>
+      </div>
+
+      {/* Pagination */}
+      <div class="flex items-center justify-center gap-2 mt-6">
+        <button
+          id="prev-page-btn"
+          type="button"
+          disabled
+          class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+        >
+          <i class="bi bi-chevron-left"></i> Previous
+        </button>
+        <span id="page-info" class="text-sm text-gray-600">Page 1</span>
+        <button
+          id="next-page-btn"
+          type="button"
+          class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+        >
+          Next <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </>
+  )}
+
+</section>
+
+<script define:vars={{ haulId: id, gradeColors }}>
+let currentPage = 0;
+const pageSize = 10;
+let allListings = [];
+let filteredListings = [];
+
+const listingsContainer = document.getElementById('listings-container');
+const selectAllCheckbox = document.getElementById('select-all-checkbox');
+const addSelectedBtn = document.getElementById('add-selected-btn');
+const searchInput = document.getElementById('search-input');
+const sortSelect = document.getElementById('sort-select');
+const prevPageBtn = document.getElementById('prev-page-btn');
+const nextPageBtn = document.getElementById('next-page-btn');
+const pageInfo = document.getElementById('page-info');
+
+// Fetch listings
+async function loadListings() {
+  try {
+    const response = await fetch('/ext/v1/listings?limit=100&sortBy=completeness');
+    const data = await response.json();
+    allListings = data.items || [];
+    filteredListings = [...allListings];
+    currentPage = 0;
+    renderListings();
+  } catch (err) {
+    console.error('Failed to load listings:', err);
+    listingsContainer.innerHTML = '<div class="text-red-600 text-center py-8">Failed to load listings</div>';
+  }
+}
+
+function filterAndSort() {
+  const searchTerm = searchInput?.value?.toLowerCase() || '';
+  const sortBy = sortSelect?.value || 'completeness';
+
+  filteredListings = allListings.filter(item => {
+    if (!searchTerm) return true;
+    return (
+      item.title?.toLowerCase().includes(searchTerm) ||
+      item.city?.toLowerCase().includes(searchTerm) ||
+      item.description?.toLowerCase().includes(searchTerm)
+    );
+  });
+
+  if (sortBy === 'newest') {
+    filteredListings.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }
+
+  currentPage = 0;
+  renderListings();
+}
+
+function renderListings() {
+  const start = currentPage * pageSize;
+  const end = start + pageSize;
+  const pageListings = filteredListings.slice(start, end);
+  const totalPages = Math.ceil(filteredListings.length / pageSize);
+
+  // Update pagination buttons
+  prevPageBtn.disabled = currentPage === 0;
+  nextPageBtn.disabled = currentPage >= totalPages - 1;
+  pageInfo.textContent = `Page ${currentPage + 1} of ${Math.max(1, totalPages)} (${filteredListings.length} total)`;
+
+  // Update select all checkbox
+  selectAllCheckbox.checked = pageListings.length > 0 && pageListings.every(item => {
+    const cb = document.querySelector(`input[data-listing-id="${item.id}"]`);
+    return cb?.checked;
+  });
+
+  if (pageListings.length === 0) {
+    listingsContainer.innerHTML = '<div class="text-center py-8 text-gray-500">No listings found matching your criteria</div>';
+    return;
+  }
+
+  listingsContainer.innerHTML = pageListings.map(item => {
+    const colors = gradeColors[item.grade] || gradeColors.F;
+    const createdDate = new Date(item.created_at).toLocaleDateString();
+
+    return `
+      <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition">
+        <div class="flex items-start gap-4">
+          <input
+            type="checkbox"
+            data-listing-id="${item.id}"
+            class="listing-checkbox mt-1"
+          />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <div class="flex-1">
+                <h3 class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-1">
+                  ${item.title}
+                </h3>
+                <p class="text-blue-600 font-semibold text-sm mb-2">${item.price}</p>
+              </div>
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shrink-0 ${colors.bg} ${colors.text}">
+                ${item.grade}
+              </span>
+            </div>
+
+            <p class="text-gray-600 text-xs mb-2 line-clamp-2">${item.description}</p>
+
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              ${item.bedrooms ? `<span class="inline-flex items-center gap-0.5 text-xs text-gray-600 bg-gray-50 px-2 py-0.5 rounded"><i class="bi bi-door-open"></i> ${item.bedrooms} bed</span>` : ''}
+              ${item.bathrooms ? `<span class="inline-flex items-center gap-0.5 text-xs text-gray-600 bg-gray-50 px-2 py-0.5 rounded"><i class="bi bi-droplet"></i> ${item.bathrooms} bath</span>` : ''}
+              ${item.city ? `<span class="inline-flex items-center gap-0.5 text-xs text-gray-600 bg-gray-50 px-2 py-0.5 rounded"><i class="bi bi-geo-alt"></i> ${item.city}, ${item.country}</span>` : ''}
+              <span class="inline-flex items-center gap-0.5 text-xs text-gray-600 bg-gray-50 px-2 py-0.5 rounded">${Math.round(item.extraction_rate)}% extracted</span>
+            </div>
+
+            <p class="text-xs text-gray-400">Added ${createdDate}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Attach checkbox listeners
+  document.querySelectorAll('.listing-checkbox').forEach(cb => {
+    cb.addEventListener('change', updateAddButton);
+  });
+
+  updateAddButton();
+}
+
+function updateAddButton() {
+  const checked = document.querySelectorAll('.listing-checkbox:checked');
+  const count = checked.length;
+  addSelectedBtn.disabled = count === 0;
+  addSelectedBtn.textContent = `Add Selected (${count})`;
+}
+
+async function addSelectedListings() {
+  const checked = Array.from(document.querySelectorAll('.listing-checkbox:checked'));
+  const listingIds = checked.map(cb => cb.dataset.listingId);
+
+  if (listingIds.length === 0) return;
+
+  addSelectedBtn.disabled = true;
+  const originalText = addSelectedBtn.textContent;
+  addSelectedBtn.textContent = 'Adding...';
+
+  try {
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const resultId of listingIds) {
+      try {
+        const response = await fetch(`/ext/v1/hauls/${haulId}/add-result`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resultId }),
+        });
+
+        if (response.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (err) {
+        failCount++;
+      }
+    }
+
+    if (successCount > 0) {
+      addSelectedBtn.textContent = `✓ Added ${successCount} listing${successCount !== 1 ? 's' : ''}!`;
+      setTimeout(() => {
+        window.location.href = `/haul/${haulId}`;
+      }, 1500);
+    } else {
+      addSelectedBtn.textContent = `Failed to add (${failCount} error${failCount !== 1 ? 's' : ''})`;
+    }
+  } catch (err) {
+    console.error('Error adding listings:', err);
+    addSelectedBtn.textContent = 'Error adding listings';
+  }
+
+  addSelectedBtn.disabled = false;
+}
+
+// Event listeners
+searchInput?.addEventListener('input', filterAndSort);
+sortSelect?.addEventListener('change', filterAndSort);
+selectAllCheckbox?.addEventListener('change', (e) => {
+  document.querySelectorAll('.listing-checkbox').forEach(cb => {
+    cb.checked = e.target.checked;
+  });
+  updateAddButton();
+});
+addSelectedBtn?.addEventListener('click', addSelectedListings);
+prevPageBtn?.addEventListener('click', () => {
+  if (currentPage > 0) {
+    currentPage--;
+    renderListings();
+    window.scrollTo(0, 0);
+  }
+});
+nextPageBtn?.addEventListener('click', () => {
+  const totalPages = Math.ceil(filteredListings.length / pageSize);
+  if (currentPage < totalPages - 1) {
+    currentPage++;
+    renderListings();
+    window.scrollTo(0, 0);
+  }
+});
+
+// Load listings on page load
+document.addEventListener('DOMContentLoaded', loadListings);
+</script>
+
+</BaseLayout>

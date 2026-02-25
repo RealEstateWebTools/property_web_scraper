@@ -1,156 +1,401 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import StatCard from '../../components/admin/StatCard.astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
 
 const auth = authenticateAdmin(Astro.request);
 if (!auth.authorized) return Astro.redirect('/admin/login');
-
-// Note: In production with KV, you'd list users from KV.
-// For now this page shows a placeholder for manual user management
-// and instructions for using the API key management endpoints.
 ---
-<AdminLayout title="Users & API Keys — Admin" activePage="users">
-  <h1 class="text-2xl font-bold mb-6">Users & API Keys</h1>
+<AdminLayout title="Users — Admin" activePage="users">
+  <h1 class="text-2xl font-bold mb-2">User Management</h1>
+  <p class="text-sm text-gray-500 mb-6">View and manage all users, tiers, and API keys.</p>
 
-  <!-- Quick Info -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-    <StatCard
-      title="Subscription Tiers"
-      value="4"
-      subtitle="Free, Starter, Pro, Enterprise"
-      icon="bi-layers"
-      color="text-blue-600"
-    />
-    <StatCard
-      title="Key Format"
-      value="pws_live_"
-      subtitle="SHA-256 hashed storage"
-      icon="bi-key"
-      color="text-green-600"
-    />
-    <StatCard
-      title="Rate Limits"
-      value="30–1K"
-      subtitle="requests/min by tier"
-      icon="bi-speedometer"
-      color="text-orange-600"
+  <!-- Loading -->
+  <div id="loading" class="text-center py-12">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
+    <p class="mt-3 text-sm text-gray-500">Loading users...</p>
+  </div>
+
+  <!-- Summary cards -->
+  <div id="summary" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">Total Users</p>
+      <p class="text-2xl font-bold" id="total-users">—</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-5">
+      <p class="text-sm text-gray-500">By Tier</p>
+      <p class="text-sm font-mono" id="by-tier">—</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div id="search-bar" class="hidden mb-4">
+    <input
+      id="search-input"
+      type="text"
+      placeholder="Search by email or user ID..."
+      class="w-full sm:w-80 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
   </div>
 
-  <!-- Tier Details -->
-  <div class="bg-white rounded-lg shadow mb-8">
-    <div class="px-5 py-4 border-b border-gray-200">
-      <h2 class="font-semibold">Subscription Tiers</h2>
+  <!-- Results table -->
+  <div id="results" class="hidden bg-white rounded-lg shadow">
+    <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="font-semibold">All Users</h2>
+      <button
+        id="refresh-btn"
+        class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition"
+      >
+        Refresh
+      </button>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
           <tr class="text-left text-gray-500 border-b border-gray-200">
-            <th class="py-2 px-4 font-medium">Tier</th>
-            <th class="py-2 px-4 font-medium">Rate Limit</th>
-            <th class="py-2 px-4 font-medium">Daily Quota</th>
-            <th class="py-2 px-4 font-medium">Stripe Price</th>
+            <th class="py-2 px-5 font-medium">Email</th>
+            <th class="py-2 px-5 font-medium">User ID</th>
+            <th class="py-2 px-5 font-medium">Tier</th>
+            <th class="py-2 px-5 font-medium">Keys</th>
+            <th class="py-2 px-5 font-medium">Created</th>
+            <th class="py-2 px-5 font-medium">Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr class="border-b border-gray-100">
-            <td class="py-2 px-4"><span class="inline-block bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Free</span></td>
-            <td class="py-2 px-4">30/min</td>
-            <td class="py-2 px-4">500/day</td>
-            <td class="py-2 px-4 text-gray-400">—</td>
-          </tr>
-          <tr class="border-b border-gray-100">
-            <td class="py-2 px-4"><span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded">Starter</span></td>
-            <td class="py-2 px-4">120/min</td>
-            <td class="py-2 px-4">5,000/day</td>
-            <td class="py-2 px-4 font-mono text-xs">{import.meta.env.STRIPE_PRICE_STARTER || 'Not configured'}</td>
-          </tr>
-          <tr class="border-b border-gray-100">
-            <td class="py-2 px-4"><span class="inline-block bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded">Pro</span></td>
-            <td class="py-2 px-4">300/min</td>
-            <td class="py-2 px-4">25,000/day</td>
-            <td class="py-2 px-4 font-mono text-xs">{import.meta.env.STRIPE_PRICE_PRO || 'Not configured'}</td>
-          </tr>
-          <tr class="border-b border-gray-100">
-            <td class="py-2 px-4"><span class="inline-block bg-amber-100 text-amber-800 text-xs font-medium px-2 py-0.5 rounded">Enterprise</span></td>
-            <td class="py-2 px-4">1,000/min</td>
-            <td class="py-2 px-4">100,000/day</td>
-            <td class="py-2 px-4 text-gray-400">Custom</td>
-          </tr>
+        <tbody id="results-body">
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- API Key Management Guide -->
-  <div class="bg-white rounded-lg shadow mb-8">
-    <div class="px-5 py-4 border-b border-gray-200">
-      <h2 class="font-semibold">API Key Management</h2>
+  <!-- Empty state -->
+  <div id="empty-state" class="hidden bg-gray-50 rounded-lg p-8 text-center">
+    <p class="text-gray-500">No users found.</p>
+  </div>
+
+  <!-- Error -->
+  <div id="error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm mt-4">
+  </div>
+
+  <!-- Keys panel (shown inline) -->
+  <div id="keys-panel" class="hidden bg-white rounded-lg shadow mt-4">
+    <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h3 class="font-semibold" id="keys-panel-title">API Keys</h3>
+      <button
+        id="close-keys-btn"
+        class="text-gray-400 hover:text-gray-600 text-lg"
+      >
+        ✕
+      </button>
     </div>
-    <div class="p-5 space-y-4 text-sm">
-      <div>
-        <h3 class="font-medium mb-2">Create a new API key</h3>
-        <pre class="bg-gray-900 text-green-400 p-3 rounded overflow-x-auto text-xs"><code>curl -X POST /public_api/v1/auth/keys \
-  -H "X-Api-Key: $MASTER_KEY" \
-  -H "Content-Type: application/json" \
-  -d '&#123;"label": "production"&#125;'</code></pre>
-      </div>
-      <div>
-        <h3 class="font-medium mb-2">List API keys</h3>
-        <pre class="bg-gray-900 text-green-400 p-3 rounded overflow-x-auto text-xs"><code>curl /public_api/v1/auth/keys \
-  -H "X-Api-Key: $YOUR_KEY"</code></pre>
-      </div>
-      <div>
-        <h3 class="font-medium mb-2">Revoke an API key</h3>
-        <pre class="bg-gray-900 text-green-400 p-3 rounded overflow-x-auto text-xs"><code>curl -X DELETE "/public_api/v1/auth/keys?prefix=pws_live_xxxx" \
-  -H "X-Api-Key: $YOUR_KEY"</code></pre>
-      </div>
-      <div>
-        <h3 class="font-medium mb-2">Check usage</h3>
-        <pre class="bg-gray-900 text-green-400 p-3 rounded overflow-x-auto text-xs"><code>curl /public_api/v1/usage \
-  -H "X-Api-Key: $YOUR_KEY"</code></pre>
+    <div class="p-5">
+      <div id="keys-list" class="space-y-2">
       </div>
     </div>
   </div>
 
-  <!-- Billing Endpoints -->
-  <div class="bg-white rounded-lg shadow">
-    <div class="px-5 py-4 border-b border-gray-200">
-      <h2 class="font-semibold">Billing Endpoints</h2>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="text-left text-gray-500 border-b border-gray-200">
-            <th class="py-2 px-4 font-medium">Method</th>
-            <th class="py-2 px-4 font-medium">Path</th>
-            <th class="py-2 px-4 font-medium">Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="border-b border-gray-100">
-            <td class="py-2 px-4"><span class="bg-green-100 text-green-800 text-xs font-mono px-1.5 py-0.5 rounded">POST</span></td>
-            <td class="py-2 px-4 font-mono text-xs">/public_api/v1/billing/checkout</td>
-            <td class="py-2 px-4 text-xs">Create Stripe Checkout session</td>
-          </tr>
-          <tr class="border-b border-gray-100">
-            <td class="py-2 px-4"><span class="bg-green-100 text-green-800 text-xs font-mono px-1.5 py-0.5 rounded">POST</span></td>
-            <td class="py-2 px-4 font-mono text-xs">/public_api/v1/billing/portal</td>
-            <td class="py-2 px-4 text-xs">Open Stripe Customer Portal</td>
-          </tr>
-          <tr class="border-b border-gray-100">
-            <td class="py-2 px-4"><span class="bg-yellow-100 text-yellow-800 text-xs font-mono px-1.5 py-0.5 rounded">POST</span></td>
-            <td class="py-2 px-4 font-mono text-xs">/public_api/v1/stripe-webhook</td>
-            <td class="py-2 px-4 text-xs">Stripe webhook (auto-syncs tier)</td>
-          </tr>
-          <tr>
-            <td class="py-2 px-4"><span class="bg-blue-100 text-blue-800 text-xs font-mono px-1.5 py-0.5 rounded">GET</span></td>
-            <td class="py-2 px-4 font-mono text-xs">/public_api/v1/usage</td>
-            <td class="py-2 px-4 text-xs">Usage stats & quota</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <script>
+    function escapeHtml(str: unknown): string {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    interface UserItem {
+      userId: string;
+      email: string;
+      name: string | null;
+      tier: 'free' | 'starter' | 'pro' | 'enterprise';
+      keyCount: number;
+      activeKeyCount: number;
+      createdAt: string;
+      stripeCustomerId: string | null;
+    }
+
+    let allUsers: UserItem[] = [];
+    let currentKeysUserId: string | null = null;
+
+    function getTierColor(tier: string): string {
+      switch (tier) {
+        case 'free':
+          return 'bg-gray-100 text-gray-800';
+        case 'starter':
+          return 'bg-blue-100 text-blue-800';
+        case 'pro':
+          return 'bg-purple-100 text-purple-800';
+        case 'enterprise':
+          return 'bg-amber-100 text-amber-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
+    }
+
+    async function showKeys(userId: string) {
+      currentKeysUserId = userId;
+      const keysListEl = document.getElementById('keys-list')!;
+      const keysPanelEl = document.getElementById('keys-panel')!;
+      const keysPanelTitle = document.getElementById('keys-panel-title')!;
+
+      keysListEl.innerHTML = '<p class="text-gray-500 text-sm">Loading...</p>';
+      keysPanelEl.classList.remove('hidden');
+      keysPanelTitle.textContent = `API Keys for ${userId}`;
+
+      try {
+        const res = await fetch('/admin/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'list_keys', userId }),
+        });
+        const data = await res.json();
+        if (!data.keys || data.keys.length === 0) {
+          keysListEl.innerHTML = '<p class="text-gray-500 text-sm">No keys found.</p>';
+          return;
+        }
+
+        keysListEl.innerHTML = '';
+        for (const key of data.keys) {
+          const div = document.createElement('div');
+          div.className = 'flex items-center justify-between p-3 border border-gray-200 rounded text-xs';
+          const statusColor = key.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+          div.innerHTML = `
+            <div>
+              <p class="font-mono"><span class="bg-gray-100 px-2 py-1 rounded">${escapeHtml(key.prefix)}</span></p>
+              <p class="text-gray-500">${escapeHtml(key.label)} • <span class="bg-${statusColor === 'bg-green-100 text-green-800' ? 'green' : 'gray'}-100 text-${statusColor === 'bg-green-100 text-green-800' ? 'green' : 'gray'}-800 px-2 py-0.5 rounded">${key.active ? 'Active' : 'Revoked'}</span></p>
+              <p class="text-gray-400">${new Date(key.createdAt).toLocaleDateString()}</p>
+            </div>
+            <button class="revoke-key-btn text-red-600 hover:text-red-800 cursor-pointer border-0 bg-transparent" data-hash="${escapeHtml(key.hash)}" ${key.active ? '' : 'disabled'}>
+              <i class="bi bi-trash"></i>
+            </button>
+          `;
+          keysListEl.appendChild(div);
+        }
+
+        // Attach revoke handlers
+        for (const btn of keysListEl.querySelectorAll('.revoke-key-btn')) {
+          btn.addEventListener('click', async (e) => {
+            if ((e.currentTarget as HTMLButtonElement).disabled) return;
+            const hash = (e.currentTarget as HTMLElement).dataset.hash!;
+            if (!confirm('Revoke this key? It will no longer work.')) return;
+            await revokeKey(hash);
+          });
+        }
+      } catch (err) {
+        keysListEl.innerHTML = '<p class="text-red-600 text-sm">Error loading keys.</p>';
+      }
+    }
+
+    async function revokeKey(keyHash: string) {
+      try {
+        const res = await fetch('/admin/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'revoke_key', userId: currentKeysUserId, keyHash }),
+        });
+        const data = await res.json();
+        if (data.success && currentKeysUserId) {
+          await showKeys(currentKeysUserId);
+        } else {
+          alert(data.error || 'Revoke failed');
+        }
+      } catch (err) {
+        alert('Network error');
+      }
+    }
+
+    async function changeTier(userId: string, newTier: string) {
+      try {
+        const res = await fetch('/admin/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'change_tier', userId, tier: newTier }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          await loadUsers();
+        } else {
+          alert(data.error || 'Tier change failed');
+        }
+      } catch (err) {
+        alert('Network error');
+      }
+    }
+
+    async function deleteUserConfirm(userId: string) {
+      if (!confirm(`Delete user ${userId}? This cannot be undone. All their keys will be revoked.`)) return;
+      try {
+        const res = await fetch('/admin/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete_user', userId }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          await loadUsers();
+        } else {
+          alert(data.error || 'Delete failed');
+        }
+      } catch (err) {
+        alert('Network error');
+      }
+    }
+
+    function renderTable(users: UserItem[]) {
+      const bodyEl = document.getElementById('results-body')!;
+      bodyEl.innerHTML = '';
+
+      for (const u of users) {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-gray-100 hover:bg-gray-50';
+
+        // Email
+        const tdEmail = document.createElement('td');
+        tdEmail.className = 'py-2 px-5';
+        tdEmail.textContent = u.email;
+        tr.appendChild(tdEmail);
+
+        // User ID
+        const tdUserId = document.createElement('td');
+        tdUserId.className = 'py-2 px-5 font-mono text-xs';
+        tdUserId.textContent = u.userId;
+        tr.appendChild(tdUserId);
+
+        // Tier
+        const tdTier = document.createElement('td');
+        tdTier.className = 'py-2 px-5';
+        const tierSelect = document.createElement('select');
+        tierSelect.className = `text-xs px-2 py-1 rounded cursor-pointer border border-gray-300 ${getTierColor(u.tier)}`;
+        tierSelect.value = u.tier;
+        ['free', 'starter', 'pro', 'enterprise'].forEach((t) => {
+          const option = document.createElement('option');
+          option.value = t;
+          option.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+          tierSelect.appendChild(option);
+        });
+        tierSelect.addEventListener('change', async (e) => {
+          const newTier = (e.currentTarget as HTMLSelectElement).value;
+          await changeTier(u.userId, newTier);
+        });
+        tdTier.appendChild(tierSelect);
+        tr.appendChild(tdTier);
+
+        // Keys
+        const tdKeys = document.createElement('td');
+        tdKeys.className = 'py-2 px-5';
+        tdKeys.innerHTML = `<button class="text-blue-600 hover:underline no-underline text-xs border-0 bg-transparent cursor-pointer show-keys-btn" data-user-id="${escapeHtml(u.userId)}">
+          ${u.activeKeyCount}/${u.keyCount}
+        </button>`;
+        tr.appendChild(tdKeys);
+
+        // Created
+        const tdCreated = document.createElement('td');
+        tdCreated.className = 'py-2 px-5 text-gray-600';
+        tdCreated.textContent = new Date(u.createdAt).toLocaleDateString();
+        tr.appendChild(tdCreated);
+
+        // Actions
+        const tdActions = document.createElement('td');
+        tdActions.className = 'py-2 px-5';
+        tdActions.innerHTML = `
+          <button class="text-red-600 hover:text-red-800 text-xs cursor-pointer border-0 bg-transparent delete-user-btn" data-user-id="${escapeHtml(u.userId)}">
+            <i class="bi bi-trash"></i> Delete
+          </button>
+        `;
+        tr.appendChild(tdActions);
+
+        bodyEl.appendChild(tr);
+      }
+
+      // Attach event handlers
+      for (const btn of bodyEl.querySelectorAll('.show-keys-btn')) {
+        btn.addEventListener('click', (e) => {
+          const userId = (e.currentTarget as HTMLElement).dataset.userId!;
+          showKeys(userId);
+        });
+      }
+      for (const btn of bodyEl.querySelectorAll('.delete-user-btn')) {
+        btn.addEventListener('click', (e) => {
+          const userId = (e.currentTarget as HTMLElement).dataset.userId!;
+          deleteUserConfirm(userId);
+        });
+      }
+    }
+
+    function filterAndRender() {
+      const query = (document.getElementById('search-input') as HTMLInputElement)?.value.toLowerCase() || '';
+      let filtered = allUsers;
+      if (query) {
+        filtered = allUsers.filter(
+          (u) =>
+            u.email.toLowerCase().includes(query) || u.userId.toLowerCase().includes(query),
+        );
+      }
+      renderTable(filtered);
+    }
+
+    async function loadUsers() {
+      const loadingEl = document.getElementById('loading')!;
+      const summaryEl = document.getElementById('summary')!;
+      const searchBar = document.getElementById('search-bar')!;
+      const resultsEl = document.getElementById('results')!;
+      const emptyEl = document.getElementById('empty-state')!;
+      const errorEl = document.getElementById('error')!;
+
+      loadingEl.classList.remove('hidden');
+      summaryEl.classList.add('hidden');
+      searchBar.classList.add('hidden');
+      resultsEl.classList.add('hidden');
+      emptyEl.classList.add('hidden');
+      errorEl.classList.add('hidden');
+
+      try {
+        const res = await fetch('/admin/api/users');
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({ error: 'Request failed' }));
+          errorEl.textContent = data.error || `HTTP ${res.status}`;
+          errorEl.classList.remove('hidden');
+          loadingEl.classList.add('hidden');
+          return;
+        }
+
+        const data = await res.json();
+        allUsers = data.users || [];
+
+        // Summary
+        document.getElementById('total-users')!.textContent = String(data.total);
+        const byTierText = `Free: ${data.byTier.free} | Starter: ${data.byTier.starter} | Pro: ${data.byTier.pro} | Enterprise: ${data.byTier.enterprise}`;
+        document.getElementById('by-tier')!.textContent = byTierText;
+
+        loadingEl.classList.add('hidden');
+        summaryEl.classList.remove('hidden');
+
+        if (allUsers.length === 0) {
+          emptyEl.classList.remove('hidden');
+        } else {
+          searchBar.classList.remove('hidden');
+          resultsEl.classList.remove('hidden');
+          filterAndRender();
+        }
+      } catch (err) {
+        errorEl.textContent = 'Network error: ' + (err instanceof Error ? err.message : String(err));
+        errorEl.classList.remove('hidden');
+        loadingEl.classList.add('hidden');
+      }
+    }
+
+    // Search
+    document.getElementById('search-input')?.addEventListener('input', filterAndRender);
+
+    // Close keys panel
+    document.getElementById('close-keys-btn')?.addEventListener('click', () => {
+      document.getElementById('keys-panel')!.classList.add('hidden');
+      currentKeysUserId = null;
+    });
+
+    // Load on page ready
+    loadUsers();
+
+    // Refresh button
+    document.getElementById('refresh-btn')?.addEventListener('click', loadUsers);
+  </script>
 </AdminLayout>

@@ -31,6 +31,7 @@ export const ADMIN_NAV_LINKS: NavLink[] = [
   { label: 'Trends', href: '/admin/scraper-trends', icon: 'bi-graph-up-arrow', activePage: 'scraper-trends' },
   { label: 'Retention', href: '/admin/retention', icon: 'bi-clock-history', activePage: 'retention' },
   { label: 'Hauls', href: '/admin/hauls', icon: 'bi-box-seam', activePage: 'hauls' },
+  { label: 'Users', href: '/admin/users', icon: 'bi-people', activePage: 'users' },
   { label: 'Dead Letters', href: '/admin/dead-letters', icon: 'bi-exclamation-triangle', activePage: 'dead-letters' },
   { label: 'Webhooks', href: '/admin/webhooks', icon: 'bi-broadcast', activePage: 'webhooks' },
   { label: 'AI Map', href: '/admin/ai-map', icon: 'bi-magic', activePage: 'ai-map' },

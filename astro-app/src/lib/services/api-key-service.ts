@@ -303,3 +303,53 @@ export async function setStripeCustomerId(userId: string, stripeCustomerId: stri
   await kvPut(`user:${userId}`, JSON.stringify(user));
   return true;
 }
+
+/**
+ * List all users.
+ */
+export async function listUsers(): Promise<UserRecord[]> {
+  const users: UserRecord[] = [];
+  if (kv) {
+    const list = await kv.list({ prefix: 'user:' });
+    for (const key of list.keys) {
+      const json = await kvGet(key.name);
+      if (json) {
+        try {
+          users.push(JSON.parse(json));
+        } catch {
+          // Skip corrupt entries
+        }
+      }
+    }
+  } else {
+    // In-memory fallback
+    for (const [k, v] of memStore) {
+      if (k.startsWith('user:')) {
+        try {
+          users.push(JSON.parse(v));
+        } catch {
+          // Skip corrupt entries
+        }
+      }
+    }
+  }
+  return users;
+}
+
+/**
+ * Delete a user and all their API keys.
+ */
+export async function deleteUser(userId: string): Promise<boolean> {
+  const user = await getUser(userId);
+  if (!user) return false;
+
+  // Revoke all keys first
+  for (const hash of user.keyHashes) {
+    await kvDelete(`apikey:${hash}`);
+    validationCache.delete(hash);
+  }
+
+  // Delete user record
+  await kvDelete(`user:${userId}`);
+  return true;
+}
