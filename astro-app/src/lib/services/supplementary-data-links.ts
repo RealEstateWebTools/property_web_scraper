@@ -1,79 +1,57 @@
 import type { Listing } from '../models/listing.js';
+import defaultLinksConfig from '../../config/supplementary-links.json';
 
 export interface SupplementaryLinkConfig {
   titleTemplate: string;
   urlTemplate: string;
-  condition: (listing: Partial<Listing>) => boolean;
+  requireFields?: string[];
+  category?: string;
+  icon?: string;
 }
 
 export type CountryLinkConfig = Record<string, SupplementaryLinkConfig[]>;
 
-// Configuration storage for how to generate links per country
-const DEFAULT_LINK_CONFIGS: CountryLinkConfig = {
-  UK: [
-    {
-      titleTemplate: 'Doogal Postcode Data',
-      urlTemplate: 'https://www.doogal.co.uk/UKPostcodes.php?Search={postal_code}',
-      condition: (listing) => !!listing.postal_code,
-    },
-    {
-      titleTemplate: 'Mouseprice Property Data',
-      urlTemplate: 'https://www.mouseprice.com/property-for-sale/refine?search={postal_code}',
-      condition: (listing) => !!listing.postal_code,
-    },
-  ],
-  GB: [
-    {
-      titleTemplate: 'Doogal Postcode Data',
-      urlTemplate: 'https://www.doogal.co.uk/UKPostcodes.php?Search={postal_code}',
-      condition: (listing) => !!listing.postal_code,
-    },
-    {
-      titleTemplate: 'Mouseprice Property Data',
-      urlTemplate: 'https://www.mouseprice.com/property-for-sale/refine?search={postal_code}',
-      condition: (listing) => !!listing.postal_code,
-    },
-  ],
-  ES: [
-    {
-      titleTemplate: 'Idealista Area Guide',
-      urlTemplate: 'https://www.idealista.com/en/areas/{postal_code}',
-      condition: (listing) => !!listing.postal_code,
-    },
-  ],
-  US: [
-    {
-      titleTemplate: 'Zip Code Data',
-      urlTemplate: 'https://www.unitedstateszipcodes.org/{postal_code}/',
-      condition: (listing) => !!listing.postal_code,
-    },
-  ]
-};
+export interface GeneratedLink {
+  title: string;
+  url: string;
+  category?: string;
+  icon?: string;
+}
 
 export class SupplementaryDataService {
   private configs: CountryLinkConfig;
 
   constructor(customConfigs?: CountryLinkConfig) {
-    this.configs = customConfigs || DEFAULT_LINK_CONFIGS;
+    this.configs = customConfigs || (defaultLinksConfig as CountryLinkConfig);
   }
 
   /**
    * Calculates which lists to generate for which property and
    * constructs the formatted links based on configured templates.
    */
-  generateLinks(listing: Partial<Listing>): { title: string; url: string }[] {
+  generateLinks(listing: Partial<Listing>): GeneratedLink[] {
     const country = (listing.country || '').trim().toUpperCase();
-    const result: { title: string; url: string }[] = [];
+    const result: GeneratedLink[] = [];
 
     // Fallback if country is not set but we have region or want generic lists
     const countryConfigs = this.configs[country];
     if (!countryConfigs) return result;
 
     for (const config of countryConfigs) {
-      if (config.condition(listing)) {
+      let conditionsMet = true;
+      if (config.requireFields && config.requireFields.length > 0) {
+        conditionsMet = config.requireFields.every((field) => {
+          const val = (listing as any)[field];
+          return val !== undefined && val !== null && val !== '';
+        });
+      }
+
+      if (conditionsMet) {
         result.push({
           title: this.interpolate(config.titleTemplate, listing),
           url: this.interpolate(config.urlTemplate, listing),
+          ...(config.category ? { category: config.category } : {}),
+          ...(config.icon ? { icon: config.icon } : {}),
         });
       }
     }

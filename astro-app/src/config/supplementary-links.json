@@ -1,0 +1,52 @@
+{
+  "UK": [
+    {
+      "titleTemplate": "Doogal Postcode Data",
+      "urlTemplate": "https://www.doogal.co.uk/UKPostcodes.php?Search={postal_code}",
+      "requireFields": ["postal_code"],
+      "category": "demographics",
+      "icon": "map-pin"
+    },
+    {
+      "titleTemplate": "Mouseprice Property Data",
+      "urlTemplate": "https://www.mouseprice.com/property-for-sale/refine?search={postal_code}",
+      "requireFields": ["postal_code"],
+      "category": "price_history",
+      "icon": "trending-up"
+    }
+  ],
+  "GB": [
+    {
+      "titleTemplate": "Doogal Postcode Data",
+      "urlTemplate": "https://www.doogal.co.uk/UKPostcodes.php?Search={postal_code}",
+      "requireFields": ["postal_code"],
+      "category": "demographics",
+      "icon": "map-pin"
+    },
+    {
+      "titleTemplate": "Mouseprice Property Data",
+      "urlTemplate": "https://www.mouseprice.com/property-for-sale/refine?search={postal_code}",
+      "requireFields": ["postal_code"],
+      "category": "price_history",
+      "icon": "trending-up"
+    }
+  ],
+  "ES": [
+    {
+      "titleTemplate": "Idealista Area Guide",
+      "urlTemplate": "https://www.idealista.com/en/areas/{postal_code}",
+      "requireFields": ["postal_code"],
+      "category": "local_guide",
+      "icon": "map"
+    }
+  ],
+  "US": [
+    {
+      "titleTemplate": "Zip Code Data",
+      "urlTemplate": "https://www.unitedstateszipcodes.org/{postal_code}/",
+      "requireFields": ["postal_code"],
+      "category": "demographics",
+      "icon": "pie-chart"
+    }
+  ]
+}

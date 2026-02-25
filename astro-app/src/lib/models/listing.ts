@@ -96,6 +96,7 @@ export class Listing extends BaseModel {
     price_qualifier: { type: 'string' },
     floor_plan_urls: { type: 'array', default: [] },
     energy_certificate_grade: { type: 'string' },
+    supplementary_data_links: { type: 'array', default: [] },
   };
 
   // All declared attribute properties
@@ -176,6 +177,7 @@ export class Listing extends BaseModel {
   price_qualifier = '';
   floor_plan_urls: string[] = [];
   energy_certificate_grade = '';
+  supplementary_data_links: Array<{ title: string; url: string; category?: string; icon?: string }> = [];
 
   /**
    * Returns a JSON-safe hash of public listing attributes.
@@ -197,12 +199,8 @@ export class Listing extends BaseModel {
       'property_type', 'property_subtype', 'tenure', 'listing_status',
       'agent_name', 'agent_phone', 'agent_email', 'agent_logo_url',
       'price_qualifier', 'floor_plan_urls', 'energy_certificate_grade',
+      'supplementary_data_links'
     ]);
-    
-    // Dynamically calculate supplementary links for the listing
-    if (!only || only.includes('supplementary_data_links')) {
-      json.supplementary_data_links = supplementaryDataService.generateLinks(this);
-    }
     
     return json;
   }
@@ -234,6 +232,7 @@ export class Listing extends BaseModel {
 
     const ARRAY_FIELDS: Set<string> = new Set([
       'image_urls', 'features', 'related_urls', 'floor_plan_urls',
+      'supplementary_data_links'
     ]);
 
     const NUMERIC_FIELDS: Set<string> = new Set([
@@ -450,6 +449,9 @@ export class Listing extends BaseModel {
     } else {
       listing.image_urls = [];
     }
+
+    // Refresh supplementary links after location/fields have been updated
+    listing.supplementary_data_links = supplementaryDataService.generateLinks(listing);
   }
 
   /**

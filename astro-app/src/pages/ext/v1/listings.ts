@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getAllListings, getDiagnostics } from '@lib/services/listing-store.js';
 import { successResponse, corsPreflightResponse } from '@lib/services/api-response.js';
-import { supplementaryDataService } from '@lib/services/supplementary-data-links.js';
 
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
@@ -95,7 +94,7 @@ export const GET: APIRoute = async ({ request }) => {
       extraction_rate: (diagnostics?.extractionRate || 0) * 100,
       created_at: listing.last_retrieved_at,
       url: listing.import_url,
-      supplementary_data_links: supplementaryDataService.generateLinks(listing),
+      supplementary_data_links: listing.supplementary_data_links || [],
     }));
 
     return successResponse(

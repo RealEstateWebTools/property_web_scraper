@@ -19,7 +19,6 @@ import { detectListingType } from '@lib/extractor/listing-type-detector.js';
 import type { SplitSchema } from '@lib/extractor/schema-splitter.js';
 import type { PortalConfig } from '@lib/services/portal-registry.js';
 import { runExtraction, countAvailableFields, countExtractedFields } from '@lib/services/extraction-runner.js';
-import { supplementaryDataService } from '@lib/services/supplementary-data-links.js';
 
 /**
  * Build PWB-formatted response from extraction result.
@@ -31,6 +30,7 @@ function buildPwbResponse(
   sourceUrl: string,
   portal: PortalConfig | undefined,
   extractionRate: number,
+  supplementaryLinks: any[],
 ): Record<string, unknown> {
   const { assetData, listingData } = splitSchema;
 
@@ -54,11 +54,7 @@ function buildPwbResponse(
     year_construction: assetData.year_construction,
     energy_rating: assetData.energy_rating,
     energy_performance: assetData.energy_performance,
-    supplementary_data_links: supplementaryDataService.generateLinks({
-      ...props,
-      ...assetData,
-      country: assetData.country || portal?.country
-    } as any),
+    supplementary_data_links: supplementaryLinks,
   };
 
   const listingType = detectListingType(props, sourceUrl);
@@ -464,6 +460,7 @@ export const POST: APIRoute = async ({ request }) => {
       extraction.diagnostics
         ? (extraction.diagnostics as any).extractionRate || 0
         : 0,
+      listing.supplementary_data_links || [],
     );
 
     logActivity({
