@@ -3,11 +3,13 @@ import { validateEnv } from '@lib/services/env-validator.js';
 import { corsPreflightResponse, buildCorsHeaders } from '@lib/services/api-response.js';
 import { initAllKV } from '@lib/services/kv-init.js';
 import { maybeTriggerCleanup } from '@lib/services/retention-cleanup.js';
+import { logActivity } from '@lib/services/activity-logger.js';
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   validateEnv();
   initAllKV(context.locals);
 
+  const startTime = Date.now();
   const { method } = context.request;
   const url = new URL(context.request.url);
   const origin = context.request.headers.get('origin');
@@ -48,6 +50,22 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data:; font-src 'self' https:; connect-src 'self' https:; frame-ancestors 'none'");
 
   console.log(`[Middleware] ${method} ${url.pathname} → ${response.status}`);
+
+  // Log to activity buffer
+  const durationMs = Date.now() - startTime;
+  const isApiPath = url.pathname.startsWith('/ext/') || url.pathname.startsWith('/public_api/');
+  const isAdminPath = url.pathname.startsWith('/admin/');
+  if (isApiPath || isAdminPath) {
+    logActivity({
+      level: response.status >= 500 ? 'error' : response.status >= 400 ? 'warn' : 'info',
+      category: isApiPath ? 'api_request' : 'system',
+      message: `${method} ${url.pathname} → ${response.status}`,
+      method,
+      path: url.pathname,
+      statusCode: response.status,
+      durationMs,
+    });
+  }
 
   // Probabilistic retention cleanup on admin/API requests
   if (url.pathname.startsWith('/admin/') || url.pathname.startsWith('/public_api/')) {
