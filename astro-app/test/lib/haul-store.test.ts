@@ -23,6 +23,25 @@ describe('haul-store', () => {
     await createHaul(haulId, '127.0.0.1');
   });
 
+  describe('createHaul visibility', () => {
+    it('defaults to public visibility', async () => {
+      const id = `public-${Date.now()}`;
+      const haul = await createHaul(id, '127.0.0.1');
+      expect(haul.visibility).toBe('public');
+      expect(haul.ownerUserId).toBeUndefined();
+    });
+
+    it('supports private ownership for authenticated users', async () => {
+      const id = `private-${Date.now()}`;
+      const haul = await createHaul(id, '127.0.0.1', {
+        visibility: 'private',
+        ownerUserId: 'user-123',
+      });
+      expect(haul.visibility).toBe('private');
+      expect(haul.ownerUserId).toBe('user-123');
+    });
+  });
+
   describe('addScrapeToHaul', () => {
     it('appends a scrape to the haul', async () => {
       const scrape = makeScrape();

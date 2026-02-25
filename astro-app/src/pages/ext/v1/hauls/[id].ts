@@ -1,6 +1,13 @@
 import type { APIRoute } from 'astro';
 import { isValidHaulId } from '@lib/services/haul-id.js';
 import { getHaul, updateHaulMeta } from '@lib/services/haul-store.js';
+import { authenticateApiKey } from '@lib/services/auth.js';
+import {
+  canAccessHaul,
+  canModifyHaul,
+  resolveHaulVisibility,
+  userIdFromAuth,
+} from '@lib/services/haul-access.js';
 import { errorResponse, successResponse, corsPreflightResponse, ApiErrorCode } from '@lib/services/api-response.js';
 
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
@@ -18,6 +25,11 @@ export const GET: APIRoute = async ({ params, request }) => {
   if (!haul) {
     return errorResponse(ApiErrorCode.NOT_FOUND, 'Haul not found or expired', request);
   }
+  const auth = await authenticateApiKey(request);
+  const requesterUserId = userIdFromAuth(auth);
+  if (!canAccessHaul(haul, requesterUserId)) {
+    return errorResponse(ApiErrorCode.NOT_FOUND, 'Haul not found or expired', request);
+  }
 
   return successResponse({
     haul_id: haul.id,
@@ -28,6 +40,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     scrapes: haul.scrapes,
     name: haul.name || null,
     notes: haul.notes || null,
+    visibility: resolveHaulVisibility(haul),
   }, request);
 };
 
@@ -57,6 +70,16 @@ export const PATCH: APIRoute = async ({ params, request }) => {
 
   if (name === undefined && notes === undefined) {
     return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Provide name and/or notes', request);
+  }
+
+  const existing = await getHaul(id);
+  if (!existing) {
+    return errorResponse(ApiErrorCode.NOT_FOUND, 'Haul not found or expired', request);
+  }
+  const auth = await authenticateApiKey(request);
+  const requesterUserId = userIdFromAuth(auth);
+  if (!canModifyHaul(existing, requesterUserId)) {
+    return errorResponse(ApiErrorCode.NOT_FOUND, 'Haul not found or expired', request);
   }
 
   try {

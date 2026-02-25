@@ -2,14 +2,22 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getHaul } from '../lib/services/haul-store.js';
 import { parseCookie } from '../lib/services/web-haul-resolver.js';
+import { authenticateApiKey } from '../lib/services/auth.js';
+import { canAccessHaul, userIdFromAuth } from '../lib/services/haul-access.js';
 
 const cookieHeader = Astro.request.headers.get('cookie') || '';
+const requestUrl = new URL(Astro.request.url);
+const requestApiKey = requestUrl.searchParams.get('api_key') || '';
+const haulQuerySuffix = requestApiKey ? `?api_key=${encodeURIComponent(requestApiKey)}` : '';
 const cookieHaulId = parseCookie(cookieHeader, 'pws_haul_id');
+const auth = await authenticateApiKey(Astro.request);
+const requesterUserId = userIdFromAuth(auth);
 
 let activeHaul: Awaited<ReturnType<typeof getHaul>> | undefined;
 if (cookieHaulId) {
   try {
-    activeHaul = await getHaul(cookieHaulId);
+    const loadedHaul = await getHaul(cookieHaulId);
+    activeHaul = loadedHaul && canAccessHaul(loadedHaul, requesterUserId) ? loadedHaul : undefined;
   } catch {
     // Firestore unavailable — fall through to client-side only
   }
@@ -29,11 +37,15 @@ if (cookieHaulId) {
     </button>
   </div>
 
+  <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+    <strong>Note:</strong> Anonymous hauls are public and editable by anyone with the link. Authenticated API-key users create private hauls visible only to their own account.
+  </div>
+
   {activeHaul && (
     <div class="mb-6">
       <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Active Haul</h2>
       <div class="grid gap-4 sm:grid-cols-2">
-        <a href={`/haul/${activeHaul.id}`} class="block bg-white rounded-xl shadow-sm border-2 border-blue-200 p-5 hover:shadow-md transition-shadow no-underline">
+        <a href={`/haul/${activeHaul.id}${haulQuerySuffix}`} class="block bg-white rounded-xl shadow-sm border-2 border-blue-200 p-5 hover:shadow-md transition-shadow no-underline">
           <div class="flex items-center justify-between mb-2">
             <h3 class="font-semibold text-gray-900 text-sm truncate">
               {activeHaul.name || `📦 ${activeHaul.id}`}
@@ -92,10 +104,15 @@ if (cookieHaulId) {
   </div>
 </section>
 
-<script is:inline define:vars={{ activeHaulId: activeHaul?.id ?? '' }}>
+<script is:inline define:vars={{ activeHaulId: activeHaul?.id ?? '', requestApiKey }}>
 document.addEventListener('DOMContentLoaded', function() {
   var serverHaulId = activeHaulId;
   var hasServerHaul = !!serverHaulId;
+
+  function withApiKey(path) {
+    if (!requestApiKey) return path;
+    return path + (path.includes('?') ? '&' : '?') + 'api_key=' + encodeURIComponent(requestApiKey);
+  }
 
   function escapeHtml(str) {
     return String(str == null ? '' : str)
@@ -113,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
       createBtn.disabled = true;
       createBtn.textContent = 'Creating...';
       try {
-        var res = await fetch('/ext/v1/hauls', { method: 'POST' });
+        var res = await fetch(withApiKey('/ext/v1/hauls'), { method: 'POST' });
         var data = await res.json();
         if (!res.ok) {
           if (data.error?.code === 'HAUL_LIMIT_REACHED') {
@@ -137,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
           });
           window.PwsStorage.set('functional:my-hauls', myHauls);
         }
-        window.location.href = '/haul/' + haulId;
+        window.location.href = withApiKey('/haul/' + haulId);
       } catch (err) {
         createBtn.innerHTML = '<i class="bi bi-plus-lg"></i> New Haul';
         createBtn.disabled = false;
@@ -190,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
   myHauls.forEach(function(h) {
     var daysLeft = Math.max(0, Math.ceil((new Date(h.expiresAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     var visited = new Date(h.lastVisited).toLocaleDateString();
-    html += '<a href="/haul/' + encodeURIComponent(h.id) + '" class="block bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow no-underline">';
+    html += '<a href="' + withApiKey('/haul/' + encodeURIComponent(h.id)) + '" class="block bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow no-underline">';
     html += '<div class="flex items-center justify-between mb-2">';
     html += '<h3 class="font-semibold text-gray-900 text-sm truncate">' + (h.name ? escapeHtml(h.name) : '📦 ' + escapeHtml(h.id)) + '</h3>';
     html += '<span class="text-xs text-gray-400 whitespace-nowrap ml-2">' + escapeHtml(daysLeft) + 'd left</span>';

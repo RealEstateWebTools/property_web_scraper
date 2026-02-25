@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { isValidHaulId } from '@lib/services/haul-id.js';
 import { getHaul, addScrapeToHaul } from '@lib/services/haul-store.js';
+import { authenticateApiKey } from '@lib/services/auth.js';
+import { canModifyHaul, userIdFromAuth } from '@lib/services/haul-access.js';
 import { getListing, getDiagnostics } from '@lib/services/listing-store.js';
 import { buildHaulScrapeFromListing } from '@lib/pages-helpers/build-haul-scrape.js';
 import {
@@ -26,6 +28,11 @@ export const POST: APIRoute = async ({ params, request }) => {
   // Check haul exists
   const haul = await getHaul(id);
   if (!haul) {
+    return errorResponse(ApiErrorCode.NOT_FOUND, 'Haul not found or expired', request);
+  }
+  const auth = await authenticateApiKey(request);
+  const requesterUserId = userIdFromAuth(auth);
+  if (!canModifyHaul(haul, requesterUserId)) {
     return errorResponse(ApiErrorCode.NOT_FOUND, 'Haul not found or expired', request);
   }
   if (haul.scrapes.length >= 20) {

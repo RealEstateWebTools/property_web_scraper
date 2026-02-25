@@ -3,6 +3,11 @@ import { generateHaulId, isValidHaulId } from '@lib/services/haul-id.js';
 import { createHaul, getHaul } from '@lib/services/haul-store.js';
 import { resolveKV } from '@lib/services/kv-resolver.js';
 import { authenticateApiKey } from '@lib/services/auth.js';
+import {
+  canModifyHaul,
+  isAuthenticatedUser,
+  userIdFromAuth,
+} from '@lib/services/haul-access.js';
 import { handleScrapeRequest, parseScrapeBody } from '@lib/services/scrape-handler.js';
 import {
   errorResponse, corsPreflightResponse,
@@ -65,28 +70,32 @@ async function resolveHaul(
   const ip = request.headers.get('cf-connecting-ip')
     || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     || 'unknown';
+  const auth = await authenticateApiKey(request);
+  const isAuthenticated = isAuthenticatedUser(auth);
+  const requesterUserId = userIdFromAuth(auth);
 
   // If a haul_id was provided, try to use it
   if (providedHaulId) {
     if (!isValidHaulId(providedHaulId)) {
       // Invalid format — create a new one instead
-      return createNewHaul(ip, request, locals);
+      return createNewHaul(ip, isAuthenticated, requesterUserId);
     }
     const haul = await getHaul(providedHaulId);
     if (haul) {
+      if (!canModifyHaul(haul, requesterUserId)) {
+        return errorResponse(ApiErrorCode.NOT_FOUND, 'Haul not found or expired', request);
+      }
       if (haul.scrapes.length >= 20) {
         return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Haul is full (20/20 scrapes)', request);
       }
       return providedHaulId;
     }
     // Haul expired or missing — create new
-    return createNewHaul(ip, request, locals);
+    return createNewHaul(ip, isAuthenticated, requesterUserId);
   }
 
   // No haul_id provided — auto-resolve
   const kv = resolveKV(locals);
-  const auth = await authenticateApiKey(request);
-  const isAuthenticated = auth.authorized && auth.userId !== 'anonymous';
 
   if (!isAuthenticated && kv) {
     // Anonymous with KV: reuse existing free haul or create one
@@ -94,7 +103,7 @@ async function resolveHaul(
     const existing = await kv.get(freeHaulKey, 'json') as { haulId: string } | null;
     if (existing) {
       const haul = await getHaul(existing.haulId);
-      if (haul) {
+      if (haul && canModifyHaul(haul, requesterUserId)) {
         if (haul.scrapes.length >= 20) {
           return errorResponse(ApiErrorCode.INVALID_REQUEST, 'Haul is full (20/20 scrapes). Sign up for a free account to create more hauls.', request);
         }
@@ -104,7 +113,7 @@ async function resolveHaul(
     }
 
     const id = generateHaulId();
-    await createHaul(id, ip);
+    await createHaul(id, ip, { visibility: 'public' });
     await kv.put(freeHaulKey, JSON.stringify({ haulId: id, createdAt: new Date().toISOString() }), {
       expirationTtl: FREE_HAUL_TTL_S,
     });
@@ -112,15 +121,19 @@ async function resolveHaul(
   }
 
   // Authenticated or no KV (local dev) — create freely
-  return createNewHaul(ip, request, locals);
+  return createNewHaul(ip, isAuthenticated, requesterUserId);
 }
 
 async function createNewHaul(
   ip: string,
-  _request: Request,
-  _locals: any,
+  isAuthenticated: boolean,
+  requesterUserId?: string,
 ): Promise<string> {
   const id = generateHaulId();
-  await createHaul(id, ip);
+  if (isAuthenticated && requesterUserId && requesterUserId !== 'anonymous') {
+    await createHaul(id, ip, { visibility: 'private', ownerUserId: requesterUserId });
+  } else {
+    await createHaul(id, ip, { visibility: 'public' });
+  }
   return id;
 }

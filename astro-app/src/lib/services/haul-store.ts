@@ -7,6 +7,8 @@
 import { deduplicationKey } from './url-canonicalizer.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
 
+export type HaulVisibility = 'public' | 'private';
+
 export interface HaulScrape {
   resultId: string;
   title: string;
@@ -54,6 +56,8 @@ export interface Haul {
   createdAt: string;
   expiresAt: string;
   creatorIp: string;
+  visibility?: HaulVisibility;
+  ownerUserId?: string;
   scrapes: HaulScrape[];
   name?: string;
   notes?: string;
@@ -109,15 +113,35 @@ async function firestoreGetHaul(id: string): Promise<Haul | undefined> {
   return doc.data() as unknown as Haul;
 }
 
+function normalizeHaul(haul: Haul): Haul {
+  const visibility: HaulVisibility = haul.visibility === 'private' ? 'private' : 'public';
+  const normalized: Haul = { ...haul, visibility };
+  if (visibility !== 'private') {
+    delete normalized.ownerUserId;
+  }
+  return normalized;
+}
+
 // ─── Public API ─────────────────────────────────────────────────
 
-export async function createHaul(id: string, creatorIp: string): Promise<Haul> {
+export async function createHaul(
+  id: string,
+  creatorIp: string,
+  options: { visibility?: HaulVisibility; ownerUserId?: string } = {},
+): Promise<Haul> {
   const now = new Date();
+  const visibility: HaulVisibility = options.visibility === 'private' ? 'private' : 'public';
+  if (visibility === 'private' && !options.ownerUserId) {
+    throw new Error('Private hauls require ownerUserId');
+  }
+
   const haul: Haul = {
     id,
     createdAt: now.toISOString(),
     expiresAt: new Date(now.getTime() + THIRTY_DAYS_MS).toISOString(),
     creatorIp,
+    visibility,
+    ...(visibility === 'private' ? { ownerUserId: options.ownerUserId } : {}),
     scrapes: [],
   };
   store.set(id, haul);
@@ -128,10 +152,15 @@ export async function createHaul(id: string, creatorIp: string): Promise<Haul> {
 export async function getHaul(id: string): Promise<Haul | undefined> {
   // Tier 1: in-memory
   let haul = store.get(id);
+  if (haul) {
+    haul = normalizeHaul(haul);
+    store.set(id, haul);
+  }
   // Tier 2: Firestore
   if (!haul) {
     haul = await firestoreGetHaul(id);
     if (haul) {
+      haul = normalizeHaul(haul);
       store.set(id, haul);
     }
   }
@@ -145,8 +174,9 @@ export async function getHaul(id: string): Promise<Haul | undefined> {
 }
 
 async function persistHaul(haul: Haul): Promise<void> {
-  store.set(haul.id, haul);
-  await firestoreSaveHaul(haul);
+  const normalized = normalizeHaul(haul);
+  store.set(normalized.id, normalized);
+  await firestoreSaveHaul(normalized);
 }
 
 export async function addScrapeToHaul(
@@ -218,7 +248,7 @@ export async function getAllHauls(): Promise<Haul[]> {
     const col = db.collection(`${prefix}hauls`);
     const snapshot = await col.get();
     for (const doc of snapshot.docs) {
-      const haul = doc.data() as unknown as Haul;
+      const haul = normalizeHaul(doc.data() as unknown as Haul);
       if (new Date(haul.expiresAt).getTime() < now) continue;
       results.push(haul);
       seenIds.add(doc.id);

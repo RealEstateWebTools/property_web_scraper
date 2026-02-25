@@ -2,10 +2,21 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getHaul } from '@lib/services/haul-store.js';
 import { isValidHaulId } from '@lib/services/haul-id.js';
+import { authenticateApiKey } from '@lib/services/auth.js';
+import { canAccessHaul, resolveHaulVisibility, userIdFromAuth } from '@lib/services/haul-access.js';
 
 const { id } = Astro.params;
+const requestUrl = new URL(Astro.request.url);
+const requestApiKey = requestUrl.searchParams.get('api_key') || '';
+const haulQuerySuffix = requestApiKey ? `?api_key=${encodeURIComponent(requestApiKey)}` : '';
+const backToHaulUrl = id ? `/haul/${id}${haulQuerySuffix}` : '/hauls';
+
+const auth = await authenticateApiKey(Astro.request);
+const requesterUserId = userIdFromAuth(auth);
 const validId = id && isValidHaulId(id);
-const haul = validId ? await getHaul(id) : undefined;
+const loadedHaul = validId ? await getHaul(id) : undefined;
+const haul = loadedHaul && canAccessHaul(loadedHaul, requesterUserId) ? loadedHaul : undefined;
+const haulVisibility = haul ? resolveHaulVisibility(haul) : 'public';
 
 const gradeColors: Record<string, { bg: string; text: string }> = {
   A: { bg: 'bg-green-100', text: 'text-green-800' },
@@ -30,12 +41,22 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
     <>
       {/* Header */}
       <div class="mb-6">
-        <a href={`/haul/${id}`} class="text-sm text-blue-600 hover:underline inline-flex items-center gap-1 mb-4">
+        <a href={backToHaulUrl} class="text-sm text-blue-600 hover:underline inline-flex items-center gap-1 mb-4">
           <i class="bi bi-chevron-left"></i> Back to {haul.name || `Haul ${id}`}
         </a>
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Browse & Add Listings</h1>
         <p class="text-gray-600">Select listings with complete data to add to your haul</p>
       </div>
+
+      {haulVisibility === 'public' ? (
+        <div class="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200 text-sm text-amber-900">
+          <strong>Public haul:</strong> Anyone with the link can view and edit this haul.
+        </div>
+      ) : (
+        <div class="bg-emerald-50 rounded-lg p-4 mb-6 border border-emerald-200 text-sm text-emerald-900">
+          <strong>Private haul:</strong> Only the authenticated owner can view or edit this haul.
+        </div>
+      )}
 
       {/* Status */}
       <div class="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-200">
@@ -111,11 +132,21 @@ const gradeColors: Record<string, { bg: string; text: string }> = {
 
 </section>
 
-<script define:vars={{ haulId: id, gradeColors, haulData: haul ? { scrapes: haul.scrapes.map(s => ({ url: s.url, title: s.title })) } : null }}>
+<script define:vars={{ haulId: id, requestApiKey, gradeColors, haulData: haul ? { scrapes: haul.scrapes.map(s => ({ url: s.url, title: s.title })) } : null }}>
 let currentPage = 0;
 const pageSize = 10;
 let allListings = [];
 let filteredListings = [];
+
+function buildExtApiUrl(path) {
+  if (!requestApiKey) return path;
+  return path + (path.includes('?') ? '&' : '?') + 'api_key=' + encodeURIComponent(requestApiKey);
+}
+
+function buildHaulUrl(path) {
+  if (!requestApiKey) return path;
+  return path + (path.includes('?') ? '&' : '?') + 'api_key=' + encodeURIComponent(requestApiKey);
+}
 
 const listingsContainer = document.getElementById('listings-container');
 const selectAllCheckbox = document.getElementById('select-all-checkbox');
@@ -129,7 +160,7 @@ const pageInfo = document.getElementById('page-info');
 // Fetch listings
 async function loadListings() {
   try {
-    const response = await fetch('/ext/v1/listings?limit=100&sortBy=completeness');
+    const response = await fetch(buildExtApiUrl('/ext/v1/listings?limit=100&sortBy=completeness'));
     const data = await response.json();
     allListings = data.items || [];
 
@@ -270,7 +301,7 @@ async function addSelectedListings() {
 
     for (const resultId of listingIds) {
       try {
-        const response = await fetch(`/ext/v1/hauls/${haulId}/add-result`, {
+        const response = await fetch(buildExtApiUrl(`/ext/v1/hauls/${haulId}/add-result`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ resultId }),
@@ -289,7 +320,7 @@ async function addSelectedListings() {
     if (successCount > 0) {
       addSelectedBtn.textContent = `✓ Added ${successCount} listing${successCount !== 1 ? 's' : ''}!`;
       setTimeout(() => {
-        window.location.href = `/haul/${haulId}`;
+        window.location.href = buildHaulUrl(`/haul/${haulId}`);
       }, 1500);
     } else {
       addSelectedBtn.textContent = `Failed to add (${failCount} error${failCount !== 1 ? 's' : ''})`;

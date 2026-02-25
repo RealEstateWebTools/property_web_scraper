@@ -4,12 +4,24 @@ import { getHaul } from '@lib/services/haul-store.js';
 import { isValidHaulId } from '@lib/services/haul-id.js';
 import { getRuntimeConfig } from '@lib/services/runtime-config.js';
 import { computeHaulSummary } from '@lib/services/haul-summary.js';
+import { authenticateApiKey } from '@lib/services/auth.js';
+import { canAccessHaul, resolveHaulVisibility, userIdFromAuth } from '@lib/services/haul-access.js';
 
 const h2cUrl = getRuntimeConfig().homesToCompareUrl;
 
 const { id } = Astro.params;
+const requestUrl = new URL(Astro.request.url);
+const requestApiKey = requestUrl.searchParams.get('api_key') || '';
+const haulPageQuery = requestApiKey ? `?api_key=${encodeURIComponent(requestApiKey)}` : '';
+const exportApiKeySuffix = requestApiKey ? `&api_key=${encodeURIComponent(requestApiKey)}` : '';
+
+const auth = await authenticateApiKey(Astro.request);
+const requesterUserId = userIdFromAuth(auth);
 const validId = id && isValidHaulId(id);
-const haul = validId ? await getHaul(id) : undefined;
+const loadedHaul = validId ? await getHaul(id) : undefined;
+const haul = loadedHaul && canAccessHaul(loadedHaul, requesterUserId) ? loadedHaul : undefined;
+const haulVisibility = haul ? resolveHaulVisibility(haul) : 'public';
+const addListingsUrl = id ? `/haul/${id}/add-listings${haulPageQuery}` : '/hauls';
 const summary = haul ? computeHaulSummary(haul.scrapes) : null;
 
 const gradeColors: Record<string, { bg: string; text: string }> = {
@@ -39,6 +51,15 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
     <>
       {/* Header */}
       <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+        {haulVisibility === 'public' ? (
+          <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <strong>Public haul:</strong> Anyone with this link can view and edit this haul.
+          </div>
+        ) : (
+          <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+            <strong>Private haul:</strong> Only the authenticated account that created it can access it.
+          </div>
+        )}
         <div class="flex items-center justify-between flex-wrap gap-4">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1">
@@ -88,27 +109,27 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
               </button>
               <div id="export-menu" class="hidden absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 min-w-[180px]">
                 <div class="px-4 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">Standard</div>
-                <a href={`/ext/v1/hauls/${id}/export?format=csv`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                <a href={`/ext/v1/hauls/${id}/export?format=csv${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
                   <i class="bi bi-file-earmark-spreadsheet text-green-600 mr-1.5"></i> CSV
                 </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=json`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                <a href={`/ext/v1/hauls/${id}/export?format=json${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
                   <i class="bi bi-braces text-blue-600 mr-1.5"></i> JSON
                 </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=json&inline=1`} target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                <a href={`/ext/v1/hauls/${id}/export?format=json&inline=1${exportApiKeySuffix}`} target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
                   <i class="bi bi-box-arrow-up-right text-blue-600 mr-1.5"></i> View JSON
                 </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=geojson`} class={`block px-4 py-2 text-sm no-underline ${summary && summary.scrapesWithGeo > 0 ? 'text-gray-700 hover:bg-gray-50' : 'text-gray-300 pointer-events-none'}`}>
+                <a href={`/ext/v1/hauls/${id}/export?format=geojson${exportApiKeySuffix}`} class={`block px-4 py-2 text-sm no-underline ${summary && summary.scrapesWithGeo > 0 ? 'text-gray-700 hover:bg-gray-50' : 'text-gray-300 pointer-events-none'}`}>
                   <i class="bi bi-geo-alt text-orange-600 mr-1.5"></i> GeoJSON
                 </a>
                 <div class="border-t border-gray-100 my-1"></div>
                 <div class="px-4 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">Industry</div>
-                <a href={`/ext/v1/hauls/${id}/export?format=blm`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                <a href={`/ext/v1/hauls/${id}/export?format=blm${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
                   <i class="bi bi-file-earmark-text text-red-600 mr-1.5"></i> BLM (Rightmove)
                 </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=kyero`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                <a href={`/ext/v1/hauls/${id}/export?format=kyero${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
                   <i class="bi bi-file-earmark-code text-yellow-600 mr-1.5"></i> Kyero XML
                 </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=reso-json`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
+                <a href={`/ext/v1/hauls/${id}/export?format=reso-json${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
                   <i class="bi bi-file-earmark-binary text-indigo-600 mr-1.5"></i> RESO JSON
                 </a>
               </div>
@@ -129,7 +150,7 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
             <i class="bi bi-sticky mr-1"></i> {haul.notes ? 'Edit notes' : 'Add notes'}
           </button>
           {haul.scrapes.length < 20 && (
-            <a href={`/haul/${id}/add-listings`} class="text-xs text-gray-400 hover:text-blue-600 cursor-pointer no-underline">
+            <a href={addListingsUrl} class="text-xs text-gray-400 hover:text-blue-600 cursor-pointer no-underline">
               <i class="bi bi-plus-circle mr-1"></i> Browse & Add Listings
             </a>
           )}
@@ -486,7 +507,7 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
 
 </section>
 
-<script is:inline define:vars={{ h2cUrl, id, haul: haul ? { id: haul.id, name: haul.name, scrapes: haul.scrapes.map((s: any) => ({ resultId: s.resultId, title: s.title, grade: s.grade, price: s.price, extractionRate: s.extractionRate, latitude: s.latitude, longitude: s.longitude, city: s.city })), expiresAt: haul.expiresAt } : null }}>
+<script is:inline define:vars={{ h2cUrl, id, requestApiKey, haul: haul ? { id: haul.id, name: haul.name, scrapes: haul.scrapes.map((s: any) => ({ resultId: s.resultId, title: s.title, grade: s.grade, price: s.price, extractionRate: s.extractionRate, latitude: s.latitude, longitude: s.longitude, city: s.city })), expiresAt: haul.expiresAt } : null }}>
 function escapeHtml(str) {
   return String(str == null ? '' : str)
     .replace(/&/g, '&amp;')
@@ -497,11 +518,18 @@ function escapeHtml(str) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  function buildExtApiUrl(path) {
+    if (!requestApiKey) return path;
+    return path + (path.includes('?') ? '&' : '?') + 'api_key=' + encodeURIComponent(requestApiKey);
+  }
+
   // --- Copy URL ---
   var copyBtn = document.getElementById('copy-haul-url');
   if (copyBtn) {
     copyBtn.addEventListener('click', function() {
-      navigator.clipboard.writeText(window.location.href);
+      var shareUrl = new URL(window.location.href);
+      shareUrl.searchParams.delete('api_key');
+      navigator.clipboard.writeText(shareUrl.toString());
       copyBtn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
       setTimeout(function() {
         copyBtn.innerHTML = '<i class="bi bi-link-45deg"></i> Copy URL';
@@ -547,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (saveNameBtn) {
     saveNameBtn.addEventListener('click', function() {
       var name = editNameInput ? editNameInput.value.trim() : '';
-      fetch('/ext/v1/hauls/' + id, {
+      fetch(buildExtApiUrl('/ext/v1/hauls/' + id), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name }),
@@ -582,7 +610,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   if (saveNotesBtn && notesTextarea) {
     saveNotesBtn.addEventListener('click', function() {
-      fetch('/ext/v1/hauls/' + id, {
+      fetch(buildExtApiUrl('/ext/v1/hauls/' + id), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notes: notesTextarea.value }),
@@ -600,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
     btn.addEventListener('click', function() {
       var resultId = btn.dataset.resultId;
       if (btn.dataset.confirming) {
-        fetch('/ext/v1/hauls/' + id + '/scrapes/' + resultId, { method: 'DELETE' })
+        fetch(buildExtApiUrl('/ext/v1/hauls/' + id + '/scrapes/' + resultId), { method: 'DELETE' })
           .then(function(r) { return r.json(); })
           .then(function(data) {
             if (data.success) {
