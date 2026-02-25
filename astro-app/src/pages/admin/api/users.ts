@@ -55,7 +55,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
     return new Response(
       JSON.stringify({
-        total: firebaseUsers.length,
+        total: kvUsers.length,
         byTier,
         users: usersData,
       }),
