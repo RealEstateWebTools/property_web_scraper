@@ -177,7 +177,21 @@ export class Listing extends BaseModel {
   price_qualifier = '';
   floor_plan_urls: string[] = [];
   energy_certificate_grade = '';
-  supplementary_data_links: Array<{ title: string; url: string; category?: string; icon?: string }> = [];
+  supplementary_data_links: Array<{
+    id?: string;
+    title: string;
+    description?: string;
+    url: string;
+    category?: string;
+    icon?: string;
+    intent?: string;
+    geoLevel?: string;
+    sourceName?: string;
+    sourceType?: 'official' | 'commercial' | 'community';
+    access?: 'free' | 'freemium' | 'paid' | 'api_key_required';
+    freshness?: 'real_time' | 'daily' | 'weekly' | 'monthly' | 'ad_hoc';
+    priority?: number;
+  }> = [];
 
   /**
    * Returns a JSON-safe hash of public listing attributes.
