@@ -186,7 +186,6 @@ interface FieldMapping {
 | GET/POST | `/public_api/v1/listings/:id/export` | API key | Export single listing |
 | GET | `/public_api/v1/listings/history` | API key | Listing history |
 | GET/POST | `/public_api/v1/export` | API key | Bulk export (JSON/CSV/GeoJSON) |
-| POST | `/public_api/v1/webhooks` | API key | Register webhook |
 | GET | `/public_api/v1/usage` | API key | API usage stats |
 | POST | `/public_api/v1/auth/keys` | API key | Manage API keys |
 | POST | `/public_api/v1/billing/checkout` | API key | Create Stripe checkout session |
