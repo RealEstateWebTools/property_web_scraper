@@ -151,36 +151,46 @@ export async function listFirebaseUsers(): Promise<
 
     const token = await getServiceAccountToken();
 
-    // Use Google Identity Toolkit REST API to list users
-    const response = await fetch(`https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:batchGet`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.warn(`[Firebase] Batch get failed: ${response.status} - ${errorText}`);
-      return [];
-    }
-
-    const data = (await response.json()) as {
-      users?: Array<{
-        localId: string;
-        email?: string;
-        displayName?: string;
-        disabled?: boolean;
-        createdAt?: number;
-      }>;
+    // Use Google Identity Toolkit REST API to list users (paginated)
+    type FirebaseUser = {
+      localId: string;
+      email?: string;
+      displayName?: string;
+      disabled?: boolean;
+      createdAt?: string | number; // API returns milliseconds as a string
     };
+    type BatchGetResponse = { users?: FirebaseUser[]; nextPageToken?: string };
 
-    return (data.users || []).map((user) => ({
+    const allUsers: FirebaseUser[] = [];
+    let nextPageToken: string | undefined;
+
+    do {
+      const url = new URL(`https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:batchGet`);
+      url.searchParams.set('maxResults', '1000');
+      if (nextPageToken) url.searchParams.set('nextPageToken', nextPageToken);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.warn(`[Firebase] Batch get failed: ${response.status} - ${errorText}`);
+        return [];
+      }
+
+      const data = (await response.json()) as BatchGetResponse;
+      if (data.users) allUsers.push(...data.users);
+      nextPageToken = data.nextPageToken;
+    } while (nextPageToken);
+
+    return allUsers.map((user) => ({
       uid: user.localId,
       email: user.email,
       displayName: user.displayName,
       disabled: user.disabled || false,
-      createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : undefined,
+      createdAt: user.createdAt ? new Date(Number(user.createdAt)).toISOString() : undefined,
     }));
   } catch (err) {
     console.warn('[Firebase] listFirebaseUsers failed:', err instanceof Error ? err.message : String(err));

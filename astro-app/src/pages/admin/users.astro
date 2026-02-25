@@ -169,8 +169,8 @@ const initialPayload = {
     </div>
   </div>
 
-  <script id="initial-users-data" type="application/json" is:inline>{JSON.stringify(initialPayload)}</script>
-  <script id="initial-users-error" type="application/json" is:inline>{JSON.stringify(initialLoadError)}</script>
+  <script id="initial-users-data" type="application/json" set:html={JSON.stringify(initialPayload)}></script>
+  <script id="initial-users-error" type="application/json" set:html={JSON.stringify(initialLoadError)}></script>
 
   <script>
     function escapeHtml(str: unknown): string {
