@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getAllListings, getDiagnostics } from '@lib/services/listing-store.js';
 import { successResponse, corsPreflightResponse } from '@lib/services/api-response.js';
+import { supplementaryDataService } from '@lib/services/supplementary-data-links.js';
 
 export const OPTIONS: APIRoute = ({ request }) => corsPreflightResponse(request);
 
@@ -53,8 +54,8 @@ export const GET: APIRoute = async ({ request }) => {
         listing.longitude,
       ];
       const completeness = fields.filter(Boolean).length / fields.length;
-      const grade = diagnostics?.grade || 'F';
-      const gradeScore = { A: 4, B: 3, C: 2, F: 0 }[grade] || 0;
+      const grade = diagnostics?.qualityGrade || 'F';
+      const gradeScore = ({ A: 4, B: 3, C: 2, F: 0 } as Record<string, number>)[grade] || 0;
 
       return {
         id,
@@ -67,8 +68,8 @@ export const GET: APIRoute = async ({ request }) => {
     // Sort
     if (sortBy === 'newest') {
       scored.sort((a, b) => {
-        const aTime = new Date(a.listing.created_at || 0).getTime();
-        const bTime = new Date(b.listing.created_at || 0).getTime();
+        const aTime = new Date(a.listing.last_retrieved_at || 0).getTime();
+        const bTime = new Date(b.listing.last_retrieved_at || 0).getTime();
         return bTime - aTime;
       });
     } else {
@@ -90,10 +91,11 @@ export const GET: APIRoute = async ({ request }) => {
       bathrooms: listing.count_bathrooms,
       city: listing.city,
       country: listing.country,
-      grade: diagnostics?.grade || 'F',
-      extraction_rate: (diagnostics?.extraction_rate || 0) * 100,
-      created_at: listing.created_at,
+      grade: diagnostics?.qualityGrade || 'F',
+      extraction_rate: (diagnostics?.extractionRate || 0) * 100,
+      created_at: listing.last_retrieved_at,
       url: listing.import_url,
+      supplementary_data_links: supplementaryDataService.generateLinks(listing),
     }));
 
     return successResponse(

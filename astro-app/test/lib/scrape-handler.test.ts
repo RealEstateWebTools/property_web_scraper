@@ -140,12 +140,12 @@ describe('handleScrapeRequest', () => {
   });
 
   it('reuses existing listing if URL was extracted before', async () => {
-    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(null);
+    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(undefined);
     vi.mocked(getListingByUrl).mockResolvedValue({
       id: 'listing-42',
       listing: { title: 'Cached Property', price_float: 300000 },
     } as any);
-    vi.mocked(getDiagnostics).mockResolvedValue(null);
+    vi.mocked(getDiagnostics).mockResolvedValue(undefined);
     vi.mocked(buildHaulScrapeFromListing).mockReturnValue({
       resultId: 'listing-42',
       title: 'Cached Property',
@@ -166,12 +166,12 @@ describe('handleScrapeRequest', () => {
   });
 
   it('returns error when haul is full for existing listing', async () => {
-    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(null);
+    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(undefined);
     vi.mocked(getListingByUrl).mockResolvedValue({
       id: 'listing-x',
       listing: { title: 'Full Haul Prop', price_float: 200000 },
     } as any);
-    vi.mocked(getDiagnostics).mockResolvedValue(null);
+    vi.mocked(getDiagnostics).mockResolvedValue(undefined);
     vi.mocked(buildHaulScrapeFromListing).mockReturnValue({} as any);
     vi.mocked(addScrapeToHaul).mockResolvedValue({ added: false, replaced: false } as any);
 
@@ -183,8 +183,8 @@ describe('handleScrapeRequest', () => {
   });
 
   it('validates URL and falls back to generic_real_estate for unknown host', async () => {
-    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(null);
-    vi.mocked(getListingByUrl).mockResolvedValue(null);
+    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(undefined);
+    vi.mocked(getListingByUrl).mockResolvedValue(undefined);
     vi.mocked(validateUrl).mockResolvedValue({
       valid: false,
       errorCode: 'unsupported',
@@ -212,8 +212,8 @@ describe('handleScrapeRequest', () => {
   });
 
   it('returns MISSING_SCRAPER error when validation fails with non-UNSUPPORTED code', async () => {
-    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(null);
-    vi.mocked(getListingByUrl).mockResolvedValue(null);
+    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(undefined);
+    vi.mocked(getListingByUrl).mockResolvedValue(undefined);
     vi.mocked(validateUrl).mockResolvedValue({
       valid: false,
       errorCode: 'INVALID_URL',
@@ -227,8 +227,8 @@ describe('handleScrapeRequest', () => {
   });
 
   it('returns 201 with scrape data on successful extraction', async () => {
-    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(null);
-    vi.mocked(getListingByUrl).mockResolvedValue(null);
+    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(undefined);
+    vi.mocked(getListingByUrl).mockResolvedValue(undefined);
     vi.mocked(validateUrl).mockResolvedValue({
       valid: true,
       importHost: { host: 'rightmove.co.uk', scraper_name: 'uk_rightmove', slug: 'rightmove' },
@@ -257,8 +257,8 @@ describe('handleScrapeRequest', () => {
   });
 
   it('returns error when extraction returns null', async () => {
-    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(null);
-    vi.mocked(getListingByUrl).mockResolvedValue(null);
+    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(undefined);
+    vi.mocked(getListingByUrl).mockResolvedValue(undefined);
     vi.mocked(validateUrl).mockResolvedValue({
       valid: true,
       importHost: { host: 'example.com', scraper_name: 'uk_rightmove', slug: 'rm' },
@@ -274,8 +274,8 @@ describe('handleScrapeRequest', () => {
   });
 
   it('returns haul_url in response', async () => {
-    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(null);
-    vi.mocked(getListingByUrl).mockResolvedValue(null);
+    vi.mocked(findExistingScrapeByUrl).mockResolvedValue(undefined);
+    vi.mocked(getListingByUrl).mockResolvedValue(undefined);
     vi.mocked(validateUrl).mockResolvedValue({
       valid: true,
       importHost: { host: 'example.com', scraper_name: 'uk_rightmove', slug: 'rm' },

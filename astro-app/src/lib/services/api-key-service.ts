@@ -83,7 +83,7 @@ async function persistUserToFirestore(user: UserRecord): Promise<void> {
   try {
     const client = await getClient();
     const prefix = getCollectionPrefix();
-    await client.setDocument(`${prefix}users/${user.userId}`, user);
+    await client.collection(`${prefix}users`).doc(user.userId).set(user as any);
   } catch (err) {
     // Firestore not available - continue with KV only (degraded mode)
     console.warn('[ApiKeyService] Firestore persist failed, using KV only:', err instanceof Error ? err.message : String(err));
@@ -98,9 +98,9 @@ async function fetchUserFromFirestore(userId: string): Promise<UserRecord | null
   try {
     const client = await getClient();
     const prefix = getCollectionPrefix();
-    const doc = await client.getDocument(`${prefix}users/${userId}`);
-    if (doc) {
-      return doc as UserRecord;
+    const docSnap = await client.collection(`${prefix}users`).doc(userId).get();
+    if (docSnap.exists) {
+      return docSnap.data() as unknown as UserRecord;
     }
   } catch (err) {
     // Firestore not available - continue with KV only
@@ -117,8 +117,8 @@ async function listUsersFromFirestore(): Promise<UserRecord[]> {
   try {
     const client = await getClient();
     const prefix = getCollectionPrefix();
-    const docs = await client.listDocuments(`${prefix}users`);
-    return docs.map((doc) => doc as UserRecord);
+    const snapshot = await client.collection(`${prefix}users`).get();
+    return snapshot.docs.map(doc => doc.data() as unknown as UserRecord);
   } catch (err) {
     // Firestore not available - fall back to KV
     console.warn('[ApiKeyService] Firestore list failed, falling back to KV');
@@ -133,7 +133,7 @@ async function persistKeyToFirestore(keyHash: string, record: ApiKeyRecord): Pro
   try {
     const client = await getClient();
     const prefix = getCollectionPrefix();
-    await client.setDocument(`${prefix}api_keys/${keyHash}`, record);
+    await client.collection(`${prefix}api_keys`).doc(keyHash).set(record as any);
   } catch (err) {
     console.warn('[ApiKeyService] Firestore key persist failed, using KV only');
   }

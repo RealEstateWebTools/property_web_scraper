@@ -2,6 +2,7 @@ import { BaseModel, type AttributeDefinition } from '../firestore/base-model.js'
 import { sanitizePropertyHash } from '../extractor/field-processors.js';
 import type { ImageInfo } from '../types/image-info.js';
 import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
+import { supplementaryDataService } from '../services/supplementary-data-links.js';
 
 export interface MergeDiff {
   fieldsChanged: string[];
@@ -181,8 +182,7 @@ export class Listing extends BaseModel {
    * Port of Ruby Listing#as_json.
    */
   override asJson(only?: string[]): Record<string, unknown> {
-    if (only) return super.asJson(only);
-    return super.asJson([
+    const json = super.asJson(only || [
       'import_url', 'reference', 'price_string', 'price_float',
       'price_cents', 'price_currency',
       'title', 'description', 'description_html', 'locale_code', 'area_unit', 'plot_area', 'constructed_area',
@@ -198,6 +198,13 @@ export class Listing extends BaseModel {
       'agent_name', 'agent_phone', 'agent_email', 'agent_logo_url',
       'price_qualifier', 'floor_plan_urls', 'energy_certificate_grade',
     ]);
+    
+    // Dynamically calculate supplementary links for the listing
+    if (!only || only.includes('supplementary_data_links')) {
+      json.supplementary_data_links = supplementaryDataService.generateLinks(this);
+    }
+    
+    return json;
   }
 
   /**
