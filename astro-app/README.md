@@ -122,6 +122,11 @@ npm run capture-fixture -- --help
 
 The utility saves the HTML to `test/fixtures/`, runs the extraction pipeline, and prints a manifest stub ready to paste into `test/fixtures/manifest.ts`. See `docs/scraper-maintenance-guide.md` for the full workflow.
 
+## Additional Docs
+
+- `docs/scraper-maintenance-guide.md` — fixture and mapping maintenance workflow
+- `docs/supplementary-data-links.md` — supplementary links schema, matching logic, and metadata fields
+
 ## Architecture Notes
 
 - **Astro 5 SSR** with Cloudflare Pages adapter

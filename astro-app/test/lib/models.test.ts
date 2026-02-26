@@ -84,6 +84,51 @@ describe('Models', () => {
       expect(json['description_html']).toBe('<p>Descripción de la propiedad</p>');
       expect(json['locale_code']).toBe('es');
     });
+
+    it('updateFromHash populates supplementary_data_links with enriched metadata', () => {
+      const listing = new Listing();
+      Listing.updateFromHash(listing, {
+        country: 'GB',
+        street_address: '10 Downing Street',
+        city: 'London',
+        postal_code: 'SW1A 2AA',
+        latitude: 51.5034,
+        longitude: -0.1276,
+      });
+
+      expect(Array.isArray(listing.supplementary_data_links)).toBe(true);
+      expect(listing.supplementary_data_links.length).toBeGreaterThan(2);
+
+      const ids = listing.supplementary_data_links.map((link) => link.id);
+      expect(ids).toContain('osm-location');
+      expect(ids).toContain('google-maps-search');
+      expect(ids).toContain('uk-postcode-doogal');
+
+      const first = listing.supplementary_data_links[0];
+      expect(first.priority).toBeLessThanOrEqual((listing.supplementary_data_links[1]?.priority ?? 100));
+
+      const floodLink = listing.supplementary_data_links.find((link) => link.id === 'uk-flood-risk-gov');
+      expect(floodLink?.sourceType).toBe('official');
+      expect(floodLink?.access).toBe('free');
+      expect(floodLink?.intent).toBe('climate_risk');
+      expect(floodLink?.freshness).toBe('ad_hoc');
+    });
+
+    it('supplementary_data_links require configured fields before a link is emitted', () => {
+      const listing = new Listing();
+      (listing as any).latitude = undefined;
+      (listing as any).longitude = undefined;
+
+      Listing.updateFromHash(listing, {
+        country: 'GB',
+        city: 'London',
+      });
+
+      const ids = listing.supplementary_data_links.map((link) => link.id);
+      expect(ids).toContain('google-maps-search');
+      expect(ids).not.toContain('osm-location');
+      expect(ids).not.toContain('uk-postcode-doogal');
+    });
   });
 
   describe('ImportHost', () => {
