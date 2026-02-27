@@ -12,6 +12,12 @@ const urlIndex = new Map<string, string>();
 let counter = 0;
 /** When true, skip Firestore fallback for diagnostics (set by clearListingStore). */
 let _diagnosticsCleared = false;
+/**
+ * IDs seen in the last successful Firestore read. Used to detect external
+ * deletions: if an ID was in Firestore on the previous read but is absent
+ * now, it was deleted outside this process and should be evicted from memory.
+ */
+let prevFirestoreIds = new Set<string>();
 
 export function generateId(): string {
   counter++;
@@ -195,11 +201,27 @@ export async function getAllListings(): Promise<Array<{ id: string; listing: Lis
       // Populate in-memory cache for subsequent getListing() calls
       store.set(doc.id, listing);
     }
+
+    // Evict in-memory entries that were in Firestore on the previous read but
+    // are now absent — they were deleted externally (e.g. by a cleanup script).
+    // We only evict entries that were previously confirmed in Firestore so we
+    // don't discard newly scraped listings that haven't been saved yet.
+    for (const [id, listing] of store.entries()) {
+      if (!seenIds.has(id) && prevFirestoreIds.has(id)) {
+        const importUrl = (listing as any).import_url;
+        if (importUrl) urlIndex.delete(deduplicationKey(importUrl));
+        store.delete(id);
+        diagnosticsStore.delete(id);
+      }
+    }
+
+    prevFirestoreIds = new Set(seenIds);
   } catch {
     // Firestore unavailable — fall through to in-memory below
   }
 
-  // Also include in-memory listings not yet in Firestore
+  // Also include in-memory listings not yet in Firestore (newly scraped entries
+  // that haven't been persisted yet, or all entries when Firestore is unavailable).
   for (const [id, listing] of store.entries()) {
     if (!seenIds.has(id)) {
       results.push({ id, listing });
@@ -292,5 +314,6 @@ export function clearListingStore(): void {
   store.clear();
   diagnosticsStore.clear();
   urlIndex.clear();
+  prevFirestoreIds.clear();
   _diagnosticsCleared = true;
 }
