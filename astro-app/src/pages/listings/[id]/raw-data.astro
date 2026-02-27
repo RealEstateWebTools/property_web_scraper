@@ -114,7 +114,52 @@ const formatGroups = [
         </a>
 
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Raw Data</h1>
-        <p class="text-gray-600 mb-8">Preview and download this listing in various formats.</p>
+        <p class="text-gray-600 mb-6">Preview and download this listing in various formats.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div class="flex gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <i class="bi bi-braces text-blue-500 text-xl shrink-0 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-semibold text-blue-900 mb-1">JSON schema reference</p>
+              <p class="text-xs text-blue-800 mb-2">
+                The JSON format follows the full <strong>Listing</strong> schema documented in the API reference,
+                including all 70+ fields, types, and descriptions.
+              </p>
+              <a href="/docs" target="_blank" class="inline-flex items-center gap-1 text-xs text-blue-700 font-medium hover:underline no-underline">
+                <i class="bi bi-box-arrow-up-right"></i> View API docs &amp; schema
+              </a>
+            </div>
+          </div>
+
+          <div class="flex gap-3 rounded-xl border border-violet-100 bg-violet-50 p-4">
+            <i class="bi bi-github text-violet-500 text-xl shrink-0 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-semibold text-violet-900 mb-1">Need another format?</p>
+              <p class="text-xs text-violet-800 mb-2">
+                Want XLSX, Parquet, Haystack, or something else?
+                Open an issue or submit a pull request on GitHub.
+              </p>
+              <div class="flex gap-3">
+                <a
+                  href="https://github.com/RealEstateWebTools/property_web_scraper/issues/new?template=export-format-request.md&title=Export+format+request%3A+"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-xs text-violet-700 font-medium hover:underline no-underline"
+                >
+                  <i class="bi bi-plus-circle"></i> Open an issue
+                </a>
+                <a
+                  href="https://github.com/RealEstateWebTools/property_web_scraper/pulls"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-xs text-violet-700 font-medium hover:underline no-underline"
+                >
+                  <i class="bi bi-git"></i> Submit a PR
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {formatGroups.map(group => (
