@@ -83,11 +83,16 @@ Use the `/add-scraper` skill or follow the manual workflow:
 
 ### Test haul endpoints
 
+> **Warning:** The local dev server writes to the real Firebase project. Use local dev
+> only with `FIRESTORE_COLLECTION_PREFIX=pws_localdev_` (the default in `.env`) so
+> your test data goes to separate Firestore collections from production (`pws_demo_`).
+> Never change the local prefix to match production.
+
 ```bash
 # Create a haul
 curl -X POST http://localhost:4321/ext/v1/hauls
 
-# Add a scrape to a haul
+# Add a scrape to a haul (use a real listing URL — it writes to pws_localdev_ collections)
 curl -X POST http://localhost:4321/ext/v1/hauls/<id>/scrapes \
   -H 'Content-Type: application/json' \
   -d '{"url":"https://www.rightmove.co.uk/properties/168908774","html":"<html>...</html>"}'

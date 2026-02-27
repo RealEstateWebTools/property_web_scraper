@@ -9,7 +9,11 @@
 
 ## Environment Variables
 - [ ] `FIRESTORE_PROJECT_ID` — Google Cloud project ID
-- [ ] `GOOGLE_APPLICATION_CREDENTIALS` — path to service account JSON
+- [ ] `GOOGLE_SERVICE_ACCOUNT_JSON` — service account credentials JSON
+- [ ] `FIRESTORE_COLLECTION_PREFIX` — **must differ between environments**
+  - Production: `pws_demo_` (or your chosen prod prefix)
+  - Local dev: `pws_localdev_` — **never set to the production prefix locally**
+  - This is the primary guard against dev data contaminating production Firestore
 - [ ] `PWS_API_KEY` — API key for public endpoints
 - [ ] `PWS_ADMIN_KEY` — admin dashboard key
 - [ ] `PWS_ALLOWED_ORIGINS` — CORS allowed origins (default `*`)
