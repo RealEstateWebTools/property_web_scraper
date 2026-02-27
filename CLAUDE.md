@@ -24,7 +24,7 @@ property_web_scraper/
 │   ├── src/pages/          # Astro pages and API endpoints
 │   ├── test/fixtures/      # HTML fixtures + manifest.ts
 │   ├── test/lib/           # Vitest unit tests
-│   ├── scripts/            # CLI utilities (capture-fixture)
+│   ├── scripts/            # CLI utilities (see docs/operations/scripts.md)
 │   └── docs/               # Maintenance guides
 ├── chrome-extensions/       # Chrome extensions
 │   ├── property-scraper/   # Public extension (haul-based extraction)
@@ -114,6 +114,30 @@ cd astro-app
 npm run capture-fixture -- <url>                              # fetch from URL
 npm run capture-fixture -- --file page.html --url <url>       # from local file
 npm run capture-fixture -- --help                             # all options
+```
+
+### Clean up test / junk data
+
+```bash
+cd astro-app
+node scripts/cleanup-test-data.mjs           # preview test listings/hauls
+node scripts/cleanup-test-data.mjs --confirm # delete them
+node scripts/cleanup-empty-hauls.mjs         # preview hauls with 0 listings
+node scripts/cleanup-empty-hauls.mjs --confirm
+node scripts/cleanup-env-data.mjs            # preview dev/test-tagged docs
+npx tsx scripts/deduplicate-listings.ts      # preview duplicate listings
+```
+
+See `docs/operations/scripts.md` for all scripts with full usage details.
+
+### Quality checks
+
+```bash
+cd astro-app
+bash scripts/smoke-test.sh                   # verify server is up
+npx tsx scripts/contract-test.ts             # live extraction against real sites
+npx tsx scripts/stale-check.ts --save        # save quality baseline
+npx tsx scripts/stale-check.ts               # check for regressions
 ```
 
 ## Code style and conventions
