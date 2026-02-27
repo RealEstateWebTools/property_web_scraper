@@ -124,6 +124,8 @@ node scripts/cleanup-test-data.mjs           # preview test listings/hauls
 node scripts/cleanup-test-data.mjs --confirm # delete them
 node scripts/cleanup-empty-hauls.mjs         # preview hauls with 0 listings
 node scripts/cleanup-empty-hauls.mjs --confirm
+node scripts/cleanup-low-quality-listings.mjs            # preview grade F listings
+node scripts/cleanup-low-quality-listings.mjs --grade F,C --confirm  # delete them
 node scripts/cleanup-env-data.mjs            # preview dev/test-tagged docs
 npx tsx scripts/deduplicate-listings.ts      # preview duplicate listings
 ```

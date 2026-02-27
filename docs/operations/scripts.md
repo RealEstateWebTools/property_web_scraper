@@ -46,6 +46,24 @@ Expired hauls are excluded from deletion (they will expire on their own).
 
 ---
 
+### `cleanup-low-quality-listings.mjs`
+
+Deletes listings whose extraction quality falls below a configurable threshold. Filters by grade, extraction rate, confidence score, or any combination (all conditions must match).
+
+```bash
+node scripts/cleanup-low-quality-listings.mjs                         # Preview grade F (default)
+node scripts/cleanup-low-quality-listings.mjs --grade F,C             # Preview grade F or C
+node scripts/cleanup-low-quality-listings.mjs --max-rate 0.1          # Preview rate < 10%
+node scripts/cleanup-low-quality-listings.mjs --max-confidence 0.2    # Preview confidence < 20%
+node scripts/cleanup-low-quality-listings.mjs --grade F --max-rate 0.15  # Combine filters (AND)
+node scripts/cleanup-low-quality-listings.mjs --grade F --confirm     # Execute deletion
+node scripts/cleanup-low-quality-listings.mjs --help                  # Show all options
+```
+
+Always runs as a dry-run preview unless `--confirm` is passed. Shows a breakdown by grade, visibility, and a sample of affected listings before deleting.
+
+---
+
 ### `cleanup-env-data.mjs`
 
 Deletes listings and hauls tagged with a specific `env` field value. More targeted than `cleanup-test-data` — only matches documents that have an explicit environment tag set.
