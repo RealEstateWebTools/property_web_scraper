@@ -98,7 +98,7 @@ curl http://localhost:4321/ext/v1/hauls/<id>
 
 ### Fix a broken scraper
 
-See `astro-app/docs/scraper-maintenance-guide.md` for the full diagnosis workflow.
+See `docs/scrapers/scraper-maintenance-guide.md` for the full diagnosis workflow.
 
 ### Capture a fixture via MCP bridge
 
