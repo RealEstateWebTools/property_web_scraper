@@ -1,8 +1,8 @@
 [{
   "name": "in_realestateindia",
-  "version": 1,
-  "last_checked": "2026-02-20",
-  "expectedExtractionRate": 0.70,
+  "version": 2,
+  "last_checked": "2026-02-27",
+  "expectedExtractionRate": 0.65,
   "defaultValues": {
     "country": {
       "value": "India"
@@ -33,62 +33,82 @@
   },
   "intFields": {
     "count_bedrooms": {
-      "cssLocator": "p.w55.ofh",
-      "cssCountId": "0",
-      "splitTextCharacter": ",",
-      "splitTextArrayId": "0"
+      "cssLocator": ".pdsi-list li:nth-child(1) strong",
+      "fallbacks": [
+        { "cssLocator": "p.w55.ofh", "cssCountId": "0", "splitTextCharacter": ",", "splitTextArrayId": "0" }
+      ]
     },
     "count_bathrooms": {
-      "cssLocator": "p.w55.ofh",
-      "cssCountId": "0",
-      "splitTextCharacter": ",",
-      "splitTextArrayId": "1"
+      "cssLocator": ".pdsi-list li:nth-child(2) strong",
+      "fallbacks": [
+        { "cssLocator": "p.w55.ofh", "cssCountId": "0", "splitTextCharacter": ",", "splitTextArrayId": "1" }
+      ]
     }
   },
   "textFields": {
     "title": {
-      "cssLocator": "h1.xxxlarge",
-      "cssCountId": "0"
+      "cssLocator": "h1 .dProjectUnitName",
+      "fallbacks": [
+        { "cssLocator": "h1.xxxlarge", "cssCountId": "0" }
+      ]
     },
     "description": {
       "cssLocator": "meta[name='description']",
       "cssAttr": "content"
     },
     "price_string": {
-      "cssLocator": "span.red",
-      "cssCountId": "0"
+      "cssLocator": ".pdt-price .call_price",
+      "fallbacks": [
+        { "cssLocator": "span.red", "cssCountId": "0" }
+      ]
     },
     "main_image_url": {
-      "cssLocator": "ul.imgSlider li:first-child img",
-      "cssAttr": "src"
+      "cssLocator": ".big_img img",
+      "cssAttr": "src",
+      "fallbacks": [
+        { "cssLocator": "ul.imgSlider li:first-child img", "cssAttr": "src" }
+      ]
     },
     "address_string": {
       "cssLocator": "li[itemprop='itemListElement'] > a",
-      "cssCountId": "2"
+      "cssCountId": "2",
+      "fallbacks": [
+        { "cssLocator": "li[itemprop='itemListElement'] > a", "cssCountId": "1" }
+      ]
     }
   },
+  // Combined selector matches images from new (.big_img img) or old (ul.imgSlider img) page structure
   "images": [{
-    "cssLocator": "ul.imgSlider img",
+    "cssLocator": ".big_img img, ul.imgSlider img",
     "cssAttr": "src"
   }],
   "booleanFields": {
     "for_rent": {
-      "cssLocator": "h1.xxxlarge",
+      "cssLocator": "head > title",
       "evaluator": "include?",
       "caseInsensitive": true,
-      "evaluatorParam": "rent"
+      "evaluatorParam": "rent",
+      "fallbacks": [
+        { "cssLocator": "h1.xxxlarge", "evaluator": "include?", "caseInsensitive": true, "evaluatorParam": "rent" }
+      ]
     },
     "for_rent_long_term": {
-      "cssLocator": "h1.xxxlarge",
+      "cssLocator": "head > title",
       "evaluator": "include?",
       "caseInsensitive": true,
-      "evaluatorParam": "rent"
+      "evaluatorParam": "rent",
+      "fallbacks": [
+        { "cssLocator": "h1.xxxlarge", "evaluator": "include?", "caseInsensitive": true, "evaluatorParam": "rent" }
+      ]
     },
     "for_sale": {
-      "cssLocator": "h1.xxxlarge",
+      "cssLocator": "head > title",
       "evaluator": "include?",
       "caseInsensitive": true,
-      "evaluatorParam": "sale"
+      "evaluatorParam": "for sale",
+      "fallbacks": [
+        { "cssLocator": "h1.xxxlarge", "evaluator": "include?", "caseInsensitive": true, "evaluatorParam": "sale" }
+      ]
     }
   }
 }]
