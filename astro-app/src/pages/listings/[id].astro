@@ -2,49 +2,95 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SocialShare from '../../components/SocialShare.astro';
 import DataBridgeNotice from '../../components/DataBridgeNotice.astro';
-import { getListing } from '@lib/services/listing-store.js';
+import { getListing, getDiagnostics } from '@lib/services/listing-store.js';
+import { getLatestScrapeForListing } from '@lib/services/scrape-metadata.js';
 import { getRuntimeConfig } from '@lib/services/runtime-config.js';
 
 const h2cUrl = getRuntimeConfig().homesToCompareUrl;
-
 const { id } = Astro.params;
-const listing = id ? await getListing(id) : undefined;
 
-// Visibility filtering is handled by the index page (/listings).
-// Direct links (e.g. from /extract/results) should always render.
+const listing    = id ? await getListing(id) : undefined;
+const diagnostics = id ? await getDiagnostics(id) : undefined;
+const scrapeRecord = id ? await getLatestScrapeForListing(id) : undefined;
 
-let mainImageUrl = 'https://placehold.co/500x250?text=No+Image';
+// Query-param feedback from re-extract action
+const searchParams = new URL(Astro.request.url).searchParams;
+const justUpdated  = searchParams.get('updated') === '1';
+const updateError  = searchParams.get('update_error') ?? '';
+
+// Geo + image setup
 let osmDirectionsUrl = '';
 let googleDirectionsUrl = '';
+let mainImageUrl = 'https://placehold.co/500x250?text=No+Image';
 
 if (listing) {
-  if (typeof listing.latitude === 'number' && typeof listing.longitude === 'number' && (listing.latitude !== 0 || listing.longitude !== 0)) {
+  if (
+    typeof listing.latitude === 'number' &&
+    typeof listing.longitude === 'number' &&
+    (listing.latitude !== 0 || listing.longitude !== 0)
+  ) {
     const lat = listing.latitude;
     const lng = listing.longitude;
-    osmDirectionsUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${lat}%2C${lng}`;
+    osmDirectionsUrl  = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${lat}%2C${lng}`;
     googleDirectionsUrl = `https://www.google.com/maps/search/?api=1&query=${lat}%2C${lng}`;
   }
-  if (listing.image_urls?.length > 0) {
-    mainImageUrl = listing.image_urls[0].url;
-  } else if (listing.main_image_url) {
-    mainImageUrl = listing.main_image_url;
-  }
+  if (listing.image_urls?.length > 0) mainImageUrl = listing.image_urls[0].url;
+  else if (listing.main_image_url)     mainImageUrl = listing.main_image_url;
 }
+
+// Quality grade
+const gradeColors: Record<string, { bg: string; text: string; icon: string }> = {
+  A: { bg: 'bg-green-100',  text: 'text-green-900',  icon: 'bi-check-circle-fill' },
+  B: { bg: 'bg-blue-100',   text: 'text-blue-900',   icon: 'bi-check-circle-fill' },
+  C: { bg: 'bg-amber-100',  text: 'text-amber-900',  icon: 'bi-exclamation-triangle-fill' },
+  F: { bg: 'bg-red-100',    text: 'text-red-900',    icon: 'bi-x-circle-fill' },
+};
+const grade   = diagnostics?.qualityGrade ?? 'F';
+const colors  = gradeColors[grade] ?? gradeColors['F'];
+
+const ratePercent        = diagnostics ? Math.round(diagnostics.extractionRate * 100) : 0;
+const weightedPercent    = diagnostics?.weightedExtractionRate != null
+  ? Math.round(diagnostics.weightedExtractionRate * 100) : null;
+const expectedPercent    = diagnostics?.expectedExtractionRate != null
+  ? Math.round(diagnostics.expectedExtractionRate * 100) : null;
+const expectationGapPercent = diagnostics?.expectationGap != null
+  ? Math.round(diagnostics.expectationGap * 100) : null;
+
+const criticalMissing  = diagnostics?.criticalFieldsMissing ?? [];
+const contentAnalysis  = diagnostics?.contentAnalysis;
+const imageUrls        = listing?.image_urls ?? [];
 
 const details: [string, any][] = [];
 if (listing) {
-  if (listing.reference) details.push(['Reference', listing.reference]);
-  if (listing.price_string) details.push(['Price', listing.price_string]);
+  if (listing.reference)         details.push(['Reference', listing.reference]);
+  if (listing.price_string)      details.push(['Price', listing.price_string]);
   if (listing.count_bedrooms > 0) details.push(['Bedrooms', listing.count_bedrooms]);
   if (listing.count_bathrooms > 0) details.push(['Bathrooms', listing.count_bathrooms]);
-  if (listing.constructed_area > 0) details.push(['Area', `${listing.constructed_area} ${listing.area_unit || ''}`]);
-  if (listing.address_string) details.push(['Address', listing.address_string]);
+  if (listing.constructed_area > 0)
+    details.push(['Area', `${listing.constructed_area} ${listing.area_unit ?? ''}`]);
+  if (listing.address_string)    details.push(['Address', listing.address_string]);
 }
----
-<BaseLayout title={listing ? (listing.title || 'Property Details') : 'Not Found'}>
 
-{!listing ? (
-  <div class="max-w-6xl mx-auto px-4 py-12">
+const fieldAttrs = [
+  'reference', 'title', 'description', 'price_string', 'price_float',
+  'area_unit', 'address_string', 'currency', 'country', 'longitude',
+  'latitude', 'main_image_url', 'for_rent', 'for_sale',
+  'count_bedrooms', 'count_bathrooms',
+];
+---
+
+<BaseLayout title={listing ? (listing.title || 'Property Details') : 'Not Found'}>
+<div class="max-w-6xl mx-auto px-4 pt-4 pb-16">
+
+  <nav class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+    <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <a href="/listings" class="text-gray-500 no-underline hover:text-blue-600 transition">Listings</a>
+    <i class="bi bi-chevron-right text-[0.65rem]"></i>
+    <span>Property Details</span>
+  </nav>
+
+  {!listing ? (
     <div class="flex justify-center">
       <div class="w-full max-w-lg">
         <div class="bg-amber-50 rounded-2xl p-6 text-center">
@@ -57,179 +103,476 @@ if (listing) {
         </div>
       </div>
     </div>
-  </div>
-) : (
-  <div class="max-w-6xl mx-auto px-4 pt-4 pb-12">
-    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-5">
-      <a href="/" class="text-gray-500 no-underline hover:text-blue-600 transition"><i class="bi bi-house mr-1"></i>Home</a>
-      <i class="bi bi-chevron-right text-[0.65rem]"></i>
-      <a href="/listings" class="text-gray-500 no-underline hover:text-blue-600 transition">Listings</a>
-      <i class="bi bi-chevron-right text-[0.65rem]"></i>
-      <span>Property Details</span>
-    </nav>
+  ) : (
+    <>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
-      <div>
-        {listing.image_urls?.length > 1 ? (
-          <div class="rounded-xl overflow-hidden relative mb-5 shadow-md">
-            <div id="propertyCarousel" class="relative">
-              <div class="overflow-hidden">
-                <div id="carouselTrack" class="flex transition-transform duration-300 ease-in-out">
-                  {listing.image_urls.map((img, i: number) => (
-                    <div class="w-full flex-shrink-0">
-                      <img src={img.url} class="block w-full max-h-[450px] object-cover" alt={`Property image ${i + 1}`} />
-                    </div>
-                  ))}
+      {/* ── Quality grade banner ─────────────────────────────────────────────── */}
+      {diagnostics ? (
+        <div class={`rounded-xl px-5 py-4 mb-3 ${colors.bg} ${colors.text}`}>
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <i class={`bi ${colors.icon} text-2xl shrink-0`}></i>
+              <div class="min-w-0">
+                <div class="font-bold text-lg leading-tight">Grade {grade}: {diagnostics.qualityLabel}</div>
+                <div class="text-sm opacity-80 truncate">
+                  {diagnostics.populatedExtractableFields}/{diagnostics.extractableFields} fields ({ratePercent}%{weightedPercent != null ? `, weighted ${weightedPercent}%` : ''})
+                  &nbsp;·&nbsp; {diagnostics.populatedFields}/{diagnostics.totalFields} total populated
                 </div>
               </div>
-              <button id="carouselPrev" type="button" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition">
-                <i class="bi bi-chevron-left"></i>
-              </button>
-              <button id="carouselNext" type="button" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition">
-                <i class="bi bi-chevron-right"></i>
-              </button>
             </div>
-            <div class="absolute bottom-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-              <i class="bi bi-images"></i> {listing.image_urls.length} photos
+            <div class="flex flex-wrap items-center gap-3 text-sm shrink-0">
+              <div class="flex items-center gap-2">
+                <span class="opacity-60 text-xs uppercase tracking-wide">Confidence</span>
+                <div class="w-20 bg-black/15 h-2 rounded-full overflow-hidden">
+                  <div
+                    class={`h-full rounded-full ${diagnostics.confidenceScore > 0.7 ? 'bg-green-600' : diagnostics.confidenceScore > 0.4 ? 'bg-amber-500' : 'bg-red-500'}`}
+                    style={`width:${diagnostics.confidenceScore * 100}%`}
+                  ></div>
+                </div>
+                <span class="font-bold">{Math.round(diagnostics.confidenceScore * 100)}%</span>
+              </div>
+              <span class={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${
+                diagnostics.visibility === 'published' ? 'bg-green-200 border-green-300 text-green-800' :
+                diagnostics.visibility === 'pending'   ? 'bg-amber-200 border-amber-300 text-amber-800' :
+                                                         'bg-red-200 border-red-300 text-red-800'
+              }`}>
+                <i class="bi bi-circle-fill text-[0.4rem]"></i> {diagnostics.visibility}
+              </span>
+              <span class="opacity-60 text-xs font-mono">{diagnostics.scraperName}</span>
             </div>
           </div>
-        ) : (
-          <div class="rounded-xl overflow-hidden relative mb-5 shadow-md">
-            <img src={mainImageUrl} class="w-full max-h-[450px] object-cover" alt="Property image" />
-          </div>
-        )}
+        </div>
+      ) : (
+        <div class="flex items-center gap-2 bg-gray-100 text-gray-500 px-4 py-2.5 rounded-xl mb-3 text-sm">
+          <i class="bi bi-info-circle"></i> No extraction diagnostics recorded for this listing.
+        </div>
+      )}
 
-        {listing.description && (
-          <div class="bg-white rounded-xl shadow-md p-6 mb-5">
-            <h5 class="font-semibold text-base text-gray-800 mb-4"><i class="bi bi-text-paragraph mr-2"></i>Description</h5>
-            <div class="text-sm leading-relaxed text-gray-600" set:html={listing.description_html || listing.description}></div>
-          </div>
-        )}
+      {/* Alert strips */}
+      {criticalMissing.length > 0 && (
+        <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2.5 rounded-lg mb-2 text-sm">
+          <i class="bi bi-exclamation-octagon shrink-0"></i>
+          <span><strong>Critical fields missing:</strong> {criticalMissing.join(', ')}</span>
+        </div>
+      )}
 
-        {osmDirectionsUrl && (
-          <div class="bg-white rounded-xl shadow-md p-6 mb-5">
-            <h5 class="font-semibold text-base text-gray-800 mb-4"><i class="bi bi-geo-alt mr-2"></i>Location</h5>
-            <div class="rounded-lg border border-gray-200 p-4 bg-gray-50 text-sm text-gray-700">
-              <p class="mb-2">Interactive map embed has been removed to avoid third-party map SDK dependency.</p>
+      {expectedPercent != null && diagnostics?.expectationStatus && (
+        <div class={`flex items-center gap-2 px-4 py-2.5 rounded-lg mb-2 text-sm ${
+          diagnostics.expectationStatus === 'above' || diagnostics.expectationStatus === 'meets'
+            ? 'bg-green-50 border border-green-200 text-green-800'
+            : diagnostics.expectationStatus === 'below'
+              ? 'bg-amber-50 border border-amber-200 text-amber-800'
+              : 'bg-red-50 border border-red-200 text-red-800'
+        }`}>
+          <i class="bi bi-speedometer2 shrink-0"></i>
+          Baseline: expected {expectedPercent}% for {diagnostics.scraperName}; actual {ratePercent}%
+          {expectationGapPercent != null && (
+            <span>({expectationGapPercent >= 0 ? '+' : ''}{expectationGapPercent} pts, {diagnostics.expectationStatus.replace('_', ' ')})</span>
+          )}
+        </div>
+      )}
+
+      {justUpdated && (
+        <div class="flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 px-4 py-2.5 rounded-lg mb-2 text-sm">
+          <i class="bi bi-check-circle shrink-0"></i> Re-extraction complete — data updated.
+        </div>
+      )}
+
+      {updateError === 'missing_html' && (
+        <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2.5 rounded-lg mb-2 text-sm">
+          <i class="bi bi-exclamation-circle shrink-0"></i> Re-extraction failed: no HTML was provided.
+        </div>
+      )}
+
+      {scrapeRecord?.better_html_hint?.suggested && (
+        <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 text-amber-900 px-5 py-4 rounded-xl mb-3" id="better-html-banner">
+          <i class="bi bi-lightbulb text-xl text-amber-600 mt-0.5 shrink-0"></i>
+          <div class="flex-1">
+            <h6 class="font-semibold mb-1">Better results available</h6>
+            <p class="text-sm mb-2">{scrapeRecord.better_html_hint.recommendation}</p>
+            <ul class="text-sm list-disc pl-4 mb-2 space-y-0.5">
+              {scrapeRecord.better_html_hint.suggestedActions.map((action) => <li>{action}</li>)}
+            </ul>
+            <div class="flex gap-3 text-sm">
+              <a href="/extract/html" class="text-amber-700 hover:underline font-medium">Paste HTML</a>
+              <span class="text-amber-400">|</span>
+              <a href="/extract/upload" class="text-amber-700 hover:underline font-medium">Upload File</a>
+            </div>
+          </div>
+          <button type="button" class="text-amber-400 hover:text-amber-600 border-0 bg-transparent cursor-pointer shrink-0" onclick="this.closest('#better-html-banner').remove()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      )}
+
+      {/* ── Main grid ────────────────────────────────────────────────────────── */}
+      <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5 mt-2">
+
+        {/* Left column */}
+        <div>
+          {listing.image_urls?.length > 1 ? (
+            <div class="rounded-xl overflow-hidden relative mb-5 shadow-md">
+              <div id="propertyCarousel" class="relative">
+                <div class="overflow-hidden">
+                  <div id="carouselTrack" class="flex transition-transform duration-300 ease-in-out">
+                    {listing.image_urls.map((img, i: number) => (
+                      <div class="w-full flex-shrink-0">
+                        <img src={img.url} class="block w-full max-h-[420px] object-cover" alt={`Property image ${i + 1}`} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <button id="carouselPrev" type="button" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition">
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+                <button id="carouselNext" type="button" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+              </div>
+              <div class="absolute bottom-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+                <i class="bi bi-images"></i> {listing.image_urls.length} photos
+              </div>
+            </div>
+          ) : (
+            <div class="rounded-xl overflow-hidden relative mb-5 shadow-md">
+              <img src={mainImageUrl} class="w-full max-h-[420px] object-cover" alt="Property image" />
+            </div>
+          )}
+
+          {listing.description && (
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-5">
+              <h5 class="font-semibold text-base text-gray-800 mb-3"><i class="bi bi-text-paragraph mr-2"></i>Description</h5>
+              <div class="text-sm leading-relaxed text-gray-600" set:html={listing.description_html || listing.description}></div>
+            </div>
+          )}
+
+          {osmDirectionsUrl && (
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-5">
+              <h5 class="font-semibold text-base text-gray-800 mb-3"><i class="bi bi-geo-alt mr-2"></i>Location</h5>
               <div class="flex flex-wrap gap-2">
-                <a
-                  href={osmDirectionsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 rounded-md border border-blue-600 px-3 py-1.5 text-blue-600 no-underline hover:bg-blue-50 transition"
-                >
-                  <i class="bi bi-sign-turn-right"></i>
-                  Open directions (OpenStreetMap)
+                <a href={osmDirectionsUrl} target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 rounded-md border border-blue-600 px-3 py-1.5 text-blue-600 text-sm no-underline hover:bg-blue-50 transition">
+                  <i class="bi bi-sign-turn-right"></i> OpenStreetMap
                 </a>
-                <a
-                  href={googleDirectionsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 no-underline hover:bg-gray-100 transition"
-                >
-                  <i class="bi bi-box-arrow-up-right"></i>
-                  Open in external map app
+                <a href={googleDirectionsUrl} target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 text-sm no-underline hover:bg-gray-100 transition">
+                  <i class="bi bi-box-arrow-up-right"></i> Google Maps
                 </a>
               </div>
             </div>
-          </div>
-        )}
-
-        <DataBridgeNotice />
-      </div>
-
-      <div>
-        <div class="bg-white rounded-xl shadow-md p-6 sticky top-4">
-          <div class="flex flex-wrap gap-2 mb-3">
-            {listing.for_sale && <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full"><i class="bi bi-house-door mr-1"></i>For Sale</span>}
-            {listing.for_rent && <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full"><i class="bi bi-key mr-1"></i>For Rent</span>}
-          </div>
-
-          {listing.title && <h4 class="font-bold text-lg text-gray-900 mb-2 leading-snug">{listing.title}</h4>}
-
-          {listing.address_string && (
-            <p class="text-gray-500 text-sm mb-3"><i class="bi bi-geo-alt mr-1"></i>{listing.address_string}</p>
           )}
+        </div>
 
-          {listing.price_string && (
-            <div class="bg-blue-50 rounded-lg px-4 py-3.5 mb-4">
-              <span class="text-2xl font-bold text-blue-600">{listing.price_string}</span>
-              {listing.currency && <span class="text-sm text-gray-500 ml-1.5">{listing.currency}</span>}
+        {/* Right sidebar */}
+        <div>
+          <div class="bg-white rounded-xl shadow-md p-5 sticky top-4 space-y-4">
+
+            <div class="flex flex-wrap gap-2">
+              {listing.for_sale && <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full"><i class="bi bi-house-door mr-1"></i>For Sale</span>}
+              {listing.for_rent && <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full"><i class="bi bi-key mr-1"></i>For Rent</span>}
             </div>
-          )}
 
-          <div class="grid grid-cols-[repeat(auto-fit,minmax(90px,1fr))] gap-3 mb-4">
-            {listing.count_bedrooms > 0 && (
-              <div class="text-center py-3 px-2 bg-gray-50 rounded-lg">
-                <i class="bi bi-door-open block text-xl text-blue-600 mb-1"></i>
-                <span class="block text-lg font-bold text-gray-900">{listing.count_bedrooms}</span>
-                <span class="block text-[0.7rem] text-gray-400 uppercase tracking-wide">Bedrooms</span>
+            {listing.title && <h4 class="font-bold text-lg text-gray-900 leading-snug">{listing.title}</h4>}
+
+            {listing.address_string && (
+              <p class="text-gray-500 text-sm"><i class="bi bi-geo-alt mr-1"></i>{listing.address_string}</p>
+            )}
+
+            {listing.price_string && (
+              <div class="bg-blue-50 rounded-lg px-4 py-3">
+                <span class="text-2xl font-bold text-blue-600">{listing.price_string}</span>
+                {listing.currency && <span class="text-sm text-gray-500 ml-1.5">{listing.currency}</span>}
               </div>
             )}
-            {listing.count_bathrooms > 0 && (
-              <div class="text-center py-3 px-2 bg-gray-50 rounded-lg">
-                <i class="bi bi-droplet block text-xl text-blue-600 mb-1"></i>
-                <span class="block text-lg font-bold text-gray-900">{listing.count_bathrooms}</span>
-                <span class="block text-[0.7rem] text-gray-400 uppercase tracking-wide">Bathrooms</span>
+
+            {(listing.count_bedrooms > 0 || listing.count_bathrooms > 0 || listing.constructed_area > 0) && (
+              <div class="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2">
+                {listing.count_bedrooms > 0 && (
+                  <div class="text-center py-2 px-1 bg-gray-50 rounded-lg">
+                    <i class="bi bi-door-open block text-lg text-blue-600 mb-0.5"></i>
+                    <span class="block text-base font-bold text-gray-900">{listing.count_bedrooms}</span>
+                    <span class="block text-[0.65rem] text-gray-400 uppercase tracking-wide">Beds</span>
+                  </div>
+                )}
+                {listing.count_bathrooms > 0 && (
+                  <div class="text-center py-2 px-1 bg-gray-50 rounded-lg">
+                    <i class="bi bi-droplet block text-lg text-blue-600 mb-0.5"></i>
+                    <span class="block text-base font-bold text-gray-900">{listing.count_bathrooms}</span>
+                    <span class="block text-[0.65rem] text-gray-400 uppercase tracking-wide">Baths</span>
+                  </div>
+                )}
+                {listing.constructed_area > 0 && (
+                  <div class="text-center py-2 px-1 bg-gray-50 rounded-lg">
+                    <i class="bi bi-arrows-angle-expand block text-lg text-blue-600 mb-0.5"></i>
+                    <span class="block text-base font-bold text-gray-900">{listing.constructed_area}</span>
+                    <span class="block text-[0.65rem] text-gray-400 uppercase tracking-wide">{listing.area_unit || 'm²'}</span>
+                  </div>
+                )}
               </div>
             )}
-            {listing.constructed_area > 0 && (
-              <div class="text-center py-3 px-2 bg-gray-50 rounded-lg">
-                <i class="bi bi-arrows-angle-expand block text-xl text-blue-600 mb-1"></i>
-                <span class="block text-lg font-bold text-gray-900">{listing.constructed_area}</span>
-                <span class="block text-[0.7rem] text-gray-400 uppercase tracking-wide">{listing.area_unit || 'm\u00B2'}</span>
+
+            {details.length > 0 && (
+              <div class="border-t border-gray-100 pt-3">
+                {details.map(([label, value]) => (
+                  <div class="flex justify-between py-1.5 border-b border-gray-100 text-sm last:border-0">
+                    <span class="text-gray-400 font-medium">{label}</span>
+                    <span class="text-gray-800 font-semibold text-right">{value}</span>
+                  </div>
+                ))}
               </div>
             )}
-          </div>
 
-          {details.length > 0 && (
-            <div class="mb-4 border-t border-gray-200">
-              {details.map(([label, value]) => (
-                <div class="flex justify-between py-2 border-b border-gray-100 text-sm">
-                  <span class="text-gray-400 font-medium">{label}</span>
-                  <span class="text-gray-800 font-semibold text-right">{value}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <SocialShare
-            url={Astro.url.toString()}
-            title={listing.title || 'Property Listing'}
-            description={listing.description ? listing.description.replace(/<[^>]*>?/gm, '').substring(0, 200) : ''}
-          />
-
-          <div class="mb-4">
-            {listing.import_url && (
-              <a href={listing.import_url} target="_blank" class="block w-full text-center border border-blue-600 text-blue-600 rounded-lg py-2 text-sm hover:bg-blue-50 transition no-underline mb-2">
-                <i class="bi bi-box-arrow-up-right mr-1"></i> View Original Listing
-              </a>
-            )}
+            {/* ── Raw Data — prominent ── */}
             <a
               href={`/listings/${id}/raw-data`}
-              class="block w-full text-center border border-gray-300 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50 transition no-underline mb-2"
+              class="flex items-center justify-between w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-4 no-underline transition group"
             >
-              <i class="bi bi-file-earmark-code mr-1"></i> Raw Data
+              <div class="flex items-center gap-3">
+                <i class="bi bi-file-earmark-code text-2xl shrink-0"></i>
+                <div>
+                  <div class="font-bold text-base leading-tight">Raw Data</div>
+                  <div class="text-xs opacity-70 mt-0.5">JSON · CSV · GeoJSON · XML · 5 more</div>
+                </div>
+              </div>
+              <i class="bi bi-arrow-right text-lg group-hover:translate-x-1 transition-transform"></i>
             </a>
-            {listing.import_url && (
-              <a
-                href={`${h2cUrl}/new?left_url=${encodeURIComponent(listing.import_url)}&source=scraper`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block w-full text-center border border-indigo-600 text-indigo-600 rounded-lg py-2 text-sm hover:bg-indigo-50 transition no-underline"
-              >
-                <i class="bi bi-arrow-left-right mr-1"></i> Compare on HomesToCompare
-              </a>
-            )}
+
+            {/* Other actions */}
+            <div class="space-y-2">
+              {listing.import_url && (
+                <a href={listing.import_url} target="_blank"
+                  class="flex items-center justify-center gap-1.5 w-full border border-blue-600 text-blue-600 rounded-lg py-2 text-sm hover:bg-blue-50 transition no-underline">
+                  <i class="bi bi-box-arrow-up-right"></i> View Original Listing
+                </a>
+              )}
+
+              <div class="relative">
+                <button id="add-to-haul-btn" type="button"
+                  class="flex items-center justify-center gap-1.5 w-full border border-amber-500 text-amber-600 rounded-lg py-2 text-sm hover:bg-amber-50 transition cursor-pointer bg-transparent">
+                  <i class="bi bi-box-seam"></i> Add to Haul
+                </button>
+                <div id="haul-picker" class="hidden absolute left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-10 mt-1">
+                  <div id="haul-picker-list" class="max-h-40 overflow-y-auto"></div>
+                  <button id="haul-create-new" type="button"
+                    class="w-full text-left text-sm text-blue-600 hover:bg-blue-50 px-2 py-1.5 rounded mt-1 cursor-pointer border-0 bg-transparent inline-flex items-center gap-1">
+                    <i class="bi bi-plus-lg"></i> New Haul
+                  </button>
+                  <div id="haul-picker-status" class="text-xs mt-2 hidden"></div>
+                </div>
+              </div>
+
+              {listing.import_url && (
+                <a
+                  href={`${h2cUrl}/new?left_url=${encodeURIComponent(listing.import_url)}&source=scraper`}
+                  target="_blank" rel="noopener noreferrer"
+                  class="flex items-center justify-center gap-1.5 w-full border border-indigo-400 text-indigo-600 rounded-lg py-2 text-sm hover:bg-indigo-50 transition no-underline">
+                  <i class="bi bi-arrow-left-right"></i> Compare on HomesToCompare
+                </a>
+              )}
+            </div>
+
+            <SocialShare
+              url={Astro.url.toString()}
+              title={listing.title || 'Property Listing'}
+              description={listing.description ? listing.description.replace(/<[^>]*>?/gm, '').substring(0, 200) : ''}
+            />
           </div>
         </div>
       </div>
-    </div>
-  </div>
-)}
+
+      {/* ── Developer panels ─────────────────────────────────────────────────── */}
+      <div class="mt-6 space-y-3">
+
+        {/* Extracted fields */}
+        <details open class="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <summary class="flex items-center gap-2 px-5 py-3.5 cursor-pointer select-none font-semibold text-gray-700 text-sm hover:bg-gray-50 rounded-xl transition list-none">
+            <i class="bi bi-table text-gray-400"></i> Extracted Fields
+            <span class="ml-auto text-xs font-normal text-gray-400">{fieldAttrs.filter(a => { const v = (listing as any)[a]; return v != null && v !== '' && v !== 0 && v !== false; }).length} / {fieldAttrs.length} shown</span>
+          </summary>
+          <div class="px-5 pb-5 border-t border-gray-100 pt-4">
+            <table class="w-full text-sm mb-4">
+              <tbody>
+                {fieldAttrs.map((attr) => {
+                  const val = (listing as any)[attr];
+                  if (val == null || val === '' || val === 0 || val === false) return null;
+                  const label = attr.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+                  return (
+                    <tr class="even:bg-gray-50">
+                      <td class="font-medium text-gray-500 py-1.5 px-2 w-[36%]">{label}</td>
+                      <td class="py-1.5 px-2 text-gray-800">{String(val)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {imageUrls.length > 0 && (
+              <>
+                <div class="flex items-center gap-3 mb-2">
+                  <p class="font-medium text-sm text-gray-700 m-0">{imageUrls.length} image{imageUrls.length === 1 ? '' : 's'}</p>
+                  <button id="enrich-images-btn" type="button"
+                    class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-lg hover:bg-blue-100 transition cursor-pointer inline-flex items-center gap-1">
+                    <i class="bi bi-arrow-clockwise"></i> Fetch Image Details
+                  </button>
+                  <span id="enrich-status" class="text-xs text-gray-500 hidden"></span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  {imageUrls.slice(0, 8).map((img) => (
+                    <a href={img.url} target="_blank">
+                      <img src={img.url} alt="Property" class="w-20 h-14 object-cover rounded-md border border-gray-200" />
+                    </a>
+                  ))}
+                  {imageUrls.length > 8 && (
+                    <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs self-center">+{imageUrls.length - 8} more</span>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </details>
+
+        {/* Extraction diagnostics + field traces */}
+        {diagnostics && (
+          <details open class="bg-white rounded-xl border border-gray-200 shadow-sm">
+            <summary class="flex items-center gap-2 px-5 py-3.5 cursor-pointer select-none font-semibold text-gray-700 text-sm hover:bg-gray-50 rounded-xl transition list-none">
+              <i class="bi bi-microscope text-gray-400"></i> Extraction Diagnostics
+              <span class="ml-1 text-xs font-mono font-normal text-gray-500">{diagnostics.scraperName}</span>
+              <span class="ml-auto text-xs font-normal text-gray-400">{diagnostics.fieldTraces.length} field traces</span>
+            </summary>
+            <div class="px-5 pb-5 border-t border-gray-100 pt-4 space-y-3">
+
+              {contentAnalysis && (
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                  <span>HTML: <strong>{Math.round(contentAnalysis.htmlLength / 1024)}KB</strong></span>
+                  <span>JSON-LD: <strong>{contentAnalysis.jsonLdCount}</strong></span>
+                  {contentAnalysis.scriptJsonVarsFound.length > 0 && (
+                    <span>Script vars: <strong>{contentAnalysis.scriptJsonVarsFound.join(', ')}</strong></span>
+                  )}
+                  {contentAnalysis.appearsBlocked && <span class="text-red-600 font-semibold">⚠ Appears blocked</span>}
+                  {contentAnalysis.appearsJsOnly && <span class="text-amber-600 font-semibold">⚠ JS-only shell</span>}
+                </div>
+              )}
+
+              {diagnostics.emptyFields.length > 0 && (
+                <div class="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-2 rounded-lg">
+                  <strong>Empty fields:</strong> {diagnostics.emptyFields.join(', ')}
+                </div>
+              )}
+
+              <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="w-full text-xs">
+                  <thead>
+                    <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                      <th class="py-2 px-3 font-medium">Field</th>
+                      <th class="py-2 px-3 font-medium">Section</th>
+                      <th class="py-2 px-3 font-medium">Strategy</th>
+                      <th class="py-2 px-3 font-medium">Raw text</th>
+                      <th class="py-2 px-3 font-medium">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {diagnostics.fieldTraces.map((trace) => {
+                      const isEmpty = trace.rawText === '' || trace.value === 0 || trace.value === false || trace.value === '';
+                      return (
+                        <tr class={`border-b border-gray-100 last:border-0 ${isEmpty ? 'bg-red-50' : ''}`}>
+                          <td class="py-1.5 px-3 font-mono">{trace.field}</td>
+                          <td class="py-1.5 px-3 text-gray-500">{trace.section}</td>
+                          <td class="py-1.5 px-3 text-gray-500 max-w-[180px] truncate" title={trace.strategy}>{trace.strategy}</td>
+                          <td class="py-1.5 px-3 max-w-[200px] truncate" title={trace.rawText}>{trace.rawText || <span class="text-red-400 italic">empty</span>}</td>
+                          <td class="py-1.5 px-3 max-w-[200px] truncate" title={String(trace.value)}>{JSON.stringify(trace.value)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </details>
+        )}
+
+        {/* Scrape metadata */}
+        {scrapeRecord && (
+          <details open class="bg-white rounded-xl border border-gray-200 shadow-sm">
+            <summary class="flex items-center gap-2 px-5 py-3.5 cursor-pointer select-none font-semibold text-gray-700 text-sm hover:bg-gray-50 rounded-xl transition list-none">
+              <i class="bi bi-hdd-network text-gray-400"></i> Scrape Metadata
+            </summary>
+            <div class="px-5 pb-5 border-t border-gray-100 pt-4">
+              <div class="flex flex-wrap gap-2 mb-3">
+                <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-medium px-2 py-1 rounded">
+                  <i class="bi bi-arrow-down-circle"></i> {scrapeRecord.source_type.replace(/_/g, ' ')}
+                </span>
+                <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+                  {scrapeRecord.html_size_kb} KB
+                </span>
+                {typeof scrapeRecord.fetch_duration_ms === 'number' && (
+                  <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+                    {scrapeRecord.fetch_duration_ms} ms
+                  </span>
+                )}
+                <span class={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded ${
+                  scrapeRecord.render_mode === 'client' ? 'bg-amber-50 text-amber-700'
+                  : scrapeRecord.render_mode === 'hybrid' ? 'bg-purple-50 text-purple-700'
+                  : 'bg-green-50 text-green-700'
+                }`}>
+                  {scrapeRecord.render_mode} rendered
+                </span>
+              </div>
+              {scrapeRecord.technology_stack.length > 0 && (
+                <div class="flex flex-wrap gap-1.5 mb-2">
+                  <span class="text-xs text-gray-500 self-center">Tech:</span>
+                  {scrapeRecord.technology_stack.map((tech) => (
+                    <span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded">{tech}</span>
+                  ))}
+                </div>
+              )}
+              {scrapeRecord.anti_scraping_signals.length > 0 && (
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="text-xs text-gray-500 self-center">Signals:</span>
+                  {scrapeRecord.anti_scraping_signals.map((signal) => (
+                    <span class="bg-red-50 text-red-700 text-xs px-2 py-0.5 rounded">{signal.replace(/_/g, ' ')}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </details>
+        )}
+
+        {/* Re-extract */}
+        <details class="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <summary class="flex items-center gap-2 px-5 py-3.5 cursor-pointer select-none font-semibold text-gray-700 text-sm hover:bg-gray-50 rounded-xl transition list-none">
+            <i class="bi bi-arrow-repeat text-gray-400"></i> Re-extract with New HTML
+          </summary>
+          <div class="px-5 pb-5 border-t border-gray-100 pt-4">
+            <p class="text-xs text-gray-500 mb-3">Paste fully-rendered HTML (e.g. from browser DevTools) to re-run extraction and update this listing.</p>
+            <form method="POST" action={`/extract/results/${id}/update-html`}>
+              <input type="hidden" name="import_url" value={(listing as any).import_url || scrapeRecord?.source_url || ''} />
+              <textarea
+                name="html"
+                rows={5}
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none resize-y mb-2"
+                placeholder="Paste fully-rendered HTML here..."
+              ></textarea>
+              <button type="submit"
+                class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 inline-flex items-center gap-1.5 cursor-pointer border-0">
+                <i class="bi bi-arrow-repeat"></i> Re-extract
+              </button>
+            </form>
+          </div>
+        </details>
+
+      </div>
+
+      <div class="mt-6">
+        <DataBridgeNotice />
+      </div>
+
+    </>
+  )}
+</div>
 
 <script is:inline>
 document.addEventListener('DOMContentLoaded', () => {
+  // Carousel
   const track = document.getElementById('carouselTrack');
   const prevBtn = document.getElementById('carouselPrev');
   const nextBtn = document.getElementById('carouselNext');
@@ -237,15 +580,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const slides = track.children;
     let current = 0;
     const total = slides.length;
-
     function goTo(i) {
       current = ((i % total) + total) % total;
       track.style.transform = `translateX(-${current * 100}%)`;
     }
-
     prevBtn.addEventListener('click', () => goTo(current - 1));
     nextBtn.addEventListener('click', () => goTo(current + 1));
-
     let timer = setInterval(() => goTo(current + 1), 5000);
     track.parentElement.addEventListener('mouseenter', () => clearInterval(timer));
     track.parentElement.addEventListener('mouseleave', () => {
@@ -253,6 +593,207 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Enrich images
+  const enrichBtn = document.getElementById('enrich-images-btn');
+  const enrichStatus = document.getElementById('enrich-status');
+  if (enrichBtn && enrichStatus) {
+    enrichBtn.addEventListener('click', async () => {
+      enrichBtn.disabled = true;
+      enrichBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Fetching...';
+      enrichStatus.classList.remove('hidden');
+      enrichStatus.textContent = '';
+      try {
+        const listingId = window.location.pathname.split('/').filter(Boolean).pop();
+        const res = await fetch('/public_api/v1/listings/' + listingId + '/enrich-images', { method: 'POST' });
+        if (!res.ok) throw new Error('Failed: ' + res.status);
+        const data = await res.json();
+        const images = data.data?.image_urls || [];
+        const enriched = images.filter(img => img.enriched);
+        enrichStatus.textContent = enriched.length + '/' + images.length + ' enriched';
+        const thumbs = document.querySelectorAll('#enrich-images-btn').length
+          ? document.querySelectorAll('.flex.flex-wrap.gap-2 a img')
+          : [];
+        thumbs.forEach((img, i) => {
+          if (i < images.length && images[i].enriched) {
+            const a = img.parentElement;
+            const badge = document.createElement('span');
+            badge.className = 'text-[10px] bg-gray-800/70 text-white px-1 py-0.5 rounded absolute bottom-0.5 left-0.5 pointer-events-none';
+            const parts = [];
+            if (images[i].width && images[i].height) parts.push(images[i].width + 'x' + images[i].height);
+            if (images[i].sizeBytes) parts.push(Math.round(images[i].sizeBytes / 1024) + 'KB');
+            badge.textContent = parts.join(' ');
+            a.style.position = 'relative';
+            a.appendChild(badge);
+          }
+        });
+      } catch (e) {
+        enrichStatus.textContent = 'Error: ' + e.message;
+      }
+      enrichBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Fetch Image Details';
+      enrichBtn.disabled = false;
+    });
+  }
+});
+</script>
+
+<script is:inline define:vars={{ id, listing: listing ? { title: listing.title, price_string: listing.price_string, import_url: (listing as any).import_url } : null, grade, ratePercent }}>
+document.addEventListener('DOMContentLoaded', () => {
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  if (typeof window.PwsStorage === 'undefined') return;
+  const resultId = id;
+  if (!resultId) return;
+
+  if (listing) {
+    let hostname = '';
+    try { hostname = new URL(listing.import_url || '').hostname; } catch {}
+    const summary = {
+      id: resultId, title: (listing.title || '').slice(0, 80), grade,
+      price: listing.price_string || '', hostname, rate: ratePercent,
+      timestamp: new Date().toISOString(),
+    };
+    window.PwsStorage.set('functional:result-cache:' + resultId, summary);
+    let recent = window.PwsStorage.get('functional:recent-extractions') || [];
+    recent = recent.filter(r => r.id !== resultId);
+    recent.unshift(summary);
+    if (recent.length > 20) recent = recent.slice(0, 20);
+    window.PwsStorage.set('functional:recent-extractions', recent);
+
+    const haulId = new URLSearchParams(window.location.search).get('haul_id');
+    if (haulId) {
+      let myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+      const now = new Date();
+      const entry = {
+        id: haulId, name: null, scrapeCount: 1,
+        lastVisited: now.toISOString(),
+        expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+      const idx = myHauls.findIndex(h => h.id === haulId);
+      if (idx !== -1) {
+        entry.name = myHauls[idx].name;
+        entry.scrapeCount = (myHauls[idx].scrapeCount || 0) + 1;
+        entry.expiresAt = myHauls[idx].expiresAt || entry.expiresAt;
+        myHauls[idx] = entry;
+      } else {
+        myHauls.unshift(entry);
+      }
+      if (myHauls.length > 20) myHauls = myHauls.slice(0, 20);
+      window.PwsStorage.set('functional:my-hauls', myHauls);
+    }
+  }
+});
+</script>
+
+<script is:inline define:vars={{ id }}>
+document.addEventListener('DOMContentLoaded', function() {
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  const btn = document.getElementById('add-to-haul-btn');
+  const picker = document.getElementById('haul-picker');
+  const listEl = document.getElementById('haul-picker-list');
+  const createBtn = document.getElementById('haul-create-new');
+  const statusEl = document.getElementById('haul-picker-status');
+  if (!btn || !picker) return;
+
+  function showStatus(msg, isError) {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.className = 'text-xs mt-2 ' + (isError ? 'text-red-600' : 'text-green-600');
+    statusEl.classList.remove('hidden');
+  }
+
+  function renderHaulList() {
+    if (!listEl) return;
+    if (typeof window.PwsStorage === 'undefined') {
+      listEl.innerHTML = '<p class="text-xs text-amber-600">Enable functional cookies to use hauls.</p>';
+      return;
+    }
+    let myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+    const now = new Date();
+    myHauls = myHauls.filter(h => new Date(h.expiresAt) > now);
+    if (myHauls.length === 0) {
+      listEl.innerHTML = '<p class="text-xs text-gray-500 mb-1">No hauls yet. Create one below.</p>';
+      return;
+    }
+    myHauls.sort((a, b) => new Date(b.lastVisited).getTime() - new Date(a.lastVisited).getTime());
+    listEl.innerHTML = myHauls.map(h =>
+      `<button type="button" class="haul-pick-item w-full text-left text-sm px-2 py-1.5 rounded hover:bg-gray-100 cursor-pointer border-0 bg-transparent flex justify-between items-center" data-haul-id="${escapeHtml(h.id)}">
+        <span class="truncate">${escapeHtml(h.name || h.id)}</span>
+        <span class="text-xs text-gray-400 ml-2 whitespace-nowrap">${escapeHtml(h.scrapeCount || 0)}/20</span>
+      </button>`
+    ).join('');
+  }
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    statusEl?.classList.add('hidden');
+    renderHaulList();
+    picker.classList.toggle('hidden');
+  });
+  document.addEventListener('click', function(e) {
+    if (!picker.contains(e.target) && e.target !== btn) picker.classList.add('hidden');
+  });
+
+  async function addResultToHaul(haulId) {
+    showStatus('Adding...', false);
+    try {
+      const res = await fetch('/ext/v1/hauls/' + haulId + '/add-result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resultId: id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed');
+      if (typeof window.PwsStorage !== 'undefined') {
+        const myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+        const entry = myHauls.find(h => h.id === haulId);
+        if (entry) {
+          entry.scrapeCount = (entry.scrapeCount || 0) + (data.replaced ? 0 : 1);
+          entry.lastVisited = new Date().toISOString();
+          window.PwsStorage.set('functional:my-hauls', myHauls);
+        }
+      }
+      showStatus('Added!', false);
+      setTimeout(() => picker.classList.add('hidden'), 1500);
+    } catch (err) {
+      showStatus(err.message || 'Failed', true);
+    }
+  }
+
+  listEl?.addEventListener('click', function(e) {
+    const item = e.target.closest('.haul-pick-item');
+    if (item) addResultToHaul(item.dataset.haulId);
+  });
+
+  createBtn?.addEventListener('click', async function() {
+    showStatus('Creating haul...', false);
+    try {
+      const res = await fetch('/ext/v1/hauls', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed');
+      const haulId = data.haul_id;
+      if (typeof window.PwsStorage !== 'undefined') {
+        const myHauls = window.PwsStorage.get('functional:my-hauls') || [];
+        myHauls.unshift({
+          id: haulId, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          lastVisited: new Date().toISOString(), scrapeCount: 0, name: null,
+        });
+        window.PwsStorage.set('functional:my-hauls', myHauls);
+      }
+      await addResultToHaul(haulId);
+      renderHaulList();
+    } catch (err) {
+      showStatus(err.message || 'Failed to create haul', true);
+    }
+  });
 });
 </script>
 

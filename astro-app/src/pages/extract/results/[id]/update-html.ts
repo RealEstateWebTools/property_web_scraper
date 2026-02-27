@@ -30,7 +30,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     return redirectTo('/extract/error?reason=missing_url');
   }
   if (!html) {
-    return redirectTo(`/extract/results/${id}?update_error=missing_html`);
+    return redirectTo(`/listings/${id}?update_error=missing_html`);
   }
 
   const result = await retrieveListing(importUrl, html);
@@ -56,5 +56,5 @@ export const POST: APIRoute = async ({ params, request }) => {
     diagnostics: result.diagnostics,
   });
 
-  return redirectTo(`/extract/results/${id}?updated=1`);
+  return redirectTo(`/listings/${id}?updated=1`);
 };
