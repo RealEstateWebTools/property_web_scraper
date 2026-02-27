@@ -71,7 +71,7 @@ export class Listing extends BaseModel {
     features: { type: 'array', default: [] },
     unknown_fields: { type: 'array', default: [] },
     visibility: { type: 'string', default: 'published' },
-    confidence_score: { type: 'float', default: 1.0 },
+    confidence_score: { type: 'float', default: 0 },
     manual_override: { type: 'boolean', default: false },
     import_history: { type: 'hash', default: {} },
     // Diagnostic summary fields (persisted for admin queries)
@@ -153,7 +153,7 @@ export class Listing extends BaseModel {
   features: string[] = [];
   unknown_fields: string[] = [];
   visibility: 'published' | 'pending' | 'spam' | 'hidden' = 'published';
-  confidence_score = 1.0;
+  confidence_score = 0;
   manual_override = false;
   import_history: Record<string, unknown> = {};
   // Diagnostic summary fields
@@ -483,5 +483,7 @@ export class Listing extends BaseModel {
     listing.populated_extractable_fields = diag.populatedExtractableFields ?? 0;
     listing.meets_expectation = diag.meetsExpectation ?? false;
     listing.critical_fields_missing = diag.criticalFieldsMissing ?? [];
+    listing.confidence_score = diag.confidenceScore ?? 0;
+    if (diag.visibility) listing.visibility = diag.visibility;
   }
 }
