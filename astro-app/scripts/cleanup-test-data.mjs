@@ -78,6 +78,10 @@ async function isTestListing(doc) {
   const docId = doc.id;
   if (!data) return false;
 
+  // Explicit environment tag — always wins
+  const env = data.env;
+  if (env === 'development' || env === 'test') return true;
+
   // Check for auto-generated IDs (these are created during tests)
   if (docId.startsWith('auto_')) {
     return true;
@@ -139,6 +143,10 @@ async function isTestListing(doc) {
 async function isTestHaul(doc) {
   const data = doc.data();
   if (!data) return false;
+
+  // Explicit environment tag — always wins
+  const env = data.env;
+  if (env === 'development' || env === 'test') return true;
 
   const name = (data.name || '').toLowerCase();
 

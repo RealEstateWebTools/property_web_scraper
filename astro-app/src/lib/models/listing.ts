@@ -97,6 +97,7 @@ export class Listing extends BaseModel {
     floor_plan_urls: { type: 'array', default: [] },
     energy_certificate_grade: { type: 'string' },
     supplementary_data_links: { type: 'array', default: [] },
+    env: { type: 'string' },
   };
 
   // All declared attribute properties
@@ -192,6 +193,7 @@ export class Listing extends BaseModel {
     freshness?: 'real_time' | 'daily' | 'weekly' | 'monthly' | 'ad_hoc';
     priority?: number;
   }> = [];
+  env = '';
 
   /**
    * Returns a JSON-safe hash of public listing attributes.

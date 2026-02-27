@@ -6,6 +6,8 @@
 
 import { deduplicationKey } from './url-canonicalizer.js';
 import { getClient, getCollectionPrefix } from '../firestore/client.js';
+import { getAppEnv } from './app-env.js';
+import type { AppEnv } from './app-env.js';
 
 export type HaulVisibility = 'public' | 'private';
 
@@ -61,6 +63,7 @@ export interface Haul {
   scrapes: HaulScrape[];
   name?: string;
   notes?: string;
+  env?: AppEnv;
 }
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
@@ -143,6 +146,7 @@ export async function createHaul(
     visibility,
     ...(visibility === 'private' ? { ownerUserId: options.ownerUserId } : {}),
     scrapes: [],
+    env: getAppEnv(),
   };
   store.set(id, haul);
   await firestoreSaveHaul(haul);

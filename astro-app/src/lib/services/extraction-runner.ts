@@ -18,6 +18,7 @@ import type { ScraperMapping } from '@lib/extractor/mapping-loader.js';
 import type { ExtractionDiagnostics } from '@lib/extractor/html-extractor.js';
 import type { ImportHost } from '@lib/models/import-host.js';
 import { recordHealthSnapshot } from '@lib/services/scraper-health-trends.js';
+import { getAppEnv } from '@lib/services/app-env.js';
 
 export function countAvailableFields(mapping: ScraperMapping): number {
   let count = 0;
@@ -118,6 +119,7 @@ export async function runExtraction(opts: {
     if (result.diagnostics) {
       Listing.applyDiagnostics(listing, result.diagnostics);
     }
+    listing.env = getAppEnv();
     listing.id = resultId;
     await storeListing(resultId, listing);
     if (result.diagnostics) {
@@ -132,6 +134,7 @@ export async function runExtraction(opts: {
     if (result.diagnostics) {
       Listing.applyDiagnostics(listing, result.diagnostics);
     }
+    listing.env = getAppEnv();
     listing.id = resultId;
     try {
       await storeListing(resultId, listing);
