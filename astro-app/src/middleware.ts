@@ -47,7 +47,10 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data:; font-src 'self' https:; connect-src 'self' https:; frame-ancestors 'none'");
+  const csp = url.pathname === '/docs'
+    ? "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data:; font-src 'self' https:; connect-src 'self' https:; frame-ancestors 'none'"
+    : "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data:; font-src 'self' https:; connect-src 'self' https:; frame-ancestors 'none'";
+  response.headers.set('Content-Security-Policy', csp);
 
   console.log(`[Middleware] ${method} ${url.pathname} → ${response.status}`);
 
