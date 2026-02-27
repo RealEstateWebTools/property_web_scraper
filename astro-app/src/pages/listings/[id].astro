@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ExportDropdown from '../../components/ExportDropdown.astro';
 import SocialShare from '../../components/SocialShare.astro';
 import DataBridgeNotice from '../../components/DataBridgeNotice.astro';
 import { getListing } from '@lib/services/listing-store.js';
@@ -206,9 +205,12 @@ if (listing) {
                 <i class="bi bi-box-arrow-up-right mr-1"></i> View Original Listing
               </a>
             )}
-            <div class="flex justify-center mb-2">
-              <ExportDropdown listingId={id!} buttonClass="w-full text-center border border-gray-300 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50 transition no-underline inline-flex items-center justify-center gap-1" />
-            </div>
+            <a
+              href={`/listings/${id}/raw-data`}
+              class="block w-full text-center border border-gray-300 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50 transition no-underline mb-2"
+            >
+              <i class="bi bi-file-earmark-code mr-1"></i> Raw Data
+            </a>
             {listing.import_url && (
               <a
                 href={`${h2cUrl}/new?left_url=${encodeURIComponent(listing.import_url)}&source=scraper`}
