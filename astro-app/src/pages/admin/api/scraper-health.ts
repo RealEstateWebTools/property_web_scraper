@@ -4,13 +4,6 @@ import { extractFromHtml } from '@lib/extractor/html-extractor.js';
 import { allMappingNames, findByName } from '@lib/extractor/mapping-loader.js';
 import { findPortalByName } from '@lib/services/portal-registry.js';
 import { getPortalProfile } from '@lib/services/scrape-metadata.js';
-import { readFileSync, existsSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const FIXTURES_DIR = resolve(__dirname, '..', '..', '..', '..', 'test', 'fixtures');
 
 /**
  * Legacy fixture name overrides for scrapers where the fixture file name
@@ -24,18 +17,11 @@ const LEGACY_FIXTURE_MAP: Record<string, string> = {
   us_forsalebyowner: 'forsalebyowner',
 };
 
-/** Resolve the fixture filename for a scraper, returning null if none exists. */
-function resolveFixtureName(scraperName: string): string | null {
-  // Try standard <scraper_name>.html first
-  if (existsSync(resolve(FIXTURES_DIR, `${scraperName}.html`))) {
-    return scraperName;
-  }
-  // Fall back to legacy overrides
-  const legacy = LEGACY_FIXTURE_MAP[scraperName];
-  if (legacy && existsSync(resolve(FIXTURES_DIR, `${legacy}.html`))) {
-    return legacy;
-  }
-  return null;
+interface FixtureResolver {
+  available: boolean;
+  reason?: string;
+  resolveFixtureName: (scraperName: string) => string | null;
+  readFixture: (fixtureName: string) => string;
 }
 
 interface ScraperHealthResult {
@@ -57,6 +43,55 @@ interface ScraperHealthResult {
   error?: string;
 }
 
+async function buildFixtureResolver(): Promise<FixtureResolver> {
+  try {
+    const { readFileSync, existsSync } = await import('node:fs');
+    const { resolve, dirname } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const candidateDirs = [
+      resolve(__dirname, '..', '..', '..', '..', 'test', 'fixtures'),
+      resolve(process.cwd(), 'test', 'fixtures'),
+    ];
+    const fixturesDir = candidateDirs.find((dir) => existsSync(dir));
+
+    if (!fixturesDir) {
+      return {
+        available: false,
+        reason: 'Fixture directory is unavailable in this runtime environment',
+        resolveFixtureName: () => null,
+        readFixture: () => { throw new Error('Fixtures unavailable'); },
+      };
+    }
+
+    return {
+      available: true,
+      resolveFixtureName: (scraperName: string): string | null => {
+        // Try standard <scraper_name>.html first
+        if (existsSync(resolve(fixturesDir, `${scraperName}.html`))) {
+          return scraperName;
+        }
+        // Fall back to legacy overrides
+        const legacy = LEGACY_FIXTURE_MAP[scraperName];
+        if (legacy && existsSync(resolve(fixturesDir, `${legacy}.html`))) {
+          return legacy;
+        }
+        return null;
+      },
+      readFixture: (fixtureName: string): string => readFileSync(resolve(fixturesDir, `${fixtureName}.html`), 'utf-8'),
+    };
+  } catch (err) {
+    return {
+      available: false,
+      reason: `Filesystem access unavailable: ${err instanceof Error ? err.message : String(err)}`,
+      resolveFixtureName: () => null,
+      readFixture: () => { throw new Error('Filesystem unavailable'); },
+    };
+  }
+}
+
 export const GET: APIRoute = async ({ request }) => {
   const auth = authenticateAdmin(request);
   if (!auth.authorized) {
@@ -68,11 +103,12 @@ export const GET: APIRoute = async ({ request }) => {
 
   const results: ScraperHealthResult[] = [];
   const scraperNames = allMappingNames();
+  const fixtures = await buildFixtureResolver();
 
   for (const name of scraperNames) {
     const portal = findPortalByName(name);
     const portalProfile = await getPortalProfile(name);
-    const fixtureName = resolveFixtureName(name);
+    const fixtureName = fixtures.resolveFixtureName(name);
     const country = portal?.country || '??';
     const consecutiveBelow = portalProfile?.consecutive_below_threshold;
 
@@ -88,10 +124,8 @@ export const GET: APIRoute = async ({ request }) => {
       continue;
     }
 
-    const fixturePath = resolve(FIXTURES_DIR, `${fixtureName}.html`);
-
     try {
-      const html = readFileSync(fixturePath, 'utf-8');
+      const html = fixtures.readFixture(fixtureName);
       const result = extractFromHtml({
         html,
         sourceUrl: `https://fixture.test/${name}`,
@@ -146,7 +180,12 @@ export const GET: APIRoute = async ({ request }) => {
     return aGrade - bGrade;
   });
 
-  return new Response(JSON.stringify({ results, timestamp: new Date().toISOString() }), {
+  return new Response(JSON.stringify({
+    results,
+    timestamp: new Date().toISOString(),
+    fixtureRuntime: fixtures.available ? 'available' : 'unavailable',
+    fixtureRuntimeWarning: fixtures.reason,
+  }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
