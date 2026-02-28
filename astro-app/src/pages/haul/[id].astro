@@ -98,42 +98,13 @@ const hasEnrichedData = haul?.scrapes.some(s => s.price_float || s.count_bedroom
             </p>
           </div>
           <div class="flex items-center gap-2">
-            {/* Export dropdown */}
-            <div class="relative" id="export-dropdown-container">
-              <button
-                id="export-btn"
-                type="button"
-                class="inline-flex items-center gap-1.5 bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-green-700 cursor-pointer border-0"
-              >
-                <i class="bi bi-download"></i> Export <i class="bi bi-chevron-down text-xs"></i>
-              </button>
-              <div id="export-menu" class="hidden absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 min-w-[180px]">
-                <div class="px-4 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">Standard</div>
-                <a href={`/ext/v1/hauls/${id}/export?format=csv${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
-                  <i class="bi bi-file-earmark-spreadsheet text-green-600 mr-1.5"></i> CSV
-                </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=json${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
-                  <i class="bi bi-braces text-blue-600 mr-1.5"></i> JSON
-                </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=json&inline=1${exportApiKeySuffix}`} target="_blank" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
-                  <i class="bi bi-box-arrow-up-right text-blue-600 mr-1.5"></i> View JSON
-                </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=geojson${exportApiKeySuffix}`} class={`block px-4 py-2 text-sm no-underline ${summary && summary.scrapesWithGeo > 0 ? 'text-gray-700 hover:bg-gray-50' : 'text-gray-300 pointer-events-none'}`}>
-                  <i class="bi bi-geo-alt text-orange-600 mr-1.5"></i> GeoJSON
-                </a>
-                <div class="border-t border-gray-100 my-1"></div>
-                <div class="px-4 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">Industry</div>
-                <a href={`/ext/v1/hauls/${id}/export?format=blm${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
-                  <i class="bi bi-file-earmark-text text-red-600 mr-1.5"></i> BLM (Rightmove)
-                </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=kyero${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
-                  <i class="bi bi-file-earmark-code text-yellow-600 mr-1.5"></i> Kyero XML
-                </a>
-                <a href={`/ext/v1/hauls/${id}/export?format=reso-json${exportApiKeySuffix}`} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 no-underline">
-                  <i class="bi bi-file-earmark-binary text-indigo-600 mr-1.5"></i> RESO JSON
-                </a>
-              </div>
-            </div>
+            {/* Export button */}
+            <a
+              href={`/haul/${id}/export${haulPageQuery}`}
+              class="inline-flex items-center gap-1.5 bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-green-700 no-underline"
+            >
+              <i class="bi bi-download"></i> Export
+            </a>
             <button
               id="copy-haul-url"
               type="button"
@@ -537,18 +508,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // --- Export dropdown ---
-  var exportBtn = document.getElementById('export-btn');
-  var exportMenu = document.getElementById('export-menu');
-  if (exportBtn && exportMenu) {
-    exportBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      exportMenu.classList.toggle('hidden');
-    });
-    document.addEventListener('click', function() {
-      exportMenu.classList.add('hidden');
-    });
-  }
 
   // --- Edit name ---
   var editNameBtn = document.getElementById('edit-name-btn');

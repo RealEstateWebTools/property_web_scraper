@@ -1,0 +1,258 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getHaul } from '@lib/services/haul-store.js';
+import { isValidHaulId } from '@lib/services/haul-id.js';
+import { authenticateApiKey } from '@lib/services/auth.js';
+import { canAccessHaul, userIdFromAuth } from '@lib/services/haul-access.js';
+import { haulScrapesToListings } from '@lib/services/haul-export-adapter.js';
+import { getExportService } from '@lib/services/export-service.js';
+import type { ExportFormat } from '@lib/exporters/exporter-registry.js';
+
+const { id } = Astro.params;
+const requestUrl = new URL(Astro.request.url);
+const requestApiKey = requestUrl.searchParams.get('api_key') || '';
+const haulQuerySuffix = requestApiKey ? `?api_key=${encodeURIComponent(requestApiKey)}` : '';
+const exportApiKeySuffix = requestApiKey ? `&api_key=${encodeURIComponent(requestApiKey)}` : '';
+const backToHaulUrl = id ? `/haul/${id}${haulQuerySuffix}` : '/hauls';
+
+const auth = await authenticateApiKey(Astro.request);
+const requesterUserId = userIdFromAuth(auth);
+const validId = id && isValidHaulId(id);
+const loadedHaul = validId ? await getHaul(id) : undefined;
+const haul = loadedHaul && canAccessHaul(loadedHaul, requesterUserId) ? loadedHaul : undefined;
+
+const listings = haul ? haulScrapesToListings(haul.scrapes) : [];
+const hasGeo = listings.some(l =>
+  typeof l.latitude === 'number' && typeof l.longitude === 'number' &&
+  (l.latitude !== 0 || l.longitude !== 0) &&
+  l.latitude >= -90 && l.latitude <= 90 && l.longitude >= -180 && l.longitude <= 180
+);
+
+const PREVIEW_LIMIT = 3000;
+const exportBaseUrl = `/ext/v1/hauls/${id}/export`;
+
+interface FormatMeta {
+  format: ExportFormat;
+  icon: string;
+  iconColor: string;
+  label: string;
+  mimeType: string;
+  fileExtension: string;
+  description: string;
+  requiresGeo?: boolean;
+}
+
+const standardFormats: FormatMeta[] = [
+  { format: 'json', icon: 'bi-braces', iconColor: 'text-blue-600', label: 'JSON', mimeType: 'application/json', fileExtension: '.json', description: 'JSON format for API integration and data pipelines' },
+  { format: 'csv', icon: 'bi-file-earmark-spreadsheet', iconColor: 'text-green-600', label: 'CSV', mimeType: 'text/csv', fileExtension: '.csv', description: 'CSV format for spreadsheets and database import' },
+  { format: 'geojson', icon: 'bi-geo-alt', iconColor: 'text-orange-600', label: 'GeoJSON', mimeType: 'application/geo+json', fileExtension: '.geojson', description: 'GeoJSON format for mapping applications and GIS tools', requiresGeo: true },
+  { format: 'xml', icon: 'bi-file-earmark-code', iconColor: 'text-gray-600', label: 'XML (RETS)', mimeType: 'application/xml', fileExtension: '.xml', description: 'XML format compatible with RETS (US MLS)' },
+  { format: 'schema-org', icon: 'bi-braces-asterisk', iconColor: 'text-purple-600', label: 'Schema.org (JSON-LD)', mimeType: 'application/ld+json', fileExtension: '.jsonld', description: 'JSON-LD format for SEO and semantic web integration' },
+  { format: 'icalendar', icon: 'bi-calendar', iconColor: 'text-teal-600', label: 'iCalendar', mimeType: 'text/calendar', fileExtension: '.ics', description: 'iCalendar format for availability and calendar sync' },
+];
+
+const industryFormats: FormatMeta[] = [
+  { format: 'blm', icon: 'bi-file-earmark-text', iconColor: 'text-red-600', label: 'BLM (Rightmove)', mimeType: 'text/plain', fileExtension: '.blm', description: 'BLM pipe-delimited format for UK property portals (Rightmove/Zoopla)' },
+  { format: 'kyero', icon: 'bi-file-earmark-code', iconColor: 'text-yellow-600', label: 'Kyero XML', mimeType: 'application/xml', fileExtension: '.xml', description: 'Kyero XML format for Spanish property market' },
+  { format: 'reso-json', icon: 'bi-file-earmark-binary', iconColor: 'text-indigo-600', label: 'RESO JSON', mimeType: 'application/json', fileExtension: '.json', description: 'RESO Web API JSON format for US/Canadian MLS' },
+];
+
+interface FormatPreview {
+  content: string;
+  truncated: boolean;
+  fullLength: number;
+  error?: string;
+}
+
+const previews: Record<string, FormatPreview> = {};
+
+if (haul && listings.length > 0) {
+  const exportService = getExportService();
+  const allFormats = [...standardFormats, ...industryFormats];
+
+  for (const fmt of allFormats) {
+    if (fmt.requiresGeo && !hasGeo) {
+      previews[fmt.format] = {
+        content: '',
+        truncated: false,
+        fullLength: 0,
+        error: 'Requires valid geolocation data (latitude/longitude)',
+      };
+      continue;
+    }
+
+    try {
+      const result = await exportService['export']({ format: fmt.format, listings });
+      const fullLength = result.data.length;
+      const truncated = fullLength > PREVIEW_LIMIT;
+      previews[fmt.format] = {
+        content: truncated ? result.data.slice(0, PREVIEW_LIMIT) : result.data,
+        truncated,
+        fullLength,
+      };
+    } catch (err: unknown) {
+      previews[fmt.format] = {
+        content: '',
+        truncated: false,
+        fullLength: 0,
+        error: err instanceof Error ? err.message : 'Export failed',
+      };
+    }
+  }
+} else if (haul && listings.length === 0) {
+  const allFormats = [...standardFormats, ...industryFormats];
+  for (const fmt of allFormats) {
+    previews[fmt.format] = { content: '', truncated: false, fullLength: 0, error: 'No listings in this haul yet' };
+  }
+}
+
+const formatGroups = [
+  { title: 'Standard Formats', formats: standardFormats },
+  { title: 'Industry Formats', formats: industryFormats },
+];
+
+const haulTitle = haul?.name || id || 'Haul';
+const listingCount = listings.length;
+---
+
+<BaseLayout title={haul ? `Export — ${haulTitle}` : 'Not Found'}>
+  <div class="max-w-5xl mx-auto px-4 py-8">
+
+    {!haul ? (
+      <div class="bg-amber-50 rounded-2xl p-8 text-center">
+        <div class="text-4xl text-amber-600 mb-3"><i class="bi bi-exclamation-triangle"></i></div>
+        <h2 class="font-semibold text-amber-900 text-lg mb-2">Haul not found</h2>
+        <p class="text-amber-800 text-sm">This haul may have expired or the ID is invalid.</p>
+        <a href="/hauls" class="inline-block mt-4 text-blue-600 hover:underline text-sm">← My Hauls</a>
+      </div>
+    ) : (
+      <>
+        <a href={backToHaulUrl} class="text-sm text-blue-600 hover:underline inline-flex items-center gap-1 mb-6 no-underline">
+          <i class="bi bi-chevron-left"></i> Back to {haulTitle}
+        </a>
+
+        <h1 class="text-3xl font-bold text-gray-900 mb-1">Export</h1>
+        <p class="text-gray-600 mb-6">
+          Preview and download {listingCount} {listingCount === 1 ? 'listing' : 'listings'} from <strong>{haulTitle}</strong> in various formats.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div class="flex gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <i class="bi bi-braces text-blue-500 text-xl shrink-0 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-semibold text-blue-900 mb-1">JSON schema reference</p>
+              <p class="text-xs text-blue-800 mb-2">
+                The JSON format follows the full <strong>Listing</strong> schema documented in the API reference,
+                including all 70+ fields, types, and descriptions.
+              </p>
+              <a href="/docs" target="_blank" class="inline-flex items-center gap-1 text-xs text-blue-700 font-medium hover:underline no-underline">
+                <i class="bi bi-box-arrow-up-right"></i> View API docs &amp; schema
+              </a>
+            </div>
+          </div>
+
+          <div class="flex gap-3 rounded-xl border border-violet-100 bg-violet-50 p-4">
+            <i class="bi bi-github text-violet-500 text-xl shrink-0 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-semibold text-violet-900 mb-1">Need another format?</p>
+              <p class="text-xs text-violet-800 mb-2">
+                Want XLSX, Parquet, Haystack, or something else?
+                Open an issue or submit a pull request on GitHub.
+              </p>
+              <div class="flex gap-3">
+                <a
+                  href="https://github.com/RealEstateWebTools/property_web_scraper/issues/new?template=export-format-request.md&title=Export+format+request%3A+"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-xs text-violet-700 font-medium hover:underline no-underline"
+                >
+                  <i class="bi bi-plus-circle"></i> Open an issue
+                </a>
+                <a
+                  href="https://github.com/RealEstateWebTools/property_web_scraper/pulls"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-xs text-violet-700 font-medium hover:underline no-underline"
+                >
+                  <i class="bi bi-git"></i> Submit a PR
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          {formatGroups.map(group => (
+            <div>
+              <h2 class="text-lg font-semibold text-gray-700 mb-4">{group.title}</h2>
+              <div class="space-y-4">
+                {group.formats.map(fmt => {
+                  const preview = previews[fmt.format];
+                  const disabled = !preview || !!preview.error;
+                  const cardClass = disabled
+                    ? 'rounded-xl border border-gray-200 bg-gray-50 opacity-70'
+                    : 'rounded-xl border border-gray-200 bg-white shadow-sm';
+                  const linkClass = disabled
+                    ? 'inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-400 no-underline cursor-not-allowed pointer-events-none'
+                    : 'inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 no-underline hover:bg-gray-50 transition';
+                  return (
+                    <div class={cardClass}>
+                      <div class="p-4">
+                        <div class="flex items-center justify-between mb-1 gap-2">
+                          <div class="flex items-center gap-2 min-w-0">
+                            <i class={`bi ${fmt.icon} ${disabled ? 'text-gray-400' : fmt.iconColor} text-lg shrink-0`}></i>
+                            <span class={`font-semibold truncate ${disabled ? 'text-gray-400' : 'text-gray-900'}`}>{fmt.label}</span>
+                          </div>
+                          <span class="text-xs text-gray-400 shrink-0">{fmt.mimeType} · {fmt.fileExtension}</span>
+                        </div>
+
+                        <p class="text-xs text-gray-500 mb-3">{fmt.description}</p>
+
+                        {disabled ? (
+                          <div class="bg-gray-100 rounded-lg p-3 text-xs text-gray-500 font-mono mb-3">
+                            <i class="bi bi-exclamation-circle mr-1"></i>{preview?.error ?? 'Unavailable'}
+                          </div>
+                        ) : (
+                          <>
+                            <div class="border-t border-gray-100 pt-3 mb-2">
+                              <pre class="overflow-auto max-h-64 text-xs font-mono bg-gray-50 rounded-lg p-3 whitespace-pre">{preview.content}</pre>
+                            </div>
+                            {preview.truncated && (
+                              <p class="text-xs text-gray-400 mb-3">
+                                <i class="bi bi-scissors mr-1"></i>Truncated — showing {PREVIEW_LIMIT.toLocaleString()} of {preview.fullLength.toLocaleString()} chars
+                              </p>
+                            )}
+                          </>
+                        )}
+
+                        <div class="border-t border-gray-100 pt-3 flex gap-2">
+                          <a
+                            href={disabled ? '#' : `${exportBaseUrl}?format=${fmt.format}${exportApiKeySuffix}`}
+                            tabindex={disabled ? -1 : 0}
+                            class={linkClass}
+                          >
+                            <i class="bi bi-download"></i> Download
+                          </a>
+                          <a
+                            href={disabled ? '#' : `${exportBaseUrl}?format=${fmt.format}&inline=1${exportApiKeySuffix}`}
+                            target={disabled ? undefined : '_blank'}
+                            rel="noopener noreferrer"
+                            tabindex={disabled ? -1 : 0}
+                            class={linkClass}
+                          >
+                            <i class="bi bi-box-arrow-up-right"></i> View in browser
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </>
+    )}
+
+  </div>
+</BaseLayout>
