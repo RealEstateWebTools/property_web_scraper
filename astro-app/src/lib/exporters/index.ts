@@ -10,8 +10,6 @@ export { XMLExporter } from './xml-exporter.js';
 export type { XMLExportOptions } from './xml-exporter.js';
 export { SchemaOrgExporter } from './schema-org-exporter.js';
 export type { SchemaOrgExportOptions } from './schema-org-exporter.js';
-export { ICalExporter } from './ical-exporter.js';
-export type { ICalExportOptions } from './ical-exporter.js';
 export { BLMExporter } from './blm-exporter.js';
 export type { BLMExportOptions } from './blm-exporter.js';
 export { KyeroExporter } from './kyero-exporter.js';

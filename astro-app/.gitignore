@@ -2,6 +2,7 @@ node_modules/
 dist/
 .astro/
 .env
+.env.*
 config/firebase-credentials.json
 test-results/
 .wrangler/

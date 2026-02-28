@@ -8,13 +8,12 @@ import { CSVExporter } from './csv-exporter.js';
 import { GeoJSONExporter } from './geojson-exporter.js';
 import { XMLExporter } from './xml-exporter.js';
 import { SchemaOrgExporter } from './schema-org-exporter.js';
-import { ICalExporter } from './ical-exporter.js';
 import { BLMExporter } from './blm-exporter.js';
 import { KyeroExporter } from './kyero-exporter.js';
 import { RESOJsonExporter } from './reso-json-exporter.js';
 import { BaseExporter, type ExportOptions } from './base-exporter.js';
 
-export type ExportFormat = 'json' | 'csv' | 'geojson' | 'xml' | 'schema-org' | 'icalendar' | 'blm' | 'kyero' | 'reso-json';
+export type ExportFormat = 'json' | 'csv' | 'geojson' | 'xml' | 'schema-org' | 'blm' | 'kyero' | 'reso-json';
 
 export interface ExporterConfig {
   format: ExportFormat;
@@ -77,15 +76,6 @@ export const EXPORTER_REGISTRY: Record<ExportFormat, ExporterConfig> = {
     isAvailable: true,
     isProduction: true,
   },
-  icalendar: {
-    format: 'icalendar',
-    label: 'iCalendar',
-    description: 'iCalendar format for availability and calendar sync',
-    fileExtension: '.ics',
-    mimeType: 'text/calendar',
-    isAvailable: true,
-    isProduction: true,
-  },
   blm: {
     format: 'blm',
     label: 'BLM (Rightmove)',
@@ -137,9 +127,6 @@ export function createExporter(
 
     case 'schema-org':
       return new SchemaOrgExporter(options);
-
-    case 'icalendar':
-      return new ICalExporter(options);
 
     case 'blm':
       return new BLMExporter(options);

@@ -5,7 +5,6 @@ import { CSVExporter } from '../../src/lib/exporters/csv-exporter.js';
 import { GeoJSONExporter } from '../../src/lib/exporters/geojson-exporter.js';
 import { XMLExporter } from '../../src/lib/exporters/xml-exporter.js';
 import { SchemaOrgExporter } from '../../src/lib/exporters/schema-org-exporter.js';
-import { ICalExporter } from '../../src/lib/exporters/ical-exporter.js';
 import { BLMExporter } from '../../src/lib/exporters/blm-exporter.js';
 import { KyeroExporter } from '../../src/lib/exporters/kyero-exporter.js';
 import { RESOJsonExporter } from '../../src/lib/exporters/reso-json-exporter.js';
@@ -1063,206 +1062,6 @@ describe('Exporters', () => {
     });
   });
 
-  // ─── ICalExporter ────────────────────────────────────────────────────────────
-
-  describe('ICalExporter', () => {
-    it('exports listings as valid iCalendar', async () => {
-      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('BEGIN:VCALENDAR');
-      expect(result).toContain('VERSION:2.0');
-      expect(result).toContain('PRODID:-//PropertyWebScraper//Export//EN');
-      expect(result).toContain('END:VCALENDAR');
-    });
-
-    it('creates VEVENT entries for listings', async () => {
-      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('BEGIN:VEVENT');
-      expect(result).toContain('END:VEVENT');
-      expect(result).toContain('UID:REF-001@propertyscraper');
-    });
-
-    it('includes listing title as summary', async () => {
-      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('SUMMARY:Modern Apartment in Madrid');
-    });
-
-    it('includes location from address', async () => {
-      const listing = makeListing({
-        address_string: '123 Main St, Madrid',
-        last_retrieved_at: new Date('2024-01-15'),
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('LOCATION:123 Main St\\, Madrid');
-    });
-
-    it('includes geo coordinates', async () => {
-      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('GEO:40.4168;-3.7038');
-    });
-
-    it('includes URL', async () => {
-      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('URL:https://example.com/listing/1');
-    });
-
-    it('uses CRLF line endings', async () => {
-      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('\r\n');
-    });
-
-    it('exports multiple events', async () => {
-      const listings = makeListings(3).map(l => {
-        l.last_retrieved_at = new Date('2024-01-15');
-        return l;
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export(listings);
-
-      const eventCount = (result.match(/BEGIN:VEVENT/g) || []).length;
-      expect(eventCount).toBe(3);
-    });
-
-    it('throws on empty listings', async () => {
-      const exporter = new ICalExporter();
-      await expect(exporter.export([])).rejects.toThrow('Cannot export empty listing array');
-    });
-
-    it('uses available_to_rent_from as DTSTART when present', async () => {
-      const listing = makeListing({
-        available_to_rent_from: new Date('2024-06-01'),
-        available_to_rent_till: new Date('2024-09-01'),
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('DTSTART;VALUE=DATE:20240601');
-      expect(result).toContain('DTEND;VALUE=DATE:20240901');
-    });
-
-    it('uses active_from as DTSTART when available_to_rent_from is missing', async () => {
-      const listing = makeListing({
-        active_from: new Date('2024-03-01'),
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('DTSTART;VALUE=DATE:20240301');
-    });
-
-    it('defaults DTEND to start + 365 days when no end date', async () => {
-      const listing = makeListing({
-        last_retrieved_at: new Date('2024-01-01'),
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('DTSTART;VALUE=DATE:20240101');
-      // 2024-01-01 + 365 days = 2024-12-31
-      expect(result).toContain('DTEND;VALUE=DATE:20241231');
-    });
-
-    it('respects defaultDurationDays option', async () => {
-      const listing = makeListing({
-        last_retrieved_at: new Date('2024-01-01'),
-      });
-      const exporter = new ICalExporter({ defaultDurationDays: 30 });
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('DTSTART;VALUE=DATE:20240101');
-      // 2024-01-01 + 30 days = 2024-01-31
-      expect(result).toContain('DTEND;VALUE=DATE:20240131');
-    });
-
-    it('skips listings without any resolvable date', async () => {
-      const listing = makeListing({
-        last_retrieved_at: null,
-        active_from: null,
-        available_to_rent_from: null,
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      // Should still have VCALENDAR wrapper but no VEVENT
-      expect(result).toContain('BEGIN:VCALENDAR');
-      expect(result).not.toContain('BEGIN:VEVENT');
-    });
-
-    it('includes price as X-PRICE custom property', async () => {
-      const listing = makeListing({
-        price_string: '250,000',
-        currency: 'EUR',
-        last_retrieved_at: new Date('2024-01-15'),
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('X-PRICE:250\\,000 EUR');
-    });
-
-    it('escapes special iCal characters in text', async () => {
-      const listing = makeListing({
-        title: 'Apartment; 3 beds, 2 baths',
-        last_retrieved_at: new Date('2024-01-15'),
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('Apartment\\; 3 beds\\, 2 baths');
-    });
-
-    it('includes CALSCALE and METHOD headers', async () => {
-      const listing = makeListing({ last_retrieved_at: new Date('2024-01-15') });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('CALSCALE:GREGORIAN');
-      expect(result).toContain('METHOD:PUBLISH');
-    });
-
-    it('includes description when present', async () => {
-      const listing = makeListing({
-        description: 'Beautiful property with garden',
-        last_retrieved_at: new Date('2024-01-15'),
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      expect(result).toContain('DESCRIPTION:Beautiful property with garden');
-    });
-
-    it('generates unique UID when reference is empty', async () => {
-      const listing = makeListing({
-        reference: '',
-        last_retrieved_at: new Date('2024-01-15'),
-      });
-      const exporter = new ICalExporter();
-      const result = await exporter.export([listing]);
-
-      // Should have a UID even without reference
-      expect(result).toMatch(/UID:.+@propertyscraper/);
-    });
-  });
-
   // ─── BLMExporter ─────────────────────────────────────────────────────────────
 
   describe('BLMExporter', () => {
@@ -1906,11 +1705,6 @@ describe('Exporters', () => {
       expect(exporter).toBeInstanceOf(SchemaOrgExporter);
     });
 
-    it('creates iCalendar exporter', () => {
-      const exporter = createExporter('icalendar');
-      expect(exporter).toBeInstanceOf(ICalExporter);
-    });
-
     it('creates BLM exporter', () => {
       const exporter = createExporter('blm');
       expect(exporter).toBeInstanceOf(BLMExporter);
@@ -1933,12 +1727,12 @@ describe('Exporters', () => {
     it('returns all production-ready exporters', () => {
       const available = getAvailableExporters();
       expect(available.every(e => e.isAvailable && e.isProduction)).toBe(true);
-      expect(available.length).toBe(9);
+      expect(available.length).toBe(8);
     });
 
     it('returns all registered exporters including planned', () => {
       const all = getAllExporters();
-      expect(all.length).toBe(9);
+      expect(all.length).toBe(8);
     });
 
     it('returns correct config for format', () => {
@@ -1960,7 +1754,6 @@ describe('Exporters', () => {
       expect(getMimeType('geojson')).toBe('application/geo+json');
       expect(getMimeType('xml')).toBe('application/xml');
       expect(getMimeType('schema-org')).toBe('application/ld+json');
-      expect(getMimeType('icalendar')).toBe('text/calendar');
       expect(getMimeType('blm')).toBe('text/plain');
       expect(getMimeType('kyero')).toBe('application/xml');
       expect(getMimeType('reso-json')).toBe('application/json');
@@ -1972,7 +1765,6 @@ describe('Exporters', () => {
       expect(getFileExtension('geojson')).toBe('.geojson');
       expect(getFileExtension('xml')).toBe('.xml');
       expect(getFileExtension('schema-org')).toBe('.jsonld');
-      expect(getFileExtension('icalendar')).toBe('.ics');
       expect(getFileExtension('blm')).toBe('.blm');
       expect(getFileExtension('kyero')).toBe('.xml');
       expect(getFileExtension('reso-json')).toBe('.json');
@@ -2133,19 +1925,6 @@ describe('Exporters', () => {
       expect(result.mimeType).toBe('application/ld+json');
       const parsed = JSON.parse(result.data);
       expect(parsed['@context']).toBe('https://schema.org');
-    });
-
-    it('exports in iCalendar format via service', async () => {
-      const service = new ExportService();
-      const listing = makeListing({ last_retrieved_at: new Date('2024-06-01') });
-      const result = await service.export({
-        format: 'icalendar',
-        listings: [listing],
-      });
-
-      expect(result.format).toBe('icalendar');
-      expect(result.mimeType).toBe('text/calendar');
-      expect(result.data).toContain('BEGIN:VCALENDAR');
     });
 
     it('filename uses singular "listing" for count=1', async () => {

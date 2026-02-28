@@ -163,7 +163,7 @@ const spec = {
         summary: 'Export a listing in a specific format',
         description:
           'Returns the listing serialised as JSON, CSV, GeoJSON, XML (RETS), ' +
-          'Schema.org JSON-LD, iCalendar, BLM (Rightmove), Kyero XML, or RESO JSON.\n\n' +
+          'Schema.org JSON-LD, BLM (Rightmove), Kyero XML, or RESO JSON.\n\n' +
           'By default the response triggers a file download (`Content-Disposition: attachment`). ' +
           'Add `?inline=1` to view the raw content directly in the browser.',
         tags: ['Listings', 'Export'],
@@ -175,7 +175,7 @@ const spec = {
             required: true,
             schema: {
               type: 'string',
-              enum: ['json', 'csv', 'geojson', 'xml', 'schema-org', 'icalendar', 'blm', 'kyero', 'reso-json'],
+              enum: ['json', 'csv', 'geojson', 'xml', 'schema-org', 'blm', 'kyero', 'reso-json'],
             },
             description: 'Export format',
           },
@@ -281,7 +281,7 @@ const spec = {
                 properties: {
                   format: {
                     type: 'string',
-                    enum: ['json', 'csv', 'geojson', 'xml', 'schema-org', 'icalendar', 'blm', 'kyero', 'reso-json'],
+                    enum: ['json', 'csv', 'geojson', 'xml', 'schema-org', 'blm', 'kyero', 'reso-json'],
                   },
                   listingIds: { type: 'array', items: { type: 'string' }, maxItems: 100 },
                 },
