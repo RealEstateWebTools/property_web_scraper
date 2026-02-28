@@ -5,6 +5,7 @@ import { getClient, getCollectionPrefix } from '../firestore/client.js';
 import { logActivity } from './activity-logger.js';
 import { recordDeadLetter } from './dead-letter.js';
 import { createHash } from 'node:crypto';
+import { removeScrapeFromAllHauls } from './haul-store.js';
 
 const store = new Map<string, Listing>();
 const diagnosticsStore = new Map<string, ExtractionDiagnostics>();
@@ -240,6 +241,9 @@ export function getStoreStats(): { count: number } {
 }
 
 export async function deleteListing(id: string): Promise<void> {
+  // Remove this listing from all hauls first to avoid stale haul references.
+  await removeScrapeFromAllHauls(id);
+
   // Remove URL index entry for this listing
   const listing = store.get(id);
   if (listing) {

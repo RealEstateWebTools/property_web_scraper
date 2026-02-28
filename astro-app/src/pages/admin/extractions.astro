@@ -346,13 +346,13 @@ function truncate(str: string, len: number): string {
         deleteBtn.disabled = true;
         deleteBtn.textContent = 'Deleting...';
 
-        await Promise.all(ids.map(id =>
-          fetch('/admin/api/listings', {
+        for (const id of ids) {
+          await fetch('/admin/api/listings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'delete', listingId: id }),
-          })
-        ));
+          });
+        }
 
         window.location.reload();
       });

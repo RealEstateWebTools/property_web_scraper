@@ -240,6 +240,33 @@ export async function removeScrapeFromHaul(
   return { haul, removed: true };
 }
 
+/**
+ * Remove a listing scrape from every haul that contains it.
+ * Used when a listing is deleted so no haul keeps stale references.
+ */
+export async function removeScrapeFromAllHauls(
+  resultId: string,
+): Promise<{ updatedHauls: number; removedScrapes: number }> {
+  const hauls = await getAllHauls();
+  let updatedHauls = 0;
+  let removedScrapes = 0;
+
+  for (const haul of hauls) {
+    const beforeCount = haul.scrapes.length;
+    if (beforeCount === 0) continue;
+
+    haul.scrapes = haul.scrapes.filter((scrape) => scrape.resultId !== resultId && (scrape as any).result_id !== resultId);
+    const removed = beforeCount - haul.scrapes.length;
+    if (removed === 0) continue;
+
+    removedScrapes += removed;
+    updatedHauls += 1;
+    await persistHaul(haul);
+  }
+
+  return { updatedHauls, removedScrapes };
+}
+
 export async function getAllHauls(): Promise<Haul[]> {
   const results: Haul[] = [];
   const seenIds = new Set<string>();
