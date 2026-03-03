@@ -139,6 +139,40 @@ async function persistKeyToFirestore(keyHash: string, record: ApiKeyRecord): Pro
   }
 }
 
+async function fetchKeyFromFirestore(keyHash: string): Promise<ApiKeyRecord | null> {
+  try {
+    const client = await getClient();
+    const prefix = getCollectionPrefix();
+    const docSnap = await client.collection(`${prefix}api_keys`).doc(keyHash).get();
+    if (docSnap.exists) {
+      return docSnap.data() as unknown as ApiKeyRecord;
+    }
+  } catch {
+    // Firestore unavailable - continue with KV only
+  }
+  return null;
+}
+
+async function deleteKeyFromFirestore(keyHash: string): Promise<void> {
+  try {
+    const client = await getClient();
+    const prefix = getCollectionPrefix();
+    await client.collection(`${prefix}api_keys`).doc(keyHash).delete();
+  } catch {
+    // Firestore unavailable - continue with KV only
+  }
+}
+
+async function deleteUserFromFirestore(userId: string): Promise<void> {
+  try {
+    const client = await getClient();
+    const prefix = getCollectionPrefix();
+    await client.collection(`${prefix}users`).doc(userId).delete();
+  } catch {
+    // Firestore unavailable - continue with KV only
+  }
+}
+
 /**
  * In-memory cache for validated API keys.
  * Avoids KV read on every authenticated request.
@@ -288,11 +322,15 @@ export async function revokeApiKeyByPrefix(userId: string, prefix: string): Prom
 
   for (const hash of user.keyHashes) {
     const json = await kvGet(`apikey:${hash}`);
-    if (!json) continue;
-    const record: ApiKeyRecord = JSON.parse(json);
+    const record: ApiKeyRecord | null = json
+      ? JSON.parse(json) as ApiKeyRecord
+      : await fetchKeyFromFirestore(hash);
+    if (!record) continue;
     if (record.prefix === prefix && record.active) {
       record.active = false;
+      await persistKeyToFirestore(hash, record);
       await kvPut(`apikey:${hash}`, JSON.stringify(record));
+      validationCache.delete(hash);
       return true;
     }
   }
@@ -317,8 +355,10 @@ export async function listUserKeys(userId: string): Promise<Array<{
   const keys: Array<{ prefix: string; label: string; active: boolean; createdAt: string; hash: string }> = [];
   for (const hash of user.keyHashes) {
     const json = await kvGet(`apikey:${hash}`);
-    if (!json) continue;
-    const record: ApiKeyRecord = JSON.parse(json);
+    const record: ApiKeyRecord | null = json
+      ? JSON.parse(json) as ApiKeyRecord
+      : await fetchKeyFromFirestore(hash);
+    if (!record) continue;
     keys.push({
       prefix: record.prefix,
       label: record.label,
@@ -414,6 +454,28 @@ export async function setStripeCustomerId(userId: string, stripeCustomerId: stri
 }
 
 /**
+ * Set Stripe customer/subscription IDs for a user.
+ * Persists to Firestore with KV cache.
+ */
+export async function setStripeBillingInfo(
+  userId: string,
+  stripeCustomerId: string,
+  stripeSubscriptionId?: string,
+): Promise<boolean> {
+  const user = await getUser(userId);
+  if (!user) return false;
+
+  user.stripeCustomerId = stripeCustomerId;
+  if (stripeSubscriptionId) {
+    user.stripeSubscriptionId = stripeSubscriptionId;
+  }
+
+  await persistUserToFirestore(user);
+  await kvPut(`user:${userId}`, JSON.stringify(user));
+  return true;
+}
+
+/**
  * List all users.
  * Reads from Firestore first, falls back to KV.
  */
@@ -464,13 +526,15 @@ export async function deleteUser(userId: string): Promise<boolean> {
   const user = await getUser(userId);
   if (!user) return false;
 
-  // Revoke all keys first
+  // Revoke all keys first (KV + Firestore)
   for (const hash of user.keyHashes) {
+    await deleteKeyFromFirestore(hash);
     await kvDelete(`apikey:${hash}`);
     validationCache.delete(hash);
   }
 
-  // Delete user record
+  // Delete user record (KV + Firestore)
+  await deleteUserFromFirestore(userId);
   await kvDelete(`user:${userId}`);
   return true;
 }

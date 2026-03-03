@@ -16,13 +16,20 @@ vi.mock('../../src/lib/services/api-key-service.js', () => {
       user.tier = tier;
       return true;
     }),
+    setStripeBillingInfo: vi.fn(async (id: string, customerId: string, subscriptionId?: string) => {
+      const user = users.get(id);
+      if (!user) return false;
+      user.stripeCustomerId = customerId;
+      if (subscriptionId) user.stripeSubscriptionId = subscriptionId;
+      return true;
+    }),
     resetMockUsers: () => users.clear(),
     _users: users,
   };
 });
 
-import { handleWebhookEvent, verifyWebhookSignature } from '../../src/lib/services/stripe-service.js';
-import { updateUserTier, createUser } from '../../src/lib/services/api-key-service.js';
+import { handleWebhookEvent, verifyWebhookSignature, createCheckoutSession } from '../../src/lib/services/stripe-service.js';
+import { updateUserTier, createUser, setStripeBillingInfo } from '../../src/lib/services/api-key-service.js';
 
 // Access mock internals
 const mockModule = await import('../../src/lib/services/api-key-service.js') as any;
@@ -36,6 +43,10 @@ describe('stripe-service', () => {
     import.meta.env.STRIPE_PRICE_PRO = 'price_pro_test';
     import.meta.env.STRIPE_SECRET_KEY = '';
     import.meta.env.STRIPE_WEBHOOK_SECRET = '';
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   describe('handleWebhookEvent', () => {
@@ -56,6 +67,7 @@ describe('stripe-service', () => {
       expect(result.action).toBe('checkout_completed');
       expect(result.userId).toBe('user-stripe-1');
       expect(createUser).toHaveBeenCalledWith('user-stripe-1', 'test@example.com');
+      expect(setStripeBillingInfo).toHaveBeenCalledWith('user-stripe-1', 'cus_xxx', null);
     });
 
     it('handles customer.subscription.updated → syncs tier', async () => {
@@ -185,6 +197,32 @@ describe('stripe-service', () => {
       const signature = `t=${ts},v1=${expectedSig}`;
       const valid = await verifyWebhookSignature(payload, signature);
       expect(valid).toBe(true);
+    });
+  });
+
+  describe('createCheckoutSession', () => {
+    it('includes subscription metadata user_id for downstream webhooks', async () => {
+      import.meta.env.STRIPE_SECRET_KEY = 'sk_test_123';
+      import.meta.env.STRIPE_PRICE_STARTER = 'price_starter_test';
+
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => new Response(JSON.stringify({ id: 'cs_test_123', url: 'https://checkout.stripe.test/session' }), { status: 200 }))
+      );
+
+      await createCheckoutSession({
+        userId: 'user-meta-1',
+        email: 'meta@example.com',
+        priceId: 'price_starter_test',
+        successUrl: 'https://app.example.com/success',
+        cancelUrl: 'https://app.example.com/cancel',
+      });
+
+      const fetchMock = vi.mocked(fetch);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+      const body = String(init.body || '');
+      expect(body).toContain('subscription_data%5Bmetadata%5D%5Buser_id%5D=user-meta-1');
     });
   });
 });

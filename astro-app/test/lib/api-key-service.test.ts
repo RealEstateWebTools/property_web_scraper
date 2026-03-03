@@ -8,6 +8,7 @@ import {
   createUser,
   getUser,
   updateUserTier,
+  deleteUser,
   resetApiKeyStore,
 } from '../../src/lib/services/api-key-service.js';
 
@@ -140,6 +141,18 @@ describe('api-key-service', () => {
       expect(await validateApiKey(rawKey)).toBeNull();
     });
 
+    it('invalidates cached validation when revoked by prefix', async () => {
+      await createUser('user-1', 'test@example.com');
+      const { rawKey, prefix } = await generateApiKey('user-1');
+
+      // Populate validation cache first
+      expect(await validateApiKey(rawKey)).not.toBeNull();
+
+      const revoked = await revokeApiKeyByPrefix('user-1', prefix);
+      expect(revoked).toBe(true);
+      expect(await validateApiKey(rawKey)).toBeNull();
+    });
+
     it('returns false for unknown user', async () => {
       const result = await revokeApiKeyByPrefix('no-user', 'pws_live_abc');
       expect(result).toBe(false);
@@ -202,6 +215,17 @@ describe('api-key-service', () => {
     it('returns null for nonexistent user', async () => {
       const user = await getUser('no-user');
       expect(user).toBeNull();
+    });
+
+    it('deleteUser removes user and invalidates their keys', async () => {
+      await createUser('user-del', 'delete@example.com', 'starter');
+      const { rawKey } = await generateApiKey('user-del');
+      expect(await validateApiKey(rawKey)).not.toBeNull();
+
+      const deleted = await deleteUser('user-del');
+      expect(deleted).toBe(true);
+      expect(await getUser('user-del')).toBeNull();
+      expect(await validateApiKey(rawKey)).toBeNull();
     });
   });
 });

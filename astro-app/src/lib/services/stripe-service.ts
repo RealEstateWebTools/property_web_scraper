@@ -14,7 +14,7 @@
  *   STRIPE_PRICE_PRO      (Stripe Price ID for Pro plan)
  */
 
-import { updateUserTier, getUser, createUser } from './api-key-service.js';
+import { updateUserTier, getUser, createUser, setStripeBillingInfo } from './api-key-service.js';
 import type { SubscriptionTier } from './api-key-service.js';
 
 // ─── Stripe price → tier mapping ────────────────────────────────
@@ -141,6 +141,7 @@ export async function createCheckoutSession(
     'cancel_url': options.cancelUrl,
     'client_reference_id': options.userId,
     'metadata[user_id]': options.userId,
+    'subscription_data[metadata][user_id]': options.userId,
   };
 
   if (user?.stripeCustomerId) {
@@ -225,9 +226,10 @@ async function handleCheckoutCompleted(session: any): Promise<WebhookResult> {
     user = await createUser(userId, session.customer_email || '');
   }
 
-  // Store Stripe IDs
-  user.stripeCustomerId = customerId;
-  user.stripeSubscriptionId = subscriptionId;
+  // Persist Stripe IDs for future billing portal access and webhook lookups.
+  if (customerId) {
+    await setStripeBillingInfo(userId, customerId, subscriptionId);
+  }
 
   // Determine tier from subscription items
   let tier: SubscriptionTier = 'starter'; // default for new checkout
