@@ -143,6 +143,34 @@ Access-Control-Allow-Headers: Content-Type, X-Api-Key</code></pre>
 &#125;</code></pre>
   </div>
 
+  <!-- GET /public_api/v1/scraper_health -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded">GET</span>
+      <code class="text-sm font-semibold">/public_api/v1/scraper_health</code>
+    </div>
+    <p class="text-sm text-gray-600 mb-3">
+      Returns a fixture-based quality snapshot for each named scraper, including support tier, extraction grade,
+      extraction rate versus expected rate, and whether a checked-in fixture exists. This is intended as a public
+      trust signal, not a live contract-test feed.
+    </p>
+    <h5 class="text-sm font-semibold mb-2">Example Response</h5>
+    <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>&#123;
+  "success": true,
+  "generated_at": "2026-03-09T12:45:00.000Z",
+  "fixture_runtime": "available",
+  "summary": &#123;
+    "total_scrapers": 109,
+    "with_fixtures": 29,
+    "fixture_coverage_rate": 0.27,
+    "grade_counts": &#123; "A": 18, "B": 6, "C": 2, "F": 3, "errors": 0 &#125;
+  &#125;,
+  "results": [
+    &#123; "scraper": "uk_rightmove", "quality_grade": "A", "extraction_rate": 0.9 &#125;
+  ]
+&#125;</code></pre>
+  </div>
+
   <!-- GET /public_api/v1/health -->
   <div class="bg-white rounded-xl shadow-md p-6 mb-5">
     <div class="flex items-center gap-2 mb-3">

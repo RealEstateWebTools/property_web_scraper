@@ -43,6 +43,7 @@ test.describe('Supported sites page', () => {
   test('"Need a different site?" section is visible', async ({ page }) => {
     await expect(page.locator('text=Need a different site?')).toBeVisible();
     await expect(page.locator('a', { hasText: 'See the docs on GitHub' })).toBeVisible();
+    await expect(page.locator('a[href="/scraper-health"]', { hasText: 'View scraper health' })).toBeVisible();
   });
 
   test('breadcrumb navigation is present', async ({ page }) => {

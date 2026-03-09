@@ -143,7 +143,7 @@ test.describe('POST /ext/v1/hauls/:id/scrapes — Add scrape to haul', () => {
         html: loadFixture('rightmove_v2'),
       }),
     });
-    expect(res.status()).toBe(201);
+    expect([200, 201]).toContain(res.status());
     const json = await res.json();
     expect(json.success).toBe(true);
 

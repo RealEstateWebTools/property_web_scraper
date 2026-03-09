@@ -98,15 +98,20 @@ const tierCounts = {
       </div>
       <div>
         <h4 class="font-semibold text-lg mb-3">Need a different site?</h4>
-        <p class="text-sm text-gray-600 m-0">
+        <p class="text-sm text-gray-600 mb-3">
           PropertyWebScraper uses JSON-based mapping configs for named portals, and it also
           includes a generic fallback mapping when you provide browser-rendered HTML for an
           unsupported host. If you need a first-class scraper for a new portal, you can add one
           without changing the extraction pipeline itself.
-          <a href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank" class="text-blue-600 hover:underline">
-            See the docs on GitHub
-          </a>.
         </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="/scraper-health" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-2">
+            <i class="bi bi-activity"></i> View scraper health
+          </a>
+          <a href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank" class="bg-white text-gray-700 text-sm px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 no-underline inline-flex items-center gap-2">
+            <i class="bi bi-github"></i> See the docs on GitHub
+          </a>
+        </div>
       </div>
     </div>
   </div>

@@ -373,6 +373,88 @@ const spec = {
         },
       },
     },
+    '/scraper_health': {
+      get: {
+        operationId: 'getScraperHealth',
+        summary: 'Return a fixture-based scraper health snapshot',
+        tags: ['Meta'],
+        responses: {
+          '200': {
+            description: 'Scraper health report',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean' },
+                    generated_at: { type: 'string', format: 'date-time' },
+                    fixture_runtime: { type: 'string', enum: ['available', 'unavailable'] },
+                    fixture_runtime_warning: { type: ['string', 'null'] },
+                    summary: {
+                      type: 'object',
+                      properties: {
+                        total_scrapers: { type: 'integer' },
+                        with_fixtures: { type: 'integer' },
+                        without_fixtures: { type: 'integer' },
+                        fixture_coverage_rate: { type: 'number' },
+                        grade_counts: {
+                          type: 'object',
+                          properties: {
+                            A: { type: 'integer' },
+                            B: { type: 'integer' },
+                            C: { type: 'integer' },
+                            F: { type: 'integer' },
+                            errors: { type: 'integer' },
+                          },
+                        },
+                        tier_counts: {
+                          type: 'object',
+                          properties: {
+                            core: { type: 'integer' },
+                            experimental: { type: 'integer' },
+                            manual_only: { type: 'integer' },
+                          },
+                        },
+                        meets_expectation_count: { type: 'integer' },
+                        below_expectation_count: { type: 'integer' },
+                      },
+                      required: ['total_scrapers', 'with_fixtures', 'without_fixtures', 'fixture_coverage_rate', 'grade_counts', 'tier_counts', 'meets_expectation_count', 'below_expectation_count'],
+                    },
+                    results: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          scraper: { type: 'string' },
+                          country: { type: 'string' },
+                          has_fixture: { type: 'boolean' },
+                          support_tier: { type: ['string', 'null'] },
+                          expected_extraction_rate: { type: ['number', 'null'] },
+                          meets_expectation: { type: ['boolean', 'null'] },
+                          consecutive_below_threshold: { type: ['integer', 'null'] },
+                          quality_grade: { type: ['string', 'null'] },
+                          quality_label: { type: ['string', 'null'] },
+                          extraction_rate: { type: ['number', 'null'] },
+                          weighted_rate: { type: ['number', 'null'] },
+                          populated_fields: { type: ['integer', 'null'] },
+                          total_fields: { type: ['integer', 'null'] },
+                          critical_fields_missing: { type: ['array', 'null'], items: { type: 'string' } },
+                          empty_fields: { type: ['array', 'null'], items: { type: 'string' } },
+                          error: { type: ['string', 'null'] },
+                        },
+                        required: ['scraper', 'country', 'has_fixture'],
+                      },
+                    },
+                  },
+                  required: ['success', 'generated_at', 'fixture_runtime', 'summary', 'results'],
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized when the endpoint is locked down', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+        },
+      },
+    },
     '/health': {
       get: {
         operationId: 'getHealth',

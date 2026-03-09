@@ -179,6 +179,19 @@ test.describe('/public_api/v1/supported_sites API', () => {
   });
 });
 
+test.describe('/public_api/v1/scraper_health API', () => {
+  test('GET returns 200 with summary and results', async ({ request }) => {
+    const res = await request.get('/public_api/v1/scraper_health');
+    expect(res.status()).toBe(200);
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.summary.total_scrapers).toBeGreaterThan(0);
+    expect(Array.isArray(json.results)).toBe(true);
+    expect(json.results.length).toBeGreaterThan(0);
+    expect(json.results[0].scraper).toBeDefined();
+  });
+});
+
 test.describe('/public_api/v1/health API', () => {
   test('GET returns 200 with status ok', async ({ request }) => {
     const res = await request.get('/public_api/v1/health');

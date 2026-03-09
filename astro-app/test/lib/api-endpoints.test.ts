@@ -26,6 +26,10 @@ vi.mock('@lib/services/activity-logger.js', () => ({
   logActivity: vi.fn(),
 }));
 
+vi.mock('@lib/services/scraper-health-report.js', () => ({
+  buildScraperHealthReport: vi.fn(),
+}));
+
 vi.mock('@lib/services/listing-store.js', () => ({
   getListing: vi.fn(),
 }));
@@ -338,6 +342,74 @@ describe('GET /public_api/v1/supported_sites', () => {
       expect(typeof site.host).toBe('string');
       expect(typeof site.scraper).toBe('string');
     }
+  });
+});
+
+describe('GET /public_api/v1/scraper_health', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns 401 when apiGuard rejects', async () => {
+    const { apiGuard } = await import('@lib/services/api-guard.js');
+    (apiGuard as any).mockResolvedValue(guardFail(401));
+
+    const { GET } = await import('../../src/pages/public_api/v1/scraper_health.js');
+    const request = mockRequest('/public_api/v1/scraper_health');
+    const response = await GET({ request } as any);
+
+    expect(response.status).toBe(401);
+  });
+
+  it('returns summary and mapped result rows', async () => {
+    const { apiGuard } = await import('@lib/services/api-guard.js');
+    const { buildScraperHealthReport } = await import('@lib/services/scraper-health-report.js');
+    (apiGuard as any).mockResolvedValue(guardPass());
+    (buildScraperHealthReport as any).mockResolvedValue({
+      timestamp: '2026-03-09T12:45:00.000Z',
+      fixtureRuntime: 'available',
+      summary: {
+        totalScrapers: 2,
+        withFixtures: 1,
+        withoutFixtures: 1,
+        fixtureCoverageRate: 0.5,
+        gradeCounts: { A: 1, B: 0, C: 0, F: 0, errors: 0 },
+        tierCounts: { core: 1, experimental: 1, manualOnly: 0 },
+        meetsExpectationCount: 1,
+        belowExpectationCount: 0,
+      },
+      results: [
+        {
+          name: 'uk_rightmove',
+          country: 'GB',
+          hasFixture: true,
+          supportTier: 'core',
+          expectedExtractionRate: 0.85,
+          meetsExpectation: true,
+          consecutiveBelowThreshold: 0,
+          grade: 'A',
+          label: 'Excellent',
+          extractionRate: 0.9,
+          weightedRate: 0.94,
+          populatedFields: 18,
+          totalFields: 20,
+          criticalFieldsMissing: [],
+          emptyFields: ['for_rent'],
+        },
+      ],
+    });
+
+    const { GET } = await import('../../src/pages/public_api/v1/scraper_health.js');
+    const request = mockRequest('/public_api/v1/scraper_health');
+    const response = await GET({ request } as any);
+
+    expect(response.status).toBe(200);
+    const body = await parseJson(response);
+    expect(body.success).toBe(true);
+    expect(body.summary.total_scrapers).toBe(2);
+    expect(body.summary.tier_counts.manual_only).toBe(0);
+    expect(body.results[0].scraper).toBe('uk_rightmove');
+    expect(body.results[0].quality_grade).toBe('A');
   });
 });
 

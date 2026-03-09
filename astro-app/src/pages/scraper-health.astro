@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { buildScraperHealthReport } from '@lib/services/scraper-health-report.js';
+
+const report = await buildScraperHealthReport();
+const gradeClasses = {
+  A: 'bg-green-100 text-green-700',
+  B: 'bg-blue-100 text-blue-700',
+  C: 'bg-amber-100 text-amber-700',
+  F: 'bg-red-100 text-red-700',
+} as const;
+const tierClasses = {
+  core: 'bg-emerald-100 text-emerald-700',
+  experimental: 'bg-amber-100 text-amber-700',
+  'manual-only': 'bg-blue-100 text-blue-700',
+} as const;
+const tierLabels = {
+  core: 'Core',
+  experimental: 'Experimental',
+  'manual-only': 'Manual HTML',
+} as const;
+const generatedAt = new Date(report.timestamp).toLocaleString('en-GB', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+});
+const attentionCount = report.summary.gradeCounts.C
+  + report.summary.gradeCounts.F
+  + report.summary.gradeCounts.errors
+  + report.summary.belowExpectationCount;
+---
+<BaseLayout title="Scraper Health - Property Web Scraper">
+<section class="max-w-6xl mx-auto px-4 py-12">
+  <PageHeader
+    title="Scraper Health"
+    subtitle={`Fixture-based quality snapshot across ${report.summary.totalScrapers} scraper mappings. Generated ${generatedAt}.`}
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Scraper Health' },
+    ]}
+  />
+
+  <div class="bg-gradient-to-br from-slate-50 to-blue-50 border border-blue-100 rounded-2xl p-6 mb-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+      <div>
+        <h3 class="text-lg font-semibold mb-2">How to read this page</h3>
+        <p class="text-sm text-gray-600 mb-2">
+          This report runs each named scraper against its checked-in HTML fixture and records the resulting grade,
+          extraction rate, and expectation match. It is a strong maintenance signal, but it is not a live contract test
+          against the current production site.
+        </p>
+        <p class="text-xs text-gray-500 m-0">
+          API access: <a href="/public_api/v1/scraper_health" class="text-blue-600 hover:underline">/public_api/v1/scraper_health</a>
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a href="/sites" class="bg-white text-gray-700 text-sm px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 no-underline">View supported sites</a>
+        <a href="/public_api/v1/scraper_health" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 no-underline">Open JSON feed</a>
+      </div>
+    </div>
+  </div>
+
+  {report.fixtureRuntime === 'unavailable' && (
+    <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl px-4 py-3 text-sm mb-6">
+      Fixture files are unavailable in this runtime, so grades may be incomplete here.
+      {report.fixtureRuntimeWarning && <span class="block text-amber-700 mt-1">{report.fixtureRuntimeWarning}</span>}
+    </div>
+  )}
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow-md p-5">
+      <p class="text-sm text-gray-500">Scrapers tracked</p>
+      <p class="text-2xl font-bold">{report.summary.totalScrapers}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5">
+      <p class="text-sm text-gray-500">Fixture coverage</p>
+      <p class="text-2xl font-bold">{Math.round(report.summary.fixtureCoverageRate * 100)}%</p>
+      <p class="text-xs text-gray-500 mt-1">{report.summary.withFixtures} with fixtures</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5">
+      <p class="text-sm text-gray-500">Healthy grades</p>
+      <p class="text-2xl font-bold text-green-600">{report.summary.gradeCounts.A + report.summary.gradeCounts.B}</p>
+      <p class="text-xs text-gray-500 mt-1">A: {report.summary.gradeCounts.A} · B: {report.summary.gradeCounts.B}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5">
+      <p class="text-sm text-gray-500">Needs attention</p>
+      <p class="text-2xl font-bold text-amber-600">{attentionCount}</p>
+      <p class="text-xs text-gray-500 mt-1">Below expectation: {report.summary.belowExpectationCount}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5">
+      <p class="text-sm text-gray-500">Support tiers</p>
+      <p class="text-sm font-semibold mt-1">{report.summary.tierCounts.core} core · {report.summary.tierCounts.experimental} experimental · {report.summary.tierCounts.manualOnly} manual</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-200 flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h3 class="font-semibold text-base">Current fixture health</h3>
+        <p class="text-sm text-gray-500 m-0">Rows are sorted with errors and weak grades first so maintenance hotspots stay visible.</p>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-200">
+            <th class="py-3 px-5 font-medium">Scraper</th>
+            <th class="py-3 px-5 font-medium">Country</th>
+            <th class="py-3 px-5 font-medium">Tier</th>
+            <th class="py-3 px-5 font-medium">Grade</th>
+            <th class="py-3 px-5 font-medium">Rate</th>
+            <th class="py-3 px-5 font-medium">Expected</th>
+            <th class="py-3 px-5 font-medium">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {report.results.map((result) => (
+            <tr class="border-b border-gray-100 align-top">
+              <td class="py-3 px-5">
+                <span class="font-mono text-sm">{result.name}</span>
+                {result.consecutiveBelowThreshold != null && result.consecutiveBelowThreshold >= 5 && (
+                  <span class="inline-block ml-2 px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">degraded trend</span>
+                )}
+              </td>
+              <td class="py-3 px-5 text-gray-600">{result.country}</td>
+              <td class="py-3 px-5">
+                {result.supportTier ? (
+                  <span class={`inline-block px-2 py-0.5 rounded text-xs font-medium ${tierClasses[result.supportTier]}`}>{tierLabels[result.supportTier]}</span>
+                ) : (
+                  <span class="text-gray-400 text-xs">—</span>
+                )}
+              </td>
+              <td class="py-3 px-5">
+                {!result.hasFixture ? (
+                  <span class="text-gray-400 text-xs">No fixture</span>
+                ) : result.error ? (
+                  <span class="text-red-600 text-xs">Error</span>
+                ) : result.grade ? (
+                  <span class={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${gradeClasses[result.grade as keyof typeof gradeClasses] ?? gradeClasses.F}`}>{result.grade} — {result.label}</span>
+                ) : (
+                  <span class="text-gray-400 text-xs">—</span>
+                )}
+              </td>
+              <td class="py-3 px-5 text-gray-600">{typeof result.extractionRate === 'number' ? `${Math.round(result.extractionRate * 100)}%` : '—'}</td>
+              <td class="py-3 px-5 text-gray-600">{typeof result.expectedExtractionRate === 'number' ? `${Math.round(result.expectedExtractionRate * 100)}%` : '—'}</td>
+              <td class="py-3 px-5">
+                {!result.hasFixture ? (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">no fixture</span>
+                ) : result.error ? (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">error</span>
+                ) : result.meetsExpectation === false ? (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">below expectation</span>
+                ) : result.grade === 'A' ? (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">healthy</span>
+                ) : result.grade === 'B' ? (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">good</span>
+                ) : (
+                  <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">needs work</span>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</BaseLayout>
