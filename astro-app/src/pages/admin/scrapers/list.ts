@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { authenticateAdmin } from '@lib/services/admin-auth.js';
 import { allMappingNames, findByName } from '@lib/extractor/mapping-loader.js';
-import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
+import { allPortalConfigs } from '@lib/services/portal-registry.js';
 
 export const GET: APIRoute = async ({ request }) => {
   const auth = authenticateAdmin(request);
@@ -15,11 +15,9 @@ export const GET: APIRoute = async ({ request }) => {
   const mappingNames = allMappingNames();
 
   const scraperHosts = new Map<string, string[]>();
-  for (const [host, entry] of Object.entries(LOCAL_HOST_MAP)) {
-    if (!host.startsWith('www.')) continue;
-    const existing = scraperHosts.get(entry.scraper_name) || [];
-    existing.push(host);
-    scraperHosts.set(entry.scraper_name, existing);
+  for (const portal of allPortalConfigs()) {
+    const canonicalHosts = portal.hosts.filter((host) => host.startsWith('www.'));
+    scraperHosts.set(portal.scraperName, canonicalHosts.length > 0 ? canonicalHosts : portal.hosts);
   }
 
   const scrapers = mappingNames.map((name) => {

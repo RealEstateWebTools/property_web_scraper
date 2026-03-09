@@ -2,14 +2,16 @@ import { describe, it, expect } from 'vitest';
 import {
   PORTAL_REGISTRY,
   findPortalByHost,
+  findPortalByUrl,
   findPortalByName,
   allPortalNames,
+  listSupportedSites,
 } from '../../src/lib/services/portal-registry.js';
 
 describe('portal-registry', () => {
   describe('PORTAL_REGISTRY', () => {
-    it('contains all 59 portals', () => {
-      expect(Object.keys(PORTAL_REGISTRY)).toHaveLength(106);
+    it('contains all hardcoded portals', () => {
+      expect(Object.keys(PORTAL_REGISTRY)).toHaveLength(109);
     });
 
     it('each portal has required fields', () => {
@@ -75,6 +77,9 @@ describe('portal-registry', () => {
       expect(names).toContain('se_hemnet');
       expect(names).toContain('fr_seloger');
       expect(names).toContain('it_immobiliare');
+      expect(names).toContain('us_mlslistings');
+      expect(names).toContain('us_wyomingmls');
+      expect(names).toContain('pa_encuentra24');
     });
   });
 
@@ -158,10 +163,26 @@ describe('portal-registry', () => {
     });
   });
 
+  describe('findPortalByUrl', () => {
+    it('matches panama encuentra24 URLs to the Panama scraper', () => {
+      const portal = findPortalByUrl(new URL('https://www.encuentra24.com/panama/bienes-raices-venta/12345'));
+      expect(portal).toBeDefined();
+      expect(portal!.scraperName).toBe('pa_encuentra24');
+      expect(portal!.country).toBe('PA');
+    });
+
+    it('matches costa rica encuentra24 URLs to the Costa Rica scraper', () => {
+      const portal = findPortalByUrl(new URL('https://www.encuentra24.com/costa-rica/bienes-raices-venta/12345'));
+      expect(portal).toBeDefined();
+      expect(portal!.scraperName).toBe('cr_encuentra24');
+      expect(portal!.country).toBe('CR');
+    });
+  });
+
   describe('allPortalNames', () => {
     it('returns array of all portal names', () => {
       const names = allPortalNames();
-      expect(names).toHaveLength(106);
+      expect(names).toHaveLength(109);
       expect(names).toContain('uk_rightmove');
       expect(names).toContain('es_idealista');
     });
@@ -170,6 +191,16 @@ describe('portal-registry', () => {
       for (const name of allPortalNames()) {
         expect(typeof name).toBe('string');
       }
+    });
+  });
+
+  describe('listSupportedSites', () => {
+    it('returns one canonical site per scraper with support metadata', () => {
+      const sites = listSupportedSites();
+      expect(sites).toHaveLength(109);
+      expect(sites[0]).toHaveProperty('host');
+      expect(sites[0]).toHaveProperty('supportTier');
+      expect(sites[0]).toHaveProperty('url');
     });
   });
 });

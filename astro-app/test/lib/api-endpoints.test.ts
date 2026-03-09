@@ -101,6 +101,31 @@ vi.mock('@lib/services/url-validator.js', () => ({
   UNSUPPORTED: 'UNSUPPORTED',
 }));
 
+vi.mock('@lib/services/portal-registry.js', () => ({
+  listSupportedSites: vi.fn(() => [
+    {
+      host: 'www.rightmove.co.uk',
+      scraper: 'uk_rightmove',
+      slug: 'uk_rightmove',
+      country: 'GB',
+      supportTier: 'core',
+      expectedExtractionRate: 0.85,
+      requiresJsRendering: false,
+      url: 'https://www.rightmove.co.uk/',
+    },
+    {
+      host: 'www.encuentra24.com',
+      scraper: 'pa_encuentra24',
+      slug: 'pa_encuentra24',
+      country: 'PA',
+      supportTier: 'experimental',
+      expectedExtractionRate: 0.55,
+      requiresJsRendering: false,
+      url: 'https://www.encuentra24.com/panama',
+    },
+  ]),
+}));
+
 // ─── Helpers ──────────────────────────────────────────────────────
 
 function mockRequest(url: string, options: RequestInit = {}): Request {
@@ -281,7 +306,7 @@ describe('GET /public_api/v1/supported_sites', () => {
     expect(response.status).toBe(401);
   });
 
-  it('returns deduplicated list of supported sites', async () => {
+  it('returns canonical list of supported sites', async () => {
     const { apiGuard } = await import('@lib/services/api-guard.js');
     (apiGuard as any).mockResolvedValue(guardPass());
 
@@ -296,7 +321,7 @@ describe('GET /public_api/v1/supported_sites', () => {
     expect(body.sites.length).toBeGreaterThan(0);
   });
 
-  it('each site entry has host and scraper fields', async () => {
+  it('each site entry includes metadata used by docs and clients', async () => {
     const { apiGuard } = await import('@lib/services/api-guard.js');
     (apiGuard as any).mockResolvedValue(guardPass());
 
@@ -308,6 +333,8 @@ describe('GET /public_api/v1/supported_sites', () => {
     for (const site of body.sites) {
       expect(site).toHaveProperty('host');
       expect(site).toHaveProperty('scraper');
+      expect(site).toHaveProperty('support_tier');
+      expect(site).toHaveProperty('url');
       expect(typeof site.host).toBe('string');
       expect(typeof site.scraper).toBe('string');
     }

@@ -1,5 +1,5 @@
 import { ImportHost } from '../models/import-host.js';
-import { PORTAL_REGISTRY, findPortalByHost } from './portal-registry.js';
+import { allPortalConfigs, findPortalByUrl } from './portal-registry.js';
 
 export interface ValidationResult {
   valid: boolean;
@@ -19,7 +19,7 @@ export const UNSUPPORTED = 'unsupported';
  */
 export const LOCAL_HOST_MAP: Record<string, { scraper_name: string; slug: string }> = (() => {
   const map: Record<string, { scraper_name: string; slug: string }> = {};
-  for (const config of Object.values(PORTAL_REGISTRY)) {
+  for (const config of allPortalConfigs()) {
     for (const host of config.hosts) {
       map[host] = { scraper_name: config.scraperName, slug: config.slug };
     }
@@ -30,11 +30,11 @@ export const LOCAL_HOST_MAP: Record<string, { scraper_name: string; slug: string
 /**
  * Build an in-memory ImportHost-like object from the local map.
  */
-function buildLocalImportHost(hostname: string): ImportHost | null {
-  const portal = findPortalByHost(hostname);
+function buildLocalImportHost(url: URL): ImportHost | null {
+  const portal = findPortalByUrl(url);
   if (!portal) return null;
   const host = new ImportHost();
-  host.host = hostname;
+  host.host = url.hostname;
   host.scraper_name = portal.scraperName;
   host.slug = portal.slug;
   return host;
@@ -71,7 +71,7 @@ export async function validateUrl(url: string | undefined | null): Promise<Valid
   }
 
   if (!importHost) {
-    importHost = buildLocalImportHost(uri.hostname);
+    importHost = buildLocalImportHost(uri);
   }
 
   if (!importHost) {

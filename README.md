@@ -6,30 +6,25 @@
 
 **From the team behind [PropertyWebBuilder](https://github.com/etewiah/property_web_builder)** — the open-source real estate platform.
 
-A real estate listing extraction API and Chrome extension. Given a property listing URL (or pre-rendered HTML), it returns structured data: title, price, coordinates, images, and 70+ fields across 22 supported portals in 12 countries.
+A real estate listing extraction platform with a public API, export pipeline, webhook-ready haul workflows, admin diagnostics, and Chrome extensions. Given a property listing URL (or pre-rendered HTML), it returns structured data such as title, price, coordinates, images, and 70+ normalized fields.
 
 Built with [Astro](https://astro.build/) (SSR mode), TypeScript, and [Cheerio](https://cheerio.js.org/).
 
 ## Supported Sites
 
-| Country | Portals |
-|---------|---------|
-| 🇬🇧 UK | Rightmove, Zoopla, OnTheMarket, Jitty |
-| 🇺🇸 USA | Realtor.com, Redfin, Trulia, ForSaleByOwner, Zillow† |
-| 🇦🇺 Australia | Domain, RealEstate.com.au |
-| 🇪🇸 Spain | Idealista, Fotocasa, Pisos.com |
-| 🇩🇪 Germany | ImmobilienScout24 |
-| 🇳🇱 Netherlands | Funda |
-| 🇮🇪 Ireland | Daft.ie |
-| 🇵🇹 Portugal | Idealista PT |
-| 🇮🇳 India | RealEstateIndia |
-| 🇸🇪 Sweden | Hemnet† |
-| 🇫🇷 France | SeLoger† |
-| 🇮🇹 Italy | Immobiliare.it† |
+PropertyWebScraper currently ships with **109 named portal mappings across 75 countries**, plus a generic fallback mapping for browser-rendered HTML captured from unsupported hosts.
 
-† experimental — lower extraction rate
+- Canonical support metadata lives in `astro-app/src/lib/services/portal-registry.ts`
+- The public catalog is exposed in the app at `/sites`
+- The API catalog is exposed at `/public_api/v1/supported_sites`
 
-Portal count is derived from the `PORTAL_REGISTRY` in `astro-app/src/lib/services/portal-registry.ts` (single source of truth).
+Examples of covered portals include Rightmove, Zoopla, OnTheMarket, Idealista, Fotocasa, Realtor.com, Redfin, Zillow, Funda, Daft.ie, Domain, RealEstate.com.au, Hemnet, SeLoger, Immobiliare.it, RealEstateIndia, and many more.
+
+Support tiers:
+
+- `core` — strong direct URL support and ongoing fixture coverage
+- `experimental` — available but with lower confidence or narrower fixture history
+- `manual-only` — best used with browser-rendered HTML rather than direct URL fetches
 
 ## Chrome Extension
 
@@ -153,7 +148,7 @@ PropertyWebScraper is part of the [PropertyWebBuilder](https://github.com/etewia
 | [SinglePropertyPages](https://singlepropertypages.com/) | SaaS for dedicated property microsites with lead capture, analytics, and WYSIWYG editor | Astro, TypeScript |
 | [PropertySquares](https://propertysquares.com/) | 48-step first-time buyer journey across multiple markets | Astro, TypeScript |
 
-**Building a real estate project?** PropertyWebScraper gives you structured listing data from 17 portals in 8 countries via a simple API. [Open an issue](https://github.com/RealEstateWebTools/property_web_scraper/issues) to get your project listed here.
+**Building a real estate project?** PropertyWebScraper gives you structured listing data, support-tier metadata, export formats, and Chrome-extension capture flows from a much broader multi-country portal catalog. [Open an issue](https://github.com/RealEstateWebTools/property_web_scraper/issues) to get your project listed here.
 
 ## Legacy Rails Engine
 

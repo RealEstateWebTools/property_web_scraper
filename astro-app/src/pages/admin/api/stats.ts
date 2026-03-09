@@ -4,7 +4,7 @@ import { allMappingNames, findByName } from '@lib/extractor/mapping-loader.js';
 import { getStoreStats } from '@lib/services/listing-store.js';
 import { getRateLimiterStats } from '@lib/services/rate-limiter.js';
 import { getRuntimeConfig } from '@lib/services/runtime-config.js';
-import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
+import { allPortalConfigs } from '@lib/services/portal-registry.js';
 import { getSystemHealth } from '@lib/services/system-health.js';
 
 export const GET: APIRoute = async ({ request }) => {
@@ -23,12 +23,9 @@ export const GET: APIRoute = async ({ request }) => {
   const health = getSystemHealth();
 
   // Build scraper status list
-  const hostMap = LOCAL_HOST_MAP;
   const scraperHosts = new Map<string, string[]>();
-  for (const [host, entry] of Object.entries(hostMap)) {
-    const existing = scraperHosts.get(entry.scraper_name) || [];
-    existing.push(host);
-    scraperHosts.set(entry.scraper_name, existing);
+  for (const portal of allPortalConfigs()) {
+    scraperHosts.set(portal.scraperName, portal.hosts);
   }
 
   const scrapers = mappingNames.map((name) => ({

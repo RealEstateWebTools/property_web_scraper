@@ -4,7 +4,7 @@ import type { ExtractionDiagnostics } from '../extractor/html-extractor.js';
 import { findByName } from '../extractor/mapping-loader.js';
 import { Listing } from '../models/listing.js';
 import { logActivity } from './activity-logger.js';
-import { findPortalByHost } from './portal-registry.js';
+import { findPortalByUrl } from './portal-registry.js';
 import { normalizePrice } from '../extractor/price-normalizer.js';
 import { findListingByUrl, getListing } from './listing-store.js';
 
@@ -181,7 +181,7 @@ export async function retrieveListing(
         }
 
         // Price normalization using portal's default currency
-        const portal = findPortalByHost(validation.uri!.hostname);
+        const portal = findPortalByUrl(validation.uri!);
         const fallbackCurrency = portal?.currency;
         const normalized = normalizePrice(
           listing.price_string || '',

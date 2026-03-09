@@ -6,6 +6,7 @@ export interface PortalConfig {
   scraperName: string;
   slug: string;
   hosts: string[];
+  pathPrefixes?: string[];
   country: string;
   currency: string;
   localeCode: string;
@@ -17,8 +18,19 @@ export interface PortalConfig {
   requiresJsRendering: boolean;
 }
 
+export interface SupportedSiteSummary {
+  host: string;
+  scraper: string;
+  slug: string;
+  country: string;
+  supportTier: SupportTier;
+  expectedExtractionRate?: number;
+  requiresJsRendering: boolean;
+  url: string;
+}
+
 /**
- * Hardcoded portal registry — serves as the primary source of truth.
+ * Hardcoded portal registry — canonical metadata for known portals.
  * Portals defined here take precedence over auto-discovered ones.
  */
 export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
@@ -130,6 +142,34 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     areaUnit: 'sqft',
     contentSource: 'html',
     supportTier: 'core',
+    expectedExtractionRate: 0.95,
+    stripTrailingSlash: false,
+    requiresJsRendering: false,
+  },
+  us_mlslistings: {
+    scraperName: 'us_mlslistings',
+    slug: 'us_mlslistings',
+    hosts: ['www.mlslistings.com', 'mlslistings.com'],
+    country: 'US',
+    currency: 'USD',
+    localeCode: 'en-US',
+    areaUnit: 'sqft',
+    contentSource: 'script-json',
+    supportTier: 'experimental',
+    expectedExtractionRate: 0.95,
+    stripTrailingSlash: false,
+    requiresJsRendering: false,
+  },
+  us_wyomingmls: {
+    scraperName: 'us_wyomingmls',
+    slug: 'us_wyomingmls',
+    hosts: ['www.wyomingmls.com', 'wyomingmls.com'],
+    country: 'US',
+    currency: 'USD',
+    localeCode: 'en-US',
+    areaUnit: 'sqft',
+    contentSource: 'html',
+    supportTier: 'experimental',
     expectedExtractionRate: 0.95,
     stripTrailingSlash: false,
     requiresJsRendering: false,
@@ -1160,9 +1200,25 @@ export const PORTAL_REGISTRY: Record<string, PortalConfig> = {
     scraperName: 'cr_encuentra24',
     slug: 'cr_encuentra24',
     hosts: ['www.encuentra24.com', 'encuentra24.com'],
+    pathPrefixes: ['/costa-rica'],
     country: 'CR',
     currency: 'USD',
     localeCode: 'es-CR',
+    areaUnit: 'sqmt',
+    contentSource: 'json-ld',
+    supportTier: 'experimental',
+    expectedExtractionRate: 0.55,
+    stripTrailingSlash: false,
+    requiresJsRendering: false,
+  },
+  pa_encuentra24: {
+    scraperName: 'pa_encuentra24',
+    slug: 'pa_encuentra24',
+    hosts: ['www.encuentra24.com', 'encuentra24.com'],
+    pathPrefixes: ['/panama'],
+    country: 'PA',
+    currency: 'USD',
+    localeCode: 'es-PA',
     areaUnit: 'sqmt',
     contentSource: 'json-ld',
     supportTier: 'experimental',
@@ -1550,16 +1606,58 @@ const mergedRegistry: Record<string, PortalConfig> = {
   ...PORTAL_REGISTRY, // hardcoded takes precedence
 };
 
-/** Reverse index: hostname -> PortalConfig */
-const hostIndex = new Map<string, PortalConfig>();
+/** Reverse index: hostname -> PortalConfig[] */
+const hostIndex = new Map<string, PortalConfig[]>();
 for (const config of Object.values(mergedRegistry)) {
   for (const host of config.hosts) {
-    hostIndex.set(host, config);
+    hostIndex.set(host, [...(hostIndex.get(host) ?? []), config]);
   }
 }
 
+function normalizePathPrefix(pathPrefix: string): string {
+  return pathPrefix.endsWith('/') && pathPrefix !== '/'
+    ? pathPrefix.slice(0, -1).toLowerCase()
+    : pathPrefix.toLowerCase();
+}
+
+function matchesPathPrefix(pathname: string, pathPrefixes?: string[]): boolean {
+  if (!pathPrefixes || pathPrefixes.length === 0) return true;
+
+  const normalizedPathname = normalizePathPrefix(pathname || '/');
+  return pathPrefixes.some((pathPrefix) => {
+    const normalizedPrefix = normalizePathPrefix(pathPrefix);
+    return normalizedPathname === normalizedPrefix
+      || normalizedPathname.startsWith(`${normalizedPrefix}/`);
+  });
+}
+
+function canonicalHost(config: PortalConfig): string {
+  return config.hosts.find((host) => host.startsWith('www.')) ?? config.hosts[0];
+}
+
+function canonicalUrl(config: PortalConfig): string {
+  const path = config.pathPrefixes?.[0] ?? '/';
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `https://${canonicalHost(config)}${normalizedPath}`;
+}
+
+export function allPortalConfigs(): PortalConfig[] {
+  return allPortalNames().map((name) => mergedRegistry[name]);
+}
+
 export function findPortalByHost(hostname: string): PortalConfig | undefined {
-  return hostIndex.get(hostname);
+  return hostIndex.get(hostname)?.[0];
+}
+
+export function findPortalByUrl(url: URL): PortalConfig | undefined {
+  const candidates = hostIndex.get(url.hostname);
+  if (!candidates || candidates.length === 0) return undefined;
+
+  const pathMatch = candidates.find((candidate) => matchesPathPrefix(url.pathname, candidate.pathPrefixes));
+  if (pathMatch) return pathMatch;
+
+  return candidates.find((candidate) => !candidate.pathPrefixes || candidate.pathPrefixes.length === 0)
+    ?? candidates[0];
 }
 
 export function findPortalByName(name: string): PortalConfig | undefined {
@@ -1568,4 +1666,22 @@ export function findPortalByName(name: string): PortalConfig | undefined {
 
 export function allPortalNames(): string[] {
   return Object.keys(mergedRegistry);
+}
+
+export function listSupportedSites(): SupportedSiteSummary[] {
+  return allPortalNames()
+    .map((name) => {
+      const config = mergedRegistry[name];
+      return {
+        host: canonicalHost(config),
+        scraper: config.scraperName,
+        slug: config.slug,
+        country: config.country,
+        supportTier: config.supportTier,
+        expectedExtractionRate: config.expectedExtractionRate,
+        requiresJsRendering: config.requiresJsRendering,
+        url: canonicalUrl(config),
+      };
+    })
+    .sort((a, b) => a.country.localeCompare(b.country) || a.scraper.localeCompare(b.scraper));
 }

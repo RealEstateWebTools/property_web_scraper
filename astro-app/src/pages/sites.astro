@@ -1,41 +1,90 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
+import { listSupportedSites } from '@lib/services/portal-registry.js';
 
-const sites = [
-  { name: 'Idealista', host: 'idealista.com', country: 'Spain', example: 'https://www.idealista.com/inmueble/12345678/' },
-  { name: 'Rightmove', host: 'rightmove.co.uk', country: 'UK', example: 'https://www.rightmove.co.uk/properties/123456789' },
-  { name: 'Zoopla', host: 'zoopla.co.uk', country: 'UK', example: 'https://www.zoopla.co.uk/for-sale/details/12345678/' },
-  { name: 'Realtor.com', host: 'realtor.com', country: 'USA', example: 'https://www.realtor.com/realestateandhomes-detail/123-Main-St' },
-  { name: 'Fotocasa', host: 'fotocasa.es', country: 'Spain', example: 'https://www.fotocasa.es/es/comprar/vivienda/12345678/d' },
-  { name: 'Pisos.com', host: 'pisos.com', country: 'Spain', example: 'https://www.pisos.com/comprar/piso-12345678/' },
-  { name: 'RealEstateIndia', host: 'realestateindia.com', country: 'India', example: 'https://www.realestateindia.com/property-detail/' },
-  { name: 'ForSaleByOwner', host: 'forsalebyowner.com', country: 'USA', example: 'https://www.forsalebyowner.com/listing/12345678' },
-];
+const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+const tierLabels = {
+  core: 'Core',
+  experimental: 'Experimental',
+  'manual-only': 'Manual HTML',
+} as const;
+const tierClasses = {
+  core: 'bg-emerald-100 text-emerald-700',
+  experimental: 'bg-amber-100 text-amber-700',
+  'manual-only': 'bg-blue-100 text-blue-700',
+} as const;
+
+const sites = listSupportedSites().map((site) => ({
+  ...site,
+  countryName: regionNames.of(site.country) ?? site.country,
+  extractionRatePercent:
+    typeof site.expectedExtractionRate === 'number'
+      ? Math.round(site.expectedExtractionRate * 100)
+      : null,
+}));
+
+const totalCountries = new Set(sites.map((site) => site.country)).size;
+const tierCounts = {
+  core: sites.filter((site) => site.supportTier === 'core').length,
+  experimental: sites.filter((site) => site.supportTier === 'experimental').length,
+  manualOnly: sites.filter((site) => site.supportTier === 'manual-only').length,
+};
 ---
 <BaseLayout title="Supported Sites - Property Web Scraper">
 
 <section class="max-w-6xl mx-auto px-4 py-12">
   <PageHeader
     title="Supported Sites"
-    subtitle="PropertyWebScraper has pre-configured scraper mappings for these real estate portals. Custom mappings can also be added for any site."
+    subtitle={`PropertyWebScraper currently exposes ${sites.length} named portal mappings across ${totalCountries} countries. Support tiers and browser-rendering requirements come directly from the canonical portal registry.`}
     breadcrumbs={[
       { label: 'Home', href: '/' },
       { label: 'Supported Sites' },
     ]}
   />
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow-md p-5">
+      <p class="text-sm text-gray-500">Named portals</p>
+      <p class="text-2xl font-bold">{sites.length}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5">
+      <p class="text-sm text-gray-500">Countries covered</p>
+      <p class="text-2xl font-bold">{totalCountries}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5">
+      <p class="text-sm text-gray-500">Core / experimental</p>
+      <p class="text-2xl font-bold">{tierCounts.core} / {tierCounts.experimental}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5">
+      <p class="text-sm text-gray-500">Manual HTML required</p>
+      <p class="text-2xl font-bold">{tierCounts.manualOnly}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
     {sites.map((site) => (
       <div class="bg-white rounded-xl shadow-md p-5 flex flex-col gap-3">
         <div class="flex items-center justify-between">
-          <h5 class="font-semibold text-base">{site.name}</h5>
-          <span class="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{site.country}</span>
+          <h5 class="font-semibold text-base font-mono">{site.scraper}</h5>
+          <span class={`text-xs px-2 py-0.5 rounded-full ${tierClasses[site.supportTier]}`}>{tierLabels[site.supportTier]}</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-gray-500">
+          <span class="bg-gray-100 px-2 py-0.5 rounded-full">{site.countryName}</span>
+          {site.extractionRatePercent !== null && <span>Expected rate: {site.extractionRatePercent}%</span>}
         </div>
         <p class="text-sm text-gray-400">{site.host}</p>
+        <p class="text-xs text-gray-500 m-0">
+          {site.requiresJsRendering
+            ? 'Requires browser-rendered HTML for reliable extraction.'
+            : 'Supports direct URL-based extraction.'}
+        </p>
         <div class="flex gap-2">
           <a href={`/extract/url`} class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 no-underline inline-flex items-center gap-1">
             <i class="bi bi-link-45deg"></i> Extract
+          </a>
+          <a href={site.url} target="_blank" rel="noreferrer" class="bg-gray-100 text-gray-700 text-xs px-3 py-1.5 rounded-lg hover:bg-gray-200 no-underline inline-flex items-center gap-1">
+            <i class="bi bi-box-arrow-up-right"></i> Visit
           </a>
         </div>
       </div>
@@ -50,9 +99,10 @@ const sites = [
       <div>
         <h4 class="font-semibold text-lg mb-3">Need a different site?</h4>
         <p class="text-sm text-gray-600 m-0">
-          PropertyWebScraper uses JSON-based mapping configs that define CSS selectors
-          and XPath queries for each field. You can create custom mappings for any real
-          estate site.
+          PropertyWebScraper uses JSON-based mapping configs for named portals, and it also
+          includes a generic fallback mapping when you provide browser-rendered HTML for an
+          unsupported host. If you need a first-class scraper for a new portal, you can add one
+          without changing the extraction pipeline itself.
           <a href="https://github.com/RealEstateWebTools/property_web_scraper" target="_blank" class="text-blue-600 hover:underline">
             See the docs on GitHub
           </a>.

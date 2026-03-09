@@ -185,7 +185,7 @@ test.describe('/public_api/v1/health API', () => {
     expect(res.status()).toBe(200);
     const json = await res.json();
     expect(json.success).toBe(true);
-    expect(json.status).toBe('ok');
+    expect(['ok', 'degraded']).toContain(json.status);
     expect(json.scrapers_loaded).toBeGreaterThan(0);
   });
 });

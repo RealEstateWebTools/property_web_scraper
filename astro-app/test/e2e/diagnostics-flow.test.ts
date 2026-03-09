@@ -9,13 +9,13 @@ test.describe('Diagnostics flow via HTML paste', () => {
     await page.locator('#html_input').fill(loadFixture('rightmove_v2'));
     await page.locator('button[type="submit"]').click();
 
-    await expect(page).toHaveURL(/\/extract\/results\//, { timeout: 30000 });
+    await expect(page).toHaveURL(/\/listings\//, { timeout: 30000 });
 
     // Grade banner should be visible with field count info
     // Format: "Grade X: Label — N/M fields (P%...)"
     const gradeBanner = page.locator('text=/Grade [A-F]:/');
     await expect(gradeBanner).toBeVisible();
-    await expect(gradeBanner).toContainText(/\d+\/\d+ fields/);
+    await expect(page.getByText(/\d+\/\d+ fields/).first()).toBeVisible();
   });
 
   test('empty HTML paste shows grade banner with low field count (defaults only)', async ({ page }) => {
@@ -24,7 +24,7 @@ test.describe('Diagnostics flow via HTML paste', () => {
     await page.locator('#html_input').fill('<html><body></body></html>');
     await page.locator('button[type="submit"]').click();
 
-    await expect(page).toHaveURL(/\/extract\/results\//, { timeout: 30000 });
+    await expect(page).toHaveURL(/\/listings\//, { timeout: 30000 });
 
     // Grade banner still shows even with empty HTML (defaults produce some fields)
     const gradeBanner = page.locator('text=/Grade [A-F]:/');
@@ -37,25 +37,15 @@ test.describe('Diagnostics flow via HTML paste', () => {
     await page.locator('#html_input').fill(loadFixture('rightmove_v2'));
     await page.locator('button[type="submit"]').click();
 
-    await expect(page).toHaveURL(/\/extract\/results\//, { timeout: 30000 });
+    await expect(page).toHaveURL(/\/listings\//, { timeout: 30000 });
 
-    // Diagnostics panel should exist but be hidden initially
-    const diagPanel = page.locator('#diagnostics-panel');
-    await expect(diagPanel).toBeHidden();
-
-    // Wait for client-side JS (DOMContentLoaded toggle handlers) to be ready
-    await page.waitForLoadState('domcontentloaded');
-
-    // Click the toggle to expand it
-    const diagToggle = page.locator('.pws-diag-toggle').first();
-    await expect(diagToggle).toBeVisible();
-    await diagToggle.click();
-
-    // Panel should now be visible
+    const diagPanel = page.locator('details').filter({
+      has: page.locator('summary', { hasText: 'Extraction Diagnostics' }),
+    }).first();
     await expect(diagPanel).toBeVisible();
 
     // Should contain a trace table with header columns
-    const table = diagPanel.locator('table');
+    const table = diagPanel.locator('table').first();
     await expect(table).toBeVisible();
     // Table should have rows (field traces)
     const rows = table.locator('tbody tr');
@@ -71,11 +61,11 @@ test.describe('Diagnostics via JSON endpoints', () => {
     await page.locator('#html_input').fill(loadFixture('rightmove_v2'));
     await page.locator('button[type="submit"]').click();
 
-    await expect(page).toHaveURL(/\/extract\/results\//, { timeout: 30000 });
+    await expect(page).toHaveURL(/\/listings\//, { timeout: 30000 });
 
     // Extract the listing ID from the URL
     const url = page.url();
-    const idMatch = url.match(/\/extract\/results\/([^/?]+)/);
+    const idMatch = url.match(/\/listings\/([^/?]+)/);
     expect(idMatch).not.toBeNull();
     const id = idMatch![1];
 

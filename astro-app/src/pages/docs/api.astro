@@ -19,8 +19,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <div class="bg-white rounded-xl shadow-md p-6 mb-5">
     <h3 class="text-lg font-semibold mb-3"><i class="bi bi-shield-lock mr-2 text-blue-600"></i>Authentication</h3>
     <p class="text-sm text-gray-600 mb-3">
-      If a <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">PWS_API_KEY</code> is configured on the server,
-      all API requests must include it via one of:
+      Public API routes support anonymous access by default and apply rate limits per IP when no key is provided.
+      You can still send an API key for higher-trust usage, per-user metering, or deployments that lock specific endpoint
+      prefixes with <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">PWS_LOCKED_ENDPOINTS</code>. When a route is locked,
+      include the key via one of:
     </p>
     <ul class="text-sm text-gray-600 list-disc ml-5 space-y-1">
       <li>Header: <code class="bg-gray-100 px-1.5 py-0.5 rounded">X-Api-Key: your-key</code></li>
@@ -109,14 +111,34 @@ Access-Control-Allow-Headers: Content-Type, X-Api-Key</code></pre>
       <code class="text-sm font-semibold">/public_api/v1/supported_sites</code>
     </div>
     <p class="text-sm text-gray-600 mb-3">
-      Returns the list of supported property websites and their scraper names. Requires authentication.
+      Returns the canonical supported-site catalog used by the app itself, including the scraper slug, support tier,
+      country, canonical portal URL, and whether browser-rendered HTML is required. Like the main listings endpoints, it is
+      anonymously accessible by default unless the deployment explicitly locks the route down.
     </p>
     <h5 class="text-sm font-semibold mb-2">Example Response</h5>
     <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>&#123;
   "success": true,
   "sites": [
-    &#123; "host": "www.idealista.com", "scraper": "idealista" &#125;,
-    &#123; "host": "www.rightmove.co.uk", "scraper": "rightmove" &#125;
+    &#123;
+      "host": "www.idealista.com",
+      "scraper": "es_idealista",
+      "slug": "es_idealista",
+      "country": "ES",
+      "support_tier": "core",
+      "expected_extraction_rate": 0.8,
+      "requires_browser_html": false,
+      "url": "https://www.idealista.com/"
+    &#125;,
+    &#123;
+      "host": "www.encuentra24.com",
+      "scraper": "pa_encuentra24",
+      "slug": "pa_encuentra24",
+      "country": "PA",
+      "support_tier": "experimental",
+      "expected_extraction_rate": 0.55,
+      "requires_browser_html": false,
+      "url": "https://www.encuentra24.com/panama"
+    &#125;
   ]
 &#125;</code></pre>
   </div>
@@ -128,14 +150,18 @@ Access-Control-Allow-Headers: Content-Type, X-Api-Key</code></pre>
       <code class="text-sm font-semibold">/public_api/v1/health</code>
     </div>
     <p class="text-sm text-gray-600 mb-3">
-      Health check endpoint. No authentication required. Returns server status and loaded scraper count.
+      Health check endpoint. No authentication required. Returns server status, loaded scraper count, and backend probe results.
     </p>
     <h5 class="text-sm font-semibold mb-2">Example Response</h5>
     <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto"><code>&#123;
   "success": true,
   "status": "ok",
-  "scrapers_loaded": 16,
-  "storage": "in_memory"
+  "scrapers_loaded": 110,
+  "checks": &#123;
+    "kv": &#123; "ok": true, "backend": "memory" &#125;,
+    "firestore": &#123; "backend": "memory", "connected": false, "project_id": null &#125;,
+    "dead_letters": &#123; "count": 0 &#125;
+  &#125;
 &#125;</code></pre>
   </div>
 

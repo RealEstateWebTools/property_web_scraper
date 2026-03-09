@@ -24,6 +24,12 @@ describe('url-screener', () => {
       expect(r.verdict).toBe('allowed');
     });
 
+    it('allows path-specific encuentra24 listing pages', () => {
+      const r = screenUrl('https://www.encuentra24.com/panama/bienes-raices-venta/12345');
+      expect(r.verdict).toBe('allowed');
+      expect(r.hostname).toBe('www.encuentra24.com');
+    });
+
     it('allows fotocasa property page', () => {
       const r = screenUrl('https://www.fotocasa.es/es/comprar/vivienda/madrid/calefaccion/12345678/d');
       expect(r.verdict).toBe('allowed');

@@ -10,11 +10,10 @@ test.describe('Supported sites page', () => {
   });
 
   test('renders site cards with names', async ({ page }) => {
-    // Check known sites appear as card headings
-    await expect(page.locator('h5', { hasText: 'Idealista' })).toBeVisible();
-    await expect(page.locator('h5', { hasText: 'Rightmove' })).toBeVisible();
-    await expect(page.locator('h5', { hasText: 'Zoopla' })).toBeVisible();
-    await expect(page.locator('h5', { hasText: 'Realtor.com' })).toBeVisible();
+    await expect(page.locator('h5', { hasText: 'es_idealista' })).toBeVisible();
+    await expect(page.locator('h5', { hasText: 'uk_rightmove' })).toBeVisible();
+    await expect(page.locator('h5', { hasText: 'uk_zoopla' })).toBeVisible();
+    await expect(page.locator('h5', { hasText: 'us_realtor' })).toBeVisible();
   });
 
   test('each site card shows hostname', async ({ page }) => {
@@ -25,14 +24,20 @@ test.describe('Supported sites page', () => {
 
   test('each site card shows country badge', async ({ page }) => {
     await expect(page.locator('span', { hasText: 'Spain' }).first()).toBeVisible();
-    await expect(page.locator('span', { hasText: 'UK' }).first()).toBeVisible();
-    await expect(page.locator('span', { hasText: 'USA' }).first()).toBeVisible();
-    await expect(page.locator('span', { hasText: /^India$/ })).toBeVisible();
+    await expect(page.locator('span', { hasText: 'United Kingdom' }).first()).toBeVisible();
+    await expect(page.locator('span', { hasText: 'United States' }).first()).toBeVisible();
+    await expect(page.locator('span', { hasText: /^India$/ }).first()).toBeVisible();
   });
 
-  test('each site card has Extract button linking to /extract/url', async ({ page }) => {
+  test('page renders many extract buttons linked to /extract/url', async ({ page }) => {
     const extractButtons = page.locator('.grid a[href="/extract/url"]');
-    await expect(extractButtons).toHaveCount(8);
+    expect(await extractButtons.count()).toBeGreaterThan(50);
+  });
+
+  test('summary cards show overall coverage', async ({ page }) => {
+    await expect(page.getByText('Named portals', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Countries covered', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Manual HTML required', { exact: true }).first()).toBeVisible();
   });
 
   test('"Need a different site?" section is visible', async ({ page }) => {

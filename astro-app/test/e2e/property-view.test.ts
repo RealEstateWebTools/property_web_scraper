@@ -14,11 +14,7 @@ test.describe('Listing detail page', () => {
     await page.locator('#html_input').fill(loadFixture('rightmove_v2'));
     await page.locator('button[type="submit"]').click();
 
-    await expect(page).toHaveURL(/\/extract\/results\//, { timeout: 30000 });
-
-    // Click "View Full Details" to go to the listings detail page
-    await page.locator('a', { hasText: 'View Full Details' }).click();
-    await expect(page).toHaveURL(/\/listings\//);
+    await expect(page).toHaveURL(/\/listings\//, { timeout: 30000 });
 
     // Should show property detail layout
     await expect(page.locator('a', { hasText: 'PropertyWebScraper' }).first()).toBeVisible();

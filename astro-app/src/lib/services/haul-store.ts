@@ -149,7 +149,11 @@ export async function createHaul(
     env: getAppEnv(),
   };
   store.set(id, haul);
-  await firestoreSaveHaul(haul);
+  try {
+    await firestoreSaveHaul(haul);
+  } catch {
+    // Firestore is optional in local/dev verification; keep the in-memory haul.
+  }
   return haul;
 }
 
@@ -162,10 +166,14 @@ export async function getHaul(id: string): Promise<Haul | undefined> {
   }
   // Tier 2: Firestore
   if (!haul) {
-    haul = await firestoreGetHaul(id);
-    if (haul) {
-      haul = normalizeHaul(haul);
-      store.set(id, haul);
+    try {
+      haul = await firestoreGetHaul(id);
+      if (haul) {
+        haul = normalizeHaul(haul);
+        store.set(id, haul);
+      }
+    } catch {
+      // Firestore unavailable — fall back to in-memory only.
     }
   }
   if (!haul) return undefined;
@@ -180,7 +188,11 @@ export async function getHaul(id: string): Promise<Haul | undefined> {
 async function persistHaul(haul: Haul): Promise<void> {
   const normalized = normalizeHaul(haul);
   store.set(normalized.id, normalized);
-  await firestoreSaveHaul(normalized);
+  try {
+    await firestoreSaveHaul(normalized);
+  } catch {
+    // Firestore unavailable — preserve the in-memory update.
+  }
 }
 
 export async function addScrapeToHaul(

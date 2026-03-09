@@ -1,4 +1,4 @@
-import { findPortalByHost } from './portal-registry.js';
+import { findPortalByUrl } from './portal-registry.js';
 import type { SupportTier } from './portal-registry.js';
 
 export type ScreeningVerdict =
@@ -171,7 +171,7 @@ export function screenUrl(rawUrl: string): ScreeningResult {
   const bare = stripWww(hostname);
 
   // 1. Known portal with a scraper
-  const portal = findPortalByHost(hostname);
+  const portal = findPortalByUrl(url);
   if (portal) {
     // Check if it looks like a search/listing index page
     const pathAndQuery = url.pathname + url.search;

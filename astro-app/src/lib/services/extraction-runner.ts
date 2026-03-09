@@ -6,7 +6,7 @@
 import { extractFromHtml } from '@lib/extractor/html-extractor.js';
 import { Listing } from '@lib/models/listing.js';
 import type { MergeDiff } from '@lib/models/listing.js';
-import { findPortalByHost } from '@lib/services/portal-registry.js';
+import { findPortalByUrl } from '@lib/services/portal-registry.js';
 import { normalizePrice } from '@lib/extractor/price-normalizer.js';
 import { logActivity } from '@lib/services/activity-logger.js';
 import { recordDeadLetter } from '@lib/services/dead-letter.js';
@@ -84,7 +84,7 @@ export async function runExtraction(opts: {
   // Price normalization using portal's default currency
   try {
     const parsedUrl = new URL(url);
-    const portal = findPortalByHost(parsedUrl.hostname);
+    const portal = findPortalByUrl(parsedUrl);
     const normalized = normalizePrice(
       incoming.price_string || '',
       incoming.price_float || 0,

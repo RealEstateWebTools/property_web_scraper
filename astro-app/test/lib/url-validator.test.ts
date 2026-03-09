@@ -87,6 +87,12 @@ describe('url-validator', () => {
       expect(result.valid).toBe(true);
       expect(result.importHost!.scraper_name).toBe('es_idealista');
     });
+
+    it('matches path-specific encuentra24 portals by URL path', async () => {
+      const result = await validateUrl('https://www.encuentra24.com/panama/bienes-raices-venta/12345');
+      expect(result.valid).toBe(true);
+      expect(result.importHost!.scraper_name).toBe('pa_encuentra24');
+    });
   });
 
   describe('error code constants', () => {

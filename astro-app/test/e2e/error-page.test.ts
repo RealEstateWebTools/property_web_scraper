@@ -45,7 +45,7 @@ test.describe('Error page — unsupported / unknown_real_estate', () => {
     await page.goto('/extract/error?reason=unknown_real_estate&url=https://www.example.com/listing/1');
     await expect(page.locator('button', { hasText: 'Try Anyway' })).toBeVisible();
     await expect(page.locator('a', { hasText: 'Paste HTML Instead' })).toBeVisible();
-    await expect(page.locator('a', { hasText: 'Back' })).toBeVisible();
+    await expect(page.locator('a[href="/extract/url"]', { hasText: 'Back' })).toBeVisible();
   });
 
   test('shows GitHub link for requesting site support', async ({ page }) => {

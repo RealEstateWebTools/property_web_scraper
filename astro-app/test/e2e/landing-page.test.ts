@@ -45,7 +45,7 @@ test.describe('Landing page', () => {
     // Desktop nav (#navMenu) contains the links — use .first() to avoid mobile menu duplicates
     const desktopNav = page.locator('#navMenu');
     await expect(desktopNav.locator('a[href="/extract/url"]')).toBeVisible();
-    await expect(desktopNav.locator('a[href="/listings"]')).toBeVisible();
+    await expect(desktopNav.locator('a[href="/hauls"]')).toBeVisible();
     await expect(desktopNav.locator('a[href="/sites"]')).toBeVisible();
     await expect(desktopNav.locator('a[href="/docs/api"]')).toBeVisible();
 

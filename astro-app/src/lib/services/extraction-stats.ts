@@ -4,7 +4,7 @@ import { getAllListings, getAllDiagnostics } from './listing-store.js';
 import { deduplicationKey } from './url-canonicalizer.js';
 import { Listing } from '../models/listing.js';
 import { allMappingNames, findByName } from '../extractor/mapping-loader.js';
-import { LOCAL_HOST_MAP } from './url-validator.js';
+import { allPortalConfigs } from './portal-registry.js';
 
 export interface ExtractionSummary {
   id: string;
@@ -174,12 +174,9 @@ export async function getScraperStats(name: string): Promise<ScraperStats> {
   const mapping = findByName(name);
   const loaded = mapping !== null;
 
-  // Get hosts
-  const hosts: string[] = [];
-  for (const [host, entry] of Object.entries(LOCAL_HOST_MAP)) {
-    if (!host.startsWith('www.')) continue;
-    if (entry.scraper_name === name) hosts.push(host);
-  }
+  const hosts = allPortalConfigs()
+    .find((portal) => portal.scraperName === name)
+    ?.hosts.filter((host) => host.startsWith('www.')) ?? [];
 
   // Count fields
   const textFields = Object.keys(mapping?.textFields ?? {});

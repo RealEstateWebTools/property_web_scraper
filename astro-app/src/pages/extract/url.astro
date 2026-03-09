@@ -5,7 +5,7 @@ import { retrieveListing } from '@lib/services/listing-retriever.js';
 import { fetchHtml } from '@lib/services/html-fetcher.js';
 import { generateStableId, storeListing, storeDiagnostics } from '@lib/services/listing-store.js';
 import { recordScrapeAndUpdatePortal } from '@lib/services/scrape-metadata.js';
-import { findPortalByHost } from '@lib/services/portal-registry.js';
+import { findPortalByUrl } from '@lib/services/portal-registry.js';
 import { screenUrl } from '@lib/services/url-screener.js';
 import { addToHaulAndRedirect } from '@lib/pages-helpers/astro-redirect-with-haul.js';
 
@@ -55,7 +55,7 @@ if (Astro.request.method === 'POST') {
   // Check if this portal blocks server-side fetching
   try {
     const parsedUrl = new URL(importUrl);
-    const portal = findPortalByHost(parsedUrl.hostname);
+    const portal = findPortalByUrl(parsedUrl);
     if (portal?.requiresJsRendering) {
       return Astro.redirect(`/extract/error?reason=fetch_blocked&url=${encodeURIComponent(importUrl)}&portal=${encodeURIComponent(portal.scraperName)}`);
     }

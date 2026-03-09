@@ -9,7 +9,7 @@ import { clearLogs, getLogStats } from '@lib/services/activity-logger.js';
 import { clearCache, allMappingNames } from '@lib/extractor/mapping-loader.js';
 import { getCacheStats } from '@lib/extractor/mapping-loader.js';
 import { getStoreStats, clearListingStore } from '@lib/services/listing-store.js';
-import { LOCAL_HOST_MAP } from '@lib/services/url-validator.js';
+import { allPortalNames } from '@lib/services/portal-registry.js';
 import { getSystemHealth } from '@lib/services/system-health.js';
 
 const auth = authenticateAdmin(Astro.request);
@@ -70,8 +70,7 @@ const cacheStats = getCacheStats();
 const storeStats = getStoreStats();
 const health = getSystemHealth();
 
-// Count unique supported sites
-const uniqueSites = new Set(Object.values(LOCAL_HOST_MAP).map(e => e.scraper_name));
+const supportedSiteCount = allPortalNames().length;
 
 function formatUptime(seconds: number | null): string {
   if (seconds === null) return 'N/A';
@@ -284,7 +283,7 @@ const backendLabel = health.storage.backend === 'firestore_rest' ? 'Firestore RE
           )}
           <div class="flex justify-between">
             <dt class="text-gray-500">Supported Sites</dt>
-            <dd class="font-medium">{uniqueSites.size}</dd>
+            <dd class="font-medium">{supportedSiteCount}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Scrapers Cached</dt>

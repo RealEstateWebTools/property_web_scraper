@@ -11,7 +11,7 @@ import {
 } from '@lib/services/api-response.js';
 import { logActivity } from '@lib/services/activity-logger.js';
 import { recordDeadLetter } from '@lib/services/dead-letter.js';
-import { findPortalByHost } from '@lib/services/portal-registry.js';
+import { findPortalByUrl } from '@lib/services/portal-registry.js';
 import { fireWebhooks } from '@lib/services/webhook-service.js';
 import { recordUsage } from '@lib/services/usage-meter.js';
 import { normalizePropertyType } from '@lib/extractor/property-type-normalizer.js';
@@ -318,7 +318,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!html) {
     try {
       const parsedUrl = new URL(url);
-      const portal = findPortalByHost(parsedUrl.hostname);
+      const portal = findPortalByUrl(parsedUrl);
       if (portal?.requiresJsRendering) {
         logActivity({
           level: 'warn',
@@ -450,7 +450,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (format === 'pwb' && extraction && extraction.split_schema) {
     const parsedUrl = new URL(url);
-    const portal = findPortalByHost(parsedUrl.hostname);
+    const portal = findPortalByUrl(parsedUrl);
     const props = (extraction as any)._rawProps || {};
     const pwbData = buildPwbResponse(
       extraction.split_schema as SplitSchema,

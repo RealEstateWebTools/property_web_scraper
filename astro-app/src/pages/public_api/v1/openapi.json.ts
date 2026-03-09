@@ -8,10 +8,10 @@ const spec = {
     description:
       'Extract structured real estate listing data from any property portal URL. ' +
       'Returns 70+ fields including price, location, images, area, bedrooms, and more.',
-    contact: { url: 'https://propertwebscraper.com' },
+    contact: { url: 'https://github.com/RealEstateWebTools/property_web_scraper' },
   },
   servers: [{ url: '/public_api/v1', description: 'Current server' }],
-  security: [{ apiKey: [] }],
+  security: [{ apiKey: [] }, {}],
   components: {
     securitySchemes: {
       apiKey: {
@@ -263,6 +263,7 @@ const spec = {
         responses: {
           '200': { description: 'Cached listing', content: { 'application/json': { schema: { $ref: '#/components/schemas/Listing' } } } },
           '404': { description: 'Not cached', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          '401': { description: 'Unauthorized when the endpoint is locked down', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
         },
       },
     },
@@ -299,7 +300,6 @@ const spec = {
         operationId: 'listExportFormats',
         summary: 'List available export formats',
         tags: ['Export'],
-        security: [],
         responses: {
           '200': {
             description: 'Available formats',
@@ -308,6 +308,7 @@ const spec = {
                 schema: {
                   type: 'object',
                   properties: {
+                    success: { type: 'boolean' },
                     formats: {
                       type: 'array',
                       items: {
@@ -322,10 +323,12 @@ const spec = {
                       },
                     },
                   },
+                  required: ['success', 'formats'],
                 },
               },
             },
           },
+          '401': { description: 'Unauthorized when the endpoint is locked down', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
         },
       },
     },
@@ -334,7 +337,6 @@ const spec = {
         operationId: 'getSupportedSites',
         summary: 'List all supported property portals',
         tags: ['Meta'],
-        security: [],
         responses: {
           '200': {
             description: 'Supported sites',
@@ -343,23 +345,31 @@ const spec = {
                 schema: {
                   type: 'object',
                   properties: {
+                    success: { type: 'boolean' },
                     sites: {
                       type: 'array',
                       items: {
                         type: 'object',
                         properties: {
+                          host: { type: 'string' },
+                          scraper: { type: 'string' },
                           slug: { type: 'string' },
-                          name: { type: 'string' },
+                          country: { type: 'string', description: 'ISO 3166-1 alpha-2 country code' },
+                          support_tier: { type: 'string', enum: ['core', 'experimental', 'manual-only'] },
+                          expected_extraction_rate: { type: 'number' },
+                          requires_browser_html: { type: 'boolean' },
                           url: { type: 'string', format: 'uri' },
-                          country: { type: 'string' },
                         },
+                        required: ['host', 'scraper', 'slug', 'country', 'support_tier', 'requires_browser_html', 'url'],
                       },
                     },
                   },
+                  required: ['success', 'sites'],
                 },
               },
             },
           },
+          '401': { description: 'Unauthorized when the endpoint is locked down', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
         },
       },
     },
@@ -377,10 +387,37 @@ const spec = {
                 schema: {
                   type: 'object',
                   properties: {
+                    success: { type: 'boolean' },
                     status: { type: 'string', enum: ['ok', 'degraded'] },
-                    kv: { type: 'string' },
-                    firestore: { type: 'string' },
+                    scrapers_loaded: { type: 'integer' },
+                    checks: {
+                      type: 'object',
+                      properties: {
+                        kv: {
+                          type: 'object',
+                          properties: {
+                            ok: { type: 'boolean' },
+                            backend: { type: 'string' },
+                          },
+                        },
+                        firestore: {
+                          type: 'object',
+                          properties: {
+                            backend: { type: 'string' },
+                            connected: { type: 'boolean' },
+                            project_id: { type: ['string', 'null'] },
+                          },
+                        },
+                        dead_letters: {
+                          type: 'object',
+                          properties: {
+                            count: { type: 'integer' },
+                          },
+                        },
+                      },
+                    },
                   },
+                  required: ['success', 'status', 'scrapers_loaded', 'checks'],
                 },
               },
             },
@@ -393,10 +430,22 @@ const spec = {
         operationId: 'getUsage',
         summary: 'Get API usage statistics',
         tags: ['Account'],
+        security: [{ apiKey: [] }],
         responses: {
           '200': {
             description: 'Usage stats for the authenticated key',
-            content: { 'application/json': { schema: { type: 'object' } } },
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean' },
+                    usage: { type: 'object' },
+                  },
+                  required: ['success', 'usage'],
+                },
+              },
+            },
           },
           '401': { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
         },
