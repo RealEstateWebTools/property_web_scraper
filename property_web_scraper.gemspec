@@ -17,12 +17,12 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
   s.test_files = Dir['spec/**/*']
 
-  s.add_dependency 'google-cloud-firestore', '~> 2.16'
-  s.add_dependency 'rails', '>= 7.2'
+  s.add_dependency 'google-cloud-firestore', '~> 3.1'
+  s.add_dependency 'rails', '>= 8.1'
 
   s.add_dependency 'active_hash'
-  s.add_dependency 'faraday', '~> 2.0'
-  s.add_dependency 'nokogiri', '>= 1.13'
+  s.add_dependency 'faraday', '~> 2.14'
+  s.add_dependency 'nokogiri', '>= 1.19'
   s.add_dependency 'ostruct'
   s.add_dependency 'rack-cors', '~> 3.0'
   s.add_dependency 'sprockets-rails'
@@ -31,9 +31,9 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'debug'
 
-  s.add_development_dependency 'climate_control', '~> 1.0'
-  s.add_development_dependency 'factory_bot_rails', '~> 6.0'
+  s.add_development_dependency 'climate_control', '~> 1.2'
+  s.add_development_dependency 'factory_bot_rails', '~> 6.5'
   s.add_development_dependency 'rspec-rails', '~> 8.0'
-  s.add_development_dependency 'vcr', '~> 6.0'
-  s.add_development_dependency 'webmock', '~> 3.19'
+  s.add_development_dependency 'vcr', '~> 6.4'
+  s.add_development_dependency 'webmock', '~> 3.26'
 end
