@@ -42,6 +42,8 @@
     "wrangler": "^4.84.1"
   },
   "overrides": {
-    "wrangler": "$wrangler"
+    "wrangler": "$wrangler",
+    "teeny-request": "^10.1.2",
+    "retry-request": "^8.0.2"
   }
 }
