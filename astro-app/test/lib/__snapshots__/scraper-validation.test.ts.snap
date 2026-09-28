@@ -361,6 +361,89 @@ exports[`Scraper validation > au_realestate scraper > matches full extraction sn
 }
 `;
 
+exports[`Scraper validation > au_rent scraper > matches full extraction snapshot 1`] = `
+{
+  "address_string": "1704/130 Elizabeth Street, Sydney NSW 2000",
+  "area_unit": "sqmt",
+  "city": "Sydney",
+  "count_bathrooms": 1,
+  "count_bedrooms": 2,
+  "count_parking": 0,
+  "country": "AU",
+  "currency": "AUD",
+  "description": "This prime location ensures that you are at the heart of everything Sydney has to offer. From world-class dining and shopping to cultural landmarks and educational institutions, this apartment is perfect for those seeking a vibrant and convenient city lifestyle. Surrounded by Sydney's premier entertainment options, this apartment is just minutes from Westfield Shopping Centre, Sydney Tower, and a wide variety of shops, restaurants, cafes, and fitness centres. Enjoy the vibrant and convenient city lifestyle in this prime location.
+
+Key Features:
+
+-unfurnished
+- Stylish 2-bedroom apartment with built-in wardrobes
+- Gourmet living area with stunning city views
+- Modern open-plan kitchen featuring Germany appliances
+- 1-minute walk to Museum train station and bus stop
+- Close proximity to Central, Town Hall, and St James train stations
+- Minutes' walk to the famous Cook & Phillip Park Aquatic and Fitness Centre",
+  "for_rent": true,
+  "for_rent_long_term": true,
+  "for_rent_short_term": "false",
+  "for_sale": false,
+  "image_urls": [
+    {
+      "url": "https://cdn.rent.com.au/photos/images/268051952/ba533c74ccd7b3203aa356a5-171575759556625328-rsd-1790554495-original.jpg?1790554495",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051952%2Fba533c74ccd7b3203aa356a5-171575759556625328-rsd-1790554495-original.jpg%3F1790554495&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051956%2F87fa37f9ce11c33f91546c51-171575758103229368-rsd-1790554517-original.jpg%3F1790554517&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051957%2F7bf8ca856002f7aff8f52d05-171575759230621405-rsd-1790554518-original.jpg%3F1790554518&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051955%2Ff1968c1faae103ea9cea30ca-171575757032720003-rsd-1790554517-original.jpg%3F1790554517&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051964%2F70b4d312155bc25696a6bf45-171575757115600554-rsd-1790554532-original.jpg%3F1790554532&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051965%2Fc178e74a20475e6a08563d71-171575757600966835-rsd-1790554532-original.jpg%3F1790554532&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051958%2F0c4c9bc54ef404b4c546ac52-171575757679953514-rsd-1790554518-original.jpg%3F1790554518&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051959%2F742fcfa791ff5306a7830ba0-171575758418299989-rsd-1790554530-original.jpg%3F1790554530&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051960%2F1882b2a0140416ef5ca58939-171575758752324401-rsd-1790554530-original.jpg%3F1790554530&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051961%2F2b5fb1d952e459814b95e1a1-171575758988179069-rsd-1790554530-original.jpg%3F1790554530&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051963%2F2bf3143e0ddb5fe140f73f3f-171575759762136141-rsd-1790554531-original.jpg%3F1790554531&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051962%2F476aeca196f0efc9ad1f5102-171575885487737820-rsd-1790554530-original.jpg%3F1790554530&w=1024&q=75",
+    },
+    {
+      "url": "https://www.rent.com.au/_next/image?url=https%3A%2F%2Fcdn.rent.com.au%2Fphotos%2Fimages%2F268051966%2F66acc1ae0279f62eafbb7093-171575885094148581-rsd-1790554532-original.jpg%3F1790554532&w=1024&q=75",
+    },
+  ],
+  "latitude": -33.877132,
+  "locale_code": "en-AU",
+  "longitude": 151.20964,
+  "main_image_url": "https://cdn.rent.com.au/photos/images/268051952/ba533c74ccd7b3203aa356a5-171575759556625328-rsd-1790554495-original.jpg?1790554495",
+  "postal_code": "2000",
+  "price_float": 1295,
+  "price_string": "$1,295 pw",
+  "property_type": "Apartment",
+  "reference": "6499363",
+  "region": "NSW",
+  "title": "1704/130 Elizabeth Street, Sydney NSW 2000",
+}
+`;
+
 exports[`Scraper validation > be_immoweb scraper > matches full extraction snapshot 1`] = `
 {
   "agent_name": "DB Properties",

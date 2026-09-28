@@ -93,6 +93,12 @@ describe('url-validator', () => {
       expect(result.valid).toBe(true);
       expect(result.importHost!.scraper_name).toBe('pa_encuentra24');
     });
+
+    it('accepts rent.com.au URL', async () => {
+      const result = await validateUrl('https://www.rent.com.au/property/1704-130-elizabeth-st-sydney-nsw-2000-6499363');
+      expect(result.valid).toBe(true);
+      expect(result.importHost!.scraper_name).toBe('au_rent');
+    });
   });
 
   describe('error code constants', () => {
