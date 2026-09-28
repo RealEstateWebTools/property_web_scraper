@@ -260,6 +260,8 @@ const HOSTNAME_MAP: Record<string, string> = {
   'athome.lu': 'lu_athome',
   'www.suumo.jp': 'jp_suumo',
   'suumo.jp': 'jp_suumo',
+  'www.rent.com.au': 'au_rent',
+  'rent.com.au': 'au_rent',
 };
 
 const HELP_TEXT = `

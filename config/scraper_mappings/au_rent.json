@@ -1,0 +1,133 @@
+[{
+  "name": "au_rent",
+  "version": 1,
+  "last_checked": "2026-09-28",
+  "expectedExtractionRate": 0.80,
+
+  // rent.com.au — Australian rental portal (requested in issue #1)
+  // Next.js app: listing data is streamed as RSC flight data
+  // (self.__next_f.push), so most fields use scriptRegEx against the
+  // escaped JSON of the page's `property` / `targeting` objects.
+  // Cloudflare blocks server-side fetches, so rendered HTML is required.
+
+  "portal": {
+    "hosts": ["www.rent.com.au", "rent.com.au"],
+    "country": "AU",
+    "currency": "AUD",
+    "localeCode": "en-AU",
+    "areaUnit": "sqmt",
+    "contentSource": "flight-data",
+    "stripTrailingSlash": false,
+    "requiresJsRendering": true
+  },
+
+  "defaultValues": {
+    "country":             { "value": "AU" },
+    "currency":            { "value": "AUD" },
+    "area_unit":           { "value": "sqmt" },
+    "locale_code":         { "value": "en-AU" },
+    "for_rent_short_term": { "value": "false" }
+  },
+
+  "images": [{
+    "cssLocator": "[class~='mobile:flex'] img[src*='cdn.rent.com.au%2Fphotos%2Fimages']",
+    "cssAttr": "src"
+  }],
+
+  "intFields": {
+    "count_bedrooms": {
+      "scriptRegEx": "(?<=\\\\\"bedrooms\\\\\":)\\d+",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='feature-beds']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_bathrooms": {
+      "scriptRegEx": "(?<=\\\\\"bathrooms\\\\\":)\\d+",
+      "fallbacks": [
+        { "cssLocator": "[data-testid='feature-bathrooms']", "modifiers": ["digitsOnly"] }
+      ]
+    },
+    "count_parking": {
+      "scriptRegEx": "(?<=\\\\\"car_spaces\\\\\":)\\d+"
+    }
+  },
+
+  "floatFields": {
+    "price_float": {
+      "scriptRegEx": "(?<=\\\\\"rent_rent\\\\\":)\\d+"
+    },
+    "latitude": {
+      "scriptRegEx": "(?<=\\\\\"latitude\\\\\":\\\\\")-?[\\d.]+"
+    },
+    "longitude": {
+      "scriptRegEx": "(?<=\\\\\"longitude\\\\\":\\\\\")-?[\\d.]+"
+    }
+  },
+
+  "textFields": {
+    "title": {
+      "cssLocator": "h1",
+      "cssCountId": "0",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:title']", "cssAttr": "content" }
+      ]
+    },
+    "address_string": {
+      "cssLocator": "h1",
+      "cssCountId": "0"
+    },
+    "description": {
+      "cssLocator": "[id^='property-description-'] > div > div",
+      "cssCountId": "0",
+      "fallbacks": [
+        { "cssLocator": "meta[property='og:description']", "cssAttr": "content" }
+      ]
+    },
+    "price_string": {
+      "scriptRegEx": "(?<=\\\\\"weekly_rent\\\\\":\\\\\"\\$)[^\\\\]+"
+    },
+    "city": {
+      "scriptRegEx": "(?<=\\\\\"RentSuburb\\\\\":\\\\\")[^\\\\]+"
+    },
+    "region": {
+      "scriptRegEx": "(?<=\\\\\"rent_state\\\\\":\\\\\")\\w+",
+      "modifiers": ["uppercase"]
+    },
+    "postal_code": {
+      "scriptRegEx": "(?<=\\\\\"postcode\\\\\":\\\\\")\\d+"
+    },
+    "property_type": {
+      "scriptRegEx": "(?<=\\\\\"property_type\\\\\":\\\\\")[^\\\\]+"
+    },
+    "reference": {
+      "scriptRegEx": "(?<=\\\\\"property\\\\\":\\{\\\\\"id\\\\\":)\\d+"
+    },
+    "main_image_url": {
+      "scriptRegEx": "https://cdn\\.rent\\.com\\.au/photos/images/[^\\\\\"]+"
+    }
+  },
+
+  "booleanFields": {
+    "for_sale": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "evaluator": "include?",
+      "evaluatorParam": "for sale",
+      "caseInsensitive": true
+    },
+    "for_rent": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "evaluator": "include?",
+      "evaluatorParam": "for rent",
+      "caseInsensitive": true
+    },
+    "for_rent_long_term": {
+      "cssLocator": "meta[property='og:title']",
+      "cssAttr": "content",
+      "evaluator": "include?",
+      "evaluatorParam": "for rent",
+      "caseInsensitive": true
+    }
+  }
+}]

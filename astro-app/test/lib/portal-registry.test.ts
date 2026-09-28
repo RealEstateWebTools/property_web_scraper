@@ -177,12 +177,24 @@ describe('portal-registry', () => {
       expect(portal!.scraperName).toBe('cr_encuentra24');
       expect(portal!.country).toBe('CR');
     });
+
+    it('matches rent.com.au URLs to the auto-discovered au_rent scraper', () => {
+      for (const host of ['www.rent.com.au', 'rent.com.au']) {
+        const portal = findPortalByUrl(new URL(`https://${host}/property/1704-130-elizabeth-st-sydney-nsw-2000-6499363`));
+        expect(portal, host).toBeDefined();
+        expect(portal!.scraperName).toBe('au_rent');
+        expect(portal!.country).toBe('AU');
+        expect(portal!.currency).toBe('AUD');
+        expect(portal!.supportTier).toBe('experimental');
+        expect(portal!.requiresJsRendering).toBe(true);
+      }
+    });
   });
 
   describe('allPortalNames', () => {
     it('returns array of all portal names', () => {
       const names = allPortalNames();
-      expect(names).toHaveLength(109);
+      expect(names).toHaveLength(110);
       expect(names).toContain('uk_rightmove');
       expect(names).toContain('es_idealista');
     });
@@ -197,7 +209,7 @@ describe('portal-registry', () => {
   describe('listSupportedSites', () => {
     it('returns one canonical site per scraper with support metadata', () => {
       const sites = listSupportedSites();
-      expect(sites).toHaveLength(109);
+      expect(sites).toHaveLength(110);
       expect(sites[0]).toHaveProperty('host');
       expect(sites[0]).toHaveProperty('supportTier');
       expect(sites[0]).toHaveProperty('url');
